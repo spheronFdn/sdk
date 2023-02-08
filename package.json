@@ -1,5 +1,21 @@
 {
   "name": "spheron-sdk",
   "version": "0.0.0",
-  "scripts": {}
+  "scripts": {
+    "build": "turbo run build",
+    "prettier": "turbo run prettier",
+    "prettier:write": "turbo run prettier:write",
+    "prettier:check": "turbo run prettier:check",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "^1.7.3"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }
