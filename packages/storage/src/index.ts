@@ -1,4 +1,4 @@
-import UploadManager from "./upload-manager";
+import UploadManager, { UploadResult } from "./upload-manager";
 import { ProtocolEnum } from "./enums";
 
 export { ProtocolEnum };
@@ -17,9 +17,9 @@ export default class SpheronClient {
   async upload(
     path: string,
     configuration: { name: string; protocol: ProtocolEnum }
-  ) {
+  ): Promise<UploadResult> {
     const uploadManager = new UploadManager(this.configuration);
-    await uploadManager.upload({
+    return await uploadManager.upload({
       path: path,
       name: configuration.name,
       protocol: configuration.protocol,

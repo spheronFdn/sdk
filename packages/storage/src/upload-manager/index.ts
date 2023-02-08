@@ -14,6 +14,13 @@ export interface UploadConfiguration {
   name: string;
 }
 
+export interface UploadResult {
+  uploadId: string;
+  bucketId: string;
+  protocolLink: string;
+  dynamicLinks: string[];
+}
+
 class UploadManager {
   // private readonly uploadApiUrl = "https://api-dev.spheron.network";
   private readonly uploadApiUrl: string = "http://localhost:8002";
@@ -26,7 +33,9 @@ class UploadManager {
     this.configuration = configuration;
   }
 
-  public async upload(configuration: UploadConfiguration): Promise<void> {
+  public async upload(
+    configuration: UploadConfiguration
+  ): Promise<UploadResult> {
     this.validateUploadConfiguration(configuration);
 
     const payloadCreator = new PayloadCreator(
@@ -40,7 +49,18 @@ class UploadManager {
       configuration.name
     );
     await this.uploadPayloads(deploymentId, payloads);
-    await this.finalizeUploadDeployment(deploymentId);
+    const result = await this.finalizeUploadDeployment(deploymentId);
+
+    if (!result.success) {
+      throw new Error(result.message);
+    }
+
+    return {
+      uploadId: result.deploymentId,
+      bucketId: result.projectId,
+      protocolLink: result.sitePreview,
+      dynamicLinks: result.affectedDomains,
+    };
   }
 
   private async startDeployment(
@@ -89,16 +109,28 @@ class UploadManager {
     }
   }
 
-  private async finalizeUploadDeployment(deploymentId: string): Promise<void> {
+  private async finalizeUploadDeployment(deploymentId: string): Promise<{
+    success: boolean;
+    message: string;
+    deploymentId: string;
+    projectId: string;
+    sitePreview: string;
+    affectedDomains: string[];
+  }> {
     try {
-      await axios.post<{
+      const response = await axios.post<{
+        success: boolean;
+        message: string;
         deploymentId: string;
-        affectedDomains: string;
+        projectId: string;
+        sitePreview: string;
+        affectedDomains: string[];
       }>(
         `${this.uploadApiUrl}/v1/upload-deployment/${deploymentId}/finish?action=UPLOAD`,
         {},
         this.getAxiosRequestConfig()
       );
+      return response.data;
     } catch (error) {
       const errorMessage = error?.data?.message || error?.message;
       throw new Error(errorMessage);
