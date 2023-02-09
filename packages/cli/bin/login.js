@@ -1,6 +1,5 @@
 const http = require("http");
 const open = require("open");
-const listen = require("async-listen");
 const axios = require("axios");
 
 async function login() {
