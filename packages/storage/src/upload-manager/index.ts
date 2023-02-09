@@ -48,8 +48,16 @@ class UploadManager {
       configuration.protocol,
       configuration.name
     );
-    await this.uploadPayloads(deploymentId, payloads);
-    const result = await this.finalizeUploadDeployment(deploymentId);
+
+    const uploadPayloadsResult = await this.uploadPayloads(
+      deploymentId,
+      payloads
+    );
+
+    const result = await this.finalizeUploadDeployment(
+      deploymentId,
+      uploadPayloadsResult.success
+    );
 
     if (!result.success) {
       throw new Error(result.message);
@@ -83,33 +91,37 @@ class UploadManager {
   private async uploadPayloads(
     deploymentId: string,
     payloads: FormData[]
-  ): Promise<void> {
+  ): Promise<{ success: boolean }> {
+    let errorFlag = false;
     const limit = pLimit(this.PARALLEL_UPLOAD_COUNT);
 
+    const uploadPayload = async (payload: FormData, deploymentId: string) => {
+      try {
+        if (errorFlag) {
+          return;
+        }
+        await axios.post(
+          `${this.uploadApiUrl}/v1/upload-deployment/${deploymentId}/data`,
+          payload,
+          this.getAxiosRequestConfig()
+        );
+      } catch (error) {
+        errorFlag = true;
+      }
+    };
+
     await Promise.all(
-      payloads.map((payload, index) =>
-        limit(() => this.uploadPayload(payload, deploymentId, index))
+      payloads.map((payload) =>
+        limit(() => uploadPayload(payload, deploymentId))
       )
     );
+    return { success: !errorFlag };
   }
 
-  private async uploadPayload(
-    payload: FormData,
+  private async finalizeUploadDeployment(
     deploymentId: string,
-    payloadIndex: number
-  ): Promise<void> {
-    try {
-      await axios.post(
-        `${this.uploadApiUrl}/v1/upload-deployment/${deploymentId}/data`,
-        payload,
-        this.getAxiosRequestConfig()
-      );
-    } catch (error) {
-      console.log(`Error for chunk ${payloadIndex} - ${error.message}`);
-    }
-  }
-
-  private async finalizeUploadDeployment(deploymentId: string): Promise<{
+    upload: boolean
+  ): Promise<{
     success: boolean;
     message: string;
     deploymentId: string;
@@ -126,7 +138,11 @@ class UploadManager {
         sitePreview: string;
         affectedDomains: string[];
       }>(
-        `${this.uploadApiUrl}/v1/upload-deployment/${deploymentId}/finish?action=UPLOAD`,
+        `${
+          this.uploadApiUrl
+        }/v1/upload-deployment/${deploymentId}/finish?action=${
+          upload ? "UPLOAD" : "CANCEL"
+        }`,
         {},
         this.getAxiosRequestConfig()
       );
