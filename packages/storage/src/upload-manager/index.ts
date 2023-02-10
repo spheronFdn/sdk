@@ -25,8 +25,6 @@ class UploadManager {
   // private readonly uploadApiUrl = "https://api-dev.spheron.network";
   private readonly uploadApiUrl: string = "http://localhost:8002";
 
-  private readonly MAX_PAYLOAD_SIZE = 1024 * 1024 * 6;
-  private readonly PARALLEL_UPLOAD_COUNT = 5;
   private readonly configuration: UploadMangerConfiguration;
 
   constructor(configuration: UploadMangerConfiguration) {
@@ -38,20 +36,16 @@ class UploadManager {
   ): Promise<UploadResult> {
     this.validateUploadConfiguration(configuration);
 
-    const payloadCreator = new PayloadCreator(
-      configuration.path,
-      this.MAX_PAYLOAD_SIZE
-    );
-    const payloads = await payloadCreator.createPayloads();
+    const { deploymentId, payloadSize, parallelUploadCount } =
+      await this.startDeployment(configuration.protocol, configuration.name);
 
-    const { deploymentId } = await this.startDeployment(
-      configuration.protocol,
-      configuration.name
-    );
+    const payloadCreator = new PayloadCreator(configuration.path, payloadSize);
+    const payloads = await payloadCreator.createPayloads();
 
     const uploadPayloadsResult = await this.uploadPayloads(
       deploymentId,
-      payloads
+      payloads,
+      parallelUploadCount
     );
 
     const result = await this.finalizeUploadDeployment(
@@ -60,7 +54,7 @@ class UploadManager {
     );
 
     if (!result.success) {
-      throw new Error(result.message);
+      throw new Error(`Upload failed. ${result.message}`);
     }
 
     return {
@@ -74,9 +68,17 @@ class UploadManager {
   private async startDeployment(
     protocol: string,
     projectName: string
-  ): Promise<{ deploymentId: string }> {
+  ): Promise<{
+    deploymentId: string;
+    parallelUploadCount: number;
+    payloadSize: number;
+  }> {
     try {
-      const response = await axios.post<{ deploymentId: string }>(
+      const response = await axios.post<{
+        deploymentId: string;
+        parallelUploadCount: number;
+        payloadSize: number;
+      }>(
         `${this.uploadApiUrl}/v1/upload-deployment?protocol=${protocol}&project=${projectName}`,
         {},
         this.getAxiosRequestConfig()
@@ -90,10 +92,11 @@ class UploadManager {
 
   private async uploadPayloads(
     deploymentId: string,
-    payloads: FormData[]
+    payloads: FormData[],
+    parallelUploadCount: number
   ): Promise<{ success: boolean }> {
     let errorFlag = false;
-    const limit = pLimit(this.PARALLEL_UPLOAD_COUNT);
+    const limit = pLimit(parallelUploadCount);
 
     const uploadPayload = async (payload: FormData, deploymentId: string) => {
       try {

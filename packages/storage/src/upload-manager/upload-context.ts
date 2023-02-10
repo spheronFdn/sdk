@@ -4,7 +4,7 @@ import path from "path";
 
 export interface PayloadCreatorContext {
   payloads: FormData[];
-  currentPayload: FormData;
+  currentPayload: FormData | null;
   currentPayloadSize: number;
 }
 
@@ -20,13 +20,13 @@ export default class PayloadCreator {
   public async createPayloads(): Promise<FormData[]> {
     const uploadContext: PayloadCreatorContext = {
       payloads: new Array<FormData>(),
-      currentPayload: new FormData(),
+      currentPayload: null,
       currentPayloadSize: 0,
     };
 
     await this.fillUploadContext(this.path, "./", uploadContext, true);
 
-    if (uploadContext.currentPayloadSize > 0) {
+    if (uploadContext.currentPayload) {
       uploadContext.payloads.push(uploadContext.currentPayload);
     }
 
@@ -79,6 +79,9 @@ export default class PayloadCreator {
         uploadContext.payloads.push(form);
       }
     } else {
+      if (!uploadContext.currentPayload) {
+        uploadContext.currentPayload = new FormData();
+      }
       uploadContext.currentPayload.append(
         "files",
         fs.createReadStream(fullPath),
@@ -89,7 +92,7 @@ export default class PayloadCreator {
       uploadContext.currentPayloadSize += stat.size;
       if (uploadContext.currentPayloadSize > this.payloadSize) {
         uploadContext.payloads.push(uploadContext.currentPayload);
-        uploadContext.currentPayload = new FormData();
+        uploadContext.currentPayload = null;
         uploadContext.currentPayloadSize = 0;
       }
     }
