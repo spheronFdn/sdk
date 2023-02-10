@@ -20,7 +20,7 @@ export default class SpheronClient {
   ): Promise<UploadResult> {
     const uploadManager = new UploadManager(this.configuration);
     return await uploadManager.upload({
-      path: path,
+      path,
       name: configuration.name,
       protocol: configuration.protocol,
     });
