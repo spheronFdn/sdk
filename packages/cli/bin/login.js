@@ -10,6 +10,7 @@ async function login(provider) {
   const { port } = s.address();
   const baseURL = `http://localhost:8080/auth/${provider}/cli/login`;
   const fullURL = baseURL + `?port=${port}`;
+  console.log(fullURL);
   const successLocationRedirect = new URL(
     "https://app.spheron.network/notifications/cli-login"
   );
@@ -18,9 +19,12 @@ async function login(provider) {
     await Promise.all([
       new Promise((resolve, reject) => {
         server.once("request", async (req, res) => {
+          console.log(req.url);
           const code = req.url.split("&")[0].split("=")[1];
+          console.log(code);
+
           const verify = await axios.get(
-            `http://localhost:8080/auth/github/cli/verify-token/${code}`,
+            `http://localhost:8080/auth/${provider}/cli/verify-token/${code}?port=${port}`, //port used for bitbucket
             {
               headers: {
                 Accept: "application/json",
@@ -31,6 +35,7 @@ async function login(provider) {
             loginError = true;
             throw new Error("Verification of token failed");
           }
+
           const jwt = verify.data.jwtToken;
           // Closing of server
           res.setHeader("connection", "close");
@@ -46,7 +51,7 @@ async function login(provider) {
       open(fullURL),
     ]);
   } catch (error) {
-    console.log("Error: ", error.text);
+    // console.log("Error: ", error.text);
     loginError = true;
   } finally {
     server.close();
@@ -55,6 +60,7 @@ async function login(provider) {
     } else {
       console.log("Login succesfull!");
     }
+    process.exit(0);
   }
 }
 

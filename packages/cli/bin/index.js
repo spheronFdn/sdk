@@ -44,7 +44,7 @@ if (options.login) {
   } else if (options.gitlab) {
     login("gitlab");
   } else if (options.bitbucket) {
-    login("bitubcket");
+    login("bitbucket");
   }
 }
 
