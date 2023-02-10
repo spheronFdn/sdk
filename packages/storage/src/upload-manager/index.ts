@@ -12,7 +12,7 @@ export interface UploadConfiguration {
   path: string;
   protocol: ProtocolEnum;
   name: string;
-  onDeploymentStarted?: (deploymentId: string) => void;
+  onDeploymentStarted?: (uploadId: string) => void;
   onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
 }
 
