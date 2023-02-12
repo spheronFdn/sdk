@@ -22,8 +22,7 @@ export interface UploadResult {
 }
 
 class UploadManager {
-  // private readonly uploadApiUrl = "https://api-dev.spheron.network";
-  private readonly uploadApiUrl: string = "http://localhost:8002";
+  private readonly uploadApiUrl = "https://api-v2.spheron.network";
 
   private readonly configuration: UploadMangerConfiguration;
 
