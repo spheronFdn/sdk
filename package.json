@@ -1,5 +1,5 @@
 {
-  "name": "spheron-sdk",
+  "name": "sdk",
   "version": "0.0.0",
   "scripts": {
     "build": "turbo run build",
@@ -17,5 +17,6 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "license": "Apache-2.0"
 }
