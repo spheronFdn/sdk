@@ -2,6 +2,7 @@
 const yargs = require("yargs");
 const { upload } = require("./upload");
 const { login } = require("./login");
+const { initialize } = require("./initialize");
 
 const options = yargs
   .usage("Usage: $0 --init, --login, --upload")
@@ -30,6 +31,11 @@ const options = yargs
     type: "boolean",
     demandOption: false,
   })
+  .option("init", {
+    describe: "Create spheron config file",
+    type: "boolean",
+    demandOption: false,
+  })
   .help(true).argv;
 
 if (options.login) {
@@ -51,4 +57,8 @@ if (options.login) {
 if (options.upload) {
   console.log(upload);
   upload();
+}
+
+if (options.init) {
+  initialize();
 }
