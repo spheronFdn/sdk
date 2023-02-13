@@ -83,33 +83,3 @@ if (options._[0] === "create-organization") {
   const username = options["username"];
   createOrganization(organizationName, username, "app");
 }
-
-// if (options["create-organization"]) {
-//   const organizationName = options.name;
-//   const username = options.username;
-//   if (!options.name || !options.username) {
-//     console.error("Error: you must pass either --name and --username");
-//     process.exit(1);
-//   }
-//   console.log("Creating organization: ", organizationName, username);
-//   createOrganization(organizationName, username, "app");
-// }
-
-// const options = yargs
-//   .usage("Usage: $0 --init, --login, --upload --create-organization")
-//   .option("login", {
-//     describe: "Login to the system",
-//     type: "boolean",
-//     demandOption: false,
-//   })
-//   .option("create-organization", {
-//     describe: "Create organization",
-//     type: "string",
-//     demandOption: false,
-//   }).argv;
-
-// if (options["create-organization"]) {
-//   // console.log(`Organization name: ${options["create-organization"]}`);
-//   const organizationName = options["create-organization"];
-//   createOrganization(organizationName, "app");
-// }
