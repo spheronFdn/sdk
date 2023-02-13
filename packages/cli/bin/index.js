@@ -14,31 +14,26 @@ const options = yargs
     type: "boolean",
     demandOption: false,
   })
-  .option("github", {
-    describe: "Login using Github credentials",
-    type: "boolean",
-    demandOption: false,
+  .command("login", "Login to the system", (yargs) => {
+    yargs
+      .option("github", {
+        describe: "Login using Github credentials",
+        type: "boolean",
+        demandOption: false,
+      })
+      .option("gitlab", {
+        describe: "Login using Gitlab credentials",
+        type: "boolean",
+        demandOption: false,
+      })
+      .option("bitbucket", {
+        describe: "Login using Bitbucket credentials",
+        type: "boolean",
+        demandOption: false,
+      });
   })
-  .option("gitlab", {
-    describe: "Login using Gitlab credentials",
-    type: "boolean",
-    demandOption: false,
-  })
-  .option("bitbucket", {
-    describe: "Login using Bitbucket credentials",
-    type: "boolean",
-    demandOption: false,
-  })
-  .option("upload", {
-    describe: "Upload file to the system",
-    type: "boolean",
-    demandOption: false,
-  })
-  .option("init", {
-    describe: "Create spheron config file",
-    type: "boolean",
-    demandOption: false,
-  })
+  .command("upload", "Upload file to the system")
+  .command("init", "Create spheron config file")
   .command("create-organization", "Create organization", (yargs) => {
     yargs
       .option("name", {
@@ -53,7 +48,7 @@ const options = yargs
       });
   }).argv;
 
-if (options.login) {
+if (options._[0] === "login") {
   if (!options.github && !options.gitlab && !options.bitbucket) {
     console.error(
       "Error: you must pass either --github, --gitlab, or --bitbucket when using --login"
@@ -69,12 +64,11 @@ if (options.login) {
   }
 }
 
-if (options.upload) {
-  console.log(upload);
+if (options._[0] === "upload") {
   upload();
 }
 
-if (options.init) {
+if (options._[0] === "init") {
   initialize();
 }
 
