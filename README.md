@@ -35,7 +35,7 @@ yarn add @spheron/storage
 
 ### Usage
 
-In the example below you can see how to create an instance of `SpheronClient` and how to upload a file/directory to the specified protocol.
+In the example below, you can see how to create an instance of `SpheronClient` and how to upload a file/directory to the specified protocol.
 
 ```
 import SpheronClient, { ProtocolEnum } from "@spheron/storage";
