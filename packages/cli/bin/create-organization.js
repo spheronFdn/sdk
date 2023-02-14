@@ -1,7 +1,4 @@
-const http = require("http");
-const open = require("open");
 const axios = require("axios");
-const uuidv4 = require("uuid");
 const { configuration } = require("./configuration");
 
 const {

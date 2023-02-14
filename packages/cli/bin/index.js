@@ -4,8 +4,8 @@ const { upload } = require("./upload");
 const { login } = require("./login");
 const { initialize } = require("./initialize");
 const { createOrganization } = require("./create-organization");
-
-const { option } = require("yargs");
+const { listTemplates, createTemplate } = require("./create-template");
+const { configuration } = require("./configuration");
 
 const options = yargs
   .usage("Usage: $0 --init, --login, --upload --create-organization")
@@ -46,7 +46,48 @@ const options = yargs
         type: "string",
         demandOption: true,
       });
-  }).argv;
+  })
+  .command(
+    "create-template",
+    "Create a template application which runs on Spheron",
+    (yargs) => {
+      yargs
+        .option("list", {
+          describe: "List all possible templates that user can create",
+          type: "boolean",
+          demandOption: false,
+        })
+        .option("react-app", {
+          describe: "Create a react app template",
+          type: "boolean",
+          demandOption: false,
+        })
+        .option("nft-edition-drop-template", {
+          describe: "Create a nft edition drop app template",
+          type: "boolean",
+          demandOption: false,
+        })
+        .option("next-app", {
+          describe: "Create a next app template",
+          type: "boolean",
+          demandOption: false,
+        })
+        .option("portfolio-app", {
+          describe: "Create a porftoflio app template",
+          type: "boolean",
+          demandOption: false,
+        })
+        .option("project-name", {
+          describe: "Project name",
+          type: "string",
+          demandOption:
+            yargs.argv["react-app"] ||
+            yargs.argv["nft-edition-drop-template"] ||
+            yargs.argv["next-app"] ||
+            yargs.argv["portfolio-app"],
+        });
+    }
+  ).argv;
 
 if (options._[0] === "login") {
   if (!options.github && !options.gitlab && !options.bitbucket) {
@@ -76,4 +117,31 @@ if (options._[0] === "create-organization") {
   const organizationName = options["name"];
   const username = options["username"];
   createOrganization(organizationName, username, "app");
+}
+
+if (options._[0] === "create-template") {
+  if (options.list) {
+    listTemplates();
+    return;
+  } else if (options["react-app"]) {
+    createTemplate(
+      configuration.templateUrls["react-app"],
+      options["project-name"]
+    );
+  } else if (options["nft-edition-drop-template"]) {
+    createTemplate(
+      configuration.templateUrls["nft-edition-drop-template"],
+      options["project-name"]
+    );
+  } else if (options["next-app"]) {
+    createTemplate(
+      configuration.templateUrls["next-app"],
+      options["project-name"]
+    );
+  } else if (options["portfolio-app"]) {
+    createTemplate(
+      configuration.templateUrls["portfolio-app"],
+      options["project-name"]
+    );
+  }
 }
