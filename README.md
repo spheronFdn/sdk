@@ -33,7 +33,7 @@ npm install @spheron/storage
 yarn add @spheron/storage
 ```
 
-### Usage:
+### Usage
 
 In the example below you can see how to create an instance of `SpheronClient` and how to upload a file/directory to the specified protocol.
 
