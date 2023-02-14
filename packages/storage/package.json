@@ -1,6 +1,18 @@
 {
   "name": "@spheron/storage",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "description": "Typescript library for uploading files or directory to  IPFS, Filecoin or Arweave via Spheron",
+  "keywords": [
+    "Storage",
+    "Typescript",
+    "Badass",
+    "IPFS",
+    "Filecoin",
+    "Arweave",
+    "SDK",
+    "Upload"
+  ],
+  "author": "Spheron Team",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
@@ -10,8 +22,6 @@
     "prettier:check": "prettier --check '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
     "lint": "eslint . --ext .ts"
   },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@types/node": "^18.13.0",
     "@typescript-eslint/eslint-plugin": "^5.51.0",

@@ -2,7 +2,7 @@
 
 ### Usage:
 
-In the example bellow you can see how to create an instance of `SpheronClient` and how to upload a file/directory to the specified protocol.
+In the example below you can see how to create an instance of `SpheronClient` and how to upload a file/directory to the specified protocol.
 
 ```
 import SpheronClient, { ProtocolEnum } from "@spheron/storage";
@@ -18,7 +18,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(f
   - `filePath` - the path to the file/directory that will be uploaded
   - `configuration` - an object with two parameters:
     - `configuration.name` - represents the name of the bucket on which you are uploading the data.
-    - `configuarion.protocol` - a protocol on which the data will be uploaded. The supported protocols are [ `ARWEAVE`, `IPFS`, `FILECOIN`].
+    - `configuration.protocol` - a protocol on which the data will be uploaded. The supported protocols are [ `ARWEAVE`, `IPFS`, `FILECOIN`].
   - The response of the upload function is an object with parameters:
     - `uploadId` - the id of the upload
     - `bucketId` - the id of the bucket
