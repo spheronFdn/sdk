@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/spheronFdn/landing-site/blob/main/assets/logo_dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://github.com/spheronFdn/landing-site/blob/main/assets/logo.svg">
-    <img alt="Spheron" src="https://github.com/spheronFdn/landing-site/blob/main/assets/logo_dark.svg" width="250">
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/spheronFdn/sdk/blob/aayush/sph-1148/.github/assets/logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/spheronFdn/sdk/blob/aayush/sph-1148/.github/assets/logo.svg">
+    <img alt="Spheron" src="https://github.com/spheronFdn/sdk/blob/aayush/sph-1148/.github/assets/logo-dark.svg" width="250">
   </picture>
 </p>
 
@@ -16,8 +16,8 @@
   <a href="https://discord.com/invite/ahxuCtm" target="_blank" rel="noreferrer">
     <img src="https://img.shields.io/static/v1?label=community&message=discord&color=blue" />
   </a>
-  <a href="https://twitter.com/SpheronHQ" target="_blank" rel="noreferrer">
-    <img src="https://img.shields.io/twitter/url/https/twitter.com/cloudposse.svg?style=social&label=Follow%20%40SpheronHQ" />
+  <a href="https://twitter.com/SpheronFdn" target="_blank" rel="noreferrer">
+    <img src="https://img.shields.io/twitter/url/https/twitter.com/cloudposse.svg?style=social&label=Follow%20%40SpheronFdn" />
   </a>
 </p>
 
@@ -58,35 +58,10 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(f
     - `protocolLink` - is the protocol link of the upload
     - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
 
-## Contribution Guidelines
+## Contribution
+We encourage you to read the [contribution guidelines](https://github.com/spheronFdn/sdk/blob/aayush/sph-1148/.github/contribution-guidelines.md) to learn about our development process and how to propose bug fixes and improvements before submitting a pull request.
 
-We welcome contributions from anyone interested in helping us improve the Spheron SDK. If you have ideas for new features, bug fixes, and improvements to the documentation, please follow the guidelines below to get started.
+The Spheron community extends beyond issues and pull requests! You can support Spheron [in many other ways](https://github.com/spheronFdn/sdk/blob/aayush/sph-1148/.github/support.md) as well.
 
-### Code of Conduct
-Please be respectful and professional when contributing to the Spheron SDK. We expect all the contributors to follow our code of conduct, which can be found in the code-of-conduct.md file.
-
-### Communication
-If you have any questions or need clarification on an issue, please contact the maintainers through Discord.
-
-### Forking and Branching
-Before making any changes, please fork the SDK repository and create a new branch for your changes. There are two ways to name a branch: feat/your-branch-name: for new features fix/your-branch-name: for bug fixes.
-
-Use a descriptive branch name that reflects the changes you plan to make.
-
-### Coding Standards
-Please follow the Spheron SDK coding standards below. It is recommended to use prettier to format the code for all the files. Add appropriate comment lines where necessary, explaining what you intend to do properly.
-
-### Pull Requests
-When you are ready to make changes, please create a pull request on GitHub. Provide a detailed description of what you have done and why. Maintainers will review your changes and provide you with feedback.
-
-### Keeping Up-to-Date
-After submitting your changes, please keep your fork up to date with the latest changes made to the SDK repository. This will ensure that your contributions are compatible with the project's latest version.
-
-## Support
-You can support Spheron SDK in many different ways:
-
-- Create new features and fix bugs.
-- Report bugs or missing features by creating an issue.
-- Review and comment on existing pull requests and issues.
-- Join our Discord and help new users contribute to the Spheron SDK.
-- Give us Feedback. Tell us what we are doing well and where we can improve. Please upvote the issue that you are most interested in seeing solved.
+## Community
+For help, discussions or any other queries: [Join us on Discord](https://discord.com/invite/ahxuCtm)
