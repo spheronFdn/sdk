@@ -1,6 +1,8 @@
 {
-  "name": "spheron-sdk",
+  "name": "sdk",
   "version": "0.0.0",
+  "author": "Spheron Team",
+  "description": "🧰 Developer toolkits for web3 cloud infrastructure powered by Spheron",
   "scripts": {
     "build": "turbo run build",
     "prettier": "turbo run prettier",
@@ -17,5 +19,6 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "license": "Apache-2.0"
 }
