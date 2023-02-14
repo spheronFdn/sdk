@@ -5,10 +5,14 @@
   "keywords": [
     "Spheron",
     "Network",
-    "Hosting",
     "Storage",
     "Typescript",
-    "Badass"
+    "Badass",
+    "IPFS",
+    "Filecoin",
+    "Arweave",
+    "SDK",
+    "Upload"
   ],
   "author": "Spheron Team",
   "main": "./dist/index.js",
