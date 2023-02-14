@@ -12,7 +12,7 @@ export interface UploadConfiguration {
   path: string;
   protocol: ProtocolEnum;
   name: string;
-  onDeploymentStarted?: (uploadId: string) => void;
+  onDeploymentInitiated?: (uploadId: string) => void;
   onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
 }
 
@@ -41,8 +41,8 @@ class UploadManager {
     const { deploymentId, payloadSize, parallelUploadCount } =
       await this.startDeployment(configuration.protocol, configuration.name);
 
-    configuration.onDeploymentStarted &&
-      configuration.onDeploymentStarted(deploymentId);
+    configuration.onDeploymentInitiated &&
+      configuration.onDeploymentInitiated(deploymentId);
 
     const payloadCreator = new PayloadCreator(configuration.path, payloadSize);
     const { payloads, totalSize } = await payloadCreator.createPayloads();
