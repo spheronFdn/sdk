@@ -1,6 +1,7 @@
 {
   "name": "sdk",
   "version": "0.0.0",
+  "author": "Spheron Team",
   "scripts": {
     "build": "turbo run build",
     "prettier": "turbo run prettier",
