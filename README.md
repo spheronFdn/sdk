@@ -21,14 +21,14 @@
   </a>
 </p>
 
-# Spheron Storage SDK
+## Spheron Storage SDK
 
-## Installation
-**Using NPM**
+### Installation
+Using NPM
 ```
 npm install @spheron/storage
 ```
-**Using Yarn**
+Using Yarn
 ```
 yarn add @spheron/storage
 ```
