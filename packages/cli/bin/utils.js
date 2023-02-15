@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const yaml = require("yaml");
 const { configuration } = require("./configuration");
 
 async function writeToConfigFile(key, value) {
@@ -12,19 +11,19 @@ async function writeToConfigFile(key, value) {
       configuration.configFilePath,
       "utf-8"
     );
-    config = yaml.parse(fileContents);
+    config = JSON.parse(fileContents);
   } catch (err) {
     console.log("Spheron config file not found. Creating a new file.");
     await fs.promises.mkdir(path.join(process.env.HOME, ".spheron"), {
       recursive: true,
     });
-    await fs.promises.writeFile(configuration.configFilePath, "", "utf-8");
+    await fs.promises.writeFile(configuration.configFilePath, "{}", "utf-8");
   }
   config[key] = value;
-  const yamlString = yaml.stringify(config);
+  const jsonString = JSON.stringify(config);
   await fs.promises.writeFile(
     configuration.configFilePath,
-    yamlString,
+    jsonString,
     "utf-8"
   );
 }
@@ -36,7 +35,7 @@ async function readFromConfigFile(key) {
       configuration.configFilePath,
       "utf-8"
     );
-    config = yaml.parse(fileContents);
+    config = JSON.parse(fileContents);
   } catch (err) {
     console.error("Error reading Spheron config file:", err.message);
     return undefined;

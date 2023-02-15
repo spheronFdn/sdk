@@ -10,7 +10,7 @@ const { listTemplates, createTemplate } = require("./create-template");
 const { configuration } = require("./configuration");
 
 const options = yargs
-  .usage("Usage: $0 --init, --login, --upload --create-organization")
+  .usage("Usage: $0 init, login, create-organization, create-template, upload-dir, upload-file")
   .command("login", "Login to the system", (yargs) => {
     yargs
       .option("github", {
@@ -62,7 +62,7 @@ const options = yargs
       .option("path", {
         describe: "Path to directory",
         type: "string",
-        demandOption: false,
+        demandOption: true,
       })
       .option("protocol", {
         describe: "Upload protocol",
@@ -161,7 +161,7 @@ if (options._[0] === "upload-dir") {
     if (!projectName) {
       projectName = `${randomWords()}-${randomWords()}`;
     }
-    const path = options["path"];
+    let path = options["path"];
     if (!path) {
       path = "./";
     }
@@ -179,10 +179,7 @@ if (options._[0] === "upload-file") {
     if (!projectName) {
       projectName = `${randomWords()}-${randomWords()}`;
     }
-    const path = options["path"];
-    if (!path) {
-      path = "./";
-    }
+    let path = options["path"];
     uploadFile(path, protocol, organizationId, projectName);
   } catch (error) {
     console.log(error.message);

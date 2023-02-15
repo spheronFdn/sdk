@@ -47,7 +47,6 @@ async function uploadFile(
   data.append("files", fs.createReadStream(rootPath), {
     filepath: rootPath,
   });
-  console.log(data);
   const response = await axios.post(
     `${configuration.upload_api_address}/v1/deployment/upload?protocol=${protocol}&organization=${orgId}&project=${projectName}`,
     data,
@@ -57,7 +56,6 @@ async function uploadFile(
       },
     }
   );
-  console.log(response.data);
   if (response.data.success == true) {
     console.log(
       `Upload was succesfull\nSite preview: ${response.data.sitePreview}\nDomains: ${response.data.affectedDomains}`
