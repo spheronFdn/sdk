@@ -19,6 +19,7 @@ async function createOrganization(name, username, type) {
       console.log("JWT token not valid or does not exist. Pleas login first");
       return;
     }
+    console.log(`Creating organization name: ${name}, username: ${username}...`);
     const organizationResponse = await axios.post(
       `${configuration.spheron_server_address}/v1/organization`,
       {
@@ -39,6 +40,7 @@ async function createOrganization(name, username, type) {
       loginError = true;
       throw new Error("Failed to create an organization");
     }
+    console.log("Organization created");
     const organization = organizationResponse.data.organization;
     await writeToConfigFile("organization", organization._id);
   } catch (error) {
