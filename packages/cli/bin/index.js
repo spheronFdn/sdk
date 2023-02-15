@@ -1,6 +1,8 @@
 #! /usr/bin/env node
 const yargs = require("yargs");
-const { upload } = require("./upload");
+var randomWords = require("random-words");
+
+const { uploadDir, uploadFile } = require("./upload");
 const { login } = require("./login");
 const { initialize } = require("./initialize");
 const { createOrganization } = require("./create-organization");
@@ -9,11 +11,6 @@ const { configuration } = require("./configuration");
 
 const options = yargs
   .usage("Usage: $0 --init, --login, --upload --create-organization")
-  .option("login", {
-    describe: "Login to the system",
-    type: "boolean",
-    demandOption: false,
-  })
   .command("login", "Login to the system", (yargs) => {
     yargs
       .option("github", {
@@ -32,7 +29,57 @@ const options = yargs
         demandOption: false,
       });
   })
-  .command("upload", "Upload file to the system")
+  .command("upload-dir", "Upload dir", (yargs) => {
+    yargs
+      .option("directory", {
+        describe: "Directory",
+        type: "string",
+        demandOption: true,
+      })
+      .option("path", {
+        describe: "Path to directory",
+        type: "string",
+        demandOption: false,
+      })
+      .option("protocol", {
+        describe: "Upload protocol",
+        choices: ["arweave", "ipfs-filecoin", "ipfs"],
+        demandOption: true,
+      })
+      .option("project-name", {
+        describe: "Project name",
+        type: "string",
+        demandOption: false,
+      })
+      .option("organizationId", {
+        describe: "Organization where project will be created",
+        type: "string",
+        demandOption: false,
+      });
+  })
+  .command("upload-file", "Upload file", (yargs) => {
+    yargs
+      .option("path", {
+        describe: "Path to directory",
+        type: "string",
+        demandOption: false,
+      })
+      .option("protocol", {
+        describe: "Upload protocol",
+        choices: ["arweave", "ipfs-filecoin", "ipfs"],
+        demandOption: true,
+      })
+      .option("project-name", {
+        describe: "Project name",
+        type: "string",
+        demandOption: false,
+      })
+      .option("organizationId", {
+        describe: "Organization where project will be created",
+        type: "string",
+        demandOption: false,
+      });
+  })
   .command("init", "Create spheron config file")
   .command("create-organization", "Create organization", (yargs) => {
     yargs
@@ -105,8 +152,41 @@ if (options._[0] === "login") {
   }
 }
 
-if (options._[0] === "upload") {
-  upload();
+if (options._[0] === "upload-dir") {
+  try {
+    const directory = options["directory"];
+    const protocol = options["protocol"];
+    let projectName = options["project-name"];
+    const organizationId = options["organizationId"];
+    if (!projectName) {
+      projectName = `${randomWords()}-${randomWords()}`;
+    }
+    const path = options["path"];
+    if (!path) {
+      path = "./";
+    }
+    uploadDir(directory, path, protocol, organizationId, projectName);
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+if (options._[0] === "upload-file") {
+  try {
+    const protocol = options["protocol"];
+    let projectName = options["project-name"];
+    const organizationId = options["organizationId"];
+    if (!projectName) {
+      projectName = `${randomWords()}-${randomWords()}`;
+    }
+    const path = options["path"];
+    if (!path) {
+      path = "./";
+    }
+    uploadFile(path, protocol, organizationId, projectName);
+  } catch (error) {
+    console.log(error.message);
+  }
 }
 
 if (options._[0] === "init") {
