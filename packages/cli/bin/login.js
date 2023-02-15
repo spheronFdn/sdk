@@ -11,7 +11,6 @@ async function login(provider) {
   const { port } = s.address();
   const baseURL = `${configuration.spheron_server_address}/auth/${provider}/cli/login`;
   const fullURL = baseURL + `?port=${port}`;
-  console.log(fullURL);
   const successLocationRedirect = new URL(
     `${configuration.spheron_frontend_address}/notifications/cli-login`
   );
@@ -20,7 +19,6 @@ async function login(provider) {
     await Promise.all([
       new Promise((resolve, reject) => {
         server.once("request", async (req, res) => {
-          console.log(req.url);
           const code = req.url.split("&")[0].split("=")[1];
           console.log(code);
 
@@ -52,7 +50,6 @@ async function login(provider) {
       open(fullURL),
     ]);
   } catch (error) {
-    // console.log("Error: ", error.text);
     loginError = true;
   } finally {
     server.close();
