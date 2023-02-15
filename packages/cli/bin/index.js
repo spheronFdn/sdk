@@ -183,7 +183,6 @@ if (options._[0] === "upload-file") {
     if (!path) {
       path = "./";
     }
-    console.log("HEREEEEEEEEEEEEE");
     uploadFile(path, protocol, organizationId, projectName);
   } catch (error) {
     console.log(error.message);
