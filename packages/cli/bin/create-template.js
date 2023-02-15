@@ -21,7 +21,7 @@ async function createTemplate(templateUrl, folderName) {
 
 function executeCloneOfRepo(sourceUrl, folderName) {
   return new Promise((resolve) => {
-    const child = child_process.spawn("sh", [path.join(__dirname, "./script/clone.sh")], { //["./bin/script/clone.sh"]
+    const child = child_process.spawn("sh", [path.join(__dirname, "./scripts/clone.sh")], {
       shell: true,
       env: {
         SOURCE_URL: sourceUrl,
