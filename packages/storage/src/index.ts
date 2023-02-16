@@ -1,7 +1,8 @@
 import UploadManager, { UploadResult } from "./upload-manager";
 import { ProtocolEnum } from "./enums";
+import SpheronApi from "./spheron-api";
 
-export { ProtocolEnum };
+export { ProtocolEnum, SpheronApi };
 
 export interface SpheronClientConfiguration {
   token: string;
