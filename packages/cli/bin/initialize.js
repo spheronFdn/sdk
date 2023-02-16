@@ -1,15 +1,12 @@
-const http = require("http");
-const open = require("open");
-const axios = require("axios");
 const uuidv4 = require("uuid");
-const configuration = require("./configuration");
+const { configuration } = require("./configuration");
 
-const { writeToConfigFile, configFileExists } = require("./utils");
+const { writeToConfigFile, fileExists } = require("./utils");
 
 async function initialize() {
   let executionError = false;
   try {
-    if (await configFileExists()) {
+    if (await fileExists(configuration.configFilePath)) {
       console.log("Config file already exists");
       return;
     }

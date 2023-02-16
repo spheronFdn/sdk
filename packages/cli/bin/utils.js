@@ -20,7 +20,7 @@ async function writeToConfigFile(key, value) {
     await fs.promises.writeFile(configuration.configFilePath, "{}", "utf-8");
   }
   config[key] = value;
-  const jsonString = JSON.stringify(config);
+  const jsonString = JSON.stringify(config, null, 2); // pretty-print with 2-space indentation
   await fs.promises.writeFile(
     configuration.configFilePath,
     jsonString,
@@ -28,11 +28,20 @@ async function writeToConfigFile(key, value) {
   );
 }
 
-async function readFromConfigFile(key) {
+async function fileExists(path) {
+  try {
+    await fs.promises.stat(path);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+async function readFromJsonFile(key, path) {
   let config = {};
   try {
     const fileContents = await fs.promises.readFile(
-      configuration.configFilePath,
+      path,
       "utf-8"
     );
     config = JSON.parse(fileContents);
@@ -43,17 +52,31 @@ async function readFromConfigFile(key) {
   return config[key];
 }
 
-async function configFileExists() {
+async function writeToWorkspaceFile(key, value){
+  let config = {};
   try {
-    const x = await fs.promises.stat(configuration.configFilePath);
-    return true;
+    // Check if the  file exists
+    await fs.promises.stat("./.spheron-workspace.json");
+    const fileContents = await fs.promises.readFile(
+      "./.spheron-workspace.json",
+      "utf-8"
+    );
+    config = JSON.parse(fileContents);
   } catch (err) {
-    return false;
+    await fs.promises.writeFile("./.spheron-workspace.json", "{}", "utf-8");
   }
+  config[key] = value;
+  const jsonString = JSON.stringify(config, null, 2); // pretty-print with 2-space indentation
+  await fs.promises.writeFile(
+    "./.spheron-workspace.json",
+    jsonString,
+    "utf-8"
+  );
 }
 
 module.exports = {
   writeToConfigFile,
-  readFromConfigFile,
-  configFileExists,
+  readFromJsonFile,
+  fileExists,
+  writeToWorkspaceFile
 };
