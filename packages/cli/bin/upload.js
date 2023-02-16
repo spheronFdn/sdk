@@ -4,7 +4,7 @@ const axios = require("axios");
 const FormData = require("form-data");
 const { configuration } = require("./configuration");
 
-const { configFileExists, readFromConfigFile } = require("./utils");
+const { fileExists, readFromJsonFile } = require("./utils");
 
 async function uploadDir(
   directory,
@@ -66,16 +66,16 @@ async function uploadFile(
 }
 
 async function checkUploadConstraint(organizationId) {
-  if (!(await configFileExists())) {
+  if (!(await fileExists(configuration.configFilePath))) {
     throw new Error("config file not present");
   }
-  const jwtToken = await readFromConfigFile("jwtToken");
+  const jwtToken = await readFromJsonFile("jwtToken", configuration.configFilePath);
   if (!jwtToken) {
     throw new Error("JWT token not present. Execute login command");
   }
   let orgId = organizationId;
   if (!orgId) {
-    orgId = await readFromConfigFile("organization");
+    orgId = await readFromJsonFile("organization", configuration.configFilePath);
     if (!orgId) {
       throw new Error("Organization is not provided");
     }

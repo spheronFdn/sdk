@@ -3,18 +3,18 @@ const { configuration } = require("./configuration");
 
 const {
   writeToConfigFile,
-  configFileExists,
-  readFromConfigFile,
+  fileExists,
+  readFromJsonFile,
 } = require("./utils");
 
 async function createOrganization(name, username, type) {
   let executionError = false;
   try {
-    if (!(await configFileExists())) {
+    if (!(await fileExists(configuration.configFilePath))) {
       console.log("Spheron config file does not exist");
       return;
     }
-    const jwtToken = await readFromConfigFile("jwtToken");
+    const jwtToken = await readFromJsonFile("jwtToken", configuration.configFilePath);
     if (!jwtToken) {
       console.log("JWT token not valid or does not exist. Pleas login first");
       return;

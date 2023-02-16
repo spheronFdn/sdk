@@ -7,6 +7,7 @@ const { login } = require("./login");
 const { initialize } = require("./initialize");
 const { createOrganization } = require("./create-organization");
 const { listTemplates, createTemplate } = require("./create-template");
+const { createWorkspace } = require("./create-workspace");
 const { configuration } = require("./configuration");
 
 const options = yargs
@@ -93,6 +94,14 @@ const options = yargs
         type: "string",
         demandOption: true,
       });
+  })
+  .command("create-workspace", "Create workspace", (yargs) => {
+    yargs
+      .option("name", {
+        describe: "Workspace name",
+        type: "string",
+        demandOption: true,
+      })
   })
   .command(
     "create-template",
@@ -221,4 +230,7 @@ if (options._[0] === "create-template") {
       options["project-name"]
     );
   }
+}
+if(options._[0] === "create-workspace"){
+  createWorkspace(options["name"]);
 }
