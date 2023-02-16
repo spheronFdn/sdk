@@ -12,6 +12,8 @@ export interface UploadConfiguration {
   path: string;
   protocol: ProtocolEnum;
   name: string;
+  onUploadInitiated?: (uploadId: string) => void;
+  onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
 }
 
 export interface UploadResult {
@@ -38,13 +40,18 @@ class UploadManager {
     const { deploymentId, payloadSize, parallelUploadCount } =
       await this.startDeployment(configuration.protocol, configuration.name);
 
+    configuration.onUploadInitiated &&
+      configuration.onUploadInitiated(deploymentId);
+
     const payloadCreator = new PayloadCreator(configuration.path, payloadSize);
-    const payloads = await payloadCreator.createPayloads();
+    const { payloads, totalSize } = await payloadCreator.createPayloads();
 
     const uploadPayloadsResult = await this.uploadPayloads(
       deploymentId,
       payloads,
-      parallelUploadCount
+      parallelUploadCount,
+      totalSize,
+      configuration.onChunkUploaded
     );
 
     const result = await this.finalizeUploadDeployment(
@@ -92,7 +99,9 @@ class UploadManager {
   private async uploadPayloads(
     deploymentId: string,
     payloads: FormData[],
-    parallelUploadCount: number
+    parallelUploadCount: number,
+    totalSize: number,
+    onChunkUploaded?: (uploadedSize: number, totalSize: number) => void
   ): Promise<{ success: boolean }> {
     let errorFlag = false;
     const limit = pLimit(parallelUploadCount);
@@ -102,11 +111,12 @@ class UploadManager {
         if (errorFlag) {
           return;
         }
-        await axios.post(
+        const { data } = await axios.post<{ uploadSize: number }>(
           `${this.uploadApiUrl}/v1/upload-deployment/${deploymentId}/data`,
           payload,
           this.getAxiosRequestConfig()
         );
+        onChunkUploaded && onChunkUploaded(data.uploadSize, totalSize);
       } catch (error) {
         errorFlag = true;
       }
