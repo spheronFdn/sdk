@@ -19,7 +19,7 @@ export default class SpheronClient {
     configuration: {
       name: string;
       protocol: ProtocolEnum;
-      onDeploymentInitiated?: (uploadId: string) => void;
+      onUploadInitiated?: (uploadId: string) => void;
       onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
     }
   ): Promise<UploadResult> {
@@ -29,7 +29,7 @@ export default class SpheronClient {
       name: configuration.name,
       protocol: configuration.protocol,
       onChunkUploaded: configuration.onChunkUploaded,
-      onDeploymentInitiated: configuration.onDeploymentInitiated,
+      onUploadInitiated: configuration.onUploadInitiated,
     });
   }
 }
