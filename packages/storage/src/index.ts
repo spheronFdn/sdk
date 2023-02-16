@@ -16,13 +16,20 @@ export default class SpheronClient {
 
   async upload(
     path: string,
-    configuration: { name: string; protocol: ProtocolEnum }
+    configuration: {
+      name: string;
+      protocol: ProtocolEnum;
+      onUploadInitiated?: (uploadId: string) => void;
+      onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
+    }
   ): Promise<UploadResult> {
     const uploadManager = new UploadManager(this.configuration);
     return await uploadManager.upload({
       path,
       name: configuration.name,
       protocol: configuration.protocol,
+      onChunkUploaded: configuration.onChunkUploaded,
+      onUploadInitiated: configuration.onUploadInitiated,
     });
   }
 }

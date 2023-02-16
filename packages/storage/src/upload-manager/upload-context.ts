@@ -6,6 +6,7 @@ export interface PayloadCreatorContext {
   payloads: FormData[];
   currentPayload: FormData | null;
   currentPayloadSize: number;
+  totalSize: number;
 }
 
 export default class PayloadCreator {
@@ -17,11 +18,15 @@ export default class PayloadCreator {
     this.payloadSize = payloadSize || 1024 * 1024 * 5;
   }
 
-  public async createPayloads(): Promise<FormData[]> {
+  public async createPayloads(): Promise<{
+    payloads: FormData[];
+    totalSize: number;
+  }> {
     const uploadContext: PayloadCreatorContext = {
       payloads: new Array<FormData>(),
       currentPayload: null,
       currentPayloadSize: 0,
+      totalSize: 0,
     };
 
     await this.fillUploadContext(this.path, "./", uploadContext, true);
@@ -30,7 +35,10 @@ export default class PayloadCreator {
       uploadContext.payloads.push(uploadContext.currentPayload);
     }
 
-    return uploadContext.payloads;
+    return {
+      payloads: uploadContext.payloads,
+      totalSize: uploadContext.totalSize,
+    };
   }
 
   private async fillUploadContext(
@@ -63,6 +71,7 @@ export default class PayloadCreator {
     stat: fs.Stats,
     uploadContext: PayloadCreatorContext
   ) {
+    uploadContext.totalSize += stat.size;
     if (stat.size > this.payloadSize) {
       const numOfChunks = Math.ceil(stat.size / this.payloadSize);
       for (let i = 0; i < numOfChunks; i++) {
