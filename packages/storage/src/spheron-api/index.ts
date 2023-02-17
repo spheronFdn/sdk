@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { TokenScope } from "./interfaces";
+import { Project, TokenScope } from "./interfaces";
 
 class SpheronApi {
   private readonly spheronApiUrl = "https://api-v2.spheron.network";
@@ -17,12 +17,12 @@ class SpheronApi {
     return data;
   }
 
-  async getProject(projectId: string): Promise<void> {
-    const { data } = await axios.get(
+  async getProject(projectId: string): Promise<Project> {
+    const { data } = await axios.get<Project>(
       `${this.spheronApiUrl}/v1/project/${projectId}`,
       this.getAxiosRequestConfig()
     );
-    console.log(data);
+    return data;
   }
 
   private getAxiosRequestConfig(): AxiosRequestConfig {
