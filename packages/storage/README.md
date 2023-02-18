@@ -1,10 +1,33 @@
-# Spheron Storage SDK
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo.svg">
+    <img alt="Spheron" src="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo-dark.svg" width="250">
+  </picture>
+</p>
 
-### Usage:
+<h1 align="center">Spheron Storage SDK</h1>
+
+<p align="center">
+  🧰 Developer toolkits for web3 cloud infrastructure, powered by Spheron.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/static/v1?label=npm&message=v14.0.0&color=green" />
+  <img src="https://img.shields.io/static/v1?label=license&message=Apache%202.0&color=red" />
+  <a href="https://discord.com/invite/ahxuCtm" target="_blank" rel="noreferrer">
+    <img src="https://img.shields.io/static/v1?label=community&message=discord&color=blue" />
+  </a>
+  <a href="https://twitter.com/SpheronFdn" target="_blank" rel="noreferrer">
+    <img src="https://img.shields.io/twitter/url/https/twitter.com/cloudposse.svg?style=social&label=Follow%20%40SpheronFdn" />
+  </a>
+</p>
+
+## Usage:
 
 In the example below you can see how to create an instance of `SpheronClient` and how to upload a file/directory to the specified protocol.
 
-```
+```js
 import SpheronClient, { ProtocolEnum } from "@spheron/storage";
 
 ...
@@ -24,3 +47,10 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(f
     - `bucketId` - the id of the bucket
     - `protocolLink` - is the protocol link of the upload
     - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
+ 
+## Learn More
+
+You can learn more about Spheron and Spheron Storage SDK here:
+
+* [Spheron Discord](https://discord.com/invite/ahxuCtm)
+* [Spheron Twitter](https://twitter.com/SpheronFdn)
