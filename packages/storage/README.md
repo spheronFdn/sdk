@@ -6,10 +6,10 @@
   </picture>
 </p>
 
-<h1 align="center">Spheron Storage SDK</h1>
+<h1 align="center">Storage SDK</h1>
 
 <p align="center">
-  🧰 Developer toolkits for web3 cloud infrastructure, powered by Spheron.
+  🧰 SDK for multi-chain storage, powered by Spheron.
 </p>
 
 <p align="center">
@@ -50,7 +50,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(f
  
 ## Learn More
 
-You can learn more about Spheron and Spheron Storage SDK here:
+You can learn more about Spheron and Storage SDK here:
 
 * [Spheron Discord](https://discord.com/invite/ahxuCtm)
 * [Spheron Twitter](https://twitter.com/SpheronFdn)
