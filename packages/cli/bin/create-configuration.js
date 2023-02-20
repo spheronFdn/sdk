@@ -1,9 +1,9 @@
 const uuidv4 = require("uuid");
 const { configuration } = require("./configuration");
 
-const { writeToConfigFile, fileExists } = require("./utils");
+const { writeToConfigFile, fileExists, writeToJsonFile } = require("./utils");
 
-async function initialize() {
+async function createConfiguration() {
   let executionError = false;
   try {
     if (await fileExists(configuration.configFilePath)) {
@@ -13,6 +13,11 @@ async function initialize() {
     console.log("Creating spheron configuration file...");
     const id = uuidv4.v4();
     await writeToConfigFile("id", id);
+    await writeToJsonFile(
+      "projects",
+      [],
+      configuration.projectTrackingFilePath
+    );
   } catch (error) {
     console.log("Error: ", error.message);
     executionError = true;
@@ -25,5 +30,5 @@ async function initialize() {
 }
 
 module.exports = {
-  initialize,
+  createConfiguration,
 };

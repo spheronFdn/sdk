@@ -1,20 +1,13 @@
 const child_process = require("child_process");
-const path = require('path');
+const path = require("path");
 
-const { fileExists, writeToWorkspaceFile, readFromJsonFile } = require("./utils");
+const { fileExists, writeToJsonFile, readFromJsonFile } = require("./utils");
 const { configuration } = require("./configuration");
 
 async function createTemplate(templateUrl, folderName) {
   let executionError = false;
   try {
-    if(!(await fileExists("./.spheron-workspace.json"))){
-      console.log("Please create a workspace before creating a template. Use spheron create-workspace command");
-      throw new Error("Path does not contain workspace configuration file");
-    }
     await executeCloneOfRepo(templateUrl, folderName);
-    const projects = await readFromJsonFile("projects", "./.spheron-workspace.json");
-    projects.push({name: folderName, url: templateUrl});
-    await writeToWorkspaceFile("projects", projects);
   } catch (error) {
     console.log("Error: ", error.message);
     executionError = true;
@@ -28,13 +21,17 @@ async function createTemplate(templateUrl, folderName) {
 
 function executeCloneOfRepo(sourceUrl, folderName) {
   return new Promise((resolve) => {
-    const child = child_process.spawn("sh", [path.join(__dirname, "./scripts/clone.sh")], {
-      shell: true,
-      env: {
-        SOURCE_URL: sourceUrl,
-        FOLDER_NAME: folderName,
-      },
-    });
+    const child = child_process.spawn(
+      "sh",
+      [path.join(__dirname, "./scripts/clone.sh")],
+      {
+        shell: true,
+        env: {
+          SOURCE_URL: sourceUrl,
+          FOLDER_NAME: folderName,
+        },
+      }
+    );
     let scriptOutput = "";
     let exitCode = 0;
     child.stdout.setEncoding("utf8");
