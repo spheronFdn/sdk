@@ -1,3 +1,3 @@
-const { initialize } = require("../initialize");
+const { createConfiguration } = require("../create-configuration");
 
-initialize();
+createConfiguration();

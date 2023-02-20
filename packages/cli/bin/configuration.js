@@ -6,6 +6,10 @@ const configuration = {
   upload_api_address: "https://api-dev.spheron.network",
   version: "1.0.0",
   configFilePath: path.join(process.env.HOME, ".spheron/config.json"),
+  projectTrackingFilePath: path.join(
+    process.env.HOME,
+    ".spheron/project-tracking.json"
+  ),
   templateUrls: {
     "react-app": "https://github.com/spheronFdn/react-boilerplate",
     "nft-edition-drop-template":

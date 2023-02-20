@@ -4,14 +4,16 @@ var randomWords = require("random-words");
 
 const { uploadDir, uploadFile } = require("./upload");
 const { login } = require("./login");
-const { initialize } = require("./initialize");
+const { createConfiguration } = require("./create-configuration");
 const { createOrganization } = require("./create-organization");
 const { listTemplates, createTemplate } = require("./create-template");
-const { createWorkspace } = require("./create-workspace");
+const { init } = require("./init");
 const { configuration } = require("./configuration");
 
 const options = yargs
-  .usage("Usage: $0 init, login, create-organization, create-template, upload-dir, upload-file")
+  .usage(
+    "Usage: $0 init, login, create-organization, create-template, upload-dir, upload-file"
+  )
   .command("login", "Login to the system", (yargs) => {
     yargs
       .option("github", {
@@ -81,7 +83,7 @@ const options = yargs
         demandOption: false,
       });
   })
-  .command("init", "Create spheron config file")
+  .command("create-configuration", "Create spheron config file")
   .command("create-organization", "Create organization", (yargs) => {
     yargs
       .option("name", {
@@ -95,13 +97,22 @@ const options = yargs
         demandOption: true,
       });
   })
-  .command("create-workspace", "Create workspace", (yargs) => {
-    yargs
-      .option("name", {
-        describe: "Workspace name",
-        type: "string",
-        demandOption: true,
-      })
+  .command("init", "Spheron file initialization in project", (yargs) => {
+    yargs.option("name", {
+      describe: "Project name",
+      type: "string",
+      demandOption: true,
+    });
+    yargs.option("protocol", {
+      describe: "Protocol that will be used for uploading ",
+      type: "string",
+      demandOption: true,
+    });
+    yargs.option("path", {
+      describe: "Path to uploading content",
+      type: "string",
+      demandOption: false,
+    });
   })
   .command(
     "create-template",
@@ -195,8 +206,15 @@ if (options._[0] === "upload-file") {
   }
 }
 
+if (options._[0] === "create-configuration") {
+  createConfiguration();
+}
+
 if (options._[0] === "init") {
-  initialize();
+  const name = options["name"];
+  const protocol = options["protocol"];
+  const path = options["path"];
+  init(name, protocol, path);
 }
 
 if (options._[0] === "create-organization") {
@@ -231,6 +249,6 @@ if (options._[0] === "create-template") {
     );
   }
 }
-if(options._[0] === "create-workspace"){
+if (options._[0] === "create-workspace") {
   createWorkspace(options["name"]);
 }
