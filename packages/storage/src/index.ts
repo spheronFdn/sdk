@@ -12,9 +12,15 @@ export interface SpheronClientConfiguration {
 
 export default class SpheronClient {
   private readonly configuration: SpheronClientConfiguration;
+  private readonly spheronApi: SpheronApi;
+  private readonly bucketManager: BucketManager;
+  private readonly uploadManager: UploadManager;
 
   constructor(configuration: SpheronClientConfiguration) {
     this.configuration = configuration;
+    this.spheronApi = new SpheronApi(this.configuration.token);
+    this.bucketManager = new BucketManager(this.spheronApi);
+    this.uploadManager = new UploadManager(this.configuration);
   }
 
   async upload(
@@ -26,8 +32,7 @@ export default class SpheronClient {
       onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
     }
   ): Promise<UploadResult> {
-    const uploadManager = new UploadManager(this.configuration);
-    return await uploadManager.upload({
+    return await this.uploadManager.upload({
       path,
       name: configuration.name,
       protocol: configuration.protocol,
@@ -37,8 +42,23 @@ export default class SpheronClient {
   }
 
   async getBucket(bucketId: string): Promise<Bucket> {
-    const spheronApi = new SpheronApi(this.configuration.token);
-    const bucketManager = new BucketManager(spheronApi);
-    return await bucketManager.getBucket(bucketId);
+    return await this.bucketManager.getBucket(bucketId);
+  }
+
+  async getBucketUploadCount(bucketId: string): Promise<{
+    total: number;
+    successful: number;
+    failed: number;
+    pending: number;
+  }> {
+    return await this.bucketManager.getBucketUploadCount(bucketId);
+  }
+
+  async archiveBucket(bucketId: string): Promise<void> {
+    await this.bucketManager.archiveBucket(bucketId);
+  }
+
+  async unarchiveBucket(bucketId: string): Promise<void> {
+    await this.bucketManager.unarchiveBucket(bucketId);
   }
 }
