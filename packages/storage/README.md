@@ -12,9 +12,13 @@
   🧰 SDK for multi-chain storage, powered by Spheron.
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/static/v1?label=npm&message=v14.0.0&color=green" />
-  <img src="https://img.shields.io/static/v1?label=license&message=Apache%202.0&color=red" />
+<p align="center">  
+  <a href="https://www.npmjs.com/package/@spheron/storage" target="_blank" rel="noreferrer">
+    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.3&color=green" />
+  </a>
+  <a href="https://github.com/spheronFdn/sdk/blob/main/LICENSE" target="_blank" rel="noreferrer">
+    <img src="https://img.shields.io/static/v1?label=license&message=Apache%202.0&color=red" />
+  </a>
   <a href="https://discord.com/invite/ahxuCtm" target="_blank" rel="noreferrer">
     <img src="https://img.shields.io/static/v1?label=community&message=discord&color=blue" />
   </a>
