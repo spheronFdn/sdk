@@ -14,6 +14,19 @@ enum ProjectStateEnum {
   ARCHIVED = "ARCHIVED",
 }
 
+enum DomainTypeEnum {
+  DOMAIN = "domain",
+  SUBDOMAIN = "subdomain",
+  HANDSHAKE_DOMAIN = "handshake-domain",
+  HANDSHAKE_SUBDOMAIN = "handshake-subdomain",
+  ENS_DOMAIN = "ens-domain",
+}
+
+enum DomainApplicationTypeEnum {
+  WEB = 1,
+  COMPUTE = 2,
+}
+
 enum NodeVersionEnum {
   V_12 = "V_12",
   V_14 = "V_14",
@@ -48,4 +61,6 @@ export {
   ProjectStateEnum,
   NodeVersionEnum,
   FrameworkEnum,
+  DomainTypeEnum,
+  DomainApplicationTypeEnum,
 };

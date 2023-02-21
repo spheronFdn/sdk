@@ -1,6 +1,8 @@
 import { ProtocolEnum } from "../enums";
 import {
   DeploymentEnvironmentStatusEnum,
+  DomainApplicationTypeEnum,
+  DomainTypeEnum,
   FrameworkEnum,
   NodeVersionEnum,
   ProjectStateEnum,
@@ -49,23 +51,43 @@ interface PasswordProtection {
   credentials: string[];
 }
 
+interface Credentials {
+  username: string;
+  password: string;
+}
+
+interface Domain {
+  _id: string;
+  name: string;
+  link: string;
+  type: DomainTypeEnum;
+  verified: boolean;
+  projectId: string;
+  deploymentEnvironmentIds: DeploymentEnvironment[];
+  version: string;
+  credentials: Credentials[];
+  appType: DomainApplicationTypeEnum;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface Project {
+  _id: string;
   name: string;
   type: ProjectTypeEnum;
   url: string;
   environmentVariables: EnvironmentVariable[];
   deploymentEnvironments: DeploymentEnvironment[];
   organization: string;
-  // latestDeployment: IDeployment;
   state: ProjectStateEnum;
   hookId: string;
   provider: string;
   prCommentIds: { prId: string; commentId: string }[];
   configuration: Configuration[];
-  // createdBy: IUserModel;
   passwordProtection: PasswordProtection;
   createdAt: Date;
   updatedAt: Date;
+  domains: Domain[];
 }
 
-export { TokenScope, Project };
+export { TokenScope, Project, Domain };

@@ -1,6 +1,8 @@
 import UploadManager, { UploadResult } from "./upload-manager";
 import { ProtocolEnum } from "./enums";
 import SpheronApi from "./spheron-api";
+import { Bucket } from "./bucket-manager/interfaces";
+import BucketManager from "./bucket-manager";
 
 export { ProtocolEnum, SpheronApi };
 
@@ -32,5 +34,11 @@ export default class SpheronClient {
       onChunkUploaded: configuration.onChunkUploaded,
       onUploadInitiated: configuration.onUploadInitiated,
     });
+  }
+
+  async getBucket(bucketId: string): Promise<Bucket> {
+    const spheronApi = new SpheronApi(this.configuration.token);
+    const bucketManager = new BucketManager(spheronApi);
+    return await bucketManager.getBucket(bucketId);
   }
 }
