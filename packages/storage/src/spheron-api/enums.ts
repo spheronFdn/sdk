@@ -55,6 +55,18 @@ enum FrameworkEnum {
   IONIC_ANGULAR = "ionicangular",
 }
 
+enum DeploymentStatusEnum {
+  PRE_QUEUE = "PreQueue",
+  QUEUED = "Queued",
+  PENDING = "Pending",
+  CANCELED = "Canceled",
+  DEPLOYED = "Deployed",
+  FAILED = "Failed",
+  AUTHORIZATION_NEEDED = "AuthorizationNeeded",
+  KILLING = "Killing",
+  TIMED_OUT = "TimedOut",
+}
+
 export {
   ProjectTypeEnum,
   DeploymentEnvironmentStatusEnum,
@@ -63,4 +75,5 @@ export {
   FrameworkEnum,
   DomainTypeEnum,
   DomainApplicationTypeEnum,
+  DeploymentStatusEnum,
 };

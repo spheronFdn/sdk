@@ -1,6 +1,7 @@
 import { ProtocolEnum } from "../enums";
 import {
   DeploymentEnvironmentStatusEnum,
+  DeploymentStatusEnum,
   DomainApplicationTypeEnum,
   DomainTypeEnum,
   FrameworkEnum,
@@ -38,6 +39,7 @@ interface EnvironmentVariable {
 }
 
 interface Configuration {
+  _id: string;
   buildCommand: string;
   installCommand: string;
   workspace: string;
@@ -90,4 +92,32 @@ interface Project {
   domains: Domain[];
 }
 
-export { TokenScope, Project, Domain };
+interface Deployment {
+  _id: string;
+  sitePreview: string;
+  commitId: string;
+  commitMessage: string;
+  logs: { time: string; log: string }[];
+  buildDirectory: string[];
+  contentHash: string;
+  topic: string;
+  status: DeploymentStatusEnum;
+  paymentId: string;
+  buildTime: number;
+  memoryUsed: number;
+  env: object;
+  project: Project;
+  branch: string;
+  externalRepositoryName: string;
+  protocol: string;
+  deploymentEnvironmentName: string;
+  failedMessage: string;
+  isFromRequest: boolean;
+  configuration: Configuration;
+  pickedUpByDeployerAt: number;
+  encrypted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export { TokenScope, Project, Domain, Deployment, Configuration };
