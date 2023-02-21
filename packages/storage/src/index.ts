@@ -1,7 +1,7 @@
 import UploadManager, { UploadResult } from "./upload-manager";
 import { ProtocolEnum } from "./enums";
 import SpheronApi from "./spheron-api";
-import { Bucket } from "./bucket-manager/interfaces";
+import { Bucket, Upload } from "./bucket-manager/interfaces";
 import BucketManager from "./bucket-manager";
 
 export { ProtocolEnum, SpheronApi };
@@ -52,6 +52,16 @@ export default class SpheronClient {
     pending: number;
   }> {
     return await this.bucketManager.getBucketUploadCount(bucketId);
+  }
+
+  async getBucketUploads(
+    bucketId: string,
+    options: {
+      skip: number;
+      limit: number;
+    }
+  ): Promise<{ uploads: Upload[] }> {
+    return await this.bucketManager.getBucketUploads(bucketId, options);
   }
 
   async archiveBucket(bucketId: string): Promise<void> {
