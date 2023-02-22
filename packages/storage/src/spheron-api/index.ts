@@ -5,7 +5,13 @@ import {
   NodeVersionEnum,
   ProjectStateEnum,
 } from "./enums";
-import { Configuration, Deployment, Project, TokenScope } from "./interfaces";
+import {
+  Configuration,
+  Deployment,
+  Domain,
+  Project,
+  TokenScope,
+} from "./interfaces";
 
 class SpheronApi {
   private readonly spheronApiUrl = "https://api-v2.spheron.network";
@@ -51,6 +57,14 @@ class SpheronApi {
       this.getAxiosRequestConfig()
     );
     return { deployments: data };
+  }
+
+  async getProjectDomains(projectId: string): Promise<{ domains: Domain[] }> {
+    const { data } = await axios.get<{ domains: Domain[] }>(
+      `${this.spheronApiUrl}/v1/project/${projectId}/domains`,
+      this.getAxiosRequestConfig()
+    );
+    return data;
   }
 
   async getProjectDeploymentCount(projectId: string): Promise<{

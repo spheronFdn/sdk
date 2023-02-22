@@ -1,7 +1,7 @@
 import UploadManager, { UploadResult } from "./upload-manager";
 import { ProtocolEnum } from "./enums";
 import SpheronApi from "./spheron-api";
-import { Bucket, Upload } from "./bucket-manager/interfaces";
+import { Bucket, Domain, Upload } from "./bucket-manager/interfaces";
 import BucketManager from "./bucket-manager";
 
 export { ProtocolEnum, SpheronApi };
@@ -62,6 +62,10 @@ export default class SpheronClient {
     }
   ): Promise<{ uploads: Upload[] }> {
     return await this.bucketManager.getBucketUploads(bucketId, options);
+  }
+
+  async getBucketDomains(bucketId: string): Promise<{ domains: Domain[] }> {
+    return await this.bucketManager.getBucketDomains(bucketId);
   }
 
   async archiveBucket(bucketId: string): Promise<void> {

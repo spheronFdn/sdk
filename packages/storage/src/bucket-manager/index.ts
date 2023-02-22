@@ -4,7 +4,7 @@ import {
   ProjectStateEnum,
   ProjectTypeEnum,
 } from "../spheron-api/enums";
-import { Bucket, Upload } from "./interfaces";
+import { Bucket, Domain, Upload } from "./interfaces";
 
 class BucketManager {
   private readonly spheronApi: SpheronApi;
@@ -32,6 +32,19 @@ class BucketManager {
           bucketId: projectId,
         })
       ),
+    };
+  }
+
+  async getBucketDomains(bucketId: string): Promise<{ domains: Domain[] }> {
+    const { domains } = await this.spheronApi.getProjectDomains(bucketId);
+    return {
+      domains: domains.map((x) => ({
+        _id: x._id,
+        name: x.name,
+        link: x.link,
+        verified: x.verified,
+        bucketId: x.projectId,
+      })),
     };
   }
 
