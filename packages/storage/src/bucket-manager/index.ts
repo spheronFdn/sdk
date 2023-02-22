@@ -1,6 +1,7 @@
 import SpheronApi from "../spheron-api";
 import {
   DeploymentStatusEnum,
+  DomainTypeEnum,
   ProjectStateEnum,
   ProjectTypeEnum,
 } from "../spheron-api/enums";
@@ -45,6 +46,29 @@ class BucketManager {
         verified: x.verified,
         bucketId: x.projectId,
       })),
+    };
+  }
+
+  async addBucketDomain(
+    bucketId: string,
+    options: {
+      link: string;
+      type: DomainTypeEnum | string;
+      name: string;
+    }
+  ): Promise<{ domain: Domain }> {
+    const { domain } = await this.spheronApi.addProjectDomain(bucketId, {
+      ...options,
+      deploymentEnvironments: [],
+    });
+    return {
+      domain: {
+        _id: domain._id,
+        name: domain.name,
+        link: domain.link,
+        verified: domain.verified,
+        bucketId: domain.projectId,
+      },
     };
   }
 

@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig } from "axios";
 import {
   DeploymentStatusEnum,
+  DomainTypeEnum,
   FrameworkEnum,
   NodeVersionEnum,
   ProjectStateEnum,
@@ -62,6 +63,23 @@ class SpheronApi {
   async getProjectDomains(projectId: string): Promise<{ domains: Domain[] }> {
     const { data } = await axios.get<{ domains: Domain[] }>(
       `${this.spheronApiUrl}/v1/project/${projectId}/domains`,
+      this.getAxiosRequestConfig()
+    );
+    return data;
+  }
+
+  async addProjectDomain(
+    projectId: string,
+    options: {
+      link: string;
+      type: DomainTypeEnum | string;
+      deploymentEnvironments: string[];
+      name: string;
+    }
+  ): Promise<{ domain: Domain }> {
+    const { data } = await axios.post<{ domain: Domain }>(
+      `${this.spheronApiUrl}/v1/project/${projectId}/domains`,
+      options,
       this.getAxiosRequestConfig()
     );
     return data;

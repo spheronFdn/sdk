@@ -68,6 +68,22 @@ export default class SpheronClient {
     return await this.bucketManager.getBucketDomains(bucketId);
   }
 
+  async addBucketDomain(
+    bucketId: string,
+    options: {
+      link: string;
+      type:
+        | "domain"
+        | "subdomain"
+        | "handshake-domain"
+        | "handshake-subdomain"
+        | "ens-domain";
+      name: string;
+    }
+  ): Promise<{ domain: Domain }> {
+    return this.bucketManager.addBucketDomain(bucketId, options);
+  }
+
   async archiveBucket(bucketId: string): Promise<void> {
     await this.bucketManager.archiveBucket(bucketId);
   }
