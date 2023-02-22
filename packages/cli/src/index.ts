@@ -2,19 +2,19 @@
 const yargs = require("yargs");
 var randomWords = require("random-words");
 
-const { uploadDir, uploadFile } = require("./upload");
-const { login } = require("./login");
-const { createConfiguration } = require("./create-configuration");
-const { createOrganization } = require("./create-organization");
-const { listTemplates, createTemplate } = require("./create-template");
-const { init } = require("./init");
-const { configuration } = require("./configuration");
+import { uploadDir, uploadFile } from "./upload";
+import { login } from "./login";
+import { createConfiguration } from "./create-configuration";
+import { createOrganization } from  "./create-organization";
+import { listTemplates, createTemplate } from "./create-template";
+import { init } from "./init";
+import  configuration  from "./configuration";
 
 const options = yargs
   .usage(
     "Usage: $0 init, login, create-organization, create-template, upload-dir, upload-file"
   )
-  .command("login", "Login to the system", (yargs) => {
+  .command("login", "Login to the system", (yargs: any) => {
     yargs
       .option("github", {
         describe: "Login using Github credentials",
@@ -32,7 +32,7 @@ const options = yargs
         demandOption: false,
       });
   })
-  .command("upload-dir", "Upload dir", (yargs) => {
+  .command("upload-dir", "Upload dir", (yargs: any) => {
     yargs
       .option("directory", {
         describe: "Directory",
@@ -60,7 +60,7 @@ const options = yargs
         demandOption: false,
       });
   })
-  .command("upload-file", "Upload file", (yargs) => {
+  .command("upload-file", "Upload file", (yargs: any) => {
     yargs
       .option("path", {
         describe: "Path to directory",
@@ -84,7 +84,7 @@ const options = yargs
       });
   })
   .command("create-configuration", "Create spheron config file")
-  .command("create-organization", "Create organization", (yargs) => {
+  .command("create-organization", "Create organization", (yargs: any) => {
     yargs
       .option("name", {
         describe: "Name of the organization",
@@ -97,7 +97,7 @@ const options = yargs
         demandOption: true,
       });
   })
-  .command("init", "Spheron file initialization in project", (yargs) => {
+  .command("init", "Spheron file initialization in project", (yargs: any) => {
     yargs.option("name", {
       describe: "Project name",
       type: "string",
@@ -117,7 +117,7 @@ const options = yargs
   .command(
     "create-template",
     "Create a template application which runs on Spheron",
-    (yargs) => {
+    (yargs: any) => {
       yargs
         .option("list", {
           describe: "List all possible templates that user can create",
@@ -226,7 +226,7 @@ if (options._[0] === "create-organization") {
 if (options._[0] === "create-template") {
   if (options.list) {
     listTemplates();
-    return;
+    process.exit(0);
   } else if (options["react-app"]) {
     createTemplate(
       configuration.templateUrls["react-app"],
@@ -248,7 +248,4 @@ if (options._[0] === "create-template") {
       options["project-name"]
     );
   }
-}
-if (options._[0] === "create-workspace") {
-  createWorkspace(options["name"]);
 }

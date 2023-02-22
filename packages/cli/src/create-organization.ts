@@ -1,13 +1,9 @@
-const axios = require("axios");
-const { configuration } = require("./configuration");
+import axios from "axios";
+import configuration  from "./configuration";
+import { writeToConfigFile, fileExists, readFromJsonFile } from "./utils";
 
-const {
-  writeToConfigFile,
-  fileExists,
-  readFromJsonFile,
-} = require("./utils");
 
-async function createOrganization(name, username, type) {
+export async function createOrganization(name: string, username: string, type: string) {
   let executionError = false;
   try {
     if (!(await fileExists(configuration.configFilePath))) {
@@ -37,7 +33,6 @@ async function createOrganization(name, username, type) {
       organizationResponse.status != 201 ||
       organizationResponse.data?.success == false
     ) {
-      loginError = true;
       throw new Error("Failed to create an organization");
     }
     console.log("Organization created");
@@ -53,7 +48,3 @@ async function createOrganization(name, username, type) {
     process.exit(0);
   }
 }
-
-module.exports = {
-  createOrganization,
-};

@@ -1,17 +1,17 @@
-const uuidv4 = require("uuid");
-const path = require("path");
+import { v4 as uuidv4 } from "uuid";
+import path from "path";
 
-const { writeToJsonFile, fileExists, readFromJsonFile } = require("./utils");
-const { configuration } = require("./configuration");
+import { writeToJsonFile, fileExists, readFromJsonFile } from "./utils";
+import configuration  from "./configuration";
 
-async function init(name, protocol, projectPath) {
+export async function init(name: string, protocol: string, projectPath: string) {
   let executionError = false;
   try {
     if (await fileExists("./spheron.json")) {
       throw new Error("Spheron file already exists");
     }
     console.log("Spheron initialization...");
-    const id = uuidv4.v4();
+    const id = uuidv4();
     console.log(`${path.join(process.cwd(), "./spheron.json")}`);
     await writeToJsonFile("id", id, "./spheron.json");
     const spheron_configuration = {
@@ -50,7 +50,3 @@ async function init(name, protocol, projectPath) {
     process.exit(0);
   }
 }
-
-module.exports = {
-  init,
-};
