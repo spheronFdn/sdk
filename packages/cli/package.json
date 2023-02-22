@@ -2,15 +2,14 @@
   "name": "spheron-cli",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/index.js",
+  "main": "./build/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp -r node_modules build/ && cp src/scripts/clone.sh build/scripts/clone.sh",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "preinstall": "npm run build",
-    "postinstall": "cp -r node_modules dist/ && node ./dist/scripts/postinstall.js"
+    "postinstall": "node ./build/scripts/postinstall.js"
   },
   "bin": {
-    "spheron": "./dist/index.js"
+    "spheron": "./build/index.js"
   },
   "author": "",
   "license": "ISC",
