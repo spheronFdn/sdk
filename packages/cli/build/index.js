@@ -12,6 +12,7 @@ const create_configuration_1 = require("./create-configuration");
 const create_organization_1 = require("./create-organization");
 const create_template_1 = require("./create-template");
 const init_1 = require("./init");
+const readline_1 = __importDefault(require("readline"));
 const configuration_1 = __importDefault(require("./configuration"));
 const options = yargs
     .usage("Usage: $0 init, login, create-organization, create-template, upload-dir, upload-file")
@@ -231,4 +232,36 @@ if (options._[0] === "create-template") {
     else if (options["portfolio-app"]) {
         (0, create_template_1.createTemplate)(configuration_1.default.templateUrls["portfolio-app"], options["project-name"]);
     }
+    else {
+        console.log("Command not recognized. Use --help get more information.");
+    }
 }
+if (!options._[0]) {
+    console.log("Run spheron --help to find out what commands you can use");
+}
+const completer = (line) => {
+    const completions = [
+        "init",
+        "login",
+        "create-organization",
+        "create-template",
+        "upload-dir",
+        "upload-file",
+    ];
+    const hits = completions.filter((c) => c.startsWith(line));
+    return [hits.length ? hits : completions, line];
+};
+const rl = readline_1.default.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    completer,
+});
+rl.on("line", (line) => {
+    console.log(`You typed: ${line}`);
+    rl.prompt();
+});
+rl.on("close", () => {
+    console.log("Goodbye!");
+    process.exit(0);
+});
+rl.prompt();
