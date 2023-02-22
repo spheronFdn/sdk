@@ -68,6 +68,17 @@ class SpheronApi {
     return data;
   }
 
+  async getProjectDomain(
+    projectId: string,
+    domainIdentifier: string
+  ): Promise<{ domain: Domain }> {
+    const { data } = await axios.get<{ domain: Domain }>(
+      `${this.spheronApiUrl}/v1/project/${projectId}/domains/${domainIdentifier}`,
+      this.getAxiosRequestConfig()
+    );
+    return data;
+  }
+
   async addProjectDomain(
     projectId: string,
     options: {
@@ -80,6 +91,45 @@ class SpheronApi {
     const { data } = await axios.post<{ domain: Domain }>(
       `${this.spheronApiUrl}/v1/project/${projectId}/domains`,
       options,
+      this.getAxiosRequestConfig()
+    );
+    return data;
+  }
+
+  async patchProjectDomain(
+    projectId: string,
+    domainIdentifier: string,
+    options: {
+      link: string;
+      deploymentEnvironments: string[];
+      name: string;
+    }
+  ): Promise<{ domain: Domain }> {
+    const { data } = await axios.patch<{ domain: Domain }>(
+      `${this.spheronApiUrl}/v1/project/${projectId}/domains/${domainIdentifier}`,
+      options,
+      this.getAxiosRequestConfig()
+    );
+    return data;
+  }
+
+  async verifyProjectDomain(
+    projectId: string,
+    domainIdentifier: string
+  ): Promise<{ success: boolean; domain: Domain }> {
+    const { data } = await axios.patch<{ success: boolean; domain: Domain }>(
+      `${this.spheronApiUrl}/v1/project/${projectId}/domains/${domainIdentifier}/verify`,
+      this.getAxiosRequestConfig()
+    );
+    return data;
+  }
+
+  async deleteProjectDomain(
+    projectId: string,
+    domainIdentifier: string
+  ): Promise<{ success: boolean }> {
+    const { data } = await axios.delete<{ success: boolean }>(
+      `${this.spheronApiUrl}/v1/project/${projectId}/domains/${domainIdentifier}`,
       this.getAxiosRequestConfig()
     );
     return data;

@@ -81,7 +81,49 @@ export default class SpheronClient {
       name: string;
     }
   ): Promise<{ domain: Domain }> {
-    return this.bucketManager.addBucketDomain(bucketId, options);
+    return await this.bucketManager.addBucketDomain(bucketId, options);
+  }
+
+  async getBucketDomain(
+    bucketId: string,
+    domainIdentifier: string
+  ): Promise<{ domain: Domain }> {
+    return await this.bucketManager.getBucketDomain(bucketId, domainIdentifier);
+  }
+
+  async patchBucketDomain(
+    bucketId: string,
+    domainIdentifier: string,
+    options: {
+      link: string;
+      name: string;
+    }
+  ): Promise<{ domain: Domain }> {
+    return await this.bucketManager.patchBucketDomain(
+      bucketId,
+      domainIdentifier,
+      options
+    );
+  }
+
+  async verifyBucketDomain(
+    bucketId: string,
+    domainIdentifier: string
+  ): Promise<{ domain: Domain }> {
+    return await this.bucketManager.verifyBucketDomain(
+      bucketId,
+      domainIdentifier
+    );
+  }
+
+  async deleteBucketDomain(
+    bucketId: string,
+    domainIdentifier: string
+  ): Promise<{ success: boolean }> {
+    return await this.bucketManager.deleteBucketDomain(
+      bucketId,
+      domainIdentifier
+    );
   }
 
   async archiveBucket(bucketId: string): Promise<void> {

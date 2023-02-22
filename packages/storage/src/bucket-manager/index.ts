@@ -1,11 +1,11 @@
 import SpheronApi from "../spheron-api";
 import {
-  DeploymentStatusEnum,
   DomainTypeEnum,
   ProjectStateEnum,
   ProjectTypeEnum,
 } from "../spheron-api/enums";
 import { Bucket, Domain, Upload } from "./interfaces";
+import { Domain as ProjectDomain } from "../spheron-api/interfaces";
 
 class BucketManager {
   private readonly spheronApi: SpheronApi;
@@ -39,14 +39,62 @@ class BucketManager {
   async getBucketDomains(bucketId: string): Promise<{ domains: Domain[] }> {
     const { domains } = await this.spheronApi.getProjectDomains(bucketId);
     return {
-      domains: domains.map((x) => ({
-        _id: x._id,
-        name: x.name,
-        link: x.link,
-        verified: x.verified,
-        bucketId: x.projectId,
-      })),
+      domains: domains.map((x) => this.mapProjectDomainToBucketDomain(x)),
     };
+  }
+
+  async getBucketDomain(
+    bucketId: string,
+    domainIdentifier: string
+  ): Promise<{ domain: Domain }> {
+    const { domain } = await this.spheronApi.getProjectDomain(
+      bucketId,
+      domainIdentifier
+    );
+    return {
+      domain: this.mapProjectDomainToBucketDomain(domain),
+    };
+  }
+
+  async patchBucketDomain(
+    bucketId: string,
+    domainIdentifier: string,
+    options: {
+      link: string;
+      name: string;
+    }
+  ): Promise<{ domain: Domain }> {
+    const { domain } = await this.spheronApi.patchProjectDomain(
+      bucketId,
+      domainIdentifier,
+      { ...options, deploymentEnvironments: [] }
+    );
+    return {
+      domain: this.mapProjectDomainToBucketDomain(domain),
+    };
+  }
+
+  async verifyBucketDomain(
+    bucketId: string,
+    domainIdentifier: string
+  ): Promise<{ domain: Domain }> {
+    const { domain } = await this.spheronApi.verifyProjectDomain(
+      bucketId,
+      domainIdentifier
+    );
+    return {
+      domain: this.mapProjectDomainToBucketDomain(domain),
+    };
+  }
+
+  async deleteBucketDomain(
+    bucketId: string,
+    domainIdentifier: string
+  ): Promise<{ success: boolean }> {
+    return await this.spheronApi.deleteProjectDomain(
+      bucketId,
+      domainIdentifier
+    );
   }
 
   async addBucketDomain(
@@ -62,13 +110,7 @@ class BucketManager {
       deploymentEnvironments: [],
     });
     return {
-      domain: {
-        _id: domain._id,
-        name: domain.name,
-        link: domain.link,
-        verified: domain.verified,
-        bucketId: domain.projectId,
-      },
+      domain: this.mapProjectDomainToBucketDomain(domain),
     };
   }
 
@@ -121,6 +163,16 @@ class BucketManager {
       bucketId,
       ProjectStateEnum.MAINTAINED
     );
+  }
+
+  private mapProjectDomainToBucketDomain(domain: ProjectDomain): Domain {
+    return {
+      _id: domain._id,
+      name: domain.name,
+      link: domain.link,
+      verified: domain.verified,
+      bucketId: domain.projectId,
+    };
   }
 }
 
