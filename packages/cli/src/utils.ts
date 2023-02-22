@@ -1,9 +1,9 @@
-const fs = require("fs");
-const path = require("path");
-const { configuration } = require("./configuration");
+import fs from "fs";
+import path from "path";
+import  configuration from "./configuration";
 
-async function writeToConfigFile(key, value) {
-  let config = {};
+export async function writeToConfigFile(key: string, value: any) {
+  let config: any = {};
   try {
     // Check if the config file exists
     await fs.promises.stat(configuration.configFilePath);
@@ -14,7 +14,7 @@ async function writeToConfigFile(key, value) {
     config = JSON.parse(fileContents);
   } catch (err) {
     console.log("Spheron config file not found. Creating a new file.");
-    await fs.promises.mkdir(path.join(process.env.HOME, ".spheron"), {
+    await fs.promises.mkdir(path.join(configuration.home_path, ".spheron"), {
       recursive: true,
     });
     await fs.promises.writeFile(configuration.configFilePath, "{}", "utf-8");
@@ -28,7 +28,7 @@ async function writeToConfigFile(key, value) {
   );
 }
 
-async function fileExists(path) {
+export async function fileExists(path: string) {
   try {
     await fs.promises.stat(path);
     return true;
@@ -37,8 +37,8 @@ async function fileExists(path) {
   }
 }
 
-async function readFromJsonFile(key, path) {
-  let config = {};
+export async function readFromJsonFile(key: string, path: string) {
+  let config:any = {};
   try {
     const fileContents = await fs.promises.readFile(path, "utf-8");
     config = JSON.parse(fileContents);
@@ -49,8 +49,8 @@ async function readFromJsonFile(key, path) {
   return config[key];
 }
 
-async function writeToJsonFile(key, value, path) {
-  let config = {};
+export async function writeToJsonFile(key: string, value: any, path: string) {
+  let config:any = {};
   try {
     // Check if the  file exists
     await fs.promises.stat(path);
@@ -64,9 +64,3 @@ async function writeToJsonFile(key, value, path) {
   await fs.promises.writeFile(path, jsonString, "utf-8");
 }
 
-module.exports = {
-  writeToConfigFile,
-  readFromJsonFile,
-  fileExists,
-  writeToJsonFile,
-};

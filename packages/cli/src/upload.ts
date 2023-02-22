@@ -1,17 +1,17 @@
 //TODO: Use spheron sdk to upload files
-const fs = require("fs");
-const axios = require("axios");
-const FormData = require("form-data");
-const { configuration } = require("./configuration");
+import fs from "fs";
+import axios from "axios";
+import FormData from 'form-data';
+import  configuration  from "./configuration";
 
-const { fileExists, readFromJsonFile } = require("./utils");
+import { fileExists, readFromJsonFile } from "./utils";
 
-async function uploadDir(
-  directory,
-  rootPath,
-  protocol,
-  organizationId,
-  projectName
+export async function uploadDir(
+  directory: string,
+  rootPath: string,
+  protocol: string,
+  organizationId: string,
+  projectName: string
 ) {
   const { jwtToken, orgId } = await checkUploadConstraint(organizationId);
   console.log("Upload in progress...");
@@ -35,11 +35,11 @@ async function uploadDir(
   }
 }
 
-async function uploadFile(
-  rootPath,
-  protocol,
-  organizationId,
-  projectName
+export async function uploadFile(
+  rootPath: string,
+  protocol: string,
+  organizationId: string,
+  projectName: string
 ) {
   const { jwtToken, orgId } = await checkUploadConstraint(organizationId);
   console.log("Upload in progress...");
@@ -65,7 +65,7 @@ async function uploadFile(
   }
 }
 
-async function checkUploadConstraint(organizationId) {
+async function checkUploadConstraint(organizationId: string) {
   if (!(await fileExists(configuration.configFilePath))) {
     throw new Error("config file not present");
   }
@@ -83,7 +83,7 @@ async function checkUploadConstraint(organizationId) {
   return { jwtToken, orgId };
 }
 
-function fillDirectoryFormData(dir, rootPath, formData) {
+function fillDirectoryFormData(dir: string, rootPath: string, formData: any) {
   const files = fs.readdirSync(dir);
   for (const file of files) {
     const path = dir + "/" + file;
@@ -97,9 +97,3 @@ function fillDirectoryFormData(dir, rootPath, formData) {
     }
   }
 }
-
-
-module.exports = {
-  uploadDir,
-  uploadFile
-};

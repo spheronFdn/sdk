@@ -1,13 +1,13 @@
-const http = require("http");
-const open = require("open");
-const axios = require("axios");
-const { writeToConfigFile } = require("./utils");
-const { configuration } = require("./configuration");
+import http from "http";
+import open from "open";
+import axios from "axios";
+import { writeToConfigFile } from "./utils";
+import configuration from "./configuration";
 
-async function login(provider) {
+export async function login(provider: string) {
   console.log("Login...");
-  const server = http.createServer();
-  const s = await server.listen(0, "127.0.0.1"); // 0 = random port
+  const server: http.Server = http.createServer();
+  const s: any = await server.listen(0, "127.0.0.1"); // 0 = random port
   const { port } = s.address();
   const baseURL = `${configuration.spheron_server_address}/auth/${provider}/cli/login`;
   const fullURL = baseURL + `?port=${port}`;
@@ -17,11 +17,9 @@ async function login(provider) {
   let loginError = false;
   try {
     await Promise.all([
-      new Promise((resolve, reject) => {
+      new Promise<void>((resolve, reject) => {
         server.once("request", async (req, res) => {
-          const code = req.url.split("&")[0].split("=")[1];
-          console.log(code);
-
+          const code = req.url?.split("&")[0].split("=")[1];
           const verify = await axios.get(
             `${configuration.spheron_server_address}/auth/${provider}/cli/verify-token/${code}?port=${port}`, //port used for bitbucket
             {
@@ -61,7 +59,3 @@ async function login(provider) {
     process.exit(0);
   }
 }
-
-module.exports = {
-  login,
-};

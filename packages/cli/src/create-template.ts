@@ -1,10 +1,9 @@
-const child_process = require("child_process");
-const path = require("path");
+import child_process from "child_process";
+import path from "path";
 
-const { fileExists, writeToJsonFile, readFromJsonFile } = require("./utils");
-const { configuration } = require("./configuration");
+import configuration from "./configuration";
 
-async function createTemplate(templateUrl, folderName) {
+export async function createTemplate(templateUrl: string, folderName: string) {
   let executionError = false;
   try {
     await executeCloneOfRepo(templateUrl, folderName);
@@ -19,7 +18,7 @@ async function createTemplate(templateUrl, folderName) {
   }
 }
 
-function executeCloneOfRepo(sourceUrl, folderName) {
+function executeCloneOfRepo(sourceUrl: string, folderName: string) {
   return new Promise((resolve) => {
     const child = child_process.spawn(
       "sh",
@@ -54,7 +53,8 @@ function executeCloneOfRepo(sourceUrl, folderName) {
     });
   });
 }
-async function listTemplates() {
+
+export async function listTemplates() {
   console.log(
     `Supported templates: \n ------------------ \n 
     [react-app]                 (${configuration.templateUrls["react-app"]})\n  
@@ -63,8 +63,3 @@ async function listTemplates() {
     [portfolio-app]             (${configuration.templateUrls["portfolio-app"]})`
   );
 }
-
-module.exports = {
-  createTemplate,
-  listTemplates,
-};
