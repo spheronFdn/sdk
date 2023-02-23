@@ -10,7 +10,7 @@
     "useUnknownInCatchVariables": false,
     "forceConsistentCasingInFileNames": true,
     "rootDir": "./src",
-    "outDir": "./build/"
+    "outDir": "./dist/"
   },
   "include": ["./src/**/*"],
   "exclude": ["node_modules"]

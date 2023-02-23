@@ -8,6 +8,7 @@ import { createConfiguration } from "./create-configuration";
 import { createOrganization } from  "./create-organization";
 import { listTemplates, createTemplate } from "./create-template";
 import { init } from "./init";
+
 import  configuration  from "./configuration";
 
 const options = yargs
@@ -156,6 +157,8 @@ const options = yargs
     }
   ).argv;
 
+// IMPLEMENTED HANDLERS
+
 if (options._[0] === "login") {
   if (!options.github && !options.gitlab && !options.bitbucket) {
     console.error(
@@ -247,5 +250,15 @@ if (options._[0] === "create-template") {
       configuration.templateUrls["portfolio-app"],
       options["project-name"]
     );
+  }else { 
+    console.log("Command not recognized. Use --help get more information.");
+    process.exit(0);
   }
 }
+
+if(!options._[0]){
+  console.log("Run spheron --help to find out what commands you can use");
+  process.exit(0);
+}
+
+
