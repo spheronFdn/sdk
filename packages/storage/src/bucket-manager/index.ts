@@ -56,7 +56,7 @@ class BucketManager {
     };
   }
 
-  async patchBucketDomain(
+  async updateBucketDomain(
     bucketId: string,
     domainIdentifier: string,
     options: {

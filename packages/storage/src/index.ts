@@ -91,7 +91,7 @@ export default class SpheronClient {
     return await this.bucketManager.getBucketDomain(bucketId, domainIdentifier);
   }
 
-  async patchBucketDomain(
+  async updateBucketDomain(
     bucketId: string,
     domainIdentifier: string,
     options: {
@@ -99,7 +99,7 @@ export default class SpheronClient {
       name: string;
     }
   ): Promise<{ domain: Domain }> {
-    return await this.bucketManager.patchBucketDomain(
+    return await this.bucketManager.updateBucketDomain(
       bucketId,
       domainIdentifier,
       options
