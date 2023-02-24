@@ -6,14 +6,14 @@ import { uploadDir, uploadFile } from "./upload";
 import { login } from "./login";
 import { createConfiguration } from "./create-configuration";
 import { createOrganization } from "./create-organization";
-import { listTemplates, createTemplate } from "./create-template";
+import { listTemplates, createApp } from "./create-app";
 import { init } from "./init";
 
 import configuration from "./configuration";
 
 const options = yargs
   .usage(
-    "Usage: $0 init, login, create-organization, create-template, upload-dir, upload-file"
+    "Usage: $0 init, login, create-organization, create-app, upload-dir, upload-file"
   )
   .command("login", "Login to the system", (yargs: any) => {
     yargs
@@ -116,8 +116,8 @@ const options = yargs
     });
   })
   .command(
-    "create-template",
-    "Create a template application which runs on Spheron",
+    "create-app",
+    "Create a template application which can run on Spheron out of the box",
     (yargs: any) => {
       yargs
         .option("list", {
@@ -226,27 +226,21 @@ if (options._[0] === "create-organization") {
   createOrganization(organizationName, username, "app");
 }
 
-if (options._[0] === "create-template") {
+if (options._[0] === "create-app") {
   if (options.list) {
     listTemplates();
     process.exit(0);
   } else if (options["react-app"]) {
-    createTemplate(
-      configuration.templateUrls["react-app"],
-      options["project-name"]
-    );
+    createApp(configuration.templateUrls["react-app"], options["project-name"]);
   } else if (options["nft-edition-drop-template"]) {
-    createTemplate(
+    createApp(
       configuration.templateUrls["nft-edition-drop-template"],
       options["project-name"]
     );
   } else if (options["next-app"]) {
-    createTemplate(
-      configuration.templateUrls["next-app"],
-      options["project-name"]
-    );
+    createApp(configuration.templateUrls["next-app"], options["project-name"]);
   } else if (options["portfolio-app"]) {
-    createTemplate(
+    createApp(
       configuration.templateUrls["portfolio-app"],
       options["project-name"]
     );
