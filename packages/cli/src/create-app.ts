@@ -3,10 +3,12 @@ import path from "path";
 
 import configuration from "./configuration";
 
-export async function createTemplate(templateUrl: string, folderName: string) {
+export async function createApp(templateUrl: string, folderName: string) {
   let executionError = false;
   try {
+    console.log("Creating app...");
     await executeCloneOfRepo(templateUrl, folderName);
+    console.log("App created successfully");
   } catch (error) {
     console.log("Error: ", error.message);
     executionError = true;
@@ -31,25 +33,13 @@ function executeCloneOfRepo(sourceUrl: string, folderName: string) {
         },
       }
     );
-    let scriptOutput = "";
     let exitCode = 0;
     child.stdout.setEncoding("utf8");
-    child.stdout.on("data", (data) => {
-      const log = data.toString().trim();
-      console.log(log);
-      scriptOutput += `${log}\n`;
-    });
-    child.stderr.setEncoding("utf8");
-    child.stderr.on("data", (data) => {
-      const log = data.toString().trim();
-      console.log(log);
-    });
     child.on("error", (err) => {
       exitCode = 1;
-      console.log(err);
     });
     child.on("close", () => {
-      resolve({ exitCode, scriptOutput });
+      resolve({ exitCode });
     });
   });
 }
