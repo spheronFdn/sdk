@@ -5,11 +5,11 @@ var randomWords = require("random-words");
 import { uploadDir, uploadFile } from "./upload";
 import { login } from "./login";
 import { createConfiguration } from "./create-configuration";
-import { createOrganization } from  "./create-organization";
+import { createOrganization } from "./create-organization";
 import { listTemplates, createTemplate } from "./create-template";
 import { init } from "./init";
 
-import  configuration  from "./configuration";
+import configuration from "./configuration";
 
 const options = yargs
   .usage(
@@ -99,17 +99,17 @@ const options = yargs
       });
   })
   .command("init", "Spheron file initialization in project", (yargs: any) => {
-    yargs.option("name", {
-      describe: "Project name",
-      type: "string",
-      demandOption: true,
-    });
     yargs.option("protocol", {
       describe: "Protocol that will be used for uploading ",
       type: "string",
       demandOption: true,
     });
-    yargs.option("path", {
+    yargs.option("name", {
+      describe: "Project name",
+      type: "string",
+      demandOption: false,
+    });
+    yargs.option("rootPath", {
       describe: "Path to uploading content",
       type: "string",
       demandOption: false,
@@ -216,7 +216,7 @@ if (options._[0] === "create-configuration") {
 if (options._[0] === "init") {
   const name = options["name"];
   const protocol = options["protocol"];
-  const path = options["path"];
+  const path = options["rootPath"];
   init(name, protocol, path);
 }
 
@@ -250,15 +250,13 @@ if (options._[0] === "create-template") {
       configuration.templateUrls["portfolio-app"],
       options["project-name"]
     );
-  }else { 
+  } else {
     console.log("Command not recognized. Use --help get more information.");
     process.exit(0);
   }
 }
 
-if(!options._[0]){
+if (!options._[0]) {
   console.log("Run spheron --help to find out what commands you can use");
   process.exit(0);
 }
-
-
