@@ -119,6 +119,7 @@ class SpheronApi {
   ): Promise<{ success: boolean; domain: Domain }> {
     const { data } = await axios.patch<{ success: boolean; domain: Domain }>(
       `${this.spheronApiUrl}/v1/project/${projectId}/domains/${domainIdentifier}/verify`,
+      {},
       this.getAxiosRequestConfig()
     );
     return data;
