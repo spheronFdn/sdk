@@ -44,12 +44,15 @@ function executeCloneOfRepo(sourceUrl: string, folderName: string) {
   });
 }
 
-export async function listTemplates() {
-  console.log(
-    `Supported templates: \n ------------------ \n 
-    [react-app]                 (${configuration.templateUrls["react-app"]})\n  
-    [nft-edition-drop-template] (${configuration.templateUrls["nft-edition-drop-template"]})\n
-    [next-app]                  (${configuration.templateUrls["next-app"]})\n
-    [portfolio-app]             (${configuration.templateUrls["portfolio-app"]})`
-  );
+export function getTemplateUrlMapping(alias: string): string {
+  if (alias === "Portfolio") {
+    return "https://github.com/spheronFdn/portfolio-template";
+  } else if (alias === "NFT Drop") {
+    return "https://github.com/spheronFdn/react-boilerplate";
+  } else if (alias === "React") {
+    return "https://github.com/spheronFdn/react-boilerplate";
+  } else if (alias === "Next.js") {
+    return "https://github.com/spheronFdn/react-boilerplate";
+  }
+  throw new Error("Mapping for template not found");
 }
