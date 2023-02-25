@@ -1,13 +1,13 @@
 //TODO: Use spheron sdk to upload files
 import fs from "fs";
+import path from "path";
 import axios from "axios";
-import FormData from 'form-data';
-import  configuration  from "./configuration";
+import FormData from "form-data";
+import configuration from "./configuration";
 
 import { fileExists, readFromJsonFile } from "./utils";
 
 export async function uploadDir(
-  directory: string,
   rootPath: string,
   protocol: string,
   organizationId: string,
@@ -16,7 +16,7 @@ export async function uploadDir(
   const { jwtToken, orgId } = await checkUploadConstraint(organizationId);
   console.log("Upload in progress...");
   const data = new FormData();
-  fillDirectoryFormData(directory, rootPath, data);
+  fillDirectoryFormData(rootPath, data);
   const response = await axios.post(
     `${configuration.upload_api_address}/v1/deployment/upload?protocol=${protocol}&organization=${orgId}&project=${projectName}`,
     data,
@@ -69,13 +69,19 @@ async function checkUploadConstraint(organizationId: string) {
   if (!(await fileExists(configuration.configFilePath))) {
     throw new Error("config file not present");
   }
-  const jwtToken = await readFromJsonFile("jwtToken", configuration.configFilePath);
+  const jwtToken = await readFromJsonFile(
+    "jwtToken",
+    configuration.configFilePath
+  );
   if (!jwtToken) {
     throw new Error("JWT token not present. Execute login command");
   }
   let orgId = organizationId;
   if (!orgId) {
-    orgId = await readFromJsonFile("organization", configuration.configFilePath);
+    orgId = await readFromJsonFile(
+      "organization",
+      configuration.configFilePath
+    );
     if (!orgId) {
       throw new Error("Organization is not provided");
     }
@@ -83,16 +89,15 @@ async function checkUploadConstraint(organizationId: string) {
   return { jwtToken, orgId };
 }
 
-function fillDirectoryFormData(dir: string, rootPath: string, formData: any) {
-  const files = fs.readdirSync(dir);
+function fillDirectoryFormData(rootPath: string, formData: any) {
+  const files = fs.readdirSync(rootPath, { withFileTypes: true });
   for (const file of files) {
-    const path = dir + "/" + file;
-    const filePath = rootPath + file;
-    if (fs.statSync(path).isDirectory()) {
-      fillDirectoryFormData(path, filePath + "/", formData);
+    const filePath = path.join(rootPath, file.name);
+    if (file.isDirectory()) {
+      fillDirectoryFormData(filePath, formData);
     } else {
-      formData.append("files", fs.createReadStream(path), {
-        filepath: filePath,
+      formData.append("files", fs.createReadStream(filePath), {
+        filepath: filePath.slice(rootPath.length),
       });
     }
   }

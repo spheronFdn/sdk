@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import  configuration from "./configuration";
+import configuration from "./configuration";
 
 export async function writeToConfigFile(key: string, value: any) {
   let config: any = {};
@@ -28,7 +28,7 @@ export async function writeToConfigFile(key: string, value: any) {
   );
 }
 
-export async function fileExists(path: string) {
+export async function fileExists(path: string): Promise<boolean> {
   try {
     await fs.promises.stat(path);
     return true;
@@ -37,8 +37,25 @@ export async function fileExists(path: string) {
   }
 }
 
-export async function readFromJsonFile(key: string, path: string) {
-  let config:any = {};
+export async function getFileType(path: string): Promise<FileTypeEnum> {
+  try {
+    const stats = await fs.promises.stat(path);
+    if (stats.isDirectory()) {
+      return FileTypeEnum.DIRECTORY;
+    } else {
+      return FileTypeEnum.FILE;
+    }
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error while reading file");
+  }
+}
+
+export async function readFromJsonFile(
+  key: string,
+  path: string
+): Promise<any> {
+  let config: any = {};
   try {
     const fileContents = await fs.promises.readFile(path, "utf-8");
     config = JSON.parse(fileContents);
@@ -49,8 +66,12 @@ export async function readFromJsonFile(key: string, path: string) {
   return config[key];
 }
 
-export async function writeToJsonFile(key: string, value: any, path: string) {
-  let config:any = {};
+export async function writeToJsonFile(
+  key: string,
+  value: any,
+  path: string
+): Promise<void> {
+  let config: any = {};
   try {
     // Check if the  file exists
     await fs.promises.stat(path);
@@ -64,3 +85,7 @@ export async function writeToJsonFile(key: string, value: any, path: string) {
   await fs.promises.writeFile(path, jsonString, "utf-8");
 }
 
+export enum FileTypeEnum {
+  DIRECTORY = "directory",
+  FILE = "file",
+}
