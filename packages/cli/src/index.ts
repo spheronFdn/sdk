@@ -8,6 +8,7 @@ import { createConfiguration } from "./create-configuration";
 import { createOrganization } from "./create-organization";
 import { listTemplates, createApp } from "./create-app";
 import { init } from "./init";
+import { publish } from "./publish";
 
 import configuration from "./configuration";
 
@@ -35,11 +36,6 @@ const options = yargs
   })
   .command("upload-dir", "Upload dir", (yargs: any) => {
     yargs
-      .option("directory", {
-        describe: "Directory",
-        type: "string",
-        demandOption: true,
-      })
       .option("path", {
         describe: "Path to directory",
         type: "string",
@@ -84,6 +80,7 @@ const options = yargs
         demandOption: false,
       });
   })
+  .command("publish", "Upload your project setup in spheron.json")
   .command("create-configuration", "Create spheron config file")
   .command("create-organization", "Create organization", (yargs: any) => {
     yargs
@@ -177,7 +174,6 @@ if (options._[0] === "login") {
 
 if (options._[0] === "upload-dir") {
   try {
-    const directory = options["directory"];
     const protocol = options["protocol"];
     let projectName = options["project-name"];
     const organizationId = options["organizationId"];
@@ -188,7 +184,7 @@ if (options._[0] === "upload-dir") {
     if (!path) {
       path = "./";
     }
-    uploadDir(directory, path, protocol, organizationId, projectName);
+    uploadDir(path, protocol, organizationId, projectName);
   } catch (error) {
     console.log(error.message);
   }
@@ -207,6 +203,10 @@ if (options._[0] === "upload-file") {
   } catch (error) {
     console.log(error.message);
   }
+}
+
+if (options._[0] === "publish") {
+  publish();
 }
 
 if (options._[0] === "create-configuration") {
