@@ -3,7 +3,7 @@ const yargs = require("yargs");
 var randomWords = require("random-words");
 import { createSpinner } from "nanospinner";
 
-import { uploadDir, uploadFile } from "./commands/upload";
+import { upload } from "./commands/upload";
 import { login } from "./commands/login";
 import { createConfiguration } from "./commands/create-configuration";
 import { createOrganization } from "./commands/create-organization";
@@ -124,11 +124,7 @@ import { FileTypeEnum, getFileType, readFromJsonFile } from "./utils";
       const fileType: FileTypeEnum = await getFileType(path);
       const spinner = createSpinner(`Uploading ${fileType} `).start();
       try {
-        if (fileType === FileTypeEnum.DIRECTORY) {
-          await uploadDir(path, protocol, organizationId, projectName);
-        } else if (fileType === FileTypeEnum.FILE) {
-          await uploadFile(path, protocol, organizationId, projectName);
-        }
+        await upload(path, protocol, organizationId, projectName);
       } catch (error) {
         spinner.error();
         process.exit(1);
