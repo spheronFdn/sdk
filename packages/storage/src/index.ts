@@ -1,10 +1,22 @@
 import UploadManager, { UploadResult } from "./upload-manager";
 import { ProtocolEnum } from "./enums";
 import SpheronApi from "./spheron-api";
-import { Bucket, Domain, Upload } from "./bucket-manager/interfaces";
-import BucketManager from "./bucket-manager";
+import BucketManager, {
+  Bucket,
+  Upload,
+  BucketStateEnum,
+  Domain,
+  DomainTypeEnum,
+} from "./bucket-manager";
 
-export { ProtocolEnum, SpheronApi };
+export {
+  ProtocolEnum,
+  Bucket,
+  Upload,
+  BucketStateEnum,
+  Domain,
+  DomainTypeEnum,
+};
 
 export interface SpheronClientConfiguration {
   token: string;
@@ -45,27 +57,15 @@ export default class SpheronClient {
     return await this.bucketManager.getBucket(bucketId);
   }
 
-  async getBucketUploadCount(bucketId: string): Promise<{
-    total: number;
-    successful: number;
-    failed: number;
-    pending: number;
-  }> {
-    return await this.bucketManager.getBucketUploadCount(bucketId);
-  }
-
-  async getBucketUploads(
-    bucketId: string,
-    options: {
-      skip: number;
-      limit: number;
-    }
-  ): Promise<{ uploads: Upload[] }> {
-    return await this.bucketManager.getBucketUploads(bucketId, options);
-  }
-
   async getBucketDomains(bucketId: string): Promise<{ domains: Domain[] }> {
     return await this.bucketManager.getBucketDomains(bucketId);
+  }
+
+  async getBucketDomain(
+    bucketId: string,
+    domainIdentifier: string
+  ): Promise<{ domain: Domain }> {
+    return await this.bucketManager.getBucketDomain(bucketId, domainIdentifier);
   }
 
   async addBucketDomain(
@@ -73,6 +73,7 @@ export default class SpheronClient {
     options: {
       link: string;
       type:
+        | DomainTypeEnum
         | "domain"
         | "subdomain"
         | "handshake-domain"
@@ -82,13 +83,6 @@ export default class SpheronClient {
     }
   ): Promise<{ domain: Domain }> {
     return await this.bucketManager.addBucketDomain(bucketId, options);
-  }
-
-  async getBucketDomain(
-    bucketId: string,
-    domainIdentifier: string
-  ): Promise<{ domain: Domain }> {
-    return await this.bucketManager.getBucketDomain(bucketId, domainIdentifier);
   }
 
   async updateBucketDomain(
@@ -119,11 +113,30 @@ export default class SpheronClient {
   async deleteBucketDomain(
     bucketId: string,
     domainIdentifier: string
-  ): Promise<{ success: boolean }> {
+  ): Promise<void> {
     return await this.bucketManager.deleteBucketDomain(
       bucketId,
       domainIdentifier
     );
+  }
+
+  async getBucketUploadCount(bucketId: string): Promise<{
+    total: number;
+    successful: number;
+    failed: number;
+    pending: number;
+  }> {
+    return await this.bucketManager.getBucketUploadCount(bucketId);
+  }
+
+  async getBucketUploads(
+    bucketId: string,
+    options: {
+      skip: number;
+      limit: number;
+    }
+  ): Promise<{ uploads: Upload[] }> {
+    return await this.bucketManager.getBucketUploads(bucketId, options);
   }
 
   async archiveBucket(bucketId: string): Promise<void> {

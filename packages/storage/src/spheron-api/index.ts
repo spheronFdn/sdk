@@ -119,8 +119,8 @@ class SpheronApi {
   async deleteProjectDomain(
     projectId: string,
     domainIdentifier: string
-  ): Promise<{ success: boolean }> {
-    return await this.sendApiRequest<{ success: boolean }>(
+  ): Promise<void> {
+    await this.sendApiRequest(
       HttpMethods.DELETE,
       `/v1/project/${projectId}/domains/${domainIdentifier}`
     );

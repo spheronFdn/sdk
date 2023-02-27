@@ -4,7 +4,7 @@ import {
   ProjectStateEnum,
   ProjectTypeEnum,
 } from "../spheron-api/enums";
-import { Bucket, Domain, Upload } from "./interfaces";
+import { Bucket, Domain, Upload, BucketStateEnum } from "./interfaces";
 import { Domain as ProjectDomain } from "../spheron-api/interfaces";
 
 class BucketManager {
@@ -24,14 +24,8 @@ class BucketManager {
       name: project.name,
       organizationId: project.organization,
       state: project.state,
-      domains: project.domains?.map(
-        ({ _id, name, link, verified, projectId }) => ({
-          _id,
-          name,
-          link,
-          verified,
-          bucketId: projectId,
-        })
+      domains: project.domains?.map((x) =>
+        this.mapProjectDomainToBucketDomain(x)
       ),
     };
   }
@@ -90,11 +84,8 @@ class BucketManager {
   async deleteBucketDomain(
     bucketId: string,
     domainIdentifier: string
-  ): Promise<{ success: boolean }> {
-    return await this.spheronApi.deleteProjectDomain(
-      bucketId,
-      domainIdentifier
-    );
+  ): Promise<void> {
+    await this.spheronApi.deleteProjectDomain(bucketId, domainIdentifier);
   }
 
   async addBucketDomain(
@@ -132,7 +123,7 @@ class BucketManager {
     return {
       uploads: deployments.map((x) => ({
         _id: x._id,
-        sitePreview: x.sitePreview,
+        protocolLink: x.sitePreview,
         buildDirectory: x.buildDirectory,
         status: x.status,
         memoryUsed: x.memoryUsed,
@@ -172,8 +163,10 @@ class BucketManager {
       link: domain.link,
       verified: domain.verified,
       bucketId: domain.projectId,
+      type: domain.type,
     };
   }
 }
 
 export default BucketManager;
+export { Bucket, Domain, Upload, BucketStateEnum, DomainTypeEnum };

@@ -1,4 +1,8 @@
-import { DeploymentStatusEnum, ProjectStateEnum } from "../spheron-api/enums";
+import {
+  DeploymentStatusEnum,
+  DomainTypeEnum,
+  ProjectStateEnum,
+} from "../spheron-api/enums";
 
 interface Domain {
   _id: string;
@@ -6,13 +10,16 @@ interface Domain {
   link: string;
   verified: boolean;
   bucketId: string;
+  type: DomainTypeEnum;
 }
+
+type BucketStateEnum = ProjectStateEnum;
 
 interface Bucket {
   _id: string;
   name: string;
   organizationId: string;
-  state: ProjectStateEnum;
+  state: BucketStateEnum;
   domains: Domain[];
 }
 
@@ -26,4 +33,4 @@ interface Upload {
   protocol: string;
 }
 
-export { Bucket, Domain, Upload };
+export { Bucket, Domain, Upload, BucketStateEnum };
