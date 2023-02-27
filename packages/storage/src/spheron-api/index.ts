@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios from "axios";
 import {
   DeploymentStatusEnum,
   DomainTypeEnum,
@@ -23,19 +23,17 @@ class SpheronApi {
   }
 
   async getTokenScope(): Promise<TokenScope> {
-    const { data } = await axios.get<TokenScope>(
-      `${this.spheronApiUrl}/v1/api-keys/scope`,
-      this.getAxiosRequestConfig()
+    return await this.sendApiRequest<TokenScope>(
+      HttpMethods.GET,
+      "/v1/api-keys/scope"
     );
-    return data;
   }
 
   async getProject(projectId: string): Promise<Project> {
-    const { data } = await axios.get<Project>(
-      `${this.spheronApiUrl}/v1/project/${projectId}`,
-      this.getAxiosRequestConfig()
+    return this.sendApiRequest<Project>(
+      HttpMethods.GET,
+      `/v1/project/${projectId}`
     );
-    return data;
   }
 
   async getProjectDeployments(
@@ -49,34 +47,30 @@ class SpheronApi {
     if (options.skip < 0 || options.limit < 0) {
       throw new Error(`Skip and Limit cannot be negative numbers.`);
     }
-    const { data } = await axios.get<Deployment[]>(
-      `${this.spheronApiUrl}/v1/project/${projectId}/deployments?skip=${
-        options.skip
-      }&limit=${options.limit}${
-        options.status ? `&status=${options.status}` : ""
-      }`,
-      this.getAxiosRequestConfig()
+    const deployments = await this.sendApiRequest<Deployment[]>(
+      HttpMethods.GET,
+      `/v1/project/${projectId}/deployments?skip=${options.skip}&limit=${
+        options.limit
+      }${options.status ? `&status=${options.status}` : ""}`
     );
-    return { deployments: data };
+    return { deployments };
   }
 
   async getProjectDomains(projectId: string): Promise<{ domains: Domain[] }> {
-    const { data } = await axios.get<{ domains: Domain[] }>(
-      `${this.spheronApiUrl}/v1/project/${projectId}/domains`,
-      this.getAxiosRequestConfig()
+    return this.sendApiRequest<{ domains: Domain[] }>(
+      HttpMethods.GET,
+      `/v1/project/${projectId}/domains`
     );
-    return data;
   }
 
   async getProjectDomain(
     projectId: string,
     domainIdentifier: string
   ): Promise<{ domain: Domain }> {
-    const { data } = await axios.get<{ domain: Domain }>(
-      `${this.spheronApiUrl}/v1/project/${projectId}/domains/${domainIdentifier}`,
-      this.getAxiosRequestConfig()
+    return this.sendApiRequest<{ domain: Domain }>(
+      HttpMethods.GET,
+      `/v1/project/${projectId}/domains/${domainIdentifier}`
     );
-    return data;
   }
 
   async addProjectDomain(
@@ -88,12 +82,11 @@ class SpheronApi {
       name: string;
     }
   ): Promise<{ domain: Domain }> {
-    const { data } = await axios.post<{ domain: Domain }>(
-      `${this.spheronApiUrl}/v1/project/${projectId}/domains`,
-      options,
-      this.getAxiosRequestConfig()
+    return await this.sendApiRequest<{ domain: Domain }>(
+      HttpMethods.POST,
+      `/v1/project/${projectId}/domains`,
+      options
     );
-    return data;
   }
 
   async patchProjectDomain(
@@ -105,35 +98,32 @@ class SpheronApi {
       name: string;
     }
   ): Promise<{ domain: Domain }> {
-    const { data } = await axios.patch<{ domain: Domain }>(
-      `${this.spheronApiUrl}/v1/project/${projectId}/domains/${domainIdentifier}`,
-      options,
-      this.getAxiosRequestConfig()
+    return await this.sendApiRequest<{ domain: Domain }>(
+      HttpMethods.PATCH,
+      `/v1/project/${projectId}/domains/${domainIdentifier}`,
+      options
     );
-    return data;
   }
 
   async verifyProjectDomain(
     projectId: string,
     domainIdentifier: string
   ): Promise<{ success: boolean; domain: Domain }> {
-    const { data } = await axios.patch<{ success: boolean; domain: Domain }>(
-      `${this.spheronApiUrl}/v1/project/${projectId}/domains/${domainIdentifier}/verify`,
-      {},
-      this.getAxiosRequestConfig()
+    return await this.sendApiRequest<{ success: boolean; domain: Domain }>(
+      HttpMethods.PATCH,
+      `/v1/project/${projectId}/domains/${domainIdentifier}/verify`,
+      {}
     );
-    return data;
   }
 
   async deleteProjectDomain(
     projectId: string,
     domainIdentifier: string
   ): Promise<{ success: boolean }> {
-    const { data } = await axios.delete<{ success: boolean }>(
-      `${this.spheronApiUrl}/v1/project/${projectId}/domains/${domainIdentifier}`,
-      this.getAxiosRequestConfig()
+    return await this.sendApiRequest<{ success: boolean }>(
+      HttpMethods.DELETE,
+      `/v1/project/${projectId}/domains/${domainIdentifier}`
     );
-    return data;
   }
 
   async getProjectDeploymentCount(projectId: string): Promise<{
@@ -142,28 +132,23 @@ class SpheronApi {
     failed: number;
     pending: number;
   }> {
-    const { data } = await axios.get<{
+    return await this.sendApiRequest<{
       total: number;
       successful: number;
       failed: number;
       pending: number;
-    }>(
-      `${this.spheronApiUrl}/v1/project/${projectId}/deployments/count`,
-      this.getAxiosRequestConfig()
-    );
-    return data;
+    }>(HttpMethods.GET, `/v1/project/${projectId}/deployments/count`);
   }
 
   async updateProjectState(
     projectId: string,
     state: ProjectStateEnum | string
   ): Promise<{ message: string }> {
-    const { data } = await axios.patch<{ message: string }>(
-      `${this.spheronApiUrl}/v1/project/${projectId}/state`,
-      { state },
-      this.getAxiosRequestConfig()
+    return await this.sendApiRequest<{ message: string }>(
+      HttpMethods.PATCH,
+      `/v1/project/${projectId}/state`,
+      { state }
     );
-    return data;
   }
 
   async updateProjectConfiguration(
@@ -177,21 +162,41 @@ class SpheronApi {
       nodeVersion: NodeVersionEnum | string;
     }
   ): Promise<{ configuration: Configuration }> {
-    const { data } = await axios.put<{ configuration: Configuration }>(
-      `${this.spheronApiUrl}/v1/project/${projectId}/configuration`,
-      options,
-      this.getAxiosRequestConfig()
+    return await this.sendApiRequest<{ configuration: Configuration }>(
+      HttpMethods.PUT,
+      `/v1/project/${projectId}/configuration`,
+      options
     );
-    return data;
   }
 
-  private getAxiosRequestConfig(): AxiosRequestConfig {
-    return {
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-      },
-    };
+  private async sendApiRequest<T>(
+    method: HttpMethods,
+    path: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    payload?: any
+  ): Promise<T> {
+    try {
+      const response = await axios<T>({
+        method,
+        url: `${this.spheronApiUrl}${path}`,
+        data: payload,
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || error?.message);
+    }
   }
+}
+
+enum HttpMethods {
+  GET = "Get",
+  POST = "Post",
+  PATCH = "Patch",
+  DELETE = "Delete",
+  PUT = "Put",
 }
 
 export default SpheronApi;
