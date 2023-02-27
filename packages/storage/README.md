@@ -51,10 +51,27 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(f
     - `bucketId` - the id of the bucket
     - `protocolLink` - is the protocol link of the upload
     - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
- 
+
+The `SpheronClient` instance also provides methods for working with buckets. The supported methods are:
+
+- `getBucket(bucketId)` - used to get the bucket information for the specified `bucketId`.
+- `getBucketDomains(bucketId)` - used to get the domains that are attached to the specified `bucketId`.
+- `getBucketDomain(bucketId, domainIdentifier)` - used to get the information about the specific domain.
+- `addBucketDomain(bucketId, { link, type, name })` - used to attach a new domain to the specified bucket.
+  - `link` - needs the `protocolLink` value of an existing bucket upload.
+  - `type` - valid values are [`domain`, `subdomain`, `handshake-domain`, `handshake-subdomain`, `ens-domain`].
+  - `name` - the domain name.
+- `updateBucketDomain(bucketId, domainIdentifier, { link, name })`
+- `verifyBucketDomain(bucketId, domainIdentifier)`
+- `deleteBucketDomain(bucketId, domainIdentifier)`
+- `getBucketUploads(bucketId, { skip: number, limit: number })`
+- `getBucketUploadCount(bucketId)`
+- `archiveBucket(bucketId)`
+- `unarchiveBucket(bucketId)`
+
 ## Learn More
 
 You can learn more about Spheron and Storage SDK here:
 
-* [Spheron Discord](https://discord.com/invite/ahxuCtm)
-* [Spheron Twitter](https://twitter.com/SpheronFdn)
+- [Spheron Discord](https://discord.com/invite/ahxuCtm)
+- [Spheron Twitter](https://twitter.com/SpheronFdn)

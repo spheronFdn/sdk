@@ -18,7 +18,7 @@ interface Bucket {
 
 interface Upload {
   _id: string;
-  sitePreview: string;
+  protocolLink: string;
   buildDirectory: string[];
   status: DeploymentStatusEnum;
   memoryUsed: number;
