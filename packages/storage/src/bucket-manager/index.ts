@@ -4,7 +4,13 @@ import {
   ProjectStateEnum,
   ProjectTypeEnum,
 } from "../spheron-api/enums";
-import { Bucket, Domain, Upload, BucketStateEnum } from "./interfaces";
+import {
+  Bucket,
+  Domain,
+  Upload,
+  BucketStateEnum,
+  UploadStatusEnum,
+} from "./interfaces";
 import { Domain as ProjectDomain } from "../spheron-api/interfaces";
 
 class BucketManager {
@@ -125,7 +131,7 @@ class BucketManager {
         _id: x._id,
         protocolLink: x.sitePreview,
         buildDirectory: x.buildDirectory,
-        status: x.status,
+        status: x.status as unknown as UploadStatusEnum,
         memoryUsed: x.memoryUsed,
         bucketId: x.project._id,
         protocol: x.protocol,
@@ -169,4 +175,11 @@ class BucketManager {
 }
 
 export default BucketManager;
-export { Bucket, Domain, Upload, BucketStateEnum, DomainTypeEnum };
+export {
+  Bucket,
+  Domain,
+  Upload,
+  BucketStateEnum,
+  DomainTypeEnum,
+  UploadStatusEnum,
+};

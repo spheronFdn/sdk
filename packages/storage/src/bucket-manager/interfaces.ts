@@ -1,8 +1,4 @@
-import {
-  DeploymentStatusEnum,
-  DomainTypeEnum,
-  ProjectStateEnum,
-} from "../spheron-api/enums";
+import { DomainTypeEnum, ProjectStateEnum } from "../spheron-api/enums";
 
 interface Domain {
   _id: string;
@@ -23,14 +19,22 @@ interface Bucket {
   domains: Domain[];
 }
 
+enum UploadStatusEnum {
+  PENDING = "Pending",
+  CANCELED = "Canceled",
+  DEPLOYED = "Deployed",
+  FAILED = "Failed",
+  TIMED_OUT = "TimedOut",
+}
+
 interface Upload {
   _id: string;
   protocolLink: string;
   buildDirectory: string[];
-  status: DeploymentStatusEnum;
+  status: UploadStatusEnum;
   memoryUsed: number;
   bucketId: string;
   protocol: string;
 }
 
-export { Bucket, Domain, Upload, BucketStateEnum };
+export { Bucket, Domain, Upload, BucketStateEnum, UploadStatusEnum };

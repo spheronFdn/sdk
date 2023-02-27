@@ -52,22 +52,65 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(f
     - `protocolLink` - is the protocol link of the upload
     - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
 
+---
+
 The `SpheronClient` instance also provides methods for working with buckets. The supported methods are:
 
-- `getBucket(bucketId)` - used to get the bucket information for the specified `bucketId`.
-- `getBucketDomains(bucketId)` - used to get the domains that are attached to the specified `bucketId`.
-- `getBucketDomain(bucketId, domainIdentifier)` - used to get the information about the specific domain.
-- `addBucketDomain(bucketId, { link, type, name })` - used to attach a new domain to the specified bucket.
-  - `link` - needs the `protocolLink` value of an existing bucket upload.
-  - `type` - valid values are [`domain`, `subdomain`, `handshake-domain`, `handshake-subdomain`, `ens-domain`].
-  - `name` - the domain name.
-- `updateBucketDomain(bucketId, domainIdentifier, { link, name })`
-- `verifyBucketDomain(bucketId, domainIdentifier)`
-- `deleteBucketDomain(bucketId, domainIdentifier)`
-- `getBucketUploads(bucketId, { skip: number, limit: number })`
-- `getBucketUploadCount(bucketId)`
-- `archiveBucket(bucketId)`
-- `unarchiveBucket(bucketId)`
+- `async getBucket(bucketId: string): Promise<Bucket>` - used to get the bucket information for the specified `bucketId`.
+- `async  getBucketDomains(bucketId: string): Promise<{ domains: Domain[] }>` - used to get the domains that are attached to the specified `bucketId`.
+- `async  getBucketDomain(bucketId: string, domainIdentifier: string): Promise<{ domain: Domain }>` - used to get the information about the specific domain. The `domainIdentifier` can ether be the id of the domain, or the name of the domain.
+- `async  addBucketDomain(bucketId: string, { link:  string; type: DomainTypeEnum; name: string; }): Promise<{ domain: Domain }>` - used to attach a new domain to the specified bucket. The `link` property needs to have the `protocolLink` value of an existing bucket id.
+- `async  updateBucketDomain(bucketId: string, domainIdentifier: string, options: { link: string; name: string; }): Promise<{ domain: Domain }>` - used to update an existing domain of the Bucket.
+- `async  verifyBucketDomain(bucketId: string, domainIdentifier: string): Promise<{ domain: Domain }>` - used to verify the domain, after which the content behind the domain will be cached on CDN.
+- `async  deleteBucketDomain(bucketId: string, domainIdentifier: string): Promise<{ success: boolean }>` - used to delete the domain of the Bucket.
+- `async  archiveBucket(bucketId: string): Promise<void>` - used to archive a Bucket.
+- `async  unarchiveBucket(bucketId: string): Promise<void>` - used to unarchive a Bucket.
+- `async  getBucketUploadCount(bucketId: string): Promise<{total: number; successful: number; failed: number;pending: number; }>` - used to get the number of uploads for the specified bucket.
+- `async  getBucketUploads(bucketId: string, options: { skip: number; limit: number; }): Promise<{ uploads: Upload[] }>`- used to get the uploads of the bucket.
+
+Interfaces:
+
+```js
+interface  Domain {
+	_id: string;
+	name: string;
+	link: string;
+	verified: boolean;
+	bucketId: string;
+	type: DomainTypeEnum;
+}
+
+enum  BucketStateEnum {
+	MAINTAINED = "MAINTAINED",
+	ARCHIVED = "ARCHIVED",
+}
+
+interface  Bucket {
+	_id: string;
+	name: string;
+	organizationId: string;
+	state: BucketStateEnum;
+	domains: Domain[];
+}
+
+enum UploadStatusEnum {
+  PENDING = "Pending",
+  CANCELED = "Canceled",
+  DEPLOYED = "Deployed",
+  FAILED = "Failed",
+  TIMED_OUT = "TimedOut",
+}
+
+interface  Upload {
+	_id: string;
+	protocolLink: string;
+	buildDirectory: string[];
+	status: UploadStatusEnum;
+	memoryUsed: number;
+	bucketId: string;
+	protocol: string;
+}
+```
 
 ## Learn More
 

@@ -7,6 +7,7 @@ import BucketManager, {
   BucketStateEnum,
   Domain,
   DomainTypeEnum,
+  UploadStatusEnum,
 } from "./bucket-manager";
 
 export {
@@ -16,6 +17,7 @@ export {
   BucketStateEnum,
   Domain,
   DomainTypeEnum,
+  UploadStatusEnum,
 };
 
 export interface SpheronClientConfiguration {
@@ -120,6 +122,14 @@ export default class SpheronClient {
     );
   }
 
+  async archiveBucket(bucketId: string): Promise<void> {
+    await this.bucketManager.archiveBucket(bucketId);
+  }
+
+  async unarchiveBucket(bucketId: string): Promise<void> {
+    await this.bucketManager.unarchiveBucket(bucketId);
+  }
+
   async getBucketUploadCount(bucketId: string): Promise<{
     total: number;
     successful: number;
@@ -137,13 +147,5 @@ export default class SpheronClient {
     }
   ): Promise<{ uploads: Upload[] }> {
     return await this.bucketManager.getBucketUploads(bucketId, options);
-  }
-
-  async archiveBucket(bucketId: string): Promise<void> {
-    await this.bucketManager.archiveBucket(bucketId);
-  }
-
-  async unarchiveBucket(bucketId: string): Promise<void> {
-    await this.bucketManager.unarchiveBucket(bucketId);
   }
 }
