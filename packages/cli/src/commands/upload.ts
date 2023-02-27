@@ -1,7 +1,5 @@
-//TODO: Use spheron sdk to upload files
 import configuration from "../configuration";
-// const { default: SpheronClient, ProtocolEnum } = require("@spheron/storage");
-import SpheronClient, { ProtocolEnum } from "spheron-storage-dusan";
+const { default: SpheronClient, ProtocolEnum } = require("@spheron/storage");
 
 import { readFromJsonFile } from "../utils";
 
@@ -22,13 +20,26 @@ export async function upload(
 
     const client = new SpheronClient({ token: jwtToken });
 
+    let uploadedBytes = 0;
     const { uploadId, bucketId, protocolLink, dynamicLinks } =
       await client.upload(rootPath, {
         protocol: mapProtocol(protocol),
         name: projectName,
         organizationId,
+        onUploadInitiated: (deploymentId: any) => {
+          console.log("Upload started, id of deployment: " + deploymentId);
+        },
+        onChunkUploaded(uploadedSize: any, totalSize: any) {
+          uploadedBytes += uploadedSize;
+          console.log(
+            `Uploaded ${uploadedBytes} bytes of total ${totalSize} bytes`
+          );
+        },
       });
-    console.log(uploadId, bucketId, protocolLink, dynamicLinks);
+    console.log("uploadId:", uploadId);
+    console.log("bucketId:", bucketId);
+    console.log("protocolLink:", protocolLink);
+    console.log("dynamicLinks:", dynamicLinks);
   } catch (error) {
     console.log("Upload failed: ", error.message);
     throw error;
