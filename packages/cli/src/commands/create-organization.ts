@@ -1,21 +1,29 @@
 import axios from "axios";
-import configuration  from "./configuration";
-import { writeToConfigFile, fileExists, readFromJsonFile } from "./utils";
+import configuration from "../configuration";
+import { writeToConfigFile, fileExists, readFromJsonFile } from "../utils";
 
-
-export async function createOrganization(name: string, username: string, type: string) {
+export async function createOrganization(
+  name: string,
+  username: string,
+  type: string
+) {
   let executionError = false;
   try {
     if (!(await fileExists(configuration.configFilePath))) {
       console.log("Spheron config file does not exist");
       return;
     }
-    const jwtToken = await readFromJsonFile("jwtToken", configuration.configFilePath);
+    const jwtToken = await readFromJsonFile(
+      "jwtToken",
+      configuration.configFilePath
+    );
     if (!jwtToken) {
       console.log("JWT token not valid or does not exist. Pleas login first");
       return;
     }
-    console.log(`Creating organization name: ${name}, username: ${username}...`);
+    console.log(
+      `Creating organization name: ${name}, username: ${username}...`
+    );
     const organizationResponse = await axios.post(
       `${configuration.spheron_server_address}/v1/organization`,
       {
@@ -35,16 +43,10 @@ export async function createOrganization(name: string, username: string, type: s
     ) {
       throw new Error("Failed to create an organization");
     }
-    console.log("Organization created");
     const organization = organizationResponse.data.organization;
     await writeToConfigFile("organization", organization._id);
   } catch (error) {
     console.log("Error: ", error.message);
-    executionError = true;
-  } finally {
-    if (executionError) {
-      console.log("There was a problem while creating organization");
-    }
-    process.exit(0);
+    throw error;
   }
 }

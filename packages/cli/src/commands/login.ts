@@ -1,13 +1,13 @@
 import http from "http";
 import open from "open";
 import axios from "axios";
-import { writeToConfigFile } from "./utils";
-import configuration from "./configuration";
+import { writeToConfigFile } from "../utils";
+import configuration from "../configuration";
+import { createSpinner } from "nanospinner";
 
 let server: http.Server;
 
-export async function login(provider: string) {
-  console.log("Login...");
+export async function login(provider: string): Promise<void> {
   server = http.createServer();
   server.listen(0, "127.0.0.1", async () => {
     const { port } = server.address() as any;
@@ -17,6 +17,8 @@ export async function login(provider: string) {
       `${configuration.spheron_frontend_address}/notifications/cli-login`
     );
     let loginError = false;
+    const spinner = createSpinner("Login ").start();
+    console.log("");
     try {
       await Promise.all([
         new Promise<void>((resolve, reject) => {
@@ -55,9 +57,8 @@ export async function login(provider: string) {
       server.close();
       if (loginError) {
         console.log("Error occured while loging in, ");
-      } else {
-        console.log("Login succesfull!");
       }
+      spinner.success();
       process.exit(0);
     }
   });

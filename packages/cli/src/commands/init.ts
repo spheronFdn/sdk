@@ -1,7 +1,7 @@
 import path from "path";
 
-import { writeToJsonFile, fileExists, readFromJsonFile } from "./utils";
-import configuration from "./configuration";
+import { writeToJsonFile, fileExists, readFromJsonFile } from "../utils";
+import configuration from "../configuration";
 
 export async function init(
   name: string,
