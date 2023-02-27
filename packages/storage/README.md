@@ -56,7 +56,8 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(f
 
 The `SpheronClient` instance also provides methods for working with buckets. The supported methods are:
 
-- `async getBucket(bucketId: string): Promise<Bucket>` - used to get the bucket information for the specified `bucketId`.
+- `async getBucket(bucketId: string): Promise<Bucket>`
+  - used to get the bucket information for the specified `bucketId`.
 - `async  getBucketDomains(bucketId: string): Promise<{ domains: Domain[] }>` - used to get the domains that are attached to the specified `bucketId`.
 - `async  getBucketDomain(bucketId: string, domainIdentifier: string): Promise<{ domain: Domain }>` - used to get the information about the specific domain. The `domainIdentifier` can ether be the id of the domain, or the name of the domain.
 - `async  addBucketDomain(bucketId: string, { link:  string; type: DomainTypeEnum; name: string; }): Promise<{ domain: Domain }>` - used to attach a new domain to the specified bucket. The `link` property needs to have the `protocolLink` value of an existing bucket id.
@@ -72,25 +73,25 @@ Interfaces:
 
 ```js
 interface  Domain {
-	_id: string;
-	name: string;
-	link: string;
-	verified: boolean;
-	bucketId: string;
-	type: DomainTypeEnum;
+  _id: string;
+  name: string;
+  link: string;
+  verified: boolean;
+  bucketId: string;
+  type: DomainTypeEnum;
 }
 
 enum  BucketStateEnum {
-	MAINTAINED = "MAINTAINED",
-	ARCHIVED = "ARCHIVED",
+  MAINTAINED = "MAINTAINED",
+  ARCHIVED = "ARCHIVED",
 }
 
 interface  Bucket {
-	_id: string;
-	name: string;
-	organizationId: string;
-	state: BucketStateEnum;
-	domains: Domain[];
+  _id: string;
+  name: string;
+  organizationId: string;
+  state: BucketStateEnum;
+  domains: Domain[];
 }
 
 enum UploadStatusEnum {
@@ -102,13 +103,13 @@ enum UploadStatusEnum {
 }
 
 interface  Upload {
-	_id: string;
-	protocolLink: string;
-	buildDirectory: string[];
-	status: UploadStatusEnum;
-	memoryUsed: number;
-	bucketId: string;
-	protocol: string;
+  _id: string;
+  protocolLink: string;
+  buildDirectory: string[];
+  status: UploadStatusEnum;
+  memoryUsed: number;
+  bucketId: string;
+  protocol: string;
 }
 ```
 
