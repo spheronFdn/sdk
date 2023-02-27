@@ -1,7 +1,7 @@
 //TODO: Use spheron sdk to upload files
 import configuration from "../configuration";
 // const { default: SpheronClient, ProtocolEnum } = require("@spheron/storage");
-import SpheronClient, { ProtocolEnum } from "@spheron/storage";
+import SpheronClient, { ProtocolEnum } from "spheron-storage-dusan";
 
 import { readFromJsonFile } from "../utils";
 
