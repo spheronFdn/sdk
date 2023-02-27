@@ -91,7 +91,7 @@ class UploadManager {
       );
       return response.data;
     } catch (error) {
-      const errorMessage = error?.data?.message || error?.message;
+      const errorMessage = error?.response.data?.message || error?.message;
       throw new Error(errorMessage);
     }
   }
@@ -160,7 +160,7 @@ class UploadManager {
       );
       return response.data;
     } catch (error) {
-      const errorMessage = error?.data?.message || error?.message;
+      const errorMessage = error?.response?.data?.message || error?.message;
       throw new Error(errorMessage);
     }
   }
