@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
-import configuration  from "./configuration";
-import { writeToConfigFile, fileExists, writeToJsonFile } from "./utils";
+import configuration from "../configuration";
+import { writeToConfigFile, fileExists, writeToJsonFile } from "../utils";
 
 export async function createConfiguration() {
   let executionError = false;

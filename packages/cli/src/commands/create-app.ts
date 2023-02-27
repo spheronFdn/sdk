@@ -1,8 +1,6 @@
 import child_process from "child_process";
 import path from "path";
 
-import configuration from "./configuration";
-
 export async function createApp(templateUrl: string, folderName: string) {
   let executionError = false;
   try {

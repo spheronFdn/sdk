@@ -1,5 +1,4 @@
-import configuration from "../configuration";
-import { createApp, getTemplateUrlMapping } from "../create-app";
+import { createApp, getTemplateUrlMapping } from "../commands/create-app";
 
 const inquirer = require("inquirer");
 
