@@ -8,7 +8,6 @@ export async function createOrganization(
   username: string,
   type: string
 ) {
-  let executionError = false;
   try {
     if (!(await fileExists(configuration.configFilePath))) {
       await createConfiguration();

@@ -7,7 +7,7 @@ import {
   FileTypeEnum,
 } from "../utils";
 
-import { uploadDir, uploadFile } from "./upload";
+import { upload } from "./upload";
 
 export async function publish(): Promise<any> {
   try {
@@ -40,21 +40,12 @@ export async function publish(): Promise<any> {
     const fileType: FileTypeEnum = await getFileType(
       localConfiguration.rootPath
     );
-    if (fileType === FileTypeEnum.DIRECTORY) {
-      await uploadDir(
-        localConfiguration.rootPath,
-        localConfiguration.protocol,
-        organizationId,
-        localConfiguration.name
-      );
-    } else if (fileType === FileTypeEnum.FILE) {
-      await uploadFile(
-        localConfiguration.rootPath,
-        localConfiguration.protocol,
-        organizationId,
-        localConfiguration.name
-      );
-    }
+    await upload(
+      localConfiguration.rootPath,
+      localConfiguration.protocol,
+      organizationId,
+      localConfiguration.name
+    );
   } catch (error) {
     console.log(error.message);
     throw error;
