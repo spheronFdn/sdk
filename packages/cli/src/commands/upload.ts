@@ -1,5 +1,5 @@
 import configuration from "../configuration";
-const { default: SpheronClient, ProtocolEnum } = require("@spheron/storage");
+import SpheronClient, { ProtocolEnum } from "@spheron/storage";
 import cliProgress from "cli-progress";
 
 import { readFromJsonFile } from "../utils";

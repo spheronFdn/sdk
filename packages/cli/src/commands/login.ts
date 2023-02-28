@@ -18,7 +18,6 @@ export async function login(provider: string): Promise<void> {
     );
     let loginError = false;
     const spinner = createSpinner("Login ").start();
-    console.log("");
     try {
       await Promise.all([
         new Promise<void>((resolve, reject) => {
