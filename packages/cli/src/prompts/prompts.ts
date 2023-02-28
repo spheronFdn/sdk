@@ -123,7 +123,7 @@ export async function promptForCreateApp(): Promise<any> {
             ])
             .then(async (answers: any) => {
               console.log(
-                `Creating a new spheron ${answers.defaultAppType} project ${answers.projectName}. Time to become a wizard 🔮`
+                `Creating a new default ${answers.templateType} project named ${answers.projectName}. Time to become a wizard 🔮`
               );
               const url: string = getTemplateUrlMapping(answers.templateType);
               await createApp(url, answers.projectName);
