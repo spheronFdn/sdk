@@ -54,7 +54,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(f
 
 ---
 
-The SpheronClient instance provides several methods for working with buckets. The supported methods are:
+The `SpheronClient` instance provides several methods for working with buckets. The supported methods are:
 
 - `async getBucket(bucketId: string): Promise<Bucket>`
   - used to get the bucket information for the specified `bucketId`.
