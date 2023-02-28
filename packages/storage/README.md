@@ -77,13 +77,13 @@ The `SpheronClient` instance also provides methods for working with buckets. The
 - `async  deleteBucketDomain(bucketId: string, domainIdentifier: string): Promise<{ success: boolean }>`
   - used to delete the domain of the Bucket.
 - `async  archiveBucket(bucketId: string): Promise<void>`
-  - used to archive a Bucket.
+  - used to archive the Bucket.
 - `async  unarchiveBucket(bucketId: string): Promise<void>`
-  - used to unarchive a Bucket.
+  - used to unarchive the Bucket.
 - `async  getBucketUploadCount(bucketId: string): Promise<{total: number; successful: number; failed: number;pending: number; }>`
   - used to get the number of uploads for the specified bucket.
 - `async  getBucketUploads(bucketId: string, options: { skip: number; limit: number; }): Promise<{ uploads: Upload[] }>`
-  - used to get the uploads of the bucket.
+  - used to get the uploads of the bucket. The default value for `skip` is 0. The default value for `limit` is 6.
 
 Interfaces:
 

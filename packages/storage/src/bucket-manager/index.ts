@@ -123,7 +123,10 @@ class BucketManager {
     }
     const { deployments } = await this.spheronApi.getProjectDeployments(
       bucketId,
-      options
+      {
+        skip: options.skip && options.skip >= 0 ? options.skip : 0,
+        limit: options.limit && options.limit >= 0 ? options.limit : 6,
+      }
     );
 
     return {
