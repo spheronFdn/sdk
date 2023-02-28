@@ -52,11 +52,11 @@ import { FileTypeEnum, getFileType, readFromJsonFile } from "./utils";
           describe: "Upload protocol",
           choices: ["arweave", "ipfs-filecoin", "ipfs"],
         })
-        .option("projectName", {
+        .option("projectname", {
           describe: "Project name",
           type: "string",
         })
-        .option("organizationId", {
+        .option("organization", {
           describe: "Organization where project will be created",
           type: "string",
         });
@@ -85,7 +85,7 @@ import { FileTypeEnum, getFileType, readFromJsonFile } from "./utils";
         type: "string",
         demandOption: false,
       });
-      yargs.option("rootPath", {
+      yargs.option("path", {
         describe: "Path to uploading content",
         type: "string",
         demandOption: false,
@@ -96,30 +96,68 @@ import { FileTypeEnum, getFileType, readFromJsonFile } from "./utils";
       "Create a template application which can run on Spheron out of the box"
     ).argv;
 
-  // HANDLERS WITH INQUIRER
+  // HANDLERS - if options that are mandatory are not passed open up prompter
 
   if (options._[0] === "login") {
+    const validOptions = ["github", "gitlab", "bitbucket"];
+    const unknownOptions = Object.keys(options).filter(
+      (option) =>
+        option !== "_" && option !== "$0" && !validOptions.includes(option)
+    );
+    if (unknownOptions.length > 0) {
+      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
     (async () => {
-      const { provider } = await promptForLogin();
-      await login(provider);
+      if (options.github) {
+        await login("github");
+      } else if (options.gitlab) {
+        await login("gitlab");
+      } else if (options.bitbucket) {
+        await login("bitbucket");
+      } else {
+        const { provider } = await promptForLogin();
+        await login(provider);
+      }
     })();
   }
 
   if (options._[0] === "upload") {
+    const validOptions = ["path", "protocol", "projectname", "organization"];
+    const unknownOptions = Object.keys(options).filter(
+      (option) =>
+        option !== "_" && option !== "$0" && !validOptions.includes(option)
+    );
+    if (unknownOptions.length > 0) {
+      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
     (async () => {
-      let { path, protocol, organizationId, projectName } =
-        await promptForUploadFile();
+      let path, protocol, organizationId, projectName;
+      if (options.path && options.protocol) {
+        path = options.path;
+        protocol = options.protocol;
+        organizationId = options.organization;
+        projectName = options.projectname;
+      } else {
+        let prompt = await promptForUploadFile();
+        path = prompt.path;
+        protocol = prompt.protocol;
+        organizationId = prompt.organizationId;
+        projectName = prompt.projectName;
+      }
       if (!projectName) {
         projectName = `${randomWords()}-${randomWords()}`;
-      }
-      if (!path) {
-        path = "./";
+        console.log(`Generated default project name: ${projectName}`);
       }
       if (!organizationId) {
         organizationId = await readFromJsonFile(
           "organization",
           configuration.configFilePath
         );
+      }
+      if (!path) {
+        path = "./";
       }
       const fileType: FileTypeEnum = await getFileType(path);
       const spinner = createSpinner(`Uploading ${fileType} `).start();
@@ -153,9 +191,26 @@ import { FileTypeEnum, getFileType, readFromJsonFile } from "./utils";
   }
 
   if (options._[0] === "create-organization") {
+    const validOptions = ["name", "username"];
+    const unknownOptions = Object.keys(options).filter(
+      (option) =>
+        option !== "_" && option !== "$0" && !validOptions.includes(option)
+    );
+    if (unknownOptions.length > 0) {
+      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
     (async () => {
       try {
-        const { name, username } = await promptForCreateOrganization();
+        let name, username;
+        if (options.name && options.username) {
+          name = options.name;
+          username = options.username;
+        } else {
+          const prompt = await promptForCreateOrganization();
+          name = prompt.name;
+          username = prompt.username;
+        }
         if (!name) {
           throw new Error("Please insert a name for organization.");
         }
@@ -182,9 +237,28 @@ import { FileTypeEnum, getFileType, readFromJsonFile } from "./utils";
   }
 
   if (options._[0] === "init") {
+    const validOptions = ["protocol", "name", "path"];
+    const unknownOptions = Object.keys(options).filter(
+      (option) =>
+        option !== "_" && option !== "$0" && !validOptions.includes(option)
+    );
+    if (unknownOptions.length > 0) {
+      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
     (async () => {
       try {
-        let { name, protocol, path } = await promptForInit();
+        let name, protocol, path;
+        if (options.protocol) {
+          name = options.name;
+          protocol = options.protocol;
+          path = options.path;
+        } else {
+          const prompt = await promptForInit();
+          name = prompt.name;
+          protocol = prompt.protocol;
+          path = prompt.path;
+        }
         if (!name) {
           name = `${randomWords()}-${randomWords()}`;
         }

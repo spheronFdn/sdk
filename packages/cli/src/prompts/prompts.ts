@@ -24,23 +24,24 @@ export async function promptForUploadFile(): Promise<any> {
       {
         type: "input",
         name: "path",
-        message: "Path to file (optional):",
+        message: "Path to file (default -> ./):",
       },
       {
         type: "list",
         name: "protocol",
-        message: "Upload protocol (optional):",
+        message: "Upload protocol:",
         choices: ["arweave", "ipfs-filecoin", "ipfs"],
       },
       {
         type: "input",
         name: "projectName",
-        message: "Project name (optional):",
+        message: "Project name (default -> auto generated):",
       },
       {
         type: "input",
         name: "organizationId",
-        message: "Organization where project will be created (optional):",
+        message:
+          "Organization where project will be created (default - from settings):",
       },
     ];
     return inquirer.prompt(questions);
@@ -55,12 +56,12 @@ export async function promptForCreateOrganization(): Promise<any> {
       {
         type: "input",
         name: "name",
-        message: "Name of the organization (optional):",
+        message: "Name of the organization (default -> auto generated):",
       },
       {
         type: "input",
         name: "username",
-        message: "Username of the organization (optional):",
+        message: "Username of the organization (default -> auto generated):",
       },
     ];
     return inquirer.prompt(questions);
@@ -80,12 +81,12 @@ export async function promptForInit(): Promise<any> {
       {
         type: "input",
         name: "protocol",
-        message: "Upload protocol (optional):",
+        message: "Upload protocol:",
       },
       {
         type: "input",
         name: "path",
-        message: "Path to directory (optional):",
+        message: "Path to directory (default -> ./):",
       },
     ];
     return inquirer.prompt(questions);
