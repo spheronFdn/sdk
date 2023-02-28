@@ -1,6 +1,7 @@
 import axios from "axios";
 import configuration from "../configuration";
 import { writeToConfigFile, fileExists, readFromJsonFile } from "../utils";
+import { createConfiguration } from "./create-configuration";
 
 export async function createOrganization(
   name: string,
@@ -9,20 +10,19 @@ export async function createOrganization(
 ) {
   try {
     if (!(await fileExists(configuration.configFilePath))) {
-      console.log("Spheron config file does not exist");
-      return;
+      await createConfiguration();
     }
     const jwtToken = await readFromJsonFile(
       "jwtToken",
       configuration.configFilePath
     );
     if (!jwtToken) {
-      console.log("JWT token not valid or does not exist. Pleas login first");
+      console.log(
+        "For creating a new organisation, you need to login to Spheron first"
+      );
       return;
     }
-    console.log(
-      `Creating organization name: ${name}, username: ${username}...`
-    );
+    console.log(`Creating your organization...`);
     const organizationResponse = await axios.post(
       `${configuration.spheron_server_address}/v1/organization`,
       {
@@ -43,6 +43,7 @@ export async function createOrganization(
       throw new Error("Failed to create an organization");
     }
     const organization = organizationResponse.data.organization;
+    console.log(`${name} is now created`);
     await writeToConfigFile("organization", organization._id);
   } catch (error) {
     console.log("Error: ", error.message);

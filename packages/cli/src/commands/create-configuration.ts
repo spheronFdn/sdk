@@ -6,10 +6,10 @@ export async function createConfiguration() {
   let executionError = false;
   try {
     if (await fileExists(configuration.configFilePath)) {
-      console.log("Config file already exists");
+      console.log("Configuration created");
       return;
     }
-    console.log("Creating spheron configuration file...");
+    console.log("Setting up spheron configuration...");
     const id = uuidv4();
     await writeToConfigFile("id", id);
     await writeToJsonFile(
@@ -22,7 +22,7 @@ export async function createConfiguration() {
     executionError = true;
   } finally {
     if (executionError) {
-      console.log("There was a problem creating spheron configuration file");
+      console.log("There was a problem in creating spheron configuration");
     }
     process.exit(0);
   }
