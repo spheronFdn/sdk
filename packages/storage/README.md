@@ -64,12 +64,12 @@ The `SpheronClient` instance also provides methods for working with buckets. The
   - used to get the information about the specific domain. The `domainIdentifier` can ether be the id of the domain, or the name of the domain.
 - `async  addBucketDomain(bucketId: string, { link:  string; type: DomainTypeEnum; name: string; }): Promise<{ domain: Domain }>`
   - used to add a new domain to the specified bucket. The `link` property needs to have the `protocolLink` value of an existing bucket id. After adding a new domain, you will need to setup the record on your DNS provider:
-  - **domain**: you should create a **A** type record with value `13.248.203.0`, and the same name as the domain you have added.
-  - **subdomain** : you should create a **CNAME** type record with value `cname.spheron.io`, and the same name as the domain you have added.
-  - **handshake-domain**: you should create a **A** type record with value `ipfs.namebase.io`, and `@` for name. Also you should create a **TXT** type record with `link` for a value, and `_contenthash` for name.
-  - **handshake-subdomain**: you should create a **A** type record with value `ipfs.namebase.io`, and the same name as the domain you have added. Also you should create a **TXT** type record with `link` for a value, and `_contenthash.<name_of_the_domain>` for name.
-  - **ens-domain**: you should create a **CONTENT** type record with `link` for a value, and the same name as the domain you have added.
-- After you have setup the record on your DNS provider, then you should call the `verifyBucketDomain` method to verify your domain on Spheron. After the domain is verified, the data behind the link will be cached on the Spheron CDN.
+    - **domain**: you should create a **A** type record with value `13.248.203.0`, and the same name as the domain you have added.
+    - **subdomain** : you should create a **CNAME** type record with value `cname.spheron.io`, and the same name as the domain you have added.
+    - **handshake-domain**: you should create a **A** type record with value `ipfs.namebase.io`, and `@` for name. Also you should create a **TXT** type record with `link` for a value, and `_contenthash` for name.
+    - **handshake-subdomain**: you should create a **A** type record with value `ipfs.namebase.io`, and the same name as the domain you have added. Also you should create a **TXT** type record with `link` for a value, and `_contenthash.<name_of_the_domain>` for name.
+    - **ens-domain**: you should create a **CONTENT** type record with `link` for a value, and the same name as the domain you have added.
+  - After you have setup the record on your DNS provider, then you should call the `verifyBucketDomain` method to verify your domain on Spheron. After the domain is verified, the data behind the link will be cached on the Spheron CDN.
 - `async  updateBucketDomain(bucketId: string, domainIdentifier: string, options: { link: string; name: string; }): Promise<{ domain: Domain }>`
   - used to update an existing domain of the Bucket.
 - `async  verifyBucketDomain(bucketId: string, domainIdentifier: string): Promise<{ domain: Domain }>`
