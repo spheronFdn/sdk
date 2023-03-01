@@ -45,22 +45,22 @@ In the example below, you can see how to create an instance of `SpheronClient` a
 ```js
 import SpheronClient, { ProtocolEnum } from "@spheron/storage";
 
-...
 const client = new SpheronClient({ token });
 let currentlyUploaded = 0;
-const { uploadId, bucketId, protocolLink, dynamicLinks } =
-      await client.upload(filePath, {
-        protocol: ProtocolEnum.IPFS,
-        name,
-        onUploadInitiated: (uploadId) => {
-          console.log(`Upload with id ${uploadId} started...`);
-        },
-        onChunkUploaded: (uploadedSize, totalSize) => {
-          currentlyUploaded+=uploadedSize;
-          console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
-        },
-      });
-...
+const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
+  filePath,
+  {
+    protocol: ProtocolEnum.IPFS,
+    name,
+    onUploadInitiated: (uploadId) => {
+      console.log(`Upload with id ${uploadId} started...`);
+    },
+    onChunkUploaded: (uploadedSize, totalSize) => {
+      currentlyUploaded += uploadedSize;
+      console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
+    },
+  }
+);
 ```
 
 - The `SpheronClient` constructor takes an object that has one property `token`.

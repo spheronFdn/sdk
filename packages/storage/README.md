@@ -14,7 +14,7 @@
 
 <p align="center">  
   <a href="https://www.npmjs.com/package/@spheron/storage" target="_blank" rel="noreferrer">
-    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.3&color=green" />
+    <img src="https://img.shields.io/static/v1?label=npm&message=v8.0.5&color=green" />
   </a>
   <a href="https://github.com/spheronFdn/sdk/blob/main/LICENSE" target="_blank" rel="noreferrer">
     <img src="https://img.shields.io/static/v1?label=license&message=Apache%202.0&color=red" />
@@ -34,22 +34,22 @@ In the example below you can see how to create an instance of `SpheronClient` an
 ```js
 import SpheronClient, { ProtocolEnum } from "@spheron/storage";
 
-...
 const client = new SpheronClient({ token });
 let currentlyUploaded = 0;
-const { uploadId, bucketId, protocolLink, dynamicLinks } =
-      await client.upload(filePath, {
-        protocol: ProtocolEnum.IPFS,
-        name,
-        onUploadInitiated: (uploadId) => {
-          console.log(`Upload with id ${uploadId} started...`);
-        },
-        onChunkUploaded: (uploadedSize, totalSize) => {
-          currentlyUploaded+=uploadedSize;
-          console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
-        },
-      });
-...
+const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
+  filePath,
+  {
+    protocol: ProtocolEnum.IPFS,
+    name,
+    onUploadInitiated: (uploadId) => {
+      console.log(`Upload with id ${uploadId} started...`);
+    },
+    onChunkUploaded: (uploadedSize, totalSize) => {
+      currentlyUploaded += uploadedSize;
+      console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
+    },
+  }
+);
 ```
 
 - The `SpheronClient` constructor takes an object that has one property `token`.
