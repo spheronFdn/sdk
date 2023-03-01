@@ -14,7 +14,7 @@
 
 <p align="center">  
   <a href="https://www.npmjs.com/package/@spheron/storage" target="_blank" rel="noreferrer">
-    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.3&color=green" />
+    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.5&color=green" />
   </a>
   <a href="https://github.com/spheronFdn/sdk/blob/main/LICENSE" target="_blank" rel="noreferrer">
     <img src="https://img.shields.io/static/v1?label=license&message=Apache%202.0&color=red" />
@@ -34,27 +34,41 @@ In the example below you can see how to create an instance of `SpheronClient` an
 ```js
 import SpheronClient, { ProtocolEnum } from "@spheron/storage";
 
-...
 const client = new SpheronClient({ token });
-const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(filePath, { protocol: ProtocolEnum.IPFS, name });
-...
+let currentlyUploaded = 0;
+const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
+  filePath,
+  {
+    protocol: ProtocolEnum.IPFS,
+    name,
+    onUploadInitiated: (uploadId) => {
+      console.log(`Upload with id ${uploadId} started...`);
+    },
+    onChunkUploaded: (uploadedSize, totalSize) => {
+      currentlyUploaded += uploadedSize;
+      console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
+    },
+  }
+);
 ```
 
 - The `SpheronClient` constructor takes an object that has one property `token`.
 - Function `upload` has two parameters `client.upload(filePath, configuration);`
   - `filePath` - the path to the file/directory that will be uploaded
-  - `configuration` - an object with two parameters:
+  - `configuration` - an object with parameters:
     - `configuration.name` - represents the name of the bucket on which you are uploading the data.
     - `configuration.protocol` - a protocol on which the data will be uploaded. The supported protocols are [ `ARWEAVE`, `IPFS`, `FILECOIN`].
+    - `configuration.onUploadInitiated` - **optional** - callback function `(uploadId: string) => void`. The function will be called once, when the upload is initiated, right before the data is uploaded. The function will be called with one parameter, `uploadId`, which represents the id of the started upload.
+    - `configuration.onChunkUploaded` - **optional** - callback function `(uploadedSize: number, totalSize: number) => void`. The function will be called multiple times, depending on the upload size. The function will be called each time a chunk is uploaded, with two parameters. the first one `uploadedSize` represents the size in Bytes for the uploaded chunk. The `totalSize` represents the total size of the upload in Bytes.
   - The response of the upload function is an object with parameters:
     - `uploadId` - the id of the upload
     - `bucketId` - the id of the bucket
     - `protocolLink` - is the protocol link of the upload
     - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
- 
+
 ## Learn More
 
 You can learn more about Spheron and Storage SDK here:
 
-* [Spheron Discord](https://discord.com/invite/ahxuCtm)
-* [Spheron Twitter](https://twitter.com/SpheronFdn)
+- [Spheron Discord](https://discord.com/invite/ahxuCtm)
+- [Spheron Twitter](https://twitter.com/SpheronFdn)
