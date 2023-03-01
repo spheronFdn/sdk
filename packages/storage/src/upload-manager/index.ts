@@ -12,6 +12,7 @@ export interface UploadConfiguration {
   path: string;
   protocol: ProtocolEnum;
   name: string;
+  organizationId?: string;
   onUploadInitiated?: (uploadId: string) => void;
   onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
 }
@@ -38,7 +39,7 @@ class UploadManager {
     this.validateUploadConfiguration(configuration);
 
     const { deploymentId, payloadSize, parallelUploadCount } =
-      await this.startDeployment(configuration.protocol, configuration.name);
+      await this.startDeployment(configuration.protocol, configuration.name, configuration.organizationId);
 
     configuration.onUploadInitiated &&
       configuration.onUploadInitiated(deploymentId);
@@ -73,19 +74,24 @@ class UploadManager {
 
   private async startDeployment(
     protocol: string,
-    projectName: string
+    projectName: string,
+    organizationId?: string
   ): Promise<{
     deploymentId: string;
     parallelUploadCount: number;
     payloadSize: number;
   }> {
     try {
+      let url = `${this.uploadApiUrl}/v1/upload-deployment?protocol=${protocol}&project=${projectName}`;
+      if(organizationId){
+        url += `&organization=${organizationId}`;
+      }
       const response = await axios.post<{
         deploymentId: string;
         parallelUploadCount: number;
         payloadSize: number;
       }>(
-        `${this.uploadApiUrl}/v1/upload-deployment?protocol=${protocol}&project=${projectName}`,
+        url,
         {},
         this.getAxiosRequestConfig()
       );

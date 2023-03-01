@@ -19,6 +19,7 @@ export default class SpheronClient {
     configuration: {
       name: string;
       protocol: ProtocolEnum;
+      organizationId?: string;
       onUploadInitiated?: (uploadId: string) => void;
       onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
     }
@@ -28,6 +29,7 @@ export default class SpheronClient {
       path,
       name: configuration.name,
       protocol: configuration.protocol,
+      organizationId: configuration.organizationId,
       onChunkUploaded: configuration.onChunkUploaded,
       onUploadInitiated: configuration.onUploadInitiated,
     });
