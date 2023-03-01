@@ -1,6 +1,7 @@
 #! /usr/bin/env node
+/* eslint-disable @typescript-eslint/no-var-requires */
 const yargs = require("yargs");
-var randomWords = require("random-words");
+const randomWords = require("random-words");
 import { createSpinner } from "nanospinner";
 
 import { upload } from "./commands/upload";
@@ -148,7 +149,7 @@ import { logout } from "./commands/logout";
         organizationId = options.organization;
         projectName = options.projectname;
       } else {
-        let prompt = await promptForUploadFile();
+        const prompt = await promptForUploadFile();
         path = prompt.path;
         protocol = prompt.protocol;
         organizationId = prompt.organizationId;

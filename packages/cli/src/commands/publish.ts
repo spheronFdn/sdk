@@ -1,11 +1,6 @@
 import configuration from "../configuration";
 
-import {
-  fileExists,
-  readFromJsonFile,
-  getFileType,
-  FileTypeEnum,
-} from "../utils";
+import { fileExists, readFromJsonFile } from "../utils";
 
 import { upload } from "./upload";
 
@@ -37,9 +32,7 @@ export async function publish(): Promise<any> {
         "Please specify organization that you would wish to use while uploading"
       );
     }
-    const fileType: FileTypeEnum = await getFileType(
-      localConfiguration.rootPath
-    );
+
     await upload(
       localConfiguration.rootPath,
       localConfiguration.protocol,

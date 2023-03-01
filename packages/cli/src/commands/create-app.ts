@@ -19,7 +19,7 @@ export async function createApp(templateUrl: string, folderName: string) {
 function executeCloneOfRepo(
   sourceUrl: string,
   folderName: string
-): Promise<any> {
+): Promise<{ exitCode: number }> {
   return new Promise((resolve) => {
     const child = child_process.spawn(
       "sh",
@@ -34,7 +34,7 @@ function executeCloneOfRepo(
     );
     let exitCode = 0;
     child.stdout.setEncoding("utf8");
-    child.on("error", (err) => {
+    child.on("error", () => {
       exitCode = 1;
     });
     child.on("close", () => {
