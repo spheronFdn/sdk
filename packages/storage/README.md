@@ -44,7 +44,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } =
         onUploadInitiated: (uploadId) => {
           console.log(`Upload with id ${uploadId} started...`);
         },
-        onChunkUploaded(uploadedSize, totalSize) {
+        onChunkUploaded: (uploadedSize, totalSize) => {
           currentlyUploaded+=uploadedSize;
           console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
         },
