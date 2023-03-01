@@ -1,30 +1,29 @@
 import child_process from "child_process";
 import path from "path";
 
-import configuration from "./configuration";
-
 export async function createApp(templateUrl: string, folderName: string) {
-  let executionError = false;
   try {
-    console.log("Creating app...");
-    await executeCloneOfRepo(templateUrl, folderName);
-    console.log("App created successfully");
+    const { exitCode } = await executeCloneOfRepo(templateUrl, folderName);
+    if (exitCode == 0) {
+      console.log("App created successfully");
+    } else {
+      throw new Error("There was an issue creating app.");
+    }
   } catch (error) {
     console.log("Error: ", error.message);
-    executionError = true;
   } finally {
-    if (executionError) {
-      console.log("There was a problem while creating template");
-    }
     process.exit(0);
   }
 }
 
-function executeCloneOfRepo(sourceUrl: string, folderName: string) {
+function executeCloneOfRepo(
+  sourceUrl: string,
+  folderName: string
+): Promise<{ exitCode: number }> {
   return new Promise((resolve) => {
     const child = child_process.spawn(
       "sh",
-      [path.join(__dirname, "./scripts/clone.sh")],
+      [path.join(__dirname, "../scripts/clone.sh")],
       {
         shell: true,
         env: {
@@ -35,7 +34,7 @@ function executeCloneOfRepo(sourceUrl: string, folderName: string) {
     );
     let exitCode = 0;
     child.stdout.setEncoding("utf8");
-    child.on("error", (err) => {
+    child.on("error", () => {
       exitCode = 1;
     });
     child.on("close", () => {

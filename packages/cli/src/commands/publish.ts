@@ -1,19 +1,10 @@
-//TODO: Use spheron sdk to upload files
-import fs from "fs";
-import axios from "axios";
-import FormData from "form-data";
-import configuration from "./configuration";
+import configuration from "../configuration";
 
-import {
-  fileExists,
-  readFromJsonFile,
-  getFileType,
-  FileTypeEnum,
-} from "./utils";
+import { fileExists, readFromJsonFile } from "../utils";
 
-import { uploadDir, uploadFile } from "./upload";
+import { upload } from "./upload";
 
-export async function publish() {
+export async function publish(): Promise<any> {
   try {
     const localJsonPath = "./spheron.json";
     const projectConfig = await fileExists(localJsonPath);
@@ -41,28 +32,15 @@ export async function publish() {
         "Please specify organization that you would wish to use while uploading"
       );
     }
-    const fileType: FileTypeEnum = await getFileType(
-      localConfiguration.rootPath
+
+    await upload(
+      localConfiguration.rootPath,
+      localConfiguration.protocol,
+      organizationId,
+      localConfiguration.name
     );
-    console.log(`Uploading ${fileType}`);
-    if (fileType === FileTypeEnum.DIRECTORY) {
-      await uploadDir(
-        localConfiguration.rootPath,
-        localConfiguration.protocol,
-        organizationId,
-        localConfiguration.name
-      );
-    } else if (fileType === FileTypeEnum.FILE) {
-      await uploadFile(
-        localConfiguration.rootPath,
-        localConfiguration.protocol,
-        organizationId,
-        localConfiguration.name
-      );
-    }
   } catch (error) {
     console.log(error.message);
-  } finally {
-    process.exit(0);
+    throw error;
   }
 }
