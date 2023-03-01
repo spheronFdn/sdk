@@ -85,6 +85,23 @@ export async function writeToJsonFile(
   await fs.promises.writeFile(path, jsonString, "utf-8");
 }
 
+export async function deleteKeyFromJson(
+  key: string,
+  path: string
+): Promise<void> {
+  try {
+    const fileContents = await fs.promises.readFile(path, "utf-8");
+    const jsonConfig = JSON.parse(fileContents);
+    delete jsonConfig[key];
+    const jsonString = JSON.stringify(jsonConfig, null, 2);
+    await fs.promises.writeFile(path, jsonString, "utf-8");
+  } catch (err) {
+    console.error(
+      `Error deleting key ${key} from JSON file ${path}: ${err.message}`
+    );
+  }
+}
+
 export enum FileTypeEnum {
   DIRECTORY = "directory",
   FILE = "file",

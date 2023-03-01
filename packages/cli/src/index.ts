@@ -18,6 +18,7 @@ import {
 } from "./prompts/prompts";
 import configuration from "./configuration";
 import { FileTypeEnum, getFileType, readFromJsonFile } from "./utils";
+import { logout } from "./commands/logout";
 
 (async () => {
   console.log(`Spheron CLI ${configuration.version}`);
@@ -26,7 +27,7 @@ import { FileTypeEnum, getFileType, readFromJsonFile } from "./utils";
     .usage(
       "Usage: $0 init, create-app, login, upload, publish, create-organization"
     )
-    .command("login", "Login to the system", (yargs: any) => {
+    .command("login", "Logs into yout Spheron account", (yargs: any) => {
       yargs
         .option("github", {
           describe: "Login using Github credentials",
@@ -41,6 +42,7 @@ import { FileTypeEnum, getFileType, readFromJsonFile } from "./utils";
           type: "boolean",
         });
     })
+    .command("logout", "Logs out of your account")
     .command("upload", "Upload", (yargs: any) => {
       yargs
         .option("path", {
@@ -119,6 +121,12 @@ import { FileTypeEnum, getFileType, readFromJsonFile } from "./utils";
         const { provider } = await promptForLogin();
         await login(provider);
       }
+    })();
+  }
+
+  if (options._[0] === "logout") {
+    (async () => {
+      await logout();
     })();
   }
 
