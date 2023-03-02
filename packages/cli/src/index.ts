@@ -22,81 +22,105 @@ import { FileTypeEnum, getFileType, readFromJsonFile } from "./utils";
 import { logout } from "./commands/logout";
 
 (async () => {
-  console.log(`Spheron CLI ${configuration.version}`);
+  console.log(`Spheron CLI ${configuration.version}\n`);
 
   const options = yargs
-    .usage(
-      "Usage: $0 init, create-app, login, upload, publish, create-organization"
-    )
     .command("login", "Logs into yout Spheron account", (yargs: any) => {
       yargs
         .option("github", {
           describe: "Login using Github credentials",
-          type: "boolean",
         })
         .option("gitlab", {
           describe: "Login using Gitlab credentials",
-          type: "boolean",
         })
         .option("bitbucket", {
           describe: "Login using Bitbucket credentials",
-          type: "boolean",
-        });
+        })
+        .version(false)
+        .usage("Usage: $0 login [--github|--gitlab|--bitbucket]")
+        .wrap(100)
+        .help();
     })
-    .command("logout", "Logs out of your account")
+    .command("logout", "Logs out of your account", (yargs: any) => {
+      yargs.version(false).usage("Usage: $0 logout").help();
+    })
     .command("upload", "Upload", (yargs: any) => {
       yargs
         .option("path", {
           describe: "Path to file",
-          type: "string",
           demandOption: false,
         })
         .option("protocol", {
           describe: "Upload protocol",
           choices: ["arweave", "ipfs-filecoin", "ipfs"],
         })
-        .option("projectname", {
+        .option("project", {
           describe: "Project name",
-          type: "string",
         })
         .option("organization", {
           describe: "Organization where project will be created",
-          type: "string",
-        });
+        })
+        .version(false)
+        .usage(
+          `Usage: $0 upload --path <file_path> --protocol [ipfs|ipfs-filecoin|arweave] [--project <project_name>] [--organization <org_name>]`
+        )
+        .wrap(100)
+        .help();
     })
-    .command("publish", "Upload your project setup in spheron.json")
-    .command("create-configuration", "Create spheron config file")
+    .command(
+      "publish",
+      "Upload your project setup in spheron.json",
+      (yargs: any) => {
+        yargs.version(false).usage(`Usage: $0 publish`).help();
+      }
+    )
+    .command(
+      "create-configuration",
+      "Create spheron config file",
+      (yargs: any) => {
+        yargs.version(false);
+      }
+    )
     .command("create-organization", "Create organization", (yargs: any) => {
       yargs
         .option("name", {
           describe: "Name of the organization",
-          type: "string",
         })
         .option("username", {
           describe: "Username of the organization",
-          type: "string",
-        });
+        })
+        .version(false)
+        .usage(
+          `Usage: $0 create-organization --name <organization_name> --username <username>`
+        )
+        .wrap(100)
+        .help();
     })
     .command("init", "Spheron file initialization in project", (yargs: any) => {
       yargs.option("protocol", {
         describe: "Protocol that will be used for uploading ",
-        type: "string",
-        demandOption: false,
+        choices: ["arweave", "ipfs-filecoin", "ipfs"],
       });
-      yargs.option("name", {
+      yargs.option("project", {
         describe: "Project name",
-        type: "string",
-        demandOption: false,
       });
-      yargs.option("path", {
-        describe: "Path to uploading content",
-        type: "string",
-        demandOption: false,
-      });
+      yargs
+        .option("path", {
+          describe: "Path to uploading content",
+        })
+        .version(false)
+        .usage(
+          `Usage: $0 init --protocol <protocol> [--project <project_name>] [--path <path>]`
+        )
+        .wrap(100)
+        .help();
     })
     .command(
       "create-app",
-      "Create a template application which can run on Spheron out of the box"
+      "Create a template application which can run on Spheron out of the box",
+      (yargs: any) => {
+        yargs.version(false);
+      }
     ).argv;
 
   // HANDLERS - if options that are mandatory are not passed open up prompter
@@ -132,7 +156,7 @@ import { logout } from "./commands/logout";
   }
 
   if (options._[0] === "upload") {
-    const validOptions = ["path", "protocol", "projectname", "organization"];
+    const validOptions = ["path", "protocol", "project", "organization"];
     const unknownOptions = Object.keys(options).filter(
       (option) =>
         option !== "_" && option !== "$0" && !validOptions.includes(option)
@@ -147,7 +171,7 @@ import { logout } from "./commands/logout";
         path = options.path;
         protocol = options.protocol;
         organizationId = options.organization;
-        projectName = options.projectname;
+        projectName = options.project;
       } else {
         const prompt = await promptForUploadFile();
         path = prompt.path;
@@ -246,7 +270,7 @@ import { logout } from "./commands/logout";
   }
 
   if (options._[0] === "init") {
-    const validOptions = ["protocol", "name", "path"];
+    const validOptions = ["protocol", "project", "path"];
     const unknownOptions = Object.keys(options).filter(
       (option) =>
         option !== "_" && option !== "$0" && !validOptions.includes(option)
@@ -257,24 +281,24 @@ import { logout } from "./commands/logout";
     }
     (async () => {
       try {
-        let name, protocol, path;
+        let project, protocol, path;
         if (options.protocol) {
-          name = options.name;
+          project = options.project;
           protocol = options.protocol;
           path = options.path;
         } else {
           const prompt = await promptForInit();
-          name = prompt.name;
+          project = prompt.name;
           protocol = prompt.protocol;
           path = prompt.path;
         }
-        if (!name) {
-          name = `${randomWords()}-${randomWords()}`;
+        if (!project) {
+          project = `${randomWords()}-${randomWords()}`;
         }
         if (!path) {
           path = "./";
         }
-        await init(name, protocol, path);
+        await init(project, protocol, path);
       } catch (error) {
         console.log(error.message);
         process.exit(1);
