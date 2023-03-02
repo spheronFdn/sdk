@@ -288,7 +288,7 @@ import { logout } from "./commands/logout";
           path = options.path;
         } else {
           const prompt = await promptForInit();
-          project = prompt.name;
+          project = prompt.project;
           protocol = prompt.protocol;
           path = prompt.path;
         }
