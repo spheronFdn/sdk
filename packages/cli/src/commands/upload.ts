@@ -2,7 +2,7 @@ import configuration from "../configuration";
 import SpheronClient, { ProtocolEnum } from "@spheron/storage";
 import cliProgress from "cli-progress";
 
-import { readFromJsonFile } from "../utils";
+import { FileTypeEnum, getFileType, readFromJsonFile } from "../utils";
 
 export async function upload(
   rootPath: string,
@@ -30,6 +30,8 @@ export async function upload(
       stopOnComplete: true,
     });
     let uploadStarted = false;
+    const fileType: FileTypeEnum = await getFileType(rootPath);
+    console.log(`Uploading ${fileType} `);
     const { uploadId, bucketId, protocolLink, dynamicLinks } =
       await client.upload(rootPath, {
         protocol: mapProtocol(protocol),

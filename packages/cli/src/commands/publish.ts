@@ -32,7 +32,7 @@ export async function publish(): Promise<any> {
         "Please specify organization that you would wish to use while uploading"
       );
     }
-
+    console.log("Publishing in progress");
     await upload(
       localConfiguration.rootPath,
       localConfiguration.protocol,

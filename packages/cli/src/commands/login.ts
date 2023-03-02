@@ -17,7 +17,8 @@ export async function login(provider: string): Promise<void> {
       `${configuration.spheron_frontend_address}/notifications/cli-login`
     );
     let loginError = false;
-    const spinner = createSpinner("Login ").start();
+    const spinner = createSpinner().start();
+    console.log("Login");
     try {
       await Promise.all([
         new Promise<void>((resolve, reject) => {

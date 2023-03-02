@@ -18,7 +18,7 @@ import {
   promptForCreateApp,
 } from "./prompts/prompts";
 import configuration from "./configuration";
-import { FileTypeEnum, getFileType, readFromJsonFile } from "./utils";
+import { readFromJsonFile } from "./utils";
 import { logout } from "./commands/logout";
 
 (async () => {
@@ -192,8 +192,7 @@ import { logout } from "./commands/logout";
       if (!path) {
         path = "./";
       }
-      const fileType: FileTypeEnum = await getFileType(path);
-      const spinner = createSpinner(`Uploading ${fileType} `).start();
+      const spinner = createSpinner().start();
       try {
         await upload(path, protocol, organizationId, projectName);
       } catch (error) {
@@ -206,7 +205,7 @@ import { logout } from "./commands/logout";
 
   if (options._[0] === "publish") {
     (async () => {
-      const spinner = createSpinner(`Publish `).start();
+      const spinner = createSpinner().start();
       try {
         await publish();
       } catch (error) {
@@ -250,10 +249,7 @@ import { logout } from "./commands/logout";
         if (!username) {
           throw new Error("Please insert username for organization.");
         }
-        const spinner = createSpinner(
-          `Creating organization name: ${name}, username: ${username} `
-        ).start();
-        console.log("");
+        const spinner = createSpinner().start();
 
         try {
           await createOrganization(name, username, "app");

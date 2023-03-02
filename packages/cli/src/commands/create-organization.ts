@@ -22,7 +22,6 @@ export async function createOrganization(
       );
       return;
     }
-    console.log(`Creating your organization...`);
     const organizationResponse = await axios.post(
       `${configuration.spheron_server_address}/v1/organization`,
       {
@@ -43,7 +42,7 @@ export async function createOrganization(
       throw new Error("Failed to create an organization");
     }
     const organization = organizationResponse.data.organization;
-    console.log(`${name} is now created`);
+    console.log(`Organization ${name} is now created`);
     await writeToConfigFile("organization", organization._id);
   } catch (error) {
     console.log("Error: ", error.message);
