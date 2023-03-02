@@ -14,7 +14,6 @@ export async function init(
       throw new Error("Spheron file already exists");
     }
     console.log("Spheron initialization...");
-    console.log(`${path.join(process.cwd(), "./spheron.json")}`);
     const pathSegments = process.cwd().split("/");
     const spheron_configuration = {
       name: name ? name : pathSegments[pathSegments.length - 1],
