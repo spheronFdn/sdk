@@ -63,7 +63,7 @@ export async function promptForInit(): Promise<any> {
   const questions = [
     {
       type: "input",
-      name: "name",
+      name: "project",
       message: "Project name:",
     },
     {
