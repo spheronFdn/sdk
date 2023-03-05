@@ -1,4 +1,5 @@
 import { createApp, getTemplateUrlMapping } from "../commands/create-app";
+import { FrameworkOptions } from "../commands/init";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const inquirer = require("inquirer");
@@ -86,6 +87,13 @@ export async function promptForInit(): Promise<any> {
       name: "path",
       message: "Relative path to content:",
       default: "./",
+    },
+    {
+      type: "list",
+      name: "framework",
+      choices: Object.values(FrameworkOptions),
+      message: "Framework:",
+      default: "static",
     },
   ];
   return inquirer.prompt(questions);
