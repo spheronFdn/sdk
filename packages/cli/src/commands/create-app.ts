@@ -5,9 +5,9 @@ export async function createApp(templateUrl: string, folderName: string) {
   try {
     const { exitCode } = await executeCloneOfRepo(templateUrl, folderName);
     if (exitCode == 0) {
-      console.log("App created successfully");
+      console.log("Dapp created successfully");
     } else {
-      throw new Error("There was an issue creating app.");
+      throw new Error("There was an issue creating dapp.");
     }
   } catch (error) {
     console.log("Error: ", error.message);

@@ -4,7 +4,7 @@ import { fileExists, readFromJsonFile } from "../utils";
 
 import { upload } from "./upload";
 
-export async function publish(): Promise<any> {
+export async function publish(organization?: string): Promise<any> {
   try {
     const localJsonPath = "./spheron.json";
     const projectConfig = await fileExists(localJsonPath);
@@ -16,17 +16,16 @@ export async function publish(): Promise<any> {
     const spheronConfig = await fileExists(configuration.configFilePath);
     if (!spheronConfig) {
       throw new Error(
-        `global spheron configuration does not exist at ${configuration.configFilePath}. Please execute spheron create-configuration command`
+        `Global configuration does not exist. Please execute spheron init command.`
       );
     }
     const localConfiguration: any = await readFromJsonFile(
       "configuration",
       localJsonPath
     );
-    const organizationId: string = await readFromJsonFile(
-      "organization",
-      configuration.configFilePath
-    );
+    const organizationId: string = organization
+      ? organization
+      : await readFromJsonFile("organization", configuration.configFilePath);
     if (!organizationId) {
       throw new Error(
         "Please specify organization that you would wish to use while uploading"

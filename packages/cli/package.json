@@ -1,7 +1,7 @@
 {
   "name": "spheron-cli",
-  "version": "1.0.0 ",
-  "description": "CLI for working on projects and deploynig them via Spheron ",
+  "version": "1.0.1",
+  "description": "CLI for working on projects and deploying them via Spheron ",
   "keywords": [
     "CLI",
     "Typescript",
@@ -41,7 +41,6 @@
     "path": "^0.12.7",
     "prettier": "^2.8.3",
     "prompts": "^2.4.2",
-    "random-words": "^1.2.1",
     "uuid": "^9.0.0",
     "yaml": "^2.2.1",
     "yargs": "^17.6.2"

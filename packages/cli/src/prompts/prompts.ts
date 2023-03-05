@@ -8,7 +8,7 @@ export async function promptForLogin(): Promise<any> {
     {
       type: "list",
       name: "provider",
-      message: "Select your provider",
+      message: "Select your provider:",
       choices: ["github", "gitlab", "bitbucket"],
     },
   ]);
@@ -16,71 +16,82 @@ export async function promptForLogin(): Promise<any> {
 }
 
 export async function promptForUploadFile(): Promise<any> {
+  const pathSegments = process.cwd().split("/");
+  const defaultProject = pathSegments[pathSegments.length - 1];
   const questions = [
     {
       type: "input",
       name: "path",
-      message: "Path to file (default -> ./):",
+      message: "Path to file:",
+      default: "./",
     },
     {
       type: "list",
       name: "protocol",
       message: "Upload protocol:",
-      choices: ["arweave", "ipfs-filecoin", "ipfs"],
+      choices: ["Arweave", "Filecoin", "IPFS"],
     },
     {
       type: "input",
-      name: "projectName",
-      message: "Project name (default -> auto generated):",
+      name: "project",
+      message: "Project name:",
+      default: defaultProject,
     },
     {
       type: "input",
       name: "organizationId",
-      message:
-        "Organization where project will be created (default - from settings):",
+      message: "Organization where project will be created (optional):",
     },
   ];
   return inquirer.prompt(questions);
 }
 
 export async function promptForCreateOrganization(): Promise<any> {
+  const defaultName = `org-${Math.floor(Math.random() * 900) + 100}`;
   const questions = [
     {
       type: "input",
       name: "name",
-      message: "Name of the organization (default -> auto generated):",
+      message: "Name of the organization:",
+      default: defaultName,
     },
     {
       type: "input",
       name: "username",
-      message: "Username of the organization (default -> auto generated):",
+      message: "Username of the organization:",
+      default: defaultName,
     },
   ];
   return inquirer.prompt(questions);
 }
 
 export async function promptForInit(): Promise<any> {
+  const pathSegments = process.cwd().split("/");
+  const defaultProject = pathSegments[pathSegments.length - 1];
   const questions = [
     {
       type: "input",
       name: "project",
       message: "Project name:",
+      default: defaultProject,
     },
     {
-      type: "input",
+      type: "list",
       name: "protocol",
+      choices: ["Arweave", "Filecoin", "IPFS"],
       message: "Upload protocol:",
     },
     {
       type: "input",
       name: "path",
-      message: "Path to directory (default -> ./):",
+      message: "Relative path to content:",
+      default: "./",
     },
   ];
   return inquirer.prompt(questions);
 }
 
-export async function promptForCreateApp(): Promise<any> {
+export async function promptForCreateApp(appName?: string): Promise<any> {
   inquirer
     .prompt([
       {
@@ -102,16 +113,27 @@ export async function promptForCreateApp(): Promise<any> {
             },
             {
               type: "input",
-              name: "projectName",
-              message: "Enter project name:",
+              name: "project",
+              message: "Project name:",
+              default: function (answers: any) {
+                if (appName) {
+                  return appName;
+                }
+                if (answers.templateType === "React") {
+                  return "my-react-app";
+                } else if (answers.templateType === "Next.js") {
+                  return "my-nextjs-app";
+                }
+                return ""; // fallback default value
+              },
             },
           ])
           .then(async (answers: any) => {
             console.log(
-              `Creating a new default ${answers.templateType} project named ${answers.projectName}. Time to become a wizard 🔮`
+              `Creating a new default ${answers.templateType} project name ${answers.project}. Time to become a wizard 🔮`
             );
             const url: string = getTemplateUrlMapping(answers.templateType);
-            await createApp(url, answers.projectName);
+            await createApp(url, answers.project);
           });
       } else if (answers.projectType === "Start from a template") {
         inquirer
@@ -124,19 +146,30 @@ export async function promptForCreateApp(): Promise<any> {
             },
             {
               type: "input",
-              name: "projectName",
-              message: "Enter project name:",
+              name: "project",
+              message: "Project name:",
+              default: function (answers: any) {
+                if (appName) {
+                  return appName;
+                }
+                if (answers.templateType === "Portfolio") {
+                  return "my-portfolio-app";
+                } else if (answers.templateType === "NFT Drop") {
+                  return "my-nft-drop-app";
+                }
+                return ""; // fallback default value
+              },
             },
           ])
           .then(async (answers: any) => {
-            if (!answers.projectName) {
+            if (!answers.project) {
               throw new Error("Project name was not provided");
             }
             console.log(
-              `Creating a new spheron project from template ${answers.templateType} with project name ${answers.projectName}. Time to become a wizard 🔮`
+              `Creating a new spheron project from template ${answers.templateType} with project name ${answers.project}. Time to become a wizard 🔮`
             );
             const url: string = getTemplateUrlMapping(answers.templateType);
-            await createApp(url, answers.projectName);
+            await createApp(url, answers.project);
           });
       }
     });
