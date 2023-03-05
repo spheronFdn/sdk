@@ -3,6 +3,7 @@
 const yargs = require("yargs");
 import configuration from "./configuration";
 import { commandHandler } from "./command-handler";
+import { FrameworkOptions } from "./commands/init";
 
 (async () => {
   console.log(`Spheron CLI ${configuration.version}\n`);
@@ -76,22 +77,27 @@ import { commandHandler } from "./command-handler";
         .help();
     })
     .command("init", "Spheron file initialization in project", (yargs: any) => {
-      yargs.option("protocol", {
-        describe: "Protocol that will be used for uploading ",
-        choices: ["Arweave", "Filecoin", "IPFS"],
-      });
-      yargs.option("project", {
-        describe: "Project name",
-      });
       yargs
+        .option("protocol", {
+          describe: "Protocol that will be used for uploading ",
+          choices: ["Arweave", "Filecoin", "IPFS"],
+        })
+        .option("project", {
+          describe: "Project name",
+        })
         .option("path", {
           describe: "Relative path to uploading content",
         })
+        .option("framework", {
+          describe: "Framework choice for the project",
+          choices: Object.values(FrameworkOptions),
+          default: "static",
+        })
         .version(false)
         .usage(
-          `Usage: $0 init --protocol <protocol> [--project <project_name>] [--path <path>]`
+          `Usage: $0 init --protocol <protocol> [--project <project_name>] [--path <path>] [--framework <framework>]`
         )
-        .wrap(100)
+        .wrap(150)
         .help();
     })
     .command(

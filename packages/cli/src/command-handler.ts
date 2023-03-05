@@ -156,7 +156,7 @@ export async function commandHandler(options: any) {
   }
 
   if (options._[0] === "init") {
-    const validOptions = ["protocol", "project", "path"];
+    const validOptions = ["protocol", "project", "path", "framework"];
     const unknownOptions = Object.keys(options).filter(
       (option) =>
         option !== "_" && option !== "$0" && !validOptions.includes(option)
@@ -167,16 +167,18 @@ export async function commandHandler(options: any) {
     }
     (async () => {
       try {
-        let project, protocol, path;
+        let project, protocol, path, framework;
         if (options.protocol) {
           project = options.project;
           protocol = options.protocol;
           path = options.path;
+          framework = options.framework;
         } else {
           const prompt = await promptForInit();
           project = prompt.project;
           protocol = prompt.protocol;
           path = prompt.path;
+          framework = prompt.framework;
         }
         if (!project) {
           const pathSegments = process.cwd().split("/");
@@ -185,7 +187,7 @@ export async function commandHandler(options: any) {
         if (!path) {
           path = "./";
         }
-        await init(project, protocol, path);
+        await init(project, protocol, path, framework);
       } catch (error) {
         console.log(error.message);
         process.exit(1);
