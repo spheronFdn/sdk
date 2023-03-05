@@ -16,7 +16,9 @@ export async function upload(
       configuration.configFilePath
     );
     if (!jwtToken) {
-      throw new Error("JWT token not present. Execute login command");
+      throw new Error(
+        "Authorization failed. Please execute login command first"
+      );
     }
 
     const client = new SpheronClient({ token: jwtToken });
@@ -49,10 +51,11 @@ export async function upload(
           progressBar.update(uploadedBytes);
         },
       });
-    console.log("uploadId:", uploadId);
-    console.log("bucketId:", bucketId);
-    console.log("protocolLink:", protocolLink);
-    console.log("dynamicLinks:", dynamicLinks);
+    console.log("Upload finished, here is upload details:");
+    console.log(`Upload ID: ${uploadId}`);
+    console.log(`Bucket ID: ${bucketId}`);
+    console.log(`Protocol Link: ${protocolLink}`);
+    console.log(`Dynamic Links:", ${dynamicLinks.join(", ")}`);
   } catch (error) {
     console.log("Upload failed: ", error.message);
     throw error;
@@ -60,11 +63,11 @@ export async function upload(
 }
 
 function mapProtocol(protocol: string): ProtocolEnum {
-  if (protocol === "ipfs") {
+  if (protocol === "IPFS") {
     return ProtocolEnum.IPFS;
-  } else if (protocol === "ipfs-filecoin") {
+  } else if (protocol === "Filecoin") {
     return ProtocolEnum.FILECOIN;
-  } else if (protocol === "arweave") {
+  } else if (protocol === "Arweave") {
     return ProtocolEnum.ARWEAVE;
   }
   return ProtocolEnum.IPFS;

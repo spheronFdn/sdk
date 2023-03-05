@@ -1,6 +1,6 @@
 import axios from "axios";
 import configuration from "../configuration";
-import { writeToConfigFile, fileExists, readFromJsonFile } from "../utils";
+import { fileExists, readFromJsonFile, writeToJsonFile } from "../utils";
 import { createConfiguration } from "./create-configuration";
 
 export async function createOrganization(
@@ -43,7 +43,11 @@ export async function createOrganization(
     }
     const organization = organizationResponse.data.organization;
     console.log(`Organization ${name} is now created`);
-    await writeToConfigFile("organization", organization._id);
+    await writeToJsonFile(
+      "organization",
+      configuration.configFilePath,
+      organization._id
+    );
   } catch (error) {
     console.log("Error: ", error.message);
     throw error;

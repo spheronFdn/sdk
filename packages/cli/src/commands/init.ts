@@ -2,6 +2,7 @@ import path from "path";
 
 import { writeToJsonFile, fileExists, readFromJsonFile } from "../utils";
 import configuration from "../configuration";
+import { createConfiguration } from "./create-configuration";
 
 export async function init(
   name: string,
@@ -13,16 +14,22 @@ export async function init(
     if (await fileExists("./spheron.json")) {
       throw new Error("Spheron file already exists");
     }
+    if (
+      !(await fileExists(configuration.configFilePath)) ||
+      !(await fileExists(configuration.projectTrackingFilePath))
+    ) {
+      await createConfiguration();
+    }
     console.log("Spheron initialization...");
     const pathSegments = process.cwd().split("/");
-    const spheron_configuration = {
+    const spheronConfiguration = {
       name: name ? name : pathSegments[pathSegments.length - 1],
       protocol: protocol,
       rootPath: projectPath ? projectPath : "./", // by default it's a relative path from spheron.json point of view
     };
     await writeToJsonFile(
       "configuration",
-      spheron_configuration,
+      spheronConfiguration,
       path.join(process.cwd(), "./spheron.json")
     );
     //link to project tracking file
@@ -32,7 +39,9 @@ export async function init(
     );
     projects.push({
       name: name ? name : pathSegments[pathSegments.length - 1],
-      path: projectPath ? projectPath : path.join(process.cwd(), "./"),
+      path: projectPath
+        ? path.join(process.cwd(), projectPath)
+        : path.join(process.cwd(), "./"),
       protocol: protocol,
     });
     await writeToJsonFile(
@@ -40,7 +49,6 @@ export async function init(
       projects,
       configuration.projectTrackingFilePath
     );
-
     console.log("Spheron initialized");
   } catch (error) {
     console.log("Error: ", error.message);

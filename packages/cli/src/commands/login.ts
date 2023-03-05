@@ -1,7 +1,7 @@
 import http from "http";
 import open from "open";
 import axios from "axios";
-import { writeToConfigFile } from "../utils";
+import { writeToJsonFile } from "../utils";
 import configuration from "../configuration";
 import { createSpinner } from "nanospinner";
 
@@ -44,7 +44,11 @@ export async function login(provider: string): Promise<void> {
             res.setHeader("location", successLocationRedirect.href);
             res.end();
             //store jwt token in spheron-config file
-            await writeToConfigFile("jwtToken", jwt);
+            await writeToJsonFile(
+              "jwtToken",
+              configuration.configFilePath,
+              jwt
+            );
             resolve();
           });
           server.once("error", reject);
