@@ -15,7 +15,7 @@
   "author": "Spheron Team",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc && cp src/scripts/clone.sh dist/scripts/clone.sh",
+    "build": "tsc",
     "postinstall": "node ./dist/scripts/postinstall.js",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "prettier:write": "prettier --write '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
