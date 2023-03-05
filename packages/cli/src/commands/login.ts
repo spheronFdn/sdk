@@ -38,6 +38,7 @@ export async function login(provider: string): Promise<void> {
             }
 
             const jwt = verify.data.jwtToken;
+            const organizationId = verify.data.organizationId;
             // Closing of server
             res.setHeader("connection", "close");
             res.statusCode = 302;
@@ -46,8 +47,13 @@ export async function login(provider: string): Promise<void> {
             //store jwt token in spheron-config file
             await writeToJsonFile(
               "jwtToken",
-              configuration.configFilePath,
-              jwt
+              jwt,
+              configuration.configFilePath
+            );
+            await writeToJsonFile(
+              "organization",
+              organizationId,
+              configuration.configFilePath
             );
             resolve();
           });

@@ -45,8 +45,8 @@ export async function createOrganization(
     console.log(`Organization ${name} is now created`);
     await writeToJsonFile(
       "organization",
-      configuration.configFilePath,
-      organization._id
+      organization._id,
+      configuration.configFilePath
     );
   } catch (error) {
     console.log("Error: ", error.message);
