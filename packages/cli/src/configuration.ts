@@ -1,7 +1,7 @@
 import path from "path";
 
 const configuration = {
-  spheron_server_address: "http://localhost:8080",
+  spheron_server_address: "https://api-dev.spheron.network",
   spheron_frontend_address: "https://dev.spheron.network",
   version: "1.0.0",
   configFilePath: path.join(
