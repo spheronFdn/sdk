@@ -1,6 +1,5 @@
 #! /usr/bin/env node
 /* eslint-disable @typescript-eslint/no-var-requires */
-// require = require("esm")(module); //allows require of modules that are ES6
 const yargs = require("yargs");
 import configuration from "./configuration";
 import { commandHandler } from "./command-handler";

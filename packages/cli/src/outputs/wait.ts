@@ -1,4 +1,6 @@
-import eraseLines from "./erase-lines";
+import ora from "ora";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const chalk = require("chalk");
 
 export interface StopSpinner {
   (): void;
@@ -14,9 +16,8 @@ export default function wait(opts: any, delay = 300): StopSpinner {
   }
 
   const timeout = setTimeout(async () => {
-    const { default: ora } = await import("ora");
     spinner = ora(opts);
-    spinner.text = text;
+    spinner.text = chalk.gray(text);
     spinner.color = "gray";
     spinner.start();
   }, delay);
@@ -26,7 +27,6 @@ export default function wait(opts: any, delay = 300): StopSpinner {
     if (spinner) {
       spinner.stop();
       spinner = null;
-      process.stderr.write(await eraseLines(1));
     }
   };
 
