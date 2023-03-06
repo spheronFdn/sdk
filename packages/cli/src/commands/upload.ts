@@ -3,6 +3,7 @@ import SpheronClient, { ProtocolEnum } from "@spheron/storage";
 import cliProgress from "cli-progress";
 
 import { FileTypeEnum, getFileType, readFromJsonFile } from "../utils";
+import Spinner from "../outputs/spinner";
 
 export async function upload(
   rootPath: string,
@@ -10,19 +11,22 @@ export async function upload(
   organizationId: string,
   projectName: string
 ) {
+  const spinner = new Spinner();
   try {
+    spinner.spin("Upload in progress");
     const jwtToken = await readFromJsonFile(
       "jwtToken",
       configuration.configFilePath
     );
     if (!jwtToken) {
-      throw new Error("JWT token not present. Execute login command");
+      throw new Error(
+        "Authorization failed. Please execute login command first"
+      );
     }
 
     const client = new SpheronClient({ token: jwtToken });
 
     let uploadedBytes = 0;
-
     // Initialize the progress bar
     const progressBar = new cliProgress.SingleBar({
       format:
@@ -49,22 +53,26 @@ export async function upload(
           progressBar.update(uploadedBytes);
         },
       });
-    console.log("uploadId:", uploadId);
-    console.log("bucketId:", bucketId);
-    console.log("protocolLink:", protocolLink);
-    console.log("dynamicLinks:", dynamicLinks);
+    console.log("Upload finished, here is upload details:");
+    console.log(`Upload ID: ${uploadId}`);
+    console.log(`Bucket ID: ${bucketId}`);
+    console.log(`Protocol Link: ${protocolLink}`);
+    console.log(`Dynamic Links:", ${dynamicLinks.join(", ")}`);
+    spinner.success("Upload finished !");
   } catch (error) {
     console.log("Upload failed: ", error.message);
     throw error;
+  } finally {
+    spinner.stop();
   }
 }
 
 function mapProtocol(protocol: string): ProtocolEnum {
-  if (protocol === "ipfs") {
+  if (protocol === "IPFS") {
     return ProtocolEnum.IPFS;
-  } else if (protocol === "ipfs-filecoin") {
+  } else if (protocol === "Filecoin") {
     return ProtocolEnum.FILECOIN;
-  } else if (protocol === "arweave") {
+  } else if (protocol === "Arweave") {
     return ProtocolEnum.ARWEAVE;
   }
   return ProtocolEnum.IPFS;

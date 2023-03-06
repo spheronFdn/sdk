@@ -1,45 +1,26 @@
-import child_process from "child_process";
+import { execSync } from "child_process";
+import fs from "fs";
 import path from "path";
+import Spinner from "../outputs/spinner";
 
 export async function createApp(templateUrl: string, folderName: string) {
+  const spinner = new Spinner();
   try {
-    const { exitCode } = await executeCloneOfRepo(templateUrl, folderName);
-    if (exitCode == 0) {
-      console.log("App created successfully");
-    } else {
-      throw new Error("There was an issue creating app.");
-    }
+    spinner.spin("Creating dapp");
+    execSync(`git clone --quiet ${templateUrl} ${folderName}`);
+    cleanUpFiles(folderName);
+    spinner.success("Dapp created !");
   } catch (error) {
     console.log("Error: ", error.message);
   } finally {
-    process.exit(0);
+    spinner.stop();
   }
 }
 
-function executeCloneOfRepo(
-  sourceUrl: string,
-  folderName: string
-): Promise<{ exitCode: number }> {
-  return new Promise((resolve) => {
-    const child = child_process.spawn(
-      "sh",
-      [path.join(__dirname, "../scripts/clone.sh")],
-      {
-        shell: true,
-        env: {
-          SOURCE_URL: sourceUrl,
-          FOLDER_NAME: folderName,
-        },
-      }
-    );
-    let exitCode = 0;
-    child.stdout.setEncoding("utf8");
-    child.on("error", () => {
-      exitCode = 1;
-    });
-    child.on("close", () => {
-      resolve({ exitCode });
-    });
+function cleanUpFiles(folderName: string) {
+  fs.rmSync(path.join(process.cwd(), folderName, ".git"), {
+    recursive: true,
+    force: true,
   });
 }
 
