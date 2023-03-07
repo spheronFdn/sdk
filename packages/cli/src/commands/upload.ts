@@ -60,9 +60,9 @@ export async function upload(
           }
         },
       });
-    spinner.success("Upload finished !");
+    spinner.success("Upload finished !🚀");
     spinner.stop();
-    console.log("Upload finished, here is upload details:");
+    console.log("Upload finished, here are upload details:");
     console.log(`Upload ID: ${uploadId}`);
     console.log(`Bucket ID: ${bucketId}`);
     console.log(`Protocol Link: ${protocolLink}`);
