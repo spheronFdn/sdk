@@ -7,10 +7,8 @@ import { fileExists, writeToJsonFile } from "../utils";
 export async function createConfiguration() {
   try {
     if (await fileExists(configuration.configFilePath)) {
-      console.log("Configuration created");
       return;
     }
-    console.log("Setting up spheron configuration...");
     await fs.promises.mkdir(path.join(configuration.homePath, ".spheron"), {
       recursive: true,
       mode: 0o777,
