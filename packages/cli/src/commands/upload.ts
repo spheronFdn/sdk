@@ -59,7 +59,13 @@ export async function upload(
     console.log(`Dynamic Links:", ${dynamicLinks.join(", ")}`);
     spinner.success("Upload finished !");
   } catch (error) {
-    console.log(error.message);
+    console.log(`Error: ${error.message}`);
+    //TODO: Fix messages that are returned by spheron@storage
+    if (protocol == "Arweave") {
+      console.log(
+        `Arweave is not enabled for starter plan, please upgrade your plan to pro to start uploading your files to Arweave.\nPlease feel free to contact our team on Discord if you have any questions.`
+      );
+    }
   } finally {
     spinner.stop();
   }
