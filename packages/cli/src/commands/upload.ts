@@ -1,5 +1,6 @@
 import configuration from "../configuration";
-import SpheronClient, { ProtocolEnum } from "@spheron/storage";
+// import SpheronClient, { ProtocolEnum } from "@spheron/storage";
+import SpheronClient, { ProtocolEnum } from "spheron-storage-dusan";
 import cliProgress from "cli-progress";
 
 import { FileTypeEnum, getFileType, readFromJsonFile } from "../utils";
@@ -72,11 +73,11 @@ export async function upload(
 }
 
 function mapProtocol(protocol: string): ProtocolEnum {
-  if (protocol === "IPFS") {
+  if (protocol === "ipfs") {
     return ProtocolEnum.IPFS;
-  } else if (protocol === "Filecoin") {
+  } else if (protocol === "filecoin") {
     return ProtocolEnum.FILECOIN;
-  } else if (protocol === "Arweave") {
+  } else if (protocol === "arweave") {
     return ProtocolEnum.ARWEAVE;
   }
   return ProtocolEnum.IPFS;

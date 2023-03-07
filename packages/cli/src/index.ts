@@ -36,7 +36,7 @@ import { FrameworkOptions } from "./commands/init";
         })
         .option("protocol", {
           describe: "Upload protocol",
-          choices: ["Arweave", "Filecoin", "IPFS"],
+          choices: ["arweave", "filecoin", "ipfs"],
         })
         .option("project", {
           describe: "Project name",
@@ -46,7 +46,7 @@ import { FrameworkOptions } from "./commands/init";
         })
         .version(false)
         .usage(
-          `Usage: $0 upload --path <file_path> --protocol [Arweave| Filecoin| IPFS] [--project <project_name>] [--organization <org_name>]`
+          `Usage: $0 upload --path <file_path> --protocol [arweave| filecoin| ipfs] [--project <project_name>] [--organization <org_name>]`
         )
         .wrap(100)
         .help();
@@ -80,7 +80,7 @@ import { FrameworkOptions } from "./commands/init";
       yargs
         .option("protocol", {
           describe: "Protocol that will be used for uploading ",
-          choices: ["Arweave", "Filecoin", "IPFS"],
+          choices: ["arweave", "filecoin", "ipfs"],
         })
         .option("project", {
           describe: "Project name",

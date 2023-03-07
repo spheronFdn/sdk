@@ -39,7 +39,7 @@ export async function commandHandler(options: any) {
         await login("bitbucket");
       } else {
         const { provider } = await promptForLogin();
-        await login(provider);
+        await login(provider.toLowerCase());
       }
     })();
   }
@@ -64,13 +64,13 @@ export async function commandHandler(options: any) {
       let path, protocol, organizationId, projectName;
       if (options.path && options.protocol) {
         path = options.path;
-        protocol = options.protocol;
+        protocol = options.protocol.toLowerCase();
         organizationId = options.organization;
         projectName = options.project;
       } else {
         const prompt = await promptForUploadFile();
         path = prompt.path;
-        protocol = prompt.protocol;
+        protocol = prompt.protocol.toLowerCase();
         organizationId = prompt.organizationId;
         projectName = prompt.project;
       }
@@ -164,13 +164,13 @@ export async function commandHandler(options: any) {
         let project, protocol, path, framework;
         if (options.protocol) {
           project = options.project;
-          protocol = options.protocol;
+          protocol = options.protocol.toLowerCase();
           path = options.path;
           framework = options.framework;
         } else {
           const prompt = await promptForInit();
           project = prompt.project;
-          protocol = prompt.protocol;
+          protocol = prompt.protocol.toLowerCase();
           path = prompt.path;
           framework = prompt.framework;
         }
