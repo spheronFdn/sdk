@@ -28,11 +28,11 @@ export function getTemplateUrlMapping(alias: string): string {
   if (alias === "Portfolio") {
     return "https://github.com/spheronFdn/portfolio-template";
   } else if (alias === "NFT Drop") {
-    return "https://github.com/spheronFdn/react-boilerplate";
+    return "https://github.com/spheronFdn/nft-drop-template.git";
   } else if (alias === "React") {
     return "https://github.com/spheronFdn/react-boilerplate";
   } else if (alias === "Next.js") {
-    return "https://github.com/spheronFdn/react-boilerplate";
+    return "https://github.com/spheronFdn/next-boilerplate";
   }
   throw new Error("Mapping for template not found");
 }

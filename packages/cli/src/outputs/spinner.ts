@@ -8,13 +8,14 @@ export default class Spinner {
   constructor() {
     this._spinner = null;
   }
-  spin = (message: string, delay = 300): void => {
+  spin = (message: string, delay = 300, type?: string): void => {
     if (this._spinner) {
       this._spinner.text = message;
     } else {
       this._spinner = wait(
         {
           text: message,
+          spinner: type ? type : "dots",
         },
         delay
       );
@@ -29,6 +30,6 @@ export default class Spinner {
   };
 
   success = (str: string) => {
-    console.log(`${chalk.cyan(`> Success!`)} ${str}\n`);
+    console.log(`\n${chalk.cyan(`> Success!`)} ${str}\n`);
   };
 }
