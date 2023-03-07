@@ -13,7 +13,7 @@ export async function upload(
 ) {
   const spinner = new Spinner();
   try {
-    spinner.spin("Upload in progress ");
+    spinner.spin("Upload ");
     const jwtToken = await readFromJsonFile(
       "jwtToken",
       configuration.configFilePath
