@@ -1,6 +1,5 @@
 import configuration from "../configuration";
-// import SpheronClient, { ProtocolEnum } from "@spheron/storage";
-import SpheronClient, { ProtocolEnum } from "spheron-storage-dusan";
+import SpheronClient, { ProtocolEnum } from "@spheron/storage";
 import cliProgress from "cli-progress";
 
 import { FileTypeEnum, getFileType, readFromJsonFile } from "../utils";
@@ -14,7 +13,7 @@ export async function upload(
 ) {
   const spinner = new Spinner();
   try {
-    spinner.spin("Upload ");
+    spinner.spin(`Uploading to ${mapProtocolToUserReadable(protocol)} `);
     const jwtToken = await readFromJsonFile(
       "jwtToken",
       configuration.configFilePath
@@ -38,7 +37,7 @@ export async function upload(
     console.log(`Uploading ${fileType} `);
     const { uploadId, bucketId, protocolLink, dynamicLinks } =
       await client.upload(rootPath, {
-        protocol: mapProtocol(protocol),
+        protocol: mapProtocolToStorageSDK(protocol),
         name: projectName,
         organizationId,
         onUploadInitiated: (deploymentId: any) => {
@@ -57,7 +56,7 @@ export async function upload(
     console.log(`Upload ID: ${uploadId}`);
     console.log(`Bucket ID: ${bucketId}`);
     console.log(`Protocol Link: ${protocolLink}`);
-    console.log(`Dynamic Links:", ${dynamicLinks.join(", ")}`);
+    console.log(`Dynamic Links:, ${dynamicLinks.join(", ")}`);
     spinner.success("Upload finished !");
   } catch (error) {
     console.log(`Error: ${error.message}`);
@@ -72,7 +71,7 @@ export async function upload(
   }
 }
 
-function mapProtocol(protocol: string): ProtocolEnum {
+function mapProtocolToStorageSDK(protocol: string): ProtocolEnum {
   if (protocol === "ipfs") {
     return ProtocolEnum.IPFS;
   } else if (protocol === "filecoin") {
@@ -81,4 +80,15 @@ function mapProtocol(protocol: string): ProtocolEnum {
     return ProtocolEnum.ARWEAVE;
   }
   return ProtocolEnum.IPFS;
+}
+
+function mapProtocolToUserReadable(protocol: string): string {
+  if (protocol === "ipfs") {
+    return "IPFS";
+  } else if (protocol === "filecoin") {
+    return "Filecoin";
+  } else if (protocol === "arweave") {
+    return "Arweave";
+  }
+  return "IPFS";
 }
