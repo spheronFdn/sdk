@@ -11,7 +11,7 @@ export async function createOrganization(
 ) {
   const spinner = new Spinner();
   try {
-    spinner.spin("Creating organization");
+    spinner.spin("Creating organization ");
     if (!(await fileExists(configuration.configFilePath))) {
       await createConfiguration();
     }

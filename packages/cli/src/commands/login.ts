@@ -9,7 +9,7 @@ let server: http.Server;
 
 export async function login(provider: string): Promise<void> {
   const spinner = new Spinner();
-  spinner.spin(`Waiting for ${provider} authentication to be completed`);
+  spinner.spin(`Waiting for ${provider} authentication to be completed `);
   server = http.createServer();
   server.listen(0, "127.0.0.1", async () => {
     const { port } = server.address() as any;
