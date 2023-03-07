@@ -1,4 +1,6 @@
 import wait, { StopSpinner } from "./wait";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const chalk = require("chalk");
 
 export default class Spinner {
   private _spinner: StopSpinner | null;
@@ -27,6 +29,6 @@ export default class Spinner {
   };
 
   success = (str: string) => {
-    console.log(`> Success! ${str}\n`);
+    console.log(`${chalk.cyan(`> Success!`)} ${str}\n`);
   };
 }
