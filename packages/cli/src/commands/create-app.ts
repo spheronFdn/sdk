@@ -6,7 +6,7 @@ import Spinner from "../outputs/spinner";
 export async function createApp(templateUrl: string, folderName: string) {
   const spinner = new Spinner();
   try {
-    spinner.spin("Creating dapp");
+    spinner.spin("Creating dapp ");
     execSync(`git clone --quiet ${templateUrl} ${folderName}`);
     cleanUpFiles(folderName);
     spinner.success("Dapp created !");

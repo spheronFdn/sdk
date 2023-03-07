@@ -9,14 +9,14 @@ let server: http.Server;
 
 export async function login(provider: string): Promise<void> {
   const spinner = new Spinner();
-  spinner.spin(`Waiting for ${provider} authentication to be completed`);
+  spinner.spin(`Waiting for ${provider} authentication to be completed `);
   server = http.createServer();
   server.listen(0, "127.0.0.1", async () => {
     const { port } = server.address() as any;
-    const baseURL = `${configuration.spheron_server_address}/auth/${provider}/cli/login`;
+    const baseURL = `${configuration.spheronServerAddress}/auth/${provider}/cli/login`;
     const fullURL = baseURL + `?port=${port}`;
     const successLocationRedirect = new URL(
-      `${configuration.spheron_frontend_address}/notifications/cli-login`
+      `${configuration.spheronFrontendAddress}/notifications/cli-login`
     );
     let loginError = false;
     try {
@@ -25,7 +25,7 @@ export async function login(provider: string): Promise<void> {
           server.once("request", async (req, res) => {
             const code = req.url?.split("&")[0].split("=")[1];
             const verify = await axios.get(
-              `${configuration.spheron_server_address}/auth/${provider}/cli/verify-token/${code}?port=${port}`, //port used for bitbucket
+              `${configuration.spheronServerAddress}/auth/${provider}/cli/verify-token/${code}?port=${port}`, //port used for bitbucket
               {
                 headers: {
                   Accept: "application/json",

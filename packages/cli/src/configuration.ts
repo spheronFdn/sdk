@@ -1,8 +1,8 @@
 import path from "path";
 
 const configuration = {
-  spheron_server_address: "https://api-dev.spheron.network",
-  spheron_frontend_address: "https://dev.spheron.network",
+  spheronServerAddress: "https://api-dev.spheron.network",
+  spheronFrontendAddress: "https://dev.spheron.network",
   version: "1.0.0",
   configFilePath: path.join(
     process.env.HOME ? process.env.HOME : "/home/ubuntu",
@@ -12,7 +12,7 @@ const configuration = {
     process.env.HOME ? process.env.HOME : "/home/ubuntu",
     ".spheron/project-tracking.json"
   ),
-  home_path: process.env.HOME || "",
+  homePath: process.env.HOME || "",
 };
 
 export default configuration;

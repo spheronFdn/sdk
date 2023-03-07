@@ -2,12 +2,9 @@ import configuration from "../configuration";
 
 import { fileExists, readFromJsonFile } from "../utils";
 import { upload } from "./upload";
-import Spinner from "../outputs/spinner";
 
 export async function publish(organization?: string): Promise<any> {
-  const spinner = new Spinner();
   try {
-    spinner.spin("Publishing in progres");
     const localJsonPath = "./spheron.json";
     const projectConfig = await fileExists(localJsonPath);
     if (!projectConfig) {
@@ -39,11 +36,8 @@ export async function publish(organization?: string): Promise<any> {
       organizationId,
       localConfiguration.name
     );
-    spinner.success("Publishing finished !");
   } catch (error) {
     console.log(error.message);
     throw error;
-  } finally {
-    spinner.stop();
   }
 }
