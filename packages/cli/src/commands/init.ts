@@ -49,6 +49,10 @@ export async function init(
         ? path.join(process.cwd(), projectPath)
         : path.join(process.cwd(), "./"),
       protocol: protocol,
+      framework: {
+        name: framework,
+        configuration: frameworkConfig,
+      },
     });
     await writeToJsonFile(
       "projects",
