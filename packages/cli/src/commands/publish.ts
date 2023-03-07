@@ -5,7 +5,6 @@ import { upload } from "./upload";
 
 export async function publish(organization?: string): Promise<any> {
   try {
-    console.log("Publishing in progress...");
     const localJsonPath = "./spheron.json";
     const projectConfig = await fileExists(localJsonPath);
     if (!projectConfig) {
