@@ -1,3 +1,4 @@
+import { createConfiguration } from "./commands/create-configuration";
 import { createOrganization } from "./commands/create-organization";
 import { init } from "./commands/init";
 import { login } from "./commands/login";
@@ -12,9 +13,13 @@ import {
   promptForLogin,
   promptForUploadFile,
 } from "./prompts/prompts";
-import { readFromJsonFile } from "./utils";
+import { fileExists, readFromJsonFile } from "./utils";
 
 export async function commandHandler(options: any) {
+  if (!(await fileExists(configuration.configFilePath))) {
+    //check if ${HOME}/.spheron dir exists
+    await createConfiguration();
+  }
   if (options._[0] === "login") {
     const validOptions = ["github", "gitlab", "bitbucket"];
     const unknownOptions = Object.keys(options).filter(
