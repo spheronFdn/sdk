@@ -15,9 +15,6 @@ export async function login(provider: string): Promise<void> {
     const { port } = server.address() as any;
     const baseURL = `${configuration.spheronServerAddress}/auth/${provider}/cli/login`;
     const fullURL = baseURL + `?port=${port}`;
-    const successLocationRedirect = new URL(
-      `${configuration.spheronFrontendAddress}/notifications/cli-login`
-    );
     let loginError = false;
     try {
       await Promise.all([
@@ -39,9 +36,15 @@ export async function login(provider: string): Promise<void> {
 
             const jwt = verify.data.jwtToken;
             const organizationId = verify.data.organizationId;
+            const email = verify.data.email;
             // Closing of server
             res.setHeader("connection", "close");
             res.statusCode = 302;
+            const successLocationRedirect = new URL(
+              `${
+                configuration.spheronFrontendAddress
+              }/notifications/cli-login?email=${encodeURIComponent(email)}`
+            );
             res.setHeader("location", successLocationRedirect.href);
             res.end();
             //store jwt token in spheron-config file
