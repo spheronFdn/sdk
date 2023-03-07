@@ -60,7 +60,6 @@ export async function upload(
     spinner.success("Upload finished !");
   } catch (error) {
     console.log(error.message);
-    throw error;
   } finally {
     spinner.stop();
   }
