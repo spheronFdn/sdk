@@ -3,6 +3,7 @@ import SpheronClient, { ProtocolEnum } from "@spheron/storage";
 import cliProgress from "cli-progress";
 
 import { FileTypeEnum, getFileType, readFromJsonFile } from "../utils";
+import Spinner from "../outputs/spinner";
 
 export async function upload(
   rootPath: string,
@@ -10,7 +11,9 @@ export async function upload(
   organizationId: string,
   projectName: string
 ) {
+  const spinner = new Spinner();
   try {
+    spinner.spin("Upload in progress");
     const jwtToken = await readFromJsonFile(
       "jwtToken",
       configuration.configFilePath
@@ -24,7 +27,6 @@ export async function upload(
     const client = new SpheronClient({ token: jwtToken });
 
     let uploadedBytes = 0;
-
     // Initialize the progress bar
     const progressBar = new cliProgress.SingleBar({
       format:
@@ -56,9 +58,12 @@ export async function upload(
     console.log(`Bucket ID: ${bucketId}`);
     console.log(`Protocol Link: ${protocolLink}`);
     console.log(`Dynamic Links:", ${dynamicLinks.join(", ")}`);
+    spinner.success("Upload finished !");
   } catch (error) {
     console.log("Upload failed: ", error.message);
     throw error;
+  } finally {
+    spinner.stop();
   }
 }
 

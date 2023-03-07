@@ -2,13 +2,16 @@ import axios from "axios";
 import configuration from "../configuration";
 import { fileExists, readFromJsonFile, writeToJsonFile } from "../utils";
 import { createConfiguration } from "./create-configuration";
+import Spinner from "../outputs/spinner";
 
 export async function createOrganization(
   name: string,
   username: string,
   type: string
 ) {
+  const spinner = new Spinner();
   try {
+    spinner.spin("Creating organization");
     if (!(await fileExists(configuration.configFilePath))) {
       await createConfiguration();
     }
@@ -18,7 +21,7 @@ export async function createOrganization(
     );
     if (!jwtToken) {
       console.log(
-        "For creating a new organisation, you need to login to Spheron first"
+        "For creating new organisation, you need to login to Spheron first"
       );
       return;
     }
@@ -42,14 +45,16 @@ export async function createOrganization(
       throw new Error("Failed to create an organization");
     }
     const organization = organizationResponse.data.organization;
-    console.log(`Organization ${name} is now created`);
     await writeToJsonFile(
       "organization",
       organization._id,
       configuration.configFilePath
     );
+    spinner.success(`Organization ${name} is created`);
   } catch (error) {
     console.log("Error: ", error.message);
     throw error;
+  } finally {
+    spinner.stop();
   }
 }

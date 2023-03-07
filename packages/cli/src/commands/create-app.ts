@@ -1,16 +1,19 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
+import Spinner from "../outputs/spinner";
 
 export async function createApp(templateUrl: string, folderName: string) {
+  const spinner = new Spinner();
   try {
+    spinner.spin("Creating dapp");
     execSync(`git clone --quiet ${templateUrl} ${folderName}`);
     cleanUpFiles(folderName);
-    console.log("Dapp created successfully");
+    spinner.success("Dapp created !");
   } catch (error) {
     console.log("Error: ", error.message);
   } finally {
-    process.exit(0);
+    spinner.stop();
   }
 }
 
