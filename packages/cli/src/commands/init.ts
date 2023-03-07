@@ -3,6 +3,7 @@ import path from "path";
 import { writeToJsonFile, fileExists, readFromJsonFile } from "../utils";
 import configuration from "../configuration";
 import { createConfiguration } from "./create-configuration";
+import Spinner from "../outputs/spinner";
 
 export async function init(
   name: string,
@@ -10,8 +11,9 @@ export async function init(
   projectPath: string,
   framework: string
 ) {
-  let executionError = false;
+  const spinner = new Spinner();
   try {
+    spinner.spin(`Spheron initialization...`);
     if (await fileExists("./spheron.json")) {
       throw new Error("Spheron file already exists");
     }
@@ -21,7 +23,6 @@ export async function init(
     ) {
       await createConfiguration();
     }
-    console.log("Spheron initialization...");
     const pathSegments = process.cwd().split("/");
     const frameworkConfig = mapFrameworkConfig(framework);
     const spheronConfiguration = {
@@ -49,21 +50,21 @@ export async function init(
         ? path.join(process.cwd(), projectPath)
         : path.join(process.cwd(), "./"),
       protocol: protocol,
+      framework: {
+        name: framework,
+        configuration: frameworkConfig,
+      },
     });
     await writeToJsonFile(
       "projects",
       projects,
       configuration.projectTrackingFilePath
     );
-    console.log("Spheron initialized");
+    spinner.success("Spheron initialized");
   } catch (error) {
     console.log("Error: ", error.message);
-    executionError = true;
   } finally {
-    if (executionError) {
-      console.log("Failed to initialize spheron in project");
-    }
-    process.exit(0);
+    spinner.stop();
   }
 }
 
