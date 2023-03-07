@@ -1,9 +1,9 @@
 import configuration from "../configuration";
 import SpheronClient, { ProtocolEnum } from "@spheron/storage";
-import cliProgress from "cli-progress";
 
 import { FileTypeEnum, getFileType, readFromJsonFile } from "../utils";
 import Spinner from "../outputs/spinner";
+import { progressBar } from "../outputs/progress-bar";
 
 export async function upload(
   rootPath: string,
@@ -13,7 +13,7 @@ export async function upload(
 ) {
   const spinner = new Spinner();
   try {
-    spinner.spin(`Uploading to ${mapProtocolToUserReadable(protocol)} `);
+    spinner.spin(`Uploading to ${mapProtocolToUserReadable(protocol)} `, 4000);
     const jwtToken = await readFromJsonFile(
       "jwtToken",
       configuration.configFilePath
@@ -27,11 +27,6 @@ export async function upload(
 
     let uploadedBytes = 0;
     // Initialize the progress bar
-    const progressBar = new cliProgress.SingleBar({
-      format:
-        "Uploading [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total} bytes",
-      stopOnComplete: true,
-    });
     let uploadStarted = false;
     const fileType: FileTypeEnum = await getFileType(rootPath);
     console.log(`Uploading ${fileType} `);
@@ -46,18 +41,32 @@ export async function upload(
         onChunkUploaded(uploadedSize: any, totalSize: any) {
           if (!uploadStarted) {
             uploadStarted = true;
-            progressBar.start(totalSize, 0);
+            console.log(progressBar(0, totalSize));
+            process.stdout.moveCursor(0, -1);
+          } else {
+            uploadedBytes += uploadedSize;
+            process.stdout.moveCursor(0, 1);
+            process.stdout.clearLine(-1);
+            process.stdout.cursorTo(0);
+            console.log(
+              `Uploaded ${formatBytes(uploadedBytes)}/${formatBytes(
+                totalSize
+              )} (${formatPercentage(uploadedBytes, totalSize)}), ${progressBar(
+                uploadedBytes,
+                totalSize
+              )}`
+            );
+            process.stdout.moveCursor(0, -2);
           }
-          uploadedBytes += uploadedSize;
-          progressBar.update(uploadedBytes);
         },
       });
+    spinner.success("Upload finished !");
+    spinner.stop();
     console.log("Upload finished, here is upload details:");
     console.log(`Upload ID: ${uploadId}`);
     console.log(`Bucket ID: ${bucketId}`);
     console.log(`Protocol Link: ${protocolLink}`);
     console.log(`Dynamic Links:, ${dynamicLinks.join(", ")}`);
-    spinner.success("Upload finished !");
   } catch (error) {
     console.log(`Error: ${error.message}`);
     //TODO: Fix messages that are returned by spheron@storage
@@ -66,8 +75,6 @@ export async function upload(
         `Arweave is not enabled for starter plan, please upgrade your plan to pro to start uploading your files to Arweave.\nPlease feel free to contact our team on Discord if you have any questions.`
       );
     }
-  } finally {
-    spinner.stop();
   }
 }
 
@@ -91,4 +98,20 @@ function mapProtocolToUserReadable(protocol: string): string {
     return "Arweave";
   }
   return "IPFS";
+}
+
+// Helper functions for formatting bytes, percentages, and time
+function formatBytes(bytes: number) {
+  const units = ["B", "KB", "MB", "GB", "TB"];
+  let index = 0;
+  while (bytes >= 1024 && index < units.length - 1) {
+    bytes /= 1024;
+    index++;
+  }
+  return `${bytes.toFixed(2)} ${units[index]}`;
+}
+
+function formatPercentage(value: number, total: number) {
+  const percentage = (value / total) * 100;
+  return `${percentage.toFixed(2)}%`;
 }
