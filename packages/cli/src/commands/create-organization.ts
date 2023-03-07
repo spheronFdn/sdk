@@ -26,7 +26,7 @@ export async function createOrganization(
       return;
     }
     const organizationResponse = await axios.post(
-      `${configuration.spheron_server_address}/v1/organization`,
+      `${configuration.spheronServerAddress}/v1/organization`,
       {
         name,
         username,

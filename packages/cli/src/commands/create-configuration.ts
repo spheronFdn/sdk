@@ -11,12 +11,12 @@ export async function createConfiguration() {
       return;
     }
     console.log("Setting up spheron configuration...");
-    await fs.promises.mkdir(path.join(configuration.home_path, ".spheron"), {
+    await fs.promises.mkdir(path.join(configuration.homePath, ".spheron"), {
       recursive: true,
       mode: 0o777,
     });
     await fs.promises.chmod(
-      path.join(configuration.home_path, ".spheron"),
+      path.join(configuration.homePath, ".spheron"),
       0o777
     );
 
