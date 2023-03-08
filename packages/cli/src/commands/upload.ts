@@ -1,5 +1,6 @@
 import configuration from "../configuration";
-import SpheronClient, { ProtocolEnum } from "@spheron/storage";
+// import SpheronClient, { ProtocolEnum } from "@spheron/storage";
+import SpheronClient, { ProtocolEnum } from "spheron-storage-dusan";
 
 import { FileTypeEnum, getFileType, readFromJsonFile } from "../utils";
 import Spinner from "../outputs/spinner";
