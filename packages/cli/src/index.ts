@@ -46,7 +46,7 @@ import { FrameworkOptions } from "./commands/init";
         })
         .version(false)
         .usage(
-          `Usage: $0 upload --path <file_path> --protocol [arweave| filecoin| ipfs] [--project <project_name>] [--organization <org_name>]`
+          `Usage: $0 upload --path <file_path> --protocol [arweave| filecoin| ipfs] [--project <project_name>] [--organization <organizationId>]`
         )
         .wrap(100)
         .help();
