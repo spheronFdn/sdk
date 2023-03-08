@@ -43,7 +43,7 @@ export async function login(provider: string): Promise<void> {
             const successLocationRedirect = new URL(
               `${
                 configuration.spheronFrontendAddress
-              }/notifications/cli-login?email=${encodeURIComponent(email)}`
+              }/#/notifications/cli-login?email=${encodeURIComponent(email)}`
             );
             res.setHeader("location", successLocationRedirect.href);
             res.end();
