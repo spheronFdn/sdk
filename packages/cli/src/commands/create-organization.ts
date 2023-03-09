@@ -52,7 +52,7 @@ export async function createOrganization(
     );
     spinner.success(`Organization ${name} is created`);
   } catch (error) {
-    console.log("Error: ", error.message);
+    console.log(`✖️  Error: ${error.message}`);
     throw error;
   } finally {
     spinner.stop();

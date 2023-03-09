@@ -62,7 +62,7 @@ export async function init(
     );
     spinner.success("Spheron initialized");
   } catch (error) {
-    console.log("Error: ", error.message);
+    console.log(`✖️  Error: ${error.message}`);
   } finally {
     spinner.stop();
   }
