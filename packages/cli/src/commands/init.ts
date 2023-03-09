@@ -99,7 +99,7 @@ function mapFrameworkConfig(framework: string) {
       return {
         installCommand: "yarn install",
         buildCommand: "yarn build",
-        publishDirectory: "dist/{your-app-name}",
+        publishDirectory: "dist/app",
       };
     case FrameworkOptions.Next:
       return {

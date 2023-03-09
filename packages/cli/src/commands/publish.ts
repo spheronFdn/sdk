@@ -1,3 +1,4 @@
+import path from "path";
 import configuration from "../configuration";
 
 import { fileExists, readFromJsonFile } from "../utils";
@@ -30,8 +31,16 @@ export async function publish(organization?: string): Promise<any> {
         "Please specify organization that you would wish to use while uploading"
       );
     }
+    const publishDirectory =
+      localConfiguration?.framework?.configuration?.publishDirectory;
+    if (publishDirectory == undefined || publishDirectory == null) {
+      throw new Error(
+        "Publish directory not provided, please execute spheron init command"
+      );
+    }
+    const pathToDir = path.join(localConfiguration.rootPath, publishDirectory);
     await upload(
-      localConfiguration.rootPath,
+      pathToDir,
       localConfiguration.protocol,
       organizationId,
       localConfiguration.name
