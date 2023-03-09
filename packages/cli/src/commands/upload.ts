@@ -4,6 +4,7 @@ import SpheronClient, { ProtocolEnum } from "@spheron/storage";
 const chalk = require("chalk");
 
 import {
+  fileExists,
   FileTypeEnum,
   getFileType,
   mapProtocolToUserReadable,
@@ -35,6 +36,9 @@ export async function upload(
     let uploadedBytes = 0;
     // Initialize the progress bar
     let uploadStarted = false;
+    if (!(await fileExists(rootPath))) {
+      throw new Error(`File ${rootPath} does not exist`);
+    }
     const fileType: FileTypeEnum = await getFileType(rootPath);
     console.log(`Uploading ${fileType} ${rootPath}`);
     const { uploadId, bucketId, protocolLink, dynamicLinks } =

@@ -43,6 +43,9 @@ export async function publish(organization?: string): Promise<any> {
       );
     }
     const pathToDir = path.join(localConfiguration.rootPath, publishDirectory);
+    if (!(await fileExists(pathToDir))) {
+      throw new Error(`Publish directory ${pathToDir} does not exist`);
+    }
     console.log(
       `Publishing your dapp to ${mapProtocolToUserReadable(
         localConfiguration.protocol
