@@ -150,7 +150,7 @@ export async function promptForCreateApp(appName?: string): Promise<any> {
               type: "list",
               name: "templateType",
               message: "Choose a template:",
-              choices: ["Portfolio", "NFT Drop"],
+              choices: ["Portfolio"],
             },
             {
               type: "input",
@@ -162,8 +162,6 @@ export async function promptForCreateApp(appName?: string): Promise<any> {
                 }
                 if (answers.templateType === "Portfolio") {
                   return "my-portfolio-app";
-                } else if (answers.templateType === "NFT Drop") {
-                  return "my-nft-drop-app";
                 }
                 return ""; // fallback default value
               },
