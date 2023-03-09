@@ -1,7 +1,11 @@
 import path from "path";
 import configuration from "../configuration";
 
-import { fileExists, readFromJsonFile } from "../utils";
+import {
+  fileExists,
+  mapProtocolToUserReadable,
+  readFromJsonFile,
+} from "../utils";
 import { upload } from "./upload";
 
 export async function publish(organization?: string): Promise<any> {
@@ -39,6 +43,11 @@ export async function publish(organization?: string): Promise<any> {
       );
     }
     const pathToDir = path.join(localConfiguration.rootPath, publishDirectory);
+    console.log(
+      `Publishing your dapp to ${mapProtocolToUserReadable(
+        localConfiguration.protocol
+      )} 🚀`
+    );
     await upload(
       pathToDir,
       localConfiguration.protocol,

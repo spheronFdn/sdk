@@ -1,7 +1,14 @@
 import configuration from "../configuration";
 import SpheronClient, { ProtocolEnum } from "@spheron/storage";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const chalk = require("chalk");
 
-import { FileTypeEnum, getFileType, readFromJsonFile } from "../utils";
+import {
+  FileTypeEnum,
+  getFileType,
+  mapProtocolToUserReadable,
+  readFromJsonFile,
+} from "../utils";
 import Spinner from "../outputs/spinner";
 import { progressBar } from "../outputs/progress-bar";
 
@@ -29,14 +36,14 @@ export async function upload(
     // Initialize the progress bar
     let uploadStarted = false;
     const fileType: FileTypeEnum = await getFileType(rootPath);
-    console.log(`Uploading ${fileType} `);
+    console.log(`Uploading ${fileType} ${rootPath}`);
     const { uploadId, bucketId, protocolLink, dynamicLinks } =
       await client.upload(rootPath, {
         protocol: mapProtocolToStorageSDK(protocol),
         name: projectName,
         organizationId,
         onUploadInitiated: (deploymentId: any) => {
-          console.log("Upload started, id of deployment: " + deploymentId);
+          console.log("Upload started, ID of deployment: " + deploymentId);
         },
         onChunkUploaded(uploadedSize: any, totalSize: any) {
           if (!uploadStarted) {
@@ -60,15 +67,22 @@ export async function upload(
           }
         },
       });
-    spinner.success("Upload finished !🚀");
+    spinner.success("Upload finished !");
     spinner.stop();
-    console.log("Upload finished, here are upload details:");
+    console.log("Here are upload details:");
     console.log(`Upload ID: ${uploadId}`);
     console.log(`Bucket ID: ${bucketId}`);
-    console.log(`Protocol Link: ${protocolLink}`);
-    console.log(`Dynamic Links:, ${dynamicLinks.join(", ")}`);
+    console.log(chalk.green(`Protocol Link:`), protocolLink);
+    console.log(
+      chalk.green(`Dynamic Links:`),
+      dynamicLinks
+        .map((link) => {
+          return `https://${link}`;
+        })
+        .join(", ")
+    );
   } catch (error) {
-    console.log(`Error: ${error.message}`);
+    console.log(`✖️  Error: ${error.message}`);
     //TODO: Fix messages that are returned by spheron@storage
     if (protocol == "arweave" && error.message == "arweave storage exceeded") {
       console.log(
@@ -89,17 +103,6 @@ function mapProtocolToStorageSDK(protocol: string): ProtocolEnum {
     return ProtocolEnum.ARWEAVE;
   }
   return ProtocolEnum.IPFS;
-}
-
-function mapProtocolToUserReadable(protocol: string): string {
-  if (protocol === "ipfs") {
-    return "IPFS";
-  } else if (protocol === "filecoin") {
-    return "Filecoin";
-  } else if (protocol === "arweave") {
-    return "Arweave";
-  }
-  return "IPFS";
 }
 
 // Helper functions for formatting bytes, percentages, and time

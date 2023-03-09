@@ -76,6 +76,17 @@ export async function deleteKeyFromJson(
   }
 }
 
+export function mapProtocolToUserReadable(protocol: string): string {
+  if (protocol === "ipfs") {
+    return "IPFS";
+  } else if (protocol === "filecoin") {
+    return "Filecoin";
+  } else if (protocol === "arweave") {
+    return "Arweave";
+  }
+  return "IPFS";
+}
+
 export enum FileTypeEnum {
   DIRECTORY = "directory",
   FILE = "file",
