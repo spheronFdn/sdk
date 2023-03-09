@@ -172,7 +172,7 @@ export async function commandHandler(options: any) {
           project = prompt.project;
           protocol = prompt.protocol.toLowerCase();
           path = prompt.path;
-          framework = prompt.framework;
+          framework = prompt.framework.toLowerCase();
         }
         if (!project) {
           const pathSegments = process.cwd().split("/");
