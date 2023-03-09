@@ -87,8 +87,7 @@ export async function upload(
     );
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);
-    //TODO: Fix messages that are returned by spheron@storage
-    if (protocol == "arweave" && error.message == "arweave storage exceeded") {
+    if (protocol == "arweave") {
       console.log(
         `Arweave is not enabled for starter plan, please upgrade your plan to pro to start uploading your files to Arweave.\nPlease feel free to contact our team on Discord if you have any questions.`
       );
