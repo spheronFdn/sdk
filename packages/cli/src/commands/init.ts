@@ -9,7 +9,8 @@ export async function init(
   name: string,
   protocol: string,
   projectPath: string,
-  framework: string
+  framework: string,
+  silient?: boolean
 ) {
   const spinner = new Spinner();
   try {
@@ -60,7 +61,9 @@ export async function init(
       projects,
       configuration.projectTrackingFilePath
     );
-    spinner.success("Spheron initialized");
+    if (!silient) {
+      spinner.success("Spheron initialized");
+    }
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);
   } finally {
