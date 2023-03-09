@@ -91,7 +91,9 @@ export async function promptForInit(): Promise<any> {
     {
       type: "list",
       name: "framework",
-      choices: Object.values(FrameworkOptions),
+      choices: Object.values(FrameworkOptions).map(
+        (option) => option.charAt(0).toUpperCase() + option.slice(1)
+      ),
       message: "Framework:",
       default: "static",
     },
