@@ -20,45 +20,53 @@ export async function login(provider: string): Promise<void> {
       await Promise.all([
         new Promise<void>((resolve, reject) => {
           server.once("request", async (req, res) => {
-            const code = req.url?.split("&")[0].split("=")[1];
-            const verify = await axios.get(
-              `${configuration.spheronServerAddress}/auth/${provider}/cli/verify-token/${code}?port=${port}`, //port used for bitbucket
-              {
-                headers: {
-                  Accept: "application/json",
-                },
+            try {
+              const code = req.url?.split("&")[0].split("=")[1];
+              const verify = await axios.get(
+                `${configuration.spheronServerAddress}/auth/${provider}/cli/verify-token/${code}?port=${port}`, //port used for bitbucket
+                {
+                  headers: {
+                    Accept: "application/json",
+                  },
+                }
+              );
+              if (verify.status != 200 || !verify.data.jwtToken) {
+                loginError = true;
+                throw new Error("Verification of token failed");
               }
-            );
-            if (verify.status != 200 || !verify.data.jwtToken) {
-              loginError = true;
-              throw new Error("Verification of token failed");
-            }
 
-            const jwt = verify.data.jwtToken;
-            const organizationId = verify.data.organizationId;
-            const email = verify.data.email;
-            // Closing of server
-            res.setHeader("connection", "close");
-            res.statusCode = 302;
-            const successLocationRedirect = new URL(
-              `${
-                configuration.spheronFrontendAddress
-              }/#/notifications/cli-login?email=${encodeURIComponent(email)}`
-            );
-            res.setHeader("location", successLocationRedirect.href);
-            res.end();
-            //store jwt token in spheron-config file
-            await writeToJsonFile(
-              "jwtToken",
-              jwt,
-              configuration.configFilePath
-            );
-            await writeToJsonFile(
-              "organization",
-              organizationId,
-              configuration.configFilePath
-            );
-            resolve();
+              const jwt = verify.data.jwtToken;
+              const organizationId = verify.data.organizationId;
+              const email = verify.data.email;
+              // Closing of server
+              res.setHeader("connection", "close");
+              res.statusCode = 302;
+              const successLocationRedirect = new URL(
+                `${
+                  configuration.spheronFrontendAddress
+                }/#/notifications/cli-login?email=${encodeURIComponent(email)}`
+              );
+              res.setHeader("location", successLocationRedirect.href);
+              res.end();
+              //store jwt token in spheron-config file
+              await writeToJsonFile(
+                "jwtToken",
+                jwt,
+                configuration.configFilePath
+              );
+              await writeToJsonFile(
+                "organization",
+                organizationId,
+                configuration.configFilePath
+              );
+              resolve();
+            } catch (e) {
+              console.log(
+                `✖️  Error occured while logging in. Check if you have created an account on Spheron. You need to sign up first with ${provider} connection to be able to login with CLI.`
+              );
+              spinner.stop();
+              process.exit(0);
+            }
           });
           server.once("error", reject);
         }),
