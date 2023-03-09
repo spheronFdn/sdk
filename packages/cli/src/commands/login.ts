@@ -69,7 +69,7 @@ export async function login(provider: string): Promise<void> {
     } finally {
       server.close();
       if (loginError) {
-        console.log("Error occured while loging in, ");
+        console.log(`✖️  Error occured while logging in`);
       } else {
         spinner.success(`${provider} authentication completed`);
       }

@@ -11,7 +11,7 @@ export async function createApp(templateUrl: string, folderName: string) {
     cleanUpFiles(folderName);
     spinner.success("Dapp created !");
   } catch (error) {
-    console.log("Error: ", error.message);
+    console.log(`✖️  Error: ${error.message}`);
   } finally {
     spinner.stop();
   }

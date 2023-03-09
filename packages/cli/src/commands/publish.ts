@@ -55,7 +55,7 @@ export async function publish(organization?: string): Promise<any> {
       localConfiguration.name
     );
   } catch (error) {
-    console.log(error.message);
+    console.log(`✖️  Error: ${error.message}`);
     throw error;
   }
 }
