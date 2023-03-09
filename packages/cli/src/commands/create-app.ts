@@ -1,19 +1,35 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import Spinner from "../outputs/spinner";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const chalk = require("chalk");
+import { FrameworkOptions, init } from "./init";
 
-export async function createApp(templateUrl: string, folderName: string) {
-  const spinner = new Spinner();
+export async function createApp(
+  templateAlias: string,
+  projectName: string,
+  protocol: string
+) {
   try {
-    spinner.spin("Creating dapp ");
-    execSync(`git clone --quiet ${templateUrl} ${folderName}`);
-    cleanUpFiles(folderName);
-    spinner.success("Dapp created !");
+    console.log(`- Initializing dapp in ${projectName}`);
+    const url: string = getTemplateUrlMapping(templateAlias);
+    execSync(`git clone --quiet ${url} ${projectName}`);
+    console.log(
+      `${chalk.green("✓")} ${chalk.cyan(templateAlias)} dapp initialized`
+    );
+    cleanUpFiles(projectName);
+    const framework = getTemplateFrameworkMapping(templateAlias);
+    const rootPath = getTemplateRootPathMapping(templateAlias);
+    process.chdir(projectName);
+    await init(projectName, protocol, rootPath, framework, true);
+    process.chdir("..");
+    console.log(
+      `${chalk.green("✓")} ${chalk.cyan(
+        templateAlias
+      )} dapp created in ${projectName} 🚀`
+    );
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);
-  } finally {
-    spinner.stop();
   }
 }
 
@@ -33,4 +49,22 @@ export function getTemplateUrlMapping(alias: string): string {
     return "https://github.com/spheronFdn/next-boilerplate";
   }
   throw new Error("Mapping for template not found");
+}
+
+export function getTemplateFrameworkMapping(alias: string): FrameworkOptions {
+  if (alias === "Portfolio") {
+    return FrameworkOptions.Next;
+  } else if (alias === "React") {
+    return FrameworkOptions.React;
+  } else if (alias === "Next.js") {
+    return FrameworkOptions.Next;
+  }
+  throw new Error("Mapping for template not found");
+}
+
+export function getTemplateRootPathMapping(alias: string): string {
+  if (alias === "Portfolio" || alias === "React" || alias === "Next.js") {
+    return "./";
+  }
+  return "";
 }

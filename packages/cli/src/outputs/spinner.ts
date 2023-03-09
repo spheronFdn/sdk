@@ -30,6 +30,6 @@ export default class Spinner {
   };
 
   success = (str: string) => {
-    console.log(`\n${chalk.cyan(`✅ Success!`)} ${str}\n`);
+    console.log(`\n${chalk.green("✓")}${chalk.cyan(` Success!`)} ${str}`);
   };
 }

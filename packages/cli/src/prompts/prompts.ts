@@ -1,4 +1,4 @@
-import { createApp, getTemplateUrlMapping } from "../commands/create-app";
+import { createApp } from "../commands/create-app";
 import { FrameworkOptions } from "../commands/init";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -105,18 +105,18 @@ export async function promptForCreateApp(appName?: string): Promise<any> {
       {
         type: "list",
         name: "projectType",
-        message: "What type of project do you want to create?",
-        choices: ["Default app", "Start from a template"],
+        message: "What type of dapp do you want to create?",
+        choices: ["Default dapp", "Start from a template"],
       },
     ])
     .then((answers: any) => {
-      if (answers.projectType === "Default app") {
+      if (answers.projectType === "Default dapp") {
         inquirer
           .prompt([
             {
               type: "list",
               name: "templateType",
-              message: "Choose a default app type:",
+              message: "Choose a default dapp type:",
               choices: ["React", "Next.js"],
             },
             {
@@ -135,13 +135,23 @@ export async function promptForCreateApp(appName?: string): Promise<any> {
                 return ""; // fallback default value
               },
             },
+            {
+              type: "list",
+              name: "protocol",
+              message: "Upload protocol:",
+              choices: ["Arweave", "Filecoin", "IPFS"],
+              default: "Arweave",
+            },
           ])
           .then(async (answers: any) => {
             console.log(
-              `Creating a new default ${answers.templateType} project name ${answers.project}. Time to become a wizard 🔮`
+              `\nCreating a new ${answers.templateType} dapp with project name: ${answers.project}. Time to become a wizard 🔮`
             );
-            const url: string = getTemplateUrlMapping(answers.templateType);
-            await createApp(url, answers.project);
+            await createApp(
+              answers.templateType,
+              answers.project,
+              answers.protocol.toLowerCase()
+            );
           });
       } else if (answers.projectType === "Start from a template") {
         inquirer
@@ -166,16 +176,26 @@ export async function promptForCreateApp(appName?: string): Promise<any> {
                 return ""; // fallback default value
               },
             },
+            {
+              type: "list",
+              name: "protocol",
+              message: "Upload protocol:",
+              choices: ["Arweave", "Filecoin", "IPFS"],
+              default: "Arweave",
+            },
           ])
           .then(async (answers: any) => {
             if (!answers.project) {
               throw new Error("Project name was not provided");
             }
             console.log(
-              `Creating a new spheron project from template ${answers.templateType} with project name ${answers.project}. Time to become a wizard 🔮`
+              `\nCreating a new project from template ${answers.templateType} with project name ${answers.project}. Time to become a wizard 🔮`
             );
-            const url: string = getTemplateUrlMapping(answers.templateType);
-            await createApp(url, answers.project);
+            await createApp(
+              answers.templateType,
+              answers.project,
+              answers.protocol.toLowerCase()
+            );
           });
       }
     });
