@@ -69,7 +69,7 @@
 
 #
 <h3>spheron create-dapp</h3>
-<p>Use <code>spheron create-dapp</code> to create a template project that will easily be deployed on Sperhon later. </p>
+<p>Use <code>spheron create-dapp</code> to create a template project that will easily be deployed on Spheron later. </p>
 <pre><code>spheron create-dapp</code></pre> 
 This will open up a promter that will allow you to select what kind of a template you want to create.
 
