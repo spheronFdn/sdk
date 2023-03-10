@@ -1,6 +1,6 @@
 {
   "name": "@spheron/cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CLI for working on projects and deploying them via Spheron ",
   "keywords": [
     "CLI",
@@ -57,6 +57,6 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/spheronFdn/cli.git"
+    "url": "git://github.com/spheronFdn/sdk.git"
   }
 }
