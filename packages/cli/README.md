@@ -20,9 +20,7 @@
   
 
 <p  align="center">
-
 🧰 CLI tool for creating and deploying dapps to web3.
-
 </p>
 
   
