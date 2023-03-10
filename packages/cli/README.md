@@ -61,7 +61,7 @@
 
 <p>To use Spheron CLI, you need to first install it using the following command:</p>
 
-<pre><code>sudo npm install -g spheron@cli</code></pre>
+<pre><code>sudo npm install -g @spheron/cli</code></pre>
 
 <p>Once you have installed the CLI, you can use the following commands to create and deploy dapps to web3:</p>
 
