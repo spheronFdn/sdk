@@ -6,26 +6,30 @@ const chalk = require("chalk");
 import { FrameworkOptions, init } from "./init";
 
 export async function createApp(
-  templateAlias: string,
+  template: ITemplateApp,
   projectName: string,
   protocol: string
 ) {
   try {
     console.log(`- Initializing dapp in ${projectName}`);
-    const url: string = getTemplateUrlMapping(templateAlias);
+    const url: string = template.url;
     execSync(`git clone --quiet ${url} ${projectName}`);
     console.log(
-      `${chalk.green("✓")} ${chalk.cyan(templateAlias)} dapp initialized`
+      `${chalk.green("✓")} ${chalk.cyan(template.alias)} dapp initialized`
     );
     cleanUpFiles(projectName);
-    const framework = getTemplateFrameworkMapping(templateAlias);
-    const rootPath = getTemplateRootPathMapping(templateAlias);
     process.chdir(projectName);
-    await init(projectName, protocol, rootPath, framework, true);
+    await init(
+      projectName,
+      protocol,
+      template.rootPath,
+      template.framework,
+      true
+    );
     process.chdir("..");
     console.log(
       `${chalk.green("✓")} ${chalk.cyan(
-        templateAlias
+        template.alias
       )} dapp created in ${projectName} 🚀`
     );
   } catch (error) {
@@ -40,31 +44,55 @@ function cleanUpFiles(folderName: string) {
   });
 }
 
-export function getTemplateUrlMapping(alias: string): string {
-  if (alias === "Portfolio") {
-    return "https://github.com/spheronFdn/portfolio-template";
-  } else if (alias === "React") {
-    return "https://github.com/spheronFdn/react-boilerplate";
-  } else if (alias === "Next.js") {
-    return "https://github.com/spheronFdn/next-boilerplate";
-  }
-  throw new Error("Mapping for template not found");
+export interface ITemplateApp {
+  alias: string; // shown to user
+  dappType: DappType;
+  url: string;
+  framework: FrameworkOptions;
+  rootPath: string;
+  defaultProjectName: string;
 }
 
-export function getTemplateFrameworkMapping(alias: string): FrameworkOptions {
-  if (alias === "Portfolio") {
-    return FrameworkOptions.Next;
-  } else if (alias === "React") {
-    return FrameworkOptions.React;
-  } else if (alias === "Next.js") {
-    return FrameworkOptions.Next;
-  }
-  throw new Error("Mapping for template not found");
+export enum DappType {
+  Default = "default",
+  Template = "template",
 }
 
-export function getTemplateRootPathMapping(alias: string): string {
-  if (alias === "Portfolio" || alias === "React" || alias === "Next.js") {
-    return "./";
-  }
-  return "";
-}
+export const templateApps: Map<string, ITemplateApp> = new Map<
+  string,
+  ITemplateApp
+>([
+  [
+    "default-react",
+    {
+      alias: "React",
+      dappType: DappType.Default,
+      url: "https://github.com/spheronFdn/react-boilerplate",
+      framework: FrameworkOptions.React,
+      rootPath: "./",
+      defaultProjectName: "my-react-app",
+    },
+  ],
+  [
+    "default-nextjs",
+    {
+      alias: "Next.js",
+      dappType: DappType.Default,
+      url: "https://github.com/spheronFdn/next-boilerplate",
+      framework: FrameworkOptions.Next,
+      rootPath: "./",
+      defaultProjectName: "my-nextjs-app",
+    },
+  ],
+  [
+    "template-portfolio",
+    {
+      alias: "Portfolio",
+      dappType: DappType.Template,
+      url: "https://github.com/spheronFdn/portfolio-template",
+      framework: FrameworkOptions.Next,
+      rootPath: "./",
+      defaultProjectName: "my-portfolio-app",
+    },
+  ],
+]);

@@ -1,4 +1,4 @@
-import { createApp } from "../commands/create-app";
+import { createApp, DappType, templateApps } from "../commands/create-app";
 import { FrameworkOptions } from "../commands/init";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -117,9 +117,9 @@ export async function promptForCreateApp(appName?: string): Promise<any> {
           .prompt([
             {
               type: "list",
-              name: "templateType",
+              name: "template",
               message: "Choose a default dapp type:",
-              choices: ["React", "Next.js"],
+              choices: defaultAppChoices,
             },
             {
               type: "input",
@@ -129,12 +129,7 @@ export async function promptForCreateApp(appName?: string): Promise<any> {
                 if (appName) {
                   return appName;
                 }
-                if (answers.templateType === "React") {
-                  return "my-react-app";
-                } else if (answers.templateType === "Next.js") {
-                  return "my-nextjs-app";
-                }
-                return ""; // fallback default value
+                return answers.template.defaultProjectName;
               },
             },
             {
@@ -147,10 +142,10 @@ export async function promptForCreateApp(appName?: string): Promise<any> {
           ])
           .then(async (answers: any) => {
             console.log(
-              `\nCreating a new ${answers.templateType} dapp with project name: ${answers.project}. Time to become a wizard 🔮`
+              `\nCreating a new ${answers.template.alias} dapp with project name: ${answers.project}. Time to become a wizard 🔮`
             );
             await createApp(
-              answers.templateType,
+              answers.template,
               answers.project,
               answers.protocol.toLowerCase()
             );
@@ -160,22 +155,16 @@ export async function promptForCreateApp(appName?: string): Promise<any> {
           .prompt([
             {
               type: "list",
-              name: "templateType",
+              name: "template",
               message: "Choose a template:",
-              choices: ["Portfolio"],
+              choices: templateAppChoices,
             },
             {
               type: "input",
               name: "project",
               message: "Project name:",
               default: function (answers: any) {
-                if (appName) {
-                  return appName;
-                }
-                if (answers.templateType === "Portfolio") {
-                  return "my-portfolio-app";
-                }
-                return ""; // fallback default value
+                return answers.template.defaultProjectName;
               },
             },
             {
@@ -191,10 +180,10 @@ export async function promptForCreateApp(appName?: string): Promise<any> {
               throw new Error("Project name was not provided");
             }
             console.log(
-              `\nCreating a new project from template ${answers.templateType} with project name ${answers.project}. Time to become a wizard 🔮`
+              `\nCreating a new project from template ${answers.template.alias} with project name ${answers.project}. Time to become a wizard 🔮`
             );
             await createApp(
-              answers.templateType,
+              answers.template,
               answers.project,
               answers.protocol.toLowerCase()
             );
@@ -202,3 +191,11 @@ export async function promptForCreateApp(appName?: string): Promise<any> {
       }
     });
 }
+
+const defaultAppChoices = Array.from(templateApps.values())
+  .filter((app) => app.dappType === DappType.Default)
+  .map((app) => ({ name: app.alias, value: app }));
+
+const templateAppChoices = Array.from(templateApps.values())
+  .filter((app) => app.dappType === DappType.Template)
+  .map((app) => ({ name: app.alias, value: app }));
