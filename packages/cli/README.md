@@ -71,7 +71,7 @@
 <h3>spheron create-dapp</h3>
 <p>Use <code>spheron create-dapp</code> to create a template project that will easily be deployed on Spheron later. </p>
 <pre><code>spheron create-dapp</code></pre> 
-This will open up a promter that will allow you to select what kind of a template you want to create.
+This will open up a prompter that will allow you to select what kind of a template you want to create.
 
 <code>spheron init --protocol {protocol} [--project {project_name}] [--path {path}] [--framework {framework}]]</code> 
 
@@ -79,7 +79,7 @@ This will open up a promter that will allow you to select what kind of a templat
 <h3>spheron init</h3>
 <p>Use <code>spheron init</code> to initialize a new Spheron project. This will create a new spheron.json file in your current path. This spheron.json file is a file describing your project. It will be used for <code> spheron publish </code> command. See more in spheron publish command section.</p>
 <pre><code>spheron init</code></pre> 
-This will open up a promter that will prompt you to describe your project. If you want to directly call it without prompter you can use: 
+This will open up a prompter that will prompt you to describe your project. If you want to directly call it without prompter you can use: 
 
 <code>spheron init --protocol {protocol} [--project {project_name}] [--path {path}] [--framework {framework}]]</code> 
 You can update this file manually afterwards to change default settings.
@@ -99,9 +99,9 @@ This command will look up at your spheron.json file and  use its configuration t
 
 #
 <h3>spheron upload</h3>
-<p>Use <code>spheron upload</code> if you want to directly upload your file/directory to web3 storage without need to setup project. Using this command expects you to be logged in previously. To do that use <code>spheron login</code> before upload. </p>
+<p>Use <code>spheron upload</code> if you want to directly upload your file/directory to the specific protocol without need to setup the project. Using this command expects you to be logged in previously. To do that use <code>spheron login</code> before upload. </p>
 <pre><code>spheron upload</code></pre> 
-This will open up a promter that will prompt you to describe how you want to upload your directory/file. If you want to directly call it without prompter you can use: 
+This will open up a prompter that will prompt you to describe how you want to upload your directory/file. If you want to directly call it without prompter you can use: 
 
 <code>spheron upload --path {file_path} --protocol {protocol} [--project {project_name}] [--organization {organizationId}] </code> 
 
@@ -118,7 +118,7 @@ This will open up a promter that will prompt you to describe how you want to upl
 <h3>spheron create-organization</h3>
 <p>Use <code>spheron create-organization</code> if you want to create a new organization. This will set that organization as default and will use it later for upload/publish commands by default. Keep in mind that first time you execute <code>spheron login</code> command, you will get new organization created if you already didn't have one set up.   </p>
 <pre><code>spheron create-organization</code></pre> 
-This will open up a promter that will help you set up your new organization. If you want to directly call it without prompter you can use: 
+This will open up a prompter that will help you set up your new organization. If you want to directly call it without prompter you can use: 
 
 <code>spheron upload --name {organization_name} --username {organization_username} </code> 
 
@@ -130,16 +130,16 @@ This will open up a promter that will help you set up your new organization. If 
   
   #
   <h3>spheron login</h3>
-<p>Use <code>spheron login</code> to connect to your Spheron account. This command will allow you to autheticate to Spheron and is mandatory to execute before doing <code>upload</code> or <code>publish</code> commands.</p>
+<p>Use <code>spheron login</code> to connect to your Spheron account. This command will allow you to authenticate to Spheron and is mandatory to execute before doing <code>upload</code> or <code>publish</code> commands.</p>
 <pre><code>spheron login</code></pre> 
-This will open up a promter that will help you set up your new organization. If you want to directly call it without prompter you can use: 
+This will open up a prompter that will help you set up your new organization. If you want to directly call it without prompter you can use: 
 
 <code>spheron login [--github | --gitlab | --bitbucket] </code> 
   
 
 ## Learn More
 
-You can learn more about Spheron and Storage SDK here:
+You can learn more about Spheron and Spheron CLI here:
 
   
 
