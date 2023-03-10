@@ -16,7 +16,6 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
-    "postinstall": "node ./dist/scripts/postinstall.js",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "prettier:write": "prettier --write '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
     "prettier:check": "prettier --check '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
@@ -55,5 +54,9 @@
   },
   "files": [
     "dist/"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/spheronFdn/cli.git"
+  }
 }
