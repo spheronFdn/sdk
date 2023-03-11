@@ -79,7 +79,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
 
 ## Access Token:
 
-To create the `token` that is used with the `SpheronClient`, you can follow the instructions in the [DOCS](https://docs.spheron.network/api/rest-api-references#creating-an-access-token).
+To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/api/rest-api-references#creating-an-access-token).
 
 ## Contribution
 
