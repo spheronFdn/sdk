@@ -52,7 +52,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
 );
 ```
 
-- The `SpheronClient` constructor takes an object that has one property `token`. To create the `token`, you can follow the instructions in the [DOCS](https://docs.spheron.network/api/rest-api-references#creating-an-access-token).
+- The `SpheronClient` constructor takes an object that has one property `token`.
 - Function `upload` has two parameters `client.upload(filePath, configuration);`
   - `filePath` - the path to the file/directory that will be uploaded
   - `configuration` - an object with parameters:
@@ -65,6 +65,10 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
     - `bucketId` - the id of the bucket
     - `protocolLink` - is the protocol link of the upload
     - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
+
+## Access Token:
+
+To create the `token` that is used with the `SpheronClient`, you can follow the instructions in the [DOCS](https://docs.spheron.network/api/rest-api-references#creating-an-access-token).
 
 ## Learn More
 
