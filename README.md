@@ -24,7 +24,7 @@
 
 ---
 
-The Spheron developer toolkits include two packages that can help you build decentralized applications (dapps) on the web3:
+The Spheron developer toolkits include two packages that can help you build decentralized applications (dapps):
 - [Spheron Storage SDK](https://github.com/spheronFdn/sdk/blob/main/packages/storage/README.md)
 - [Spheron CLI](https://github.com/spheronFdn/sdk/blob/main/packages/cli/README.md)
 
