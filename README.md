@@ -77,7 +77,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
     - `protocolLink` - is the protocol link of the upload
     - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
 
-## Access Token:
+## Access Token
 
 To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/api/rest-api-references#creating-an-access-token).
 
