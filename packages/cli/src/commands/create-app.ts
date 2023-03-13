@@ -95,4 +95,15 @@ export const templateApps: Map<string, ITemplateApp> = new Map<
       defaultProjectName: "my-portfolio-app",
     },
   ],
+  [
+    "template-linktree",
+    {
+      alias: "Link Tree",
+      dappType: DappType.Template,
+      url: "https://github.com/spheronFdn/link-tree-app",
+      framework: FrameworkOptions.React,
+      rootPath: "./",
+      defaultProjectName: "my-linktree-app",
+    },
+  ],
 ]);
