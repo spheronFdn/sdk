@@ -14,7 +14,7 @@
 
 <p align="center">  
   <a href="https://www.npmjs.com/package/@spheron/storage" target="_blank" rel="noreferrer">
-    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.5&color=green" />
+    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.6&color=green" />
   </a>
   <a href="https://github.com/spheronFdn/sdk/blob/main/LICENSE" target="_blank" rel="noreferrer">
     <img src="https://img.shields.io/static/v1?label=license&message=Apache%202.0&color=red" />
@@ -65,6 +65,10 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
     - `bucketId` - the id of the bucket
     - `protocolLink` - is the protocol link of the upload
     - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
+
+## Access Token
+
+To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/api/rest-api-references#creating-an-access-token).
 
 ## Learn More
 
