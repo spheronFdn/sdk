@@ -66,6 +66,91 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
     - `protocolLink` - is the protocol link of the upload
     - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
 
+---
+
+The `SpheronClient` instance provides several methods for working with buckets. The supported methods are:
+
+- `async getBucket(bucketId: string): Promise<Bucket>`
+  - used to get the bucket information for the specified `bucketId`.
+- `async  getBucketDomains(bucketId: string): Promise<{ domains: Domain[] }>`
+  - used to get the domains that are attached to the specified `bucketId`.
+- `async  getBucketDomain(bucketId: string, domainIdentifier: string): Promise<{ domain: Domain }>`
+  - used to get the information about the specific domain. The `domainIdentifier` can ether be the id of the domain, or the name of the domain.
+- `async  addBucketDomain(bucketId: string, { link:  string; type: DomainTypeEnum; name: string; }): Promise<{ domain: Domain }>`
+  - used to add a new domain to the specified bucket. The `link` property needs to have the `protocolLink` value of an existing bucket id. After adding a new domain, you will need to setup the record on your DNS provider:
+    - **domain**: you should create a **A** type record with value `13.248.203.0`, and the same name as the domain you have added.
+    - **subdomain** : you should create a **CNAME** type record with value `cname.spheron.io`, and the same name as the domain you have added.
+    - **handshake-domain**: you should create a **A** type record with value `ipfs.namebase.io`, and `@` for name. Also you should create a **TXT** type record with `link` for a value, and `_contenthash` for name.
+    - **handshake-subdomain**: you should create a **A** type record with value `ipfs.namebase.io`, and the same name as the domain you have added. Also you should create a **TXT** type record with `link` for a value, and `_contenthash.<name_of_the_domain>` for name.
+    - **ens-domain**: you should create a **CONTENT** type record with `link` for a value, and the same name as the domain you have added.
+  - After you have setup the record on your DNS provider, then you should call the `verifyBucketDomain` method to verify your domain on Spheron. After the domain is verified, the data behind the link will be cached on the Spheron CDN.
+- `async  updateBucketDomain(bucketId: string, domainIdentifier: string, options: { link: string; name: string; }): Promise<{ domain: Domain }>`
+  - used to update an existing domain of the Bucket.
+- `async  verifyBucketDomain(bucketId: string, domainIdentifier: string): Promise<{ domain: Domain }>`
+  - used to verify the domain, after which the content behind the domain will be cached on CDN.
+- `async  deleteBucketDomain(bucketId: string, domainIdentifier: string): Promise<{ success: boolean }>`
+  - used to delete the domain of the Bucket.
+- `async  archiveBucket(bucketId: string): Promise<void>`
+  - used to archive the Bucket.
+- `async  unarchiveBucket(bucketId: string): Promise<void>`
+  - used to unarchive the Bucket.
+- `async  getBucketUploadCount(bucketId: string): Promise<{total: number; successful: number; failed: number;pending: number; }>`
+  - used to get the number of uploads for the specified bucket.
+- `async  getBucketUploads(bucketId: string, options: { skip: number; limit: number; }): Promise<{ uploads: Upload[] }>`
+  - used to get the uploads of the bucket. The default value for `skip` is 0. The default value for `limit` is 6.
+
+Interfaces:
+
+```js
+enum DomainTypeEnum {
+  DOMAIN = "domain",
+  SUBDOMAIN = "subdomain",
+  HANDSHAKE_DOMAIN = "handshake-domain",
+  HANDSHAKE_SUBDOMAIN = "handshake-subdomain",
+  ENS_DOMAIN = "ens-domain",
+}
+
+interface  Domain {
+  _id: string;
+  name: string;
+  link: string;
+  verified: boolean;
+  bucketId: string;
+  type: DomainTypeEnum;
+}
+
+enum  BucketStateEnum {
+  MAINTAINED = "MAINTAINED",
+  ARCHIVED = "ARCHIVED",
+}
+
+interface  Bucket {
+  _id: string;
+  name: string;
+  organizationId: string;
+  state: BucketStateEnum;
+  domains: Domain[];
+}
+
+enum UploadStatusEnum {
+  PENDING = "Pending",
+  CANCELED = "Canceled",
+  DEPLOYED = "Deployed",
+  FAILED = "Failed",
+  TIMED_OUT = "TimedOut",
+}
+
+interface  Upload {
+  _id: string;
+  protocolLink: string;
+  buildDirectory: string[];
+  status: UploadStatusEnum;
+  memoryUsed: number;
+  bucketId: string;
+  protocol: string;
+}
+```
+
 ## Access Token
 
 To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/api/rest-api-references#creating-an-access-token).
