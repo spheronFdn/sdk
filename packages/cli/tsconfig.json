@@ -10,7 +10,10 @@
     "useUnknownInCatchVariables": false,
     "forceConsistentCasingInFileNames": true,
     "rootDir": "./src",
-    "outDir": "./dist/"
+    "outDir": "./dist/",
+    "plugins": [
+      { "name": "typescript-babel" }
+    ]
   },
   "include": ["./src/**/*"],
   "exclude": ["node_modules"]
