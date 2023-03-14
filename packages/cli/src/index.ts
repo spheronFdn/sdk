@@ -102,7 +102,7 @@ import { FrameworkOptions } from "./commands/init";
     })
     .command(
       "create-dapp",
-      "Create a template application which can run on Spheron out of the box",
+      "Create a dapp which can run on Spheron out of the box",
       (yargs: any) => {
         yargs
           .version(false)
