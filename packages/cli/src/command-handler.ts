@@ -7,7 +7,7 @@ import { publish } from "./commands/publish";
 import { upload } from "./commands/upload";
 import configuration from "./configuration";
 import {
-  promptForCreateApp,
+  promptForCreateDapp,
   promptForCreateOrganization,
   promptForInit,
   promptForLogin,
@@ -193,9 +193,9 @@ export async function commandHandler(options: any) {
     (async () => {
       try {
         if (options._[1]) {
-          await promptForCreateApp(options._[1]);
+          await promptForCreateDapp(options._[1]);
         } else {
-          await promptForCreateApp();
+          await promptForCreateDapp();
         }
       } catch (error) {
         console.log(error.message);

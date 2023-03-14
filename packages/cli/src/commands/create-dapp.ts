@@ -5,7 +5,7 @@ import path from "path";
 const chalk = require("chalk");
 import { FrameworkOptions, init } from "./init";
 
-export async function createApp(
+export async function createDapp(
   template: ITemplateApp,
   projectName: string,
   protocol: string
