@@ -9,6 +9,7 @@ import BucketManager, {
   DomainTypeEnum,
   UploadStatusEnum,
 } from "./bucket-manager";
+import { UsageWithLimits } from "./spheron-api/interfaces";
 
 export {
   ProtocolEnum,
@@ -153,5 +154,12 @@ export default class SpheronClient {
 
   async getUpload(uploadId: string): Promise<Upload> {
     return await this.bucketManager.getUpload(uploadId);
+  }
+
+  async getOrganizationUsage(organizationId: string): Promise<UsageWithLimits> {
+    return await this.spheronApi.getOrganizationUsage(
+      organizationId,
+      "wa-global"
+    );
   }
 }

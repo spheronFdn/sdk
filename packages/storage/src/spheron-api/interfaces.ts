@@ -120,4 +120,40 @@ interface Deployment {
   updatedAt: Date;
 }
 
+export interface UsageWithLimits {
+  usedBandwidth?: number; //bytes
+  usedBuildExecution?: number; //sec
+  usedConcurrentBuild?: number;
+  usedStorageArweave?: number; //bytes
+  usedStorageSkynet?: number; //bytes
+  usedStorageFileCoin?: number; //bytes
+  usedStorageIPFS?: number; //bytes
+  usedDeploymentsPerDay?: number;
+  lastDeploymentDate?: Date;
+  usedDomains?: number;
+  usedHnsDomains?: number;
+  usedEnsDomains?: number;
+  usedEnvironments?: number;
+  usedClusterAkt?: number;
+  usedClusterBuildExecution?: number;
+  usedNumberOfRequests?: number;
+  usedPasswordProtections?: number;
+  membersLimit?: number;
+  bandwidthLimit?: number; //bytes
+  buildExecutionLimit?: number; //sec
+  concurrentBuildLimit?: number;
+  storageArweaveLimit?: number; //bytes
+  storageSkynetLimit?: number; //bytes
+  storageFileCoinLimit?: number; //bytes
+  storageIPFSLimit?: number;
+  deploymentsPerDayLimit?: number;
+  domainsLimit?: number;
+  hnsDomainsLimit?: number;
+  ensDomainsLimit?: number;
+  environmentsLimit?: number;
+  clusterAktLimit?: number;
+  clusterBuildExecutionLimit?: number;
+  passwordProtectionLimit?: number;
+}
+
 export { TokenScope, Project, Domain, Deployment, Configuration };

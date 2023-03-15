@@ -100,6 +100,8 @@ The `SpheronClient` instance provides several methods for working with buckets. 
   - used to get the uploads of the bucket. The default value for `skip` is 0. The default value for `limit` is 6.
 - `async  getUpload(uploadId: string): Promise<Upload>`
   - used to get the upload by its id.
+- `async  getOrganizationUsage(organizationId: string): Promise<UsageWithLimits>`
+  - used to get the usage of the current active subscription of the organization
 
 Interfaces:
 
