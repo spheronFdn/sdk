@@ -61,14 +61,14 @@ export default class SpheronClient {
     return await this.bucketManager.getBucket(bucketId);
   }
 
-  async getBucketDomains(bucketId: string): Promise<{ domains: Domain[] }> {
+  async getBucketDomains(bucketId: string): Promise<Domain[]> {
     return await this.bucketManager.getBucketDomains(bucketId);
   }
 
   async getBucketDomain(
     bucketId: string,
     domainIdentifier: string
-  ): Promise<{ domain: Domain }> {
+  ): Promise<Domain> {
     return await this.bucketManager.getBucketDomain(bucketId, domainIdentifier);
   }
 
@@ -85,7 +85,7 @@ export default class SpheronClient {
         | "ens-domain";
       name: string;
     }
-  ): Promise<{ domain: Domain }> {
+  ): Promise<Domain> {
     return await this.bucketManager.addBucketDomain(bucketId, options);
   }
 
@@ -96,7 +96,7 @@ export default class SpheronClient {
       link: string;
       name: string;
     }
-  ): Promise<{ domain: Domain }> {
+  ): Promise<Domain> {
     return await this.bucketManager.updateBucketDomain(
       bucketId,
       domainIdentifier,
@@ -107,7 +107,7 @@ export default class SpheronClient {
   async verifyBucketDomain(
     bucketId: string,
     domainIdentifier: string
-  ): Promise<{ domain: Domain }> {
+  ): Promise<Domain> {
     return await this.bucketManager.verifyBucketDomain(
       bucketId,
       domainIdentifier
@@ -147,7 +147,11 @@ export default class SpheronClient {
       skip: number;
       limit: number;
     }
-  ): Promise<{ uploads: Upload[] }> {
+  ): Promise<Upload[]> {
     return await this.bucketManager.getBucketUploads(bucketId, options);
+  }
+
+  async getUpload(uploadId: string): Promise<Upload> {
+    return await this.bucketManager.getUpload(uploadId);
   }
 }

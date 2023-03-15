@@ -169,6 +169,13 @@ class SpheronApi {
     );
   }
 
+  async getDeployment(deploymentId: string): Promise<Deployment> {
+    const { deployment } = await this.sendApiRequest<{
+      deployment: Deployment;
+    }>(HttpMethods.GET, `/v1/deployment/${deploymentId}`);
+    return deployment;
+  }
+
   private async sendApiRequest<T>(
     method: HttpMethods,
     path: string,

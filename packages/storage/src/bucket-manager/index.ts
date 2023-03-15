@@ -11,7 +11,11 @@ import {
   BucketStateEnum,
   UploadStatusEnum,
 } from "./interfaces";
-import { Domain as ProjectDomain } from "../spheron-api/interfaces";
+import {
+  Deployment,
+  Domain as ProjectDomain,
+  Project,
+} from "../spheron-api/interfaces";
 
 class BucketManager {
   private readonly spheronApi: SpheronApi;
@@ -25,35 +29,23 @@ class BucketManager {
     if (project.type !== ProjectTypeEnum.UPLOAD) {
       throw new Error(`Project with id '${bucketId}' is not a bucket.`);
     }
-    return {
-      _id: project._id,
-      name: project.name,
-      organizationId: project.organization,
-      state: project.state,
-      domains: project.domains?.map((x) =>
-        this.mapProjectDomainToBucketDomain(x)
-      ),
-    };
+    return this.mapProjectToBucket(project);
   }
 
-  async getBucketDomains(bucketId: string): Promise<{ domains: Domain[] }> {
+  async getBucketDomains(bucketId: string): Promise<Domain[]> {
     const { domains } = await this.spheronApi.getProjectDomains(bucketId);
-    return {
-      domains: domains.map((x) => this.mapProjectDomainToBucketDomain(x)),
-    };
+    return domains.map((x) => this.mapProjectDomainToBucketDomain(x));
   }
 
   async getBucketDomain(
     bucketId: string,
     domainIdentifier: string
-  ): Promise<{ domain: Domain }> {
+  ): Promise<Domain> {
     const { domain } = await this.spheronApi.getProjectDomain(
       bucketId,
       domainIdentifier
     );
-    return {
-      domain: this.mapProjectDomainToBucketDomain(domain),
-    };
+    return this.mapProjectDomainToBucketDomain(domain);
   }
 
   async updateBucketDomain(
@@ -63,28 +55,24 @@ class BucketManager {
       link: string;
       name: string;
     }
-  ): Promise<{ domain: Domain }> {
+  ): Promise<Domain> {
     const { domain } = await this.spheronApi.patchProjectDomain(
       bucketId,
       domainIdentifier,
       { ...options, deploymentEnvironments: [] }
     );
-    return {
-      domain: this.mapProjectDomainToBucketDomain(domain),
-    };
+    return this.mapProjectDomainToBucketDomain(domain);
   }
 
   async verifyBucketDomain(
     bucketId: string,
     domainIdentifier: string
-  ): Promise<{ domain: Domain }> {
+  ): Promise<Domain> {
     const { domain } = await this.spheronApi.verifyProjectDomain(
       bucketId,
       domainIdentifier
     );
-    return {
-      domain: this.mapProjectDomainToBucketDomain(domain),
-    };
+    return this.mapProjectDomainToBucketDomain(domain);
   }
 
   async deleteBucketDomain(
@@ -101,14 +89,12 @@ class BucketManager {
       type: DomainTypeEnum | string;
       name: string;
     }
-  ): Promise<{ domain: Domain }> {
+  ): Promise<Domain> {
     const { domain } = await this.spheronApi.addProjectDomain(bucketId, {
       ...options,
       deploymentEnvironments: [],
     });
-    return {
-      domain: this.mapProjectDomainToBucketDomain(domain),
-    };
+    return this.mapProjectDomainToBucketDomain(domain);
   }
 
   async getBucketUploads(
@@ -117,7 +103,7 @@ class BucketManager {
       skip: number;
       limit: number;
     }
-  ): Promise<{ uploads: Upload[] }> {
+  ): Promise<Upload[]> {
     if (options.skip < 0 || options.limit < 0) {
       throw new Error(`Skip and Limit cannot be negative numbers.`);
     }
@@ -129,17 +115,7 @@ class BucketManager {
       }
     );
 
-    return {
-      uploads: deployments.map((x) => ({
-        _id: x._id,
-        protocolLink: x.sitePreview,
-        buildDirectory: x.buildDirectory,
-        status: x.status as unknown as UploadStatusEnum,
-        memoryUsed: x.memoryUsed,
-        bucketId: x.project._id,
-        protocol: x.protocol,
-      })),
-    };
+    return deployments.map((x) => this.mapDeploymentToUpload(x));
   }
 
   async getBucketUploadCount(bucketId: string): Promise<{
@@ -165,6 +141,23 @@ class BucketManager {
     );
   }
 
+  async getUpload(uploadId: string): Promise<Upload> {
+    const deployment = await this.spheronApi.getDeployment(uploadId);
+    return this.mapDeploymentToUpload(deployment);
+  }
+
+  private mapProjectToBucket(project: Project): Bucket {
+    return {
+      _id: project._id,
+      name: project.name,
+      organizationId: project.organization,
+      state: project.state,
+      domains: project.domains?.map((x) =>
+        this.mapProjectDomainToBucketDomain(x)
+      ),
+    };
+  }
+
   private mapProjectDomainToBucketDomain(domain: ProjectDomain): Domain {
     return {
       _id: domain._id,
@@ -173,6 +166,18 @@ class BucketManager {
       verified: domain.verified,
       bucketId: domain.projectId,
       type: domain.type,
+    };
+  }
+
+  private mapDeploymentToUpload(deployment: Deployment): Upload {
+    return {
+      _id: deployment._id,
+      protocolLink: deployment.sitePreview,
+      buildDirectory: deployment.buildDirectory,
+      status: deployment.status as unknown as UploadStatusEnum,
+      memoryUsed: deployment.memoryUsed,
+      bucketId: deployment.project?._id ?? deployment.project,
+      protocol: deployment.protocol,
     };
   }
 }
