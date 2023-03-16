@@ -61,6 +61,30 @@ export async function login(provider: string): Promise<void> {
               );
               resolve();
             } catch (e) {
+              if (e.response?.data?.message) {
+                const error_message = e.response?.data?.message;
+                if (error_message === "security_check") {
+                  console.log(
+                    `Your account is created! Before using our platform go ahead and fill up the form for security reasons. Visit ${configuration.spheronFrontendAddress} for more information.`
+                  );
+                } else if (error_message === "banned") {
+                  console.log(
+                    `Your account has been banned. Before using our platform again please fill up security form. Visit ${configuration.spheronFrontendAddress} for more information.`
+                  );
+                } else if (error_message === "user_not_found") {
+                  console.log("User not found.");
+                } else if (
+                  error_message === "ask_admin_to_provide_access_to_dev_env"
+                ) {
+                  console.log(
+                    "You signup request is in review process. Please contact Spheron team for more information."
+                  );
+                } else if (error_message === "waiting_for_access_to_dev_env") {
+                  console.log(
+                    "You signup request is in review process. Please contact Spheron team for more information."
+                  );
+                }
+              }
               console.log(
                 `✖️  Error occured while logging in. Check if you have created an account on Spheron. You need to sign up first with ${provider} connection to be able to login with CLI.`
               );
