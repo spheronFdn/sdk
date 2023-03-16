@@ -5,7 +5,7 @@ import path from "path";
 const chalk = require("chalk");
 import { FrameworkOptions, init } from "./init";
 
-export async function createApp(
+export async function createDapp(
   template: ITemplateApp,
   projectName: string,
   protocol: string
@@ -44,21 +44,21 @@ function cleanUpFiles(folderName: string) {
   });
 }
 
+export enum DappCategory {
+  Default = "default",
+  Template = "template",
+}
+
 export interface ITemplateApp {
   alias: string; // shown to user
-  dappType: DappType;
+  dappType: DappCategory;
   url: string;
   framework: FrameworkOptions;
   rootPath: string;
   defaultProjectName: string;
 }
 
-export enum DappType {
-  Default = "default",
-  Template = "template",
-}
-
-export const templateApps: Map<string, ITemplateApp> = new Map<
+export const templateDappsMap: Map<string, ITemplateApp> = new Map<
   string,
   ITemplateApp
 >([
@@ -66,7 +66,7 @@ export const templateApps: Map<string, ITemplateApp> = new Map<
     "default-react",
     {
       alias: "React",
-      dappType: DappType.Default,
+      dappType: DappCategory.Default,
       url: "https://github.com/spheronFdn/react-boilerplate",
       framework: FrameworkOptions.React,
       rootPath: "./",
@@ -77,7 +77,7 @@ export const templateApps: Map<string, ITemplateApp> = new Map<
     "default-nextjs",
     {
       alias: "Next.js",
-      dappType: DappType.Default,
+      dappType: DappCategory.Default,
       url: "https://github.com/spheronFdn/next-boilerplate",
       framework: FrameworkOptions.Next,
       rootPath: "./",
@@ -88,7 +88,7 @@ export const templateApps: Map<string, ITemplateApp> = new Map<
     "template-portfolio",
     {
       alias: "Portfolio",
-      dappType: DappType.Template,
+      dappType: DappCategory.Template,
       url: "https://github.com/spheronFdn/portfolio-template",
       framework: FrameworkOptions.Next,
       rootPath: "./",
@@ -99,11 +99,40 @@ export const templateApps: Map<string, ITemplateApp> = new Map<
     "template-linktree",
     {
       alias: "Link Tree",
-      dappType: DappType.Template,
+      dappType: DappCategory.Template,
       url: "https://github.com/spheronFdn/link-tree-app",
       framework: FrameworkOptions.React,
       rootPath: "./",
       defaultProjectName: "my-linktree-app",
+    },
+  ],
+]);
+
+export interface ITemplateCategory {
+  alias: string; // shown to user
+  dapps: Array<ITemplateApp>;
+}
+
+export const templateTypesMap: Map<DappCategory, ITemplateCategory> = new Map<
+  DappCategory,
+  any
+>([
+  [
+    DappCategory.Default,
+    {
+      alias: "Default dapp",
+      dapps: Array.from(templateDappsMap.values())
+        .filter((app) => app.dappType === DappCategory.Default)
+        .map((app) => ({ name: app.alias, value: app })),
+    },
+  ],
+  [
+    DappCategory.Template,
+    {
+      alias: "Template",
+      dapps: Array.from(templateDappsMap.values())
+        .filter((app) => app.dappType === DappCategory.Template)
+        .map((app) => ({ name: app.alias, value: app })),
     },
   ],
 ]);
