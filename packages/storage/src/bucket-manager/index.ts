@@ -148,7 +148,7 @@ class BucketManager {
 
   private mapProjectToBucket(project: Project): Bucket {
     return {
-      _id: project._id,
+      id: project._id,
       name: project.name,
       organizationId: project.organization,
       state: project.state,
@@ -160,7 +160,7 @@ class BucketManager {
 
   private mapProjectDomainToBucketDomain(domain: ProjectDomain): Domain {
     return {
-      _id: domain._id,
+      id: domain._id,
       name: domain.name,
       link: domain.link,
       verified: domain.verified,
@@ -171,7 +171,7 @@ class BucketManager {
 
   private mapDeploymentToUpload(deployment: Deployment): Upload {
     return {
-      _id: deployment._id,
+      id: deployment._id,
       protocolLink: deployment.sitePreview,
       buildDirectory: deployment.buildDirectory,
       status: deployment.status as unknown as UploadStatusEnum,

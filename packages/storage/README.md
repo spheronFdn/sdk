@@ -113,7 +113,7 @@ enum DomainTypeEnum {
 }
 
 interface  Domain {
-  _id: string;
+  id: string;
   name: string;
   link: string;
   verified: boolean;
@@ -127,7 +127,7 @@ enum  BucketStateEnum {
 }
 
 interface  Bucket {
-  _id: string;
+  id: string;
   name: string;
   organizationId: string;
   state: BucketStateEnum;
@@ -143,7 +143,7 @@ enum UploadStatusEnum {
 }
 
 interface  Upload {
-  _id: string;
+  id: string;
   protocolLink: string;
   buildDirectory: string[];
   status: UploadStatusEnum;
