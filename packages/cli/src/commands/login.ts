@@ -1,9 +1,9 @@
 import http from "http";
 import open from "open";
-import axios from "axios";
 import { writeToJsonFile } from "../utils";
 import configuration from "../configuration";
 import Spinner from "../outputs/spinner";
+import { SpheronApi, VerifiedTokenResponse } from "core";
 
 let server: http.Server;
 
@@ -22,41 +22,37 @@ export async function login(provider: string): Promise<void> {
           server.once("request", async (req, res) => {
             try {
               const code = req.url?.split("&")[0].split("=")[1];
-              const verify = await axios.get(
-                `${configuration.spheronServerAddress}/auth/${provider}/cli/verify-token/${code}?port=${port}`, //port used for bitbucket
-                {
-                  headers: {
-                    Accept: "application/json",
-                  },
-                }
+              const client = new SpheronApi(
+                "", //not needed
+                configuration.spheronServerAddress
               );
-              if (verify.status != 200 || !verify.data.jwtToken) {
-                loginError = true;
-                throw new Error("Verification of token failed");
-              }
+              const verify: VerifiedTokenResponse = await client.verfiyGitToken(
+                provider,
+                String(code),
+                port
+              );
 
-              const jwt = verify.data.jwtToken;
-              const organizationId = verify.data.organizationId;
-              const email = verify.data.email;
               // Closing of server
               res.setHeader("connection", "close");
               res.statusCode = 302;
               const successLocationRedirect = new URL(
                 `${
                   configuration.spheronFrontendAddress
-                }/#/notifications/cli-login?email=${encodeURIComponent(email)}`
+                }/#/notifications/cli-login?email=${encodeURIComponent(
+                  verify.email
+                )}`
               );
               res.setHeader("location", successLocationRedirect.href);
               res.end();
               //store jwt token in spheron-config file
               await writeToJsonFile(
                 "jwtToken",
-                jwt,
+                verify.jwt,
                 configuration.configFilePath
               );
               await writeToJsonFile(
                 "organization",
-                organizationId,
+                verify.organizationId,
                 configuration.configFilePath
               );
               resolve();
