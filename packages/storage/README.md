@@ -14,7 +14,7 @@
 
 <p align="center">  
   <a href="https://www.npmjs.com/package/@spheron/storage" target="_blank" rel="noreferrer">
-    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.6&color=green" />
+    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.7&color=green" />
   </a>
   <a href="https://github.com/spheronFdn/sdk/blob/main/LICENSE" target="_blank" rel="noreferrer">
     <img src="https://img.shields.io/static/v1?label=license&message=Apache%202.0&color=red" />
@@ -32,7 +32,7 @@
 In the example below you can see how to create an instance of `SpheronClient` and how to upload a file/directory to the specified protocol.
 
 ```js
-import SpheronClient, { ProtocolEnum } from "@spheron/storage";
+import { SpheronClient, ProtocolEnum } from "@spheron/storage";
 
 const client = new SpheronClient({ token });
 let currentlyUploaded = 0;
@@ -155,7 +155,7 @@ interface  Upload {
 
 ## Access Token
 
-To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/api/rest-api-references#creating-an-access-token).
+To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/api/rest-api-references#creating-an-access-token). Only tokens for web app organizations will work.
 
 ## Learn More
 

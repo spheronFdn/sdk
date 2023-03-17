@@ -24,7 +24,7 @@ export interface SpheronClientConfiguration {
   token: string;
 }
 
-export default class SpheronClient {
+export class SpheronClient {
   private readonly configuration: SpheronClientConfiguration;
   private readonly spheronApi: SpheronApi;
   private readonly bucketManager: BucketManager;
@@ -155,3 +155,5 @@ export default class SpheronClient {
     return await this.bucketManager.getUpload(uploadId);
   }
 }
+
+export default SpheronClient;

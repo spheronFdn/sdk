@@ -39,7 +39,11 @@ class UploadManager {
     this.validateUploadConfiguration(configuration);
 
     const { deploymentId, payloadSize, parallelUploadCount } =
-      await this.startDeployment(configuration.protocol, configuration.name, configuration.organizationId);
+      await this.startDeployment(
+        configuration.protocol,
+        configuration.name,
+        configuration.organizationId
+      );
 
     configuration.onUploadInitiated &&
       configuration.onUploadInitiated(deploymentId);
@@ -83,18 +87,14 @@ class UploadManager {
   }> {
     try {
       let url = `${this.uploadApiUrl}/v1/upload-deployment?protocol=${protocol}&project=${projectName}`;
-      if(organizationId){
+      if (organizationId) {
         url += `&organization=${organizationId}`;
       }
       const response = await axios.post<{
         deploymentId: string;
         parallelUploadCount: number;
         payloadSize: number;
-      }>(
-        url,
-        {},
-        this.getAxiosRequestConfig()
-      );
+      }>(url, {}, this.getAxiosRequestConfig());
       return response.data;
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
