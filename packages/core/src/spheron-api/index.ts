@@ -14,6 +14,7 @@ import {
   Organization,
   Project,
   TokenScope,
+  VerifiedTokenResponse,
 } from "./interfaces";
 
 class SpheronApi {
@@ -195,6 +196,18 @@ class SpheronApi {
       organization: Organization;
     }>(HttpMethods.POST, `/v1/organization`, body);
     return organization;
+  }
+
+  async verfiyGitToken(
+    provider: string,
+    code: string,
+    port: number
+  ): Promise<VerifiedTokenResponse> {
+    const verifiedToken = await this.sendApiRequest<VerifiedTokenResponse>(
+      HttpMethods.GET,
+      `/auth/${provider}/cli/verify-token/${code}?port=${port}`
+    );
+    return verifiedToken;
   }
 
   private async sendApiRequest<T>(

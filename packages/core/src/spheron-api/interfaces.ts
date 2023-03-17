@@ -133,4 +133,18 @@ interface Organization {
   overdue: boolean;
 }
 
-export { TokenScope, Project, Domain, Deployment, Configuration, Organization };
+interface VerifiedTokenResponse {
+  jwt: string;
+  organizationId: string;
+  email: string;
+}
+
+export {
+  TokenScope,
+  Project,
+  Domain,
+  Deployment,
+  Configuration,
+  Organization,
+  VerifiedTokenResponse,
+};
