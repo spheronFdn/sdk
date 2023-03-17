@@ -32,7 +32,7 @@
 In the example below you can see how to create an instance of `SpheronClient` and how to upload a file/directory to the specified protocol.
 
 ```js
-import SpheronClient, { ProtocolEnum } from "@spheron/storage";
+import { SpheronClient, ProtocolEnum } from "@spheron/storage";
 
 const client = new SpheronClient({ token });
 let currentlyUploaded = 0;
@@ -68,7 +68,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
 
 ## Access Token
 
-To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/api/rest-api-references#creating-an-access-token).
+To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/api/rest-api-references#creating-an-access-token). Only tokens for web app organizations will work.
 
 ## Learn More
 

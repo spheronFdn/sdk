@@ -7,7 +7,7 @@ export interface SpheronClientConfiguration {
   token: string;
 }
 
-export default class SpheronClient {
+export class SpheronClient {
   private readonly configuration: SpheronClientConfiguration;
 
   constructor(configuration: SpheronClientConfiguration) {
@@ -35,3 +35,5 @@ export default class SpheronClient {
     });
   }
 }
+
+export default SpheronClient;
