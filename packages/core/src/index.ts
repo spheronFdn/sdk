@@ -1,3 +1,3 @@
-import SpheronApi from "./spheron-api";
-
-export { SpheronApi };
+export { default as SpheronApi } from "./spheron-api";
+export * from "./spheron-api/enums";
+export * from "./spheron-api/interfaces";

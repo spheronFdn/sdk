@@ -73,6 +73,11 @@ enum DeploymentStatusEnum {
   TIMED_OUT = "TimedOut",
 }
 
+enum AppTypeEnum {
+  WEB_APP = "app",
+  COMPUTE = "compute",
+}
+
 export {
   ProjectTypeEnum,
   DeploymentEnvironmentStatusEnum,
@@ -82,4 +87,5 @@ export {
   DomainTypeEnum,
   DomainApplicationTypeEnum,
   DeploymentStatusEnum,
+  AppTypeEnum,
 };
