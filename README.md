@@ -24,7 +24,7 @@
 
 ---
 
-Spheron's developer toolkit includes packages that makes it easy to build decentralized applications (dapps):
+Spheron's developer toolkit includes packages that make it easier to build decentralized applications (dapps):
 - [Spheron Storage SDK](https://github.com/spheronFdn/sdk/blob/main/packages/storage/README.md)
 - [Spheron CLI](https://github.com/spheronFdn/sdk/blob/main/packages/cli/README.md)
 
