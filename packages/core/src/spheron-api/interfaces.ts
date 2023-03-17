@@ -1,4 +1,3 @@
-import { ProtocolEnum } from "../enums";
 import {
   DeploymentEnvironmentStatusEnum,
   DeploymentStatusEnum,
@@ -7,6 +6,7 @@ import {
   FrameworkEnum,
   NodeVersionEnum,
   ProjectStateEnum,
+  ProtocolEnum,
 } from "./enums";
 import { ProjectTypeEnum } from "./enums";
 

@@ -206,4 +206,4 @@ enum HttpMethods {
   PUT = "Put",
 }
 
-export default SpheronApi;
+export { SpheronApi };

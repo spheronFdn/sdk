@@ -67,6 +67,12 @@ enum DeploymentStatusEnum {
   TIMED_OUT = "TimedOut",
 }
 
+enum ProtocolEnum {
+  ARWEAVE = "arweave",
+  FILECOIN = "ipfs-filecoin",
+  IPFS = "ipfs",
+}
+
 export {
   ProjectTypeEnum,
   DeploymentEnvironmentStatusEnum,
@@ -76,4 +82,5 @@ export {
   DomainTypeEnum,
   DomainApplicationTypeEnum,
   DeploymentStatusEnum,
+  ProtocolEnum,
 };

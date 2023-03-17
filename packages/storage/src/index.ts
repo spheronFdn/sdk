@@ -1,6 +1,5 @@
 import UploadManager, { UploadResult } from "./upload-manager";
-import { ProtocolEnum } from "./enums";
-import SpheronApi from "./spheron-api";
+import { SpheronApi, ProtocolEnum } from "@spheron/core";
 import BucketManager, {
   Bucket,
   Upload,
