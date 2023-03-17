@@ -1,4 +1,4 @@
-import { ProtocolEnum } from "./enums";
+import { AppTypeEnum, ProtocolEnum } from "./enums";
 import {
   DeploymentEnvironmentStatusEnum,
   DeploymentStatusEnum,
@@ -120,4 +120,17 @@ interface Deployment {
   updatedAt: Date;
 }
 
-export { TokenScope, Project, Domain, Deployment, Configuration };
+interface Organization {
+  _id: string;
+  appType: AppTypeEnum;
+  profile: {
+    name: string;
+    image: string;
+    username: string;
+  };
+  users: [string];
+  registries: string[];
+  overdue: boolean;
+}
+
+export { TokenScope, Project, Domain, Deployment, Configuration, Organization };

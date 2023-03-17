@@ -1,8 +1,8 @@
-import axios from "axios";
 import configuration from "../configuration";
 import { fileExists, readFromJsonFile, writeToJsonFile } from "../utils";
 import { createConfiguration } from "./create-configuration";
 import Spinner from "../outputs/spinner";
+import { AppTypeEnum, Organization, SpheronApi } from "core";
 
 export async function createOrganization(
   name: string,
@@ -25,26 +25,14 @@ export async function createOrganization(
       );
       return;
     }
-    const organizationResponse = await axios.post(
-      `${configuration.spheronServerAddress}/v1/organization`,
-      {
-        name,
-        username,
-        appType: type,
-      },
-      {
-        headers: {
-          authorization: `Bearer ${jwtToken}`,
-        },
-      }
+    const client = new SpheronApi(jwtToken, configuration.spheronServerAddress);
+    const appType =
+      type == AppTypeEnum.WEB_APP ? AppTypeEnum.WEB_APP : AppTypeEnum.COMPUTE;
+    const organization: Organization = await client.createOrganization(
+      username,
+      name,
+      appType
     );
-    if (
-      organizationResponse.status != 201 ||
-      organizationResponse.data?.success == false
-    ) {
-      throw new Error("Failed to create an organization");
-    }
-    const organization = organizationResponse.data.organization;
     await writeToJsonFile(
       "organization",
       organization._id,

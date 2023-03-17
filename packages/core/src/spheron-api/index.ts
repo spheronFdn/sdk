@@ -1,5 +1,6 @@
 import axios from "axios";
 import {
+  AppTypeEnum,
   DeploymentStatusEnum,
   DomainTypeEnum,
   FrameworkEnum,
@@ -10,16 +11,20 @@ import {
   Configuration,
   Deployment,
   Domain,
+  Organization,
   Project,
   TokenScope,
 } from "./interfaces";
 
 class SpheronApi {
-  private readonly spheronApiUrl = "https://api-v2.spheron.network";
+  private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
   private readonly token: string;
 
-  constructor(token: string) {
+  constructor(token: string, url?: string) {
     this.token = token;
+    if (url) {
+      this.spheronApiUrl = url;
+    }
   }
 
   async getTokenScope(): Promise<TokenScope> {
@@ -174,6 +179,22 @@ class SpheronApi {
       deployment: Deployment;
     }>(HttpMethods.GET, `/v1/deployment/${deploymentId}`);
     return deployment;
+  }
+
+  async createOrganization(
+    username: string,
+    name: string,
+    appType: AppTypeEnum
+  ): Promise<Organization> {
+    const body = {
+      username,
+      name,
+      appType,
+    };
+    const { organization } = await this.sendApiRequest<{
+      organization: Organization;
+    }>(HttpMethods.POST, `/v1/organization`, body);
+    return organization;
   }
 
   private async sendApiRequest<T>(
