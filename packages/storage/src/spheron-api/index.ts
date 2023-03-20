@@ -1,4 +1,4 @@
-import axios from "axios";
+import { deleteData, getData, patchData, postData, putData } from "../utils";
 import {
   DeploymentStatusEnum,
   DomainTypeEnum,
@@ -183,15 +183,27 @@ class SpheronApi {
     payload?: any
   ): Promise<T> {
     try {
-      const response = await axios<T>({
-        method,
-        url: `${this.spheronApiUrl}${path}`,
-        data: payload,
-        headers: {
-          Authorization: `Bearer ${this.token}`,
-        },
-      });
-      return response.data;
+      const url = `${this.spheronApiUrl}${path}`;
+      const token = this.token;
+      let response;
+
+      switch(method){
+        case HttpMethods.GET: 
+          response  = await getData(url, token);
+          break;
+        case HttpMethods.POST: 
+          response  = await postData(url, payload, token);
+          break;
+        case HttpMethods.PUT: 
+          response  = await putData(url, payload, token);
+          break;
+        case HttpMethods.PATCH: 
+          response  = await patchData(url, payload, token);
+          break;          
+        case HttpMethods.DELETE: 
+          response  = await deleteData(url, token);
+      }
+     return response
     } catch (error) {
       throw new Error(error.response?.data?.message || error?.message);
     }

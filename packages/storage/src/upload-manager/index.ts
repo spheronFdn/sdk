@@ -1,7 +1,7 @@
-import axios, { AxiosRequestConfig } from "axios";
 import FormData from "form-data";
 import pLimit from "p-limit";
 import { ProtocolEnum } from "../enums";
+import { postData } from "../utils";
 import PayloadCreator from "./upload-context";
 
 export interface UploadMangerConfiguration {
@@ -90,12 +90,7 @@ class UploadManager {
       if (organizationId) {
         url += `&organization=${organizationId}`;
       }
-      const response = await axios.post<{
-        deploymentId: string;
-        parallelUploadCount: number;
-        payloadSize: number;
-      }>(url, {}, this.getAxiosRequestConfig());
-      return response.data;
+      return postData(url, {}, this.configuration.token)
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
       throw new Error(errorMessage);
@@ -117,11 +112,8 @@ class UploadManager {
         if (errorFlag) {
           return;
         }
-        const { data } = await axios.post<{ uploadSize: number }>(
-          `${this.uploadApiUrl}/v1/upload-deployment/${deploymentId}/data`,
-          payload,
-          this.getAxiosRequestConfig()
-        );
+        const data =  await postData(`${this.uploadApiUrl}/v1/upload-deployment/${deploymentId}/data`, payload, this.configuration.token)
+
         onChunkUploaded && onChunkUploaded(data.uploadSize, totalSize);
       } catch (error) {
         errorFlag = true;
@@ -148,23 +140,12 @@ class UploadManager {
     affectedDomains: string[];
   }> {
     try {
-      const response = await axios.post<{
-        success: boolean;
-        message: string;
-        deploymentId: string;
-        projectId: string;
-        sitePreview: string;
-        affectedDomains: string[];
-      }>(
-        `${
-          this.uploadApiUrl
-        }/v1/upload-deployment/${deploymentId}/finish?action=${
-          upload ? "UPLOAD" : "CANCEL"
-        }`,
-        {},
-        this.getAxiosRequestConfig()
-      );
-      return response.data;
+      return await postData(`${
+        this.uploadApiUrl
+      }/v1/upload-deployment/${deploymentId}/finish?action=${
+        upload ? "UPLOAD" : "CANCEL"
+      }`, {}, this.configuration.token)
+
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
       throw new Error(errorMessage);
@@ -188,14 +169,6 @@ class UploadManager {
     if (!configuration.name) {
       throw new Error("Name is not provided.");
     }
-  }
-
-  private getAxiosRequestConfig(): AxiosRequestConfig {
-    return {
-      headers: {
-        Authorization: `Bearer ${this.configuration.token}`,
-      },
-    };
   }
 }
 
