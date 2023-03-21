@@ -157,6 +157,10 @@ interface  Upload {
 
 To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/api/rest-api-references#creating-an-access-token). Only tokens for web app organizations will work.
 
+## Notes
+
+The package is only meant for Node.js environments and will not work in a browser or frontend apps.
+
 ## Learn More
 
 You can learn more about Spheron and Storage SDK here:
