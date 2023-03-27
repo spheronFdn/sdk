@@ -38,12 +38,16 @@ class UploadManager {
   ): Promise<UploadResult> {
     this.validateUploadConfiguration(configuration);
 
-    const { deploymentId, payloadSize, parallelUploadCount } =
-      await this.startDeployment(
-        configuration.protocol,
-        configuration.name,
-        configuration.organizationId
-      );
+    const {
+      deploymentId,
+      payloadSize,
+      parallelUploadCount,
+      singleDeploymentToken,
+    } = await this.startDeployment(
+      configuration.protocol,
+      configuration.name,
+      configuration.organizationId
+    );
 
     configuration.onUploadInitiated &&
       configuration.onUploadInitiated(deploymentId);
@@ -56,12 +60,14 @@ class UploadManager {
       payloads,
       parallelUploadCount,
       totalSize,
+      singleDeploymentToken,
       configuration.onChunkUploaded
     );
 
     const result = await this.finalizeUploadDeployment(
       deploymentId,
-      uploadPayloadsResult.success
+      uploadPayloadsResult.success,
+      singleDeploymentToken
     );
 
     if (!result.success) {
@@ -84,6 +90,7 @@ class UploadManager {
     deploymentId: string;
     parallelUploadCount: number;
     payloadSize: number;
+    singleDeploymentToken: string;
   }> {
     try {
       let url = `${this.uploadApiUrl}/v1/upload-deployment?protocol=${protocol}&project=${projectName}`;
@@ -94,7 +101,8 @@ class UploadManager {
         deploymentId: string;
         parallelUploadCount: number;
         payloadSize: number;
-      }>(url, {}, this.getAxiosRequestConfig());
+        singleDeploymentToken: string;
+      }>(url, {}, this.getAxiosRequestConfig(this.configuration.token));
       return response.data;
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
@@ -107,6 +115,7 @@ class UploadManager {
     payloads: FormData[],
     parallelUploadCount: number,
     totalSize: number,
+    singleDeploymentToken: string,
     onChunkUploaded?: (uploadedSize: number, totalSize: number) => void
   ): Promise<{ success: boolean }> {
     let errorFlag = false;
@@ -120,7 +129,7 @@ class UploadManager {
         const { data } = await axios.post<{ uploadSize: number }>(
           `${this.uploadApiUrl}/v1/upload-deployment/${deploymentId}/data`,
           payload,
-          this.getAxiosRequestConfig()
+          this.getAxiosRequestConfig(singleDeploymentToken)
         );
         onChunkUploaded && onChunkUploaded(data.uploadSize, totalSize);
       } catch (error) {
@@ -138,7 +147,8 @@ class UploadManager {
 
   private async finalizeUploadDeployment(
     deploymentId: string,
-    upload: boolean
+    upload: boolean,
+    singleDeploymentToken: string
   ): Promise<{
     success: boolean;
     message: string;
@@ -162,7 +172,7 @@ class UploadManager {
           upload ? "UPLOAD" : "CANCEL"
         }`,
         {},
-        this.getAxiosRequestConfig()
+        this.getAxiosRequestConfig(singleDeploymentToken)
       );
       return response.data;
     } catch (error) {
@@ -190,10 +200,10 @@ class UploadManager {
     }
   }
 
-  private getAxiosRequestConfig(): AxiosRequestConfig {
+  private getAxiosRequestConfig(token: string): AxiosRequestConfig {
     return {
       headers: {
-        Authorization: `Bearer ${this.configuration.token}`,
+        Authorization: `Bearer ${token}`,
       },
     };
   }
