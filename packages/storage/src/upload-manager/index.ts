@@ -2,19 +2,17 @@ import axios, { AxiosRequestConfig } from "axios";
 import FormData from "form-data";
 import pLimit from "p-limit";
 import { ProtocolEnum } from "../enums";
-import PayloadCreator from "./upload-context";
 
 export interface UploadMangerConfiguration {
   token: string;
 }
 
 export interface UploadConfiguration {
-  path: string;
   protocol: ProtocolEnum;
   name: string;
   organizationId?: string;
   onUploadInitiated?: (uploadId: string) => void;
-  onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
+  onChunkUploaded?: (uploadedSize: number) => void;
 }
 
 export interface UploadResult {
@@ -25,7 +23,7 @@ export interface UploadResult {
 }
 
 class UploadManager {
-  private readonly uploadApiUrl = "https://api-v2.spheron.network";
+  private readonly uploadApiUrl = "http://localhost:8002";
 
   private readonly configuration: UploadMangerConfiguration;
 
@@ -34,16 +32,12 @@ class UploadManager {
   }
 
   public async upload(
+    payloads: FormData[],
     configuration: UploadConfiguration
   ): Promise<UploadResult> {
     this.validateUploadConfiguration(configuration);
 
-    const {
-      deploymentId,
-      payloadSize,
-      parallelUploadCount,
-      singleDeploymentToken,
-    } = await this.startDeployment(
+    const { deploymentId, singleDeploymentToken } = await this.startDeployment(
       configuration.protocol,
       configuration.name,
       configuration.organizationId
@@ -52,14 +46,9 @@ class UploadManager {
     configuration.onUploadInitiated &&
       configuration.onUploadInitiated(deploymentId);
 
-    const payloadCreator = new PayloadCreator(configuration.path, payloadSize);
-    const { payloads, totalSize } = await payloadCreator.createPayloads();
-
     const uploadPayloadsResult = await this.uploadPayloads(
       deploymentId,
       payloads,
-      parallelUploadCount,
-      totalSize,
       singleDeploymentToken,
       configuration.onChunkUploaded
     );
@@ -82,14 +71,64 @@ class UploadManager {
     };
   }
 
+  public async initiateDeployment(configuration: {
+    protocol: ProtocolEnum;
+    name: string;
+    organizationId?: string;
+  }): Promise<{ deploymentId: string; singleDeploymentToken: string }> {
+    this.validateUploadConfiguration(configuration);
+
+    const { deploymentId, singleDeploymentToken } = await this.startDeployment(
+      configuration.protocol,
+      configuration.name,
+      configuration.organizationId
+    );
+
+    return {
+      deploymentId,
+      singleDeploymentToken,
+    };
+  }
+
+  public async uploadForDeployment(
+    payloads: FormData[],
+    configuration: {
+      deploymentId: string;
+      singleDeploymentToken: string;
+      onChunkUploaded?: (uploadedSize: number) => void;
+    }
+  ): Promise<UploadResult> {
+    const uploadPayloadsResult = await this.uploadPayloads(
+      configuration.deploymentId,
+      payloads,
+      configuration.singleDeploymentToken,
+      configuration.onChunkUploaded
+    );
+
+    const result = await this.finalizeUploadDeployment(
+      configuration.deploymentId,
+      uploadPayloadsResult.success,
+      configuration.singleDeploymentToken
+    );
+
+    if (!result.success) {
+      throw new Error(`Upload failed. ${result.message}`);
+    }
+
+    return {
+      uploadId: result.deploymentId,
+      bucketId: result.projectId,
+      protocolLink: result.sitePreview,
+      dynamicLinks: result.affectedDomains,
+    };
+  }
+
   private async startDeployment(
     protocol: string,
     projectName: string,
     organizationId?: string
   ): Promise<{
     deploymentId: string;
-    parallelUploadCount: number;
-    payloadSize: number;
     singleDeploymentToken: string;
   }> {
     try {
@@ -100,7 +139,6 @@ class UploadManager {
       const response = await axios.post<{
         deploymentId: string;
         parallelUploadCount: number;
-        payloadSize: number;
         singleDeploymentToken: string;
       }>(url, {}, this.getAxiosRequestConfig(this.configuration.token));
       return response.data;
@@ -113,13 +151,11 @@ class UploadManager {
   private async uploadPayloads(
     deploymentId: string,
     payloads: FormData[],
-    parallelUploadCount: number,
-    totalSize: number,
     singleDeploymentToken: string,
-    onChunkUploaded?: (uploadedSize: number, totalSize: number) => void
+    onChunkUploaded?: (uploadedSize: number) => void
   ): Promise<{ success: boolean }> {
     let errorFlag = false;
-    const limit = pLimit(parallelUploadCount);
+    const limit = pLimit(3);
 
     const uploadPayload = async (payload: FormData, deploymentId: string) => {
       try {
@@ -131,7 +167,7 @@ class UploadManager {
           payload,
           this.getAxiosRequestConfig(singleDeploymentToken)
         );
-        onChunkUploaded && onChunkUploaded(data.uploadSize, totalSize);
+        onChunkUploaded && onChunkUploaded(data.uploadSize);
       } catch (error) {
         errorFlag = true;
       }

@@ -1,3 +1,5 @@
+import FormData from "form-data";
+
 import UploadManager, { UploadResult } from "./upload-manager";
 import { ProtocolEnum } from "./enums";
 import SpheronApi from "./spheron-api";
@@ -38,17 +40,16 @@ export class SpheronClient {
   }
 
   async upload(
-    path: string,
+    payloads: FormData[],
     configuration: {
       name: string;
       protocol: ProtocolEnum;
       organizationId?: string;
       onUploadInitiated?: (uploadId: string) => void;
-      onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
+      onChunkUploaded?: (uploadedSize: number) => void;
     }
   ): Promise<UploadResult> {
-    return await this.uploadManager.upload({
-      path,
+    return await this.uploadManager.upload(payloads, {
       name: configuration.name,
       protocol: configuration.protocol,
       organizationId: configuration.organizationId,
@@ -57,6 +58,27 @@ export class SpheronClient {
     });
   }
 
+  async initiateDeployment(configuration: {
+    name: string;
+    protocol: ProtocolEnum;
+    organizationId?: string;
+  }): Promise<{ deploymentId: string; singleDeploymentToken: string }> {
+    return await this.uploadManager.initiateDeployment(configuration);
+  }
+
+  public async uploadForDeployment(
+    payloads: FormData[],
+    configuration: {
+      deploymentId: string;
+      singleDeploymentToken: string;
+      onChunkUploaded?: (uploadedSize: number) => void;
+    }
+  ): Promise<UploadResult> {
+    return await this.uploadManager.uploadForDeployment(
+      payloads,
+      configuration
+    );
+  }
   async getBucket(bucketId: string): Promise<Bucket> {
     return await this.bucketManager.getBucket(bucketId);
   }
