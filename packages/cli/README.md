@@ -3,11 +3,11 @@
 
 <picture>
 
-<source  media="(prefers-color-scheme: dark)"  srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo-dark.svg">
+<source  media="(prefers-color-scheme: dark)"  srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/spheron-logo-dark.svg">
 
-<source  media="(prefers-color-scheme: light)"  srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo.svg">
+<source  media="(prefers-color-scheme: light)"  srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/spheron-logo.svg">
 
-<img  alt="Spheron"  src="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo.svg"  width="250">
+<img  alt="Spheron"  src="https://github.com/spheronFdn/sdk/blob/main/.github/assets/spheron-logo.svg" width="250">
 
 </picture>
 
