@@ -1,8 +1,9 @@
-import FormData from "form-data";
-
-import UploadManager, { UploadResult } from "./upload-manager";
-import { ProtocolEnum } from "./enums";
-import SpheronApi from "./spheron-api";
+import {
+  SpheronApi,
+  ProtocolEnum,
+  UploadManager,
+  UploadResult,
+} from "@spheron/core";
 import BucketManager, {
   Bucket,
   Upload,
@@ -11,6 +12,7 @@ import BucketManager, {
   DomainTypeEnum,
   UploadStatusEnum,
 } from "./bucket-manager";
+import { createPayloads } from "./fs-payload-creator";
 
 export {
   ProtocolEnum,
@@ -40,45 +42,33 @@ export class SpheronClient {
   }
 
   async upload(
-    payloads: FormData[],
+    filePath: string,
     configuration: {
       name: string;
       protocol: ProtocolEnum;
       organizationId?: string;
       onUploadInitiated?: (uploadId: string) => void;
-      onChunkUploaded?: (uploadedSize: number) => void;
+      onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
     }
   ): Promise<UploadResult> {
-    return await this.uploadManager.upload(payloads, {
-      name: configuration.name,
-      protocol: configuration.protocol,
-      organizationId: configuration.organizationId,
-      onChunkUploaded: configuration.onChunkUploaded,
-      onUploadInitiated: configuration.onUploadInitiated,
+    const { deploymentId, payloadSize, parallelUploadCount } =
+      await this.uploadManager.initiateDeployment(configuration);
+
+    const { payloads, totalSize } = await createPayloads(filePath, payloadSize);
+
+    configuration.onUploadInitiated &&
+      configuration.onUploadInitiated(deploymentId);
+
+    return this.uploadManager.uploadPayloadsForDeployment(payloads, {
+      deploymentId: deploymentId,
+      singleDeploymentToken: this.configuration.token,
+      parallelUploadCount,
+      onChunkUploaded: (uploadedSize: number) =>
+        configuration.onChunkUploaded &&
+        configuration.onChunkUploaded(uploadedSize, totalSize),
     });
   }
 
-  async initiateDeployment(configuration: {
-    name: string;
-    protocol: ProtocolEnum;
-    organizationId?: string;
-  }): Promise<{ deploymentId: string; singleDeploymentToken: string }> {
-    return await this.uploadManager.initiateDeployment(configuration);
-  }
-
-  public async uploadForDeployment(
-    payloads: FormData[],
-    configuration: {
-      deploymentId: string;
-      singleDeploymentToken: string;
-      onChunkUploaded?: (uploadedSize: number) => void;
-    }
-  ): Promise<UploadResult> {
-    return await this.uploadManager.uploadForDeployment(
-      payloads,
-      configuration
-    );
-  }
   async getBucket(bucketId: string): Promise<Bucket> {
     return await this.bucketManager.getBucket(bucketId);
   }
