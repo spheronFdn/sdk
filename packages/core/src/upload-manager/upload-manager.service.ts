@@ -45,9 +45,7 @@ class UploadManager {
       if (configuration.createSingleDeploymentToken) {
         url += `&create_single_deployment_token=${configuration.createSingleDeploymentToken}`;
       }
-      const headers = this.getAxiosRequestConfig(configuration.token);
-      console.log(headers);
-      console.log(url);
+
       const response = await axios.post<{
         deploymentId: string;
         parallelUploadCount: number;

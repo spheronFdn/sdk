@@ -57,7 +57,6 @@ export class SpheronClient {
         name: configuration.name,
         organizationId: configuration.organizationId,
         token: this.configuration.token,
-        createSingleDeploymentToken: true,
       });
 
     const { payloads, totalSize } = await createPayloads(filePath, payloadSize);
