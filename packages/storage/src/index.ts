@@ -38,7 +38,7 @@ export class SpheronClient {
     this.configuration = configuration;
     this.spheronApi = new SpheronApi(this.configuration.token);
     this.bucketManager = new BucketManager(this.spheronApi);
-    this.uploadManager = new UploadManager(this.configuration);
+    this.uploadManager = new UploadManager();
   }
 
   async upload(
@@ -52,21 +52,47 @@ export class SpheronClient {
     }
   ): Promise<UploadResult> {
     const { deploymentId, payloadSize, parallelUploadCount } =
-      await this.uploadManager.initiateDeployment(configuration);
+      await this.uploadManager.initiateDeployment({
+        protocol: configuration.protocol,
+        name: configuration.name,
+        organizationId: configuration.organizationId,
+        token: this.configuration.token,
+        createSingleDeploymentToken: true,
+      });
 
     const { payloads, totalSize } = await createPayloads(filePath, payloadSize);
 
     configuration.onUploadInitiated &&
       configuration.onUploadInitiated(deploymentId);
 
-    return this.uploadManager.uploadPayloadsForDeployment(payloads, {
-      deploymentId: deploymentId,
-      singleDeploymentToken: this.configuration.token,
-      parallelUploadCount,
-      onChunkUploaded: (uploadedSize: number) =>
-        configuration.onChunkUploaded &&
-        configuration.onChunkUploaded(uploadedSize, totalSize),
-    });
+    const uploadPayloadsResult = await this.uploadManager.uploadPayloads(
+      payloads,
+      {
+        deploymentId,
+        token: this.configuration.token,
+        parallelUploadCount,
+        onChunkUploaded: (uploadedSize: number) =>
+          configuration.onChunkUploaded &&
+          configuration.onChunkUploaded(uploadedSize, totalSize),
+      }
+    );
+
+    const result = await this.uploadManager.finalizeUploadDeployment(
+      deploymentId,
+      uploadPayloadsResult.success,
+      this.configuration.token
+    );
+
+    if (!result.success) {
+      throw new Error(`Upload failed. ${result.message}`);
+    }
+
+    return {
+      uploadId: result.deploymentId,
+      bucketId: result.projectId,
+      protocolLink: result.sitePreview,
+      dynamicLinks: result.affectedDomains,
+    };
   }
 
   async getBucket(bucketId: string): Promise<Bucket> {
