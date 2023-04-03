@@ -1,5 +1,6 @@
 import { ProtocolEnum, UploadManager, UploadResult } from "@spheron/core";
 import { createPayloads } from "./file-payload-creator";
+import { decode } from "jsonwebtoken";
 
 export { ProtocolEnum };
 
@@ -7,36 +8,44 @@ export interface SpheronClientConfiguration {
   token: string;
 }
 
-export class SpheronClient {
-  private readonly configuration: SpheronClientConfiguration;
-  private readonly uploadManager: UploadManager;
+const upload = async (
+  files: File[],
+  configuration: {
+    deploymentId: string;
+    token: string;
+    onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
+  }
+): Promise<UploadResult> => {
+  console.log(decode(configuration.token));
+  const { payloads, totalSize } = await createPayloads(files, 5 * 5 * 1024);
 
-  constructor(configuration: SpheronClientConfiguration) {
-    this.configuration = configuration;
-    this.uploadManager = new UploadManager();
+  const uploadManager = new UploadManager();
+
+  const uploadPayloadsResult = await uploadManager.uploadPayloads(payloads, {
+    deploymentId: configuration.deploymentId,
+    token: configuration.token,
+    parallelUploadCount: 3,
+    onChunkUploaded: (uploadedSize: number) =>
+      configuration.onChunkUploaded &&
+      configuration.onChunkUploaded(uploadedSize, totalSize),
+  });
+
+  const result = await uploadManager.finalizeUploadDeployment(
+    configuration.deploymentId,
+    uploadPayloadsResult.success,
+    configuration.token
+  );
+
+  if (!result.success) {
+    throw new Error(`Upload failed. ${result.message}`);
   }
 
-  // async upload(
-  //   filePath: string,
-  //   configuration: {
-  //     name: string;
-  //     protocol: ProtocolEnum;
-  //     organizationId?: string;
-  //     onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
-  //   }
-  // ): Promise<UploadResult> {
+  return {
+    uploadId: result.deploymentId,
+    bucketId: result.projectId,
+    protocolLink: result.sitePreview,
+    dynamicLinks: result.affectedDomains,
+  };
+};
 
-  //   const { payloads, totalSize } = await createPayloads(filePath, payloadSize);
-
-  //   return this.uploadManager.uploadPayloadsForDeployment(payloads, {
-  //     deploymentId: deploymentId,
-  //     singleDeploymentToken: this.configuration.token,
-  //     parallelUploadCount,
-  //     onChunkUploaded: (uploadedSize: number) =>
-  //       configuration.onChunkUploaded &&
-  //       configuration.onChunkUploaded(uploadedSize, totalSize),
-  //   });
-  // }
-}
-
-export default SpheronClient;
+export { upload };
