@@ -1,5 +1,6 @@
 import { createConfiguration } from "./commands/create-configuration";
 import { createOrganization } from "./commands/create-organization";
+import { ResourceEnum, ResourceFetcher } from "./commands/get-resources";
 import { init } from "./commands/init";
 import { login } from "./commands/login";
 import { logout } from "./commands/logout";
@@ -196,6 +197,60 @@ export async function commandHandler(options: any) {
           await promptForCreateDapp(options._[1]);
         } else {
           await promptForCreateDapp();
+        }
+      } catch (error) {
+        console.log(error.message);
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (options._[0] === "get") {
+    (async () => {
+      try {
+        if (options.resource) {
+          if (options.resource == ResourceEnum.DEPLOYMENT) {
+            const id = options.id;
+            await ResourceFetcher.getDeployment(id);
+          } else if (options.resource == ResourceEnum.DEPLOYMENTS) {
+            const projectId = options.projectId;
+            const skip = options.skip;
+            const limit = options.limit;
+            const status = options.status;
+            await ResourceFetcher.getProjectDeployments(
+              projectId,
+              skip,
+              limit,
+              status
+            );
+          } else if (options.resource == ResourceEnum.PROJECT) {
+            const id = options.id;
+            await ResourceFetcher.getProject(id);
+          } else if (options.resource == ResourceEnum.PROJECTS) {
+            const organizationId = options.organizationId;
+            const skip = options.skip;
+            const limit = options.limit;
+            const state = options.state;
+            await ResourceFetcher.getOrganizationProjects(
+              organizationId,
+              skip,
+              limit,
+              state
+            );
+          } else if (options.resource == ResourceEnum.ORGANIZATION) {
+            const id = options.id;
+            await ResourceFetcher.getOrganization(id);
+          } else if (options.resource == ResourceEnum.ORGANIZATIONS) {
+            await ResourceFetcher.getUserOrganizations();
+          } else if (options.resource == ResourceEnum.DOMAINS) {
+            const projectId = options.projectId;
+            await ResourceFetcher.getProjectDomains(projectId);
+          } else if (options.resource == ResourceEnum.DEPLOYMENT_ENVIRONMENTS) {
+            const projectId = options.projectId;
+            await ResourceFetcher.getProjectDeploymentEnvironments(projectId);
+          }
+        } else {
+          throw new Error("Resource needs to be specified");
         }
       } catch (error) {
         console.log(error.message);

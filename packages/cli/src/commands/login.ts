@@ -3,7 +3,8 @@ import open from "open";
 import { writeToJsonFile } from "../utils";
 import configuration from "../configuration";
 import Spinner from "../outputs/spinner";
-import { SpheronApi, VerifiedTokenResponse } from "core";
+import { VerifiedTokenResponse } from "core";
+import SpheronApiService from "../services/spheron-api";
 
 let server: http.Server;
 
@@ -22,16 +23,12 @@ export async function login(provider: string): Promise<void> {
           server.once("request", async (req, res) => {
             try {
               const code = req.url?.split("&")[0].split("=")[1];
-              const client = new SpheronApi(
-                "", //not needed
-                configuration.spheronServerAddress
-              );
-              const verify: VerifiedTokenResponse = await client.verfiyGitToken(
-                provider,
-                String(code),
-                port
-              );
-
+              const verify: VerifiedTokenResponse =
+                await SpheronApiService.verfiyGitToken(
+                  provider,
+                  String(code),
+                  port
+                );
               // Closing of server
               res.setHeader("connection", "close");
               res.statusCode = 302;
@@ -47,7 +44,7 @@ export async function login(provider: string): Promise<void> {
               //store jwt token in spheron-config file
               await writeToJsonFile(
                 "jwtToken",
-                verify.jwt,
+                verify.jwtToken,
                 configuration.configFilePath
               );
               await writeToJsonFile(
