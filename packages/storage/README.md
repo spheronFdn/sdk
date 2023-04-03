@@ -102,6 +102,8 @@ The `SpheronClient` instance provides several methods for working with buckets. 
   - used to get the upload by its id.
 - `async  getOrganizationUsage(organizationId: string): Promise<UsageWithLimits>`
   - used to get the usage of the current active subscription of the organization
+- `async  getOrganizationUsage(organizationId: string): Promise<UsageWithLimits>`
+  - used to get the usage of the current active subscription of the organization
 
 Interfaces:
 
@@ -152,6 +154,20 @@ interface  Upload {
   memoryUsed: number;
   bucketId: string;
   protocol: string;
+}
+
+interface TokenScope {
+  user: {
+    id: string;
+    username: string;
+    name: string;
+    email: string;
+  };
+  organizations: {
+    id: string;
+    name: string;
+    username: string;
+  }[];
 }
 ```
 
