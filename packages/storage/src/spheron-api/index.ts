@@ -1,4 +1,5 @@
 import axios from "axios";
+import config from "../config/env";
 import {
   DeploymentStatusEnum,
   DomainTypeEnum,
@@ -16,7 +17,6 @@ import {
 } from "./interfaces";
 
 class SpheronApi {
-  private readonly spheronApiUrl = "https://api-v2.spheron.network";
   private readonly token: string;
 
   constructor(token: string) {
@@ -199,7 +199,7 @@ class SpheronApi {
     try {
       const response = await axios<T>({
         method,
-        url: `${this.spheronApiUrl}${path}`,
+        url: `${config.spheronApiUrl}${path}`,
         data: payload,
         headers: {
           Authorization: `Bearer ${this.token}`,
