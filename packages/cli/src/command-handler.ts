@@ -1,3 +1,4 @@
+import { changeDefaultOrganization } from "./commands/configure";
 import { createConfiguration } from "./commands/create-configuration";
 import { createOrganization } from "./commands/create-organization";
 import { ResourceEnum, ResourceFetcher } from "./commands/get-resources";
@@ -8,6 +9,7 @@ import { publish } from "./commands/publish";
 import { upload } from "./commands/upload";
 import configuration from "./configuration";
 import {
+  promptForConfigure,
   promptForCreateDapp,
   promptForCreateOrganization,
   promptForInit,
@@ -252,6 +254,33 @@ export async function commandHandler(options: any) {
         } else {
           throw new Error("Resource needs to be specified");
         }
+      } catch (error) {
+        console.log(error.message);
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (options._[0] === "configure") {
+    const validOptions = ["organization"];
+    const unknownOptions = Object.keys(options).filter(
+      (option) =>
+        option !== "_" && option !== "$0" && !validOptions.includes(option)
+    );
+    if (unknownOptions.length > 0) {
+      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
+    (async () => {
+      try {
+        let organizationId;
+        if (options.organization) {
+          organizationId = options.organization;
+        } else {
+          const prompt = await promptForConfigure();
+          organizationId = prompt.organization;
+        }
+        await changeDefaultOrganization(organizationId);
       } catch (error) {
         console.log(error.message);
         process.exit(1);

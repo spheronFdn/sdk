@@ -126,6 +126,20 @@ import { DeploymentStatusEnum, ProjectStateEnum } from "core";
         .help();
     })
     .command(
+      "configure",
+      "Change spheron default configuration",
+      (yargs: any) => {
+        yargs
+          .option("organization", {
+            describe: "Set id of default organization ",
+          })
+          .version(false)
+          .usage(`Usage: $0 configure [--organization <organizationId>]`)
+          .wrap(150)
+          .help();
+      }
+    )
+    .command(
       "create-dapp",
       "Create a dapp which can run on Spheron out of the box",
       (yargs: any) => {
