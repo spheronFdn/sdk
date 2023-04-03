@@ -2,7 +2,8 @@ import configuration from "../configuration";
 import { fileExists, readFromJsonFile, writeToJsonFile } from "../utils";
 import { createConfiguration } from "./create-configuration";
 import Spinner from "../outputs/spinner";
-import { AppTypeEnum, Organization, SpheronApi } from "core";
+import { AppTypeEnum, Organization } from "core";
+import SpheronApiService from "../services/spheron-api";
 
 export async function createOrganization(
   name: string,
@@ -25,14 +26,10 @@ export async function createOrganization(
       );
       return;
     }
-    const client = new SpheronApi(jwtToken, configuration.spheronServerAddress);
     const appType =
       type == AppTypeEnum.WEB_APP ? AppTypeEnum.WEB_APP : AppTypeEnum.COMPUTE;
-    const organization: Organization = await client.createOrganization(
-      username,
-      name,
-      appType
-    );
+    const organization: Organization =
+      await SpheronApiService.createOrganization(username, name, appType);
     await writeToJsonFile(
       "organization",
       organization._id,

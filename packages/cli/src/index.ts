@@ -4,6 +4,8 @@ const yargs = require("yargs");
 import configuration from "./configuration";
 import { commandHandler } from "./command-handler";
 import { FrameworkOptions } from "./commands/init";
+import { ResourceEnum } from "./commands/get-resources";
+import { DeploymentStatusEnum, ProjectStateEnum } from "core";
 
 (async () => {
   console.log(`Spheron CLI ${configuration.version}\n`);
@@ -75,6 +77,29 @@ import { FrameworkOptions } from "./commands/init";
         )
         .wrap(100)
         .help();
+    })
+    .command("get <resource>", "Get resource/s <<resource>>", (yargs: any) => {
+      yargs.positional("resource", {
+        describe: "The resource to get information about",
+        choices: Object.values(ResourceEnum),
+      });
+      yargs.version(false).wrap(150).help();
+      yargs.epilogue(`Custom help text for 'get <resource>' command.
+
+      Examples:
+        - get organization            : options: --id 
+        - get organizations           : (all organization for your user will be returned)
+        - get deployment              : options: --id, --skip (optional), --limit (optional), --status (optional)
+        - get deployments             : options: --projectId  
+        - get project                 : options: --id
+        - get projects                : options: --organizationId (optional), --skip (optional), --limit (optional), --state (optional)
+        - get domains                 : options: --projectId
+        - get deployment-environmetns : options: --projectId
+      
+        Note* : 
+        deployment status field can be ${Object.values(DeploymentStatusEnum)}
+        project state field can be ${Object.values(ProjectStateEnum)} 
+      `);
     })
     .command("init", "Spheron file initialization in project", (yargs: any) => {
       yargs

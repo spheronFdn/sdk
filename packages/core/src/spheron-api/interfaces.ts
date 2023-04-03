@@ -25,6 +25,7 @@ interface TokenScope {
 }
 
 interface DeploymentEnvironment {
+  _id: string;
   name: string;
   branches: string[];
   status: DeploymentEnvironmentStatusEnum;
@@ -133,8 +134,24 @@ interface Organization {
   overdue: boolean;
 }
 
+interface User {
+  _id: string;
+  platformProfile: PlatformUser;
+  createdAt: Date;
+  updatedAt: Date;
+  organizations: [Organization];
+}
+
+interface PlatformUser {
+  username: string;
+  avatar: string;
+  is_active?: boolean;
+  name: string;
+  email: string;
+}
+
 interface VerifiedTokenResponse {
-  jwt: string;
+  jwtToken: string;
   organizationId: string;
   email: string;
 }
@@ -147,4 +164,6 @@ export {
   Configuration,
   Organization,
   VerifiedTokenResponse,
+  User,
+  DeploymentEnvironment,
 };

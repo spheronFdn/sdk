@@ -14,6 +14,8 @@ import {
   Organization,
   Project,
   TokenScope,
+  User,
+  DeploymentEnvironment,
   VerifiedTokenResponse,
 } from "./interfaces";
 
@@ -196,6 +198,51 @@ class SpheronApi {
       organization: Organization;
     }>(HttpMethods.POST, `/v1/organization`, body);
     return organization;
+  }
+
+  async getOrganization(id: string): Promise<Organization> {
+    const organization = await this.sendApiRequest<Organization>(
+      HttpMethods.GET,
+      `/v1/organization/${id}`
+    );
+    return organization;
+  }
+
+  async getOrganizationProjects(
+    id: string,
+    options: {
+      skip: number;
+      limit: number;
+      state?: string;
+    }
+  ): Promise<Project[]> {
+    if (options.skip < 0 || options.limit < 0) {
+      throw new Error(`Skip and Limit cannot be negative numbers.`);
+    }
+    const result = await this.sendApiRequest<{ projects: Project[] }>(
+      HttpMethods.GET,
+      `/v1/organization/${id}/projects?skip=${options.skip}&limit=${
+        options.limit
+      }${options.state ? `&state=${options.state}` : ""}`
+    );
+    return result.projects;
+  }
+
+  async getProfile(): Promise<User> {
+    const result = await this.sendApiRequest<{ user: User }>(
+      HttpMethods.GET,
+      `/v1/profile/`
+    );
+    return result.user;
+  }
+
+  async getDeploymentEnvironments(
+    projectId: string
+  ): Promise<DeploymentEnvironment[]> {
+    const response = await this.sendApiRequest<{
+      result: DeploymentEnvironment[];
+    }>(HttpMethods.GET, `/v1/project/${projectId}/deployment-environments`);
+    return response.result;
   }
 
   async verfiyGitToken(
