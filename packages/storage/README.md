@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo.svg">
-    <img alt="Spheron" src="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo.svg" width="250">
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/spheron-logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/spheron-logo.svg">
+    <img alt="Spheron" src="https://github.com/spheronFdn/sdk/blob/main/.github/assets/spheron-logo.svg" width="250">
   </picture>
 </p>
 
@@ -14,7 +14,7 @@
 
 <p align="center">  
   <a href="https://www.npmjs.com/package/@spheron/storage" target="_blank" rel="noreferrer">
-    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.7&color=green" />
+    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.8&color=green" />
   </a>
   <a href="https://github.com/spheronFdn/sdk/blob/main/LICENSE" target="_blank" rel="noreferrer">
     <img src="https://img.shields.io/static/v1?label=license&message=Apache%202.0&color=red" />
