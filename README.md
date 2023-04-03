@@ -1,8 +1,8 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo.svg">
-    <img alt="Spheron" src="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo.svg" width="250">
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/spheron-logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/spheron-logo.svg">
+    <img alt="Spheron" src="https://github.com/spheronFdn/sdk/blob/main/.github/assets/spheron-logo.svg" width="250">
   </picture>
 </p>
 
@@ -22,64 +22,40 @@
   </a>
 </p>
 
+---
+
+Spheron's developer toolkit includes packages that make it easier to build decentralized applications (dapps):
+- [Spheron Storage SDK](https://github.com/spheronFdn/sdk/blob/main/packages/storage/README.md)
+- [Spheron CLI](https://github.com/spheronFdn/sdk/blob/main/packages/cli/README.md)
+
 ## Spheron Storage SDK
+
+Software Development Kit (SDK) with multi-chain storage capabilities, powered by Spheron.
 
 ### Installation
 
 Using NPM
-
 ```
 npm install @spheron/storage
 ```
 
 Using Yarn
-
 ```
 yarn add @spheron/storage
 ```
 
-### Usage
+> If you're looking for more information on how to use Spheron Storage SDK, check out our [detailed guide here](https://github.com/spheronFdn/sdk/blob/main/packages/storage/README.md).
 
-In the example below, you can see how to create an instance of `SpheronClient` and how to upload a file/directory to the specified protocol.
+## Spheron CLI 
 
-```js
-import SpheronClient, { ProtocolEnum } from "@spheron/storage";
+Command Line Interface (CLI) tool for creating and deploying dapps to web3.
 
-const client = new SpheronClient({ token });
-let currentlyUploaded = 0;
-const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
-  filePath,
-  {
-    protocol: ProtocolEnum.IPFS,
-    name,
-    onUploadInitiated: (uploadId) => {
-      console.log(`Upload with id ${uploadId} started...`);
-    },
-    onChunkUploaded: (uploadedSize, totalSize) => {
-      currentlyUploaded += uploadedSize;
-      console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
-    },
-  }
-);
-```
+### Installation
 
-- The `SpheronClient` constructor takes an object that has one property `token`.
-- Function `upload` has two parameters `client.upload(filePath, configuration);`
-  - `filePath` - the path to the file/directory that will be uploaded
-  - `configuration` - an object with parameters:
-    - `configuration.name` - represents the name of the bucket on which you are uploading the data.
-    - `configuration.protocol` - a protocol on which the data will be uploaded. The supported protocols are [ `ARWEAVE`, `IPFS`, `FILECOIN`].
-    - `configuration.onUploadInitiated` - **optional** - callback function `(uploadId: string) => void`. The function will be called once, when the upload is initiated, right before the data is uploaded. The function will be called with one parameter, `uploadId`, which represents the id of the started upload.
-    - `configuration.onChunkUploaded` - **optional** - callback function `(uploadedSize: number, totalSize: number) => void`. The function will be called multiple times, depending on the upload size. The function will be called each time a chunk is uploaded, with two parameters. the first one `uploadedSize` represents the size in Bytes for the uploaded chunk. The `totalSize` represents the total size of the upload in Bytes.
-  - The response of the upload function is an object with parameters:
-    - `uploadId` - the id of the upload
-    - `bucketId` - the id of the bucket
-    - `protocolLink` - is the protocol link of the upload
-    - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
+To install Spheron CLI use the following command:
+<pre><code>sudo npm install -g @spheron/cli</code></pre>
 
-## Access Token
-
-To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/api/rest-api-references#creating-an-access-token).
+> If you're looking for more information on how to use Spheron CLI, check out our [detailed guide here](https://github.com/spheronFdn/sdk/blob/main/packages/cli/README.md).
 
 ## Contribution
 

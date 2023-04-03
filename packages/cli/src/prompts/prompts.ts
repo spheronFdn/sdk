@@ -1,4 +1,4 @@
-import { createApp, DappType, templateApps } from "../commands/create-app";
+import { createDapp, templateTypesMap } from "../commands/create-dapp";
 import { FrameworkOptions } from "../commands/init";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -101,101 +101,58 @@ export async function promptForInit(): Promise<any> {
   return inquirer.prompt(questions);
 }
 
-export async function promptForCreateApp(appName?: string): Promise<any> {
+export async function promptForCreateDapp(appName?: string): Promise<any> {
   inquirer
     .prompt([
       {
         type: "list",
         name: "projectType",
         message: "What type of dapp do you want to create?",
-        choices: ["Default dapp", "Start from a template"],
+        choices: templateTypes,
       },
     ])
     .then((answers: any) => {
-      if (answers.projectType === "Default dapp") {
-        inquirer
-          .prompt([
-            {
-              type: "list",
-              name: "template",
-              message: "Choose a default dapp type:",
-              choices: defaultAppChoices,
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            name: "template",
+            message: `Choose template:`,
+            choices: answers.projectType,
+          },
+          {
+            type: "input",
+            name: "project",
+            message: "Project name:",
+            default: function (answers: any) {
+              if (appName) {
+                return appName;
+              }
+              return answers.template.defaultProjectName;
             },
-            {
-              type: "input",
-              name: "project",
-              message: "Project name:",
-              default: function (answers: any) {
-                if (appName) {
-                  return appName;
-                }
-                return answers.template.defaultProjectName;
-              },
-            },
-            {
-              type: "list",
-              name: "protocol",
-              message: "Upload protocol:",
-              choices: ["Arweave", "Filecoin", "IPFS"],
-              default: "Arweave",
-            },
-          ])
-          .then(async (answers: any) => {
-            console.log(
-              `\nCreating a new ${answers.template.alias} dapp with project name: ${answers.project}. Time to become a wizard 🔮`
-            );
-            await createApp(
-              answers.template,
-              answers.project,
-              answers.protocol.toLowerCase()
-            );
-          });
-      } else if (answers.projectType === "Start from a template") {
-        inquirer
-          .prompt([
-            {
-              type: "list",
-              name: "template",
-              message: "Choose a template:",
-              choices: templateAppChoices,
-            },
-            {
-              type: "input",
-              name: "project",
-              message: "Project name:",
-              default: function (answers: any) {
-                return answers.template.defaultProjectName;
-              },
-            },
-            {
-              type: "list",
-              name: "protocol",
-              message: "Upload protocol:",
-              choices: ["Arweave", "Filecoin", "IPFS"],
-              default: "Arweave",
-            },
-          ])
-          .then(async (answers: any) => {
-            if (!answers.project) {
-              throw new Error("Project name was not provided");
-            }
-            console.log(
-              `\nCreating a new project from template ${answers.template.alias} with project name ${answers.project}. Time to become a wizard 🔮`
-            );
-            await createApp(
-              answers.template,
-              answers.project,
-              answers.protocol.toLowerCase()
-            );
-          });
-      }
+          },
+          {
+            type: "list",
+            name: "protocol",
+            message: "Upload protocol:",
+            choices: ["Arweave", "Filecoin", "IPFS"],
+            default: "Arweave",
+          },
+        ])
+        .then(async (answers: any) => {
+          console.log(
+            `\nCreating a new ${answers.template.alias} dapp with project name: ${answers.project}. Time to become a wizard 🔮`
+          );
+          await createDapp(
+            answers.template,
+            answers.project,
+            answers.protocol.toLowerCase()
+          );
+        });
     });
 }
 
-const defaultAppChoices = Array.from(templateApps.values())
-  .filter((app) => app.dappType === DappType.Default)
-  .map((app) => ({ name: app.alias, value: app }));
-
-const templateAppChoices = Array.from(templateApps.values())
-  .filter((app) => app.dappType === DappType.Template)
-  .map((app) => ({ name: app.alias, value: app }));
+const templateTypes = Array.from(templateTypesMap.values()).map((t) => ({
+  name: t.alias,
+  value: t.dapps,
+}));
