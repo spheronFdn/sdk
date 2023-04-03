@@ -10,7 +10,7 @@ import {
   Configuration,
   Deployment,
   Domain,
-  UsageWithLimits,
+  UsageWithLimitsWithSkynet,
   Project,
   TokenScope,
 } from "./interfaces";
@@ -180,9 +180,9 @@ class SpheronApi {
   async getOrganizationUsage(
     organizationId: string,
     specialization: "wa-global" | "c-akash"
-  ): Promise<UsageWithLimits> {
+  ): Promise<UsageWithLimitsWithSkynet> {
     const { usage } = await this.sendApiRequest<{
-      usage: UsageWithLimits;
+      usage: UsageWithLimitsWithSkynet;
     }>(
       HttpMethods.GET,
       `/v1/organization/${organizationId}/subscription-usage/specialization/${specialization}`

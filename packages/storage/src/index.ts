@@ -159,10 +159,14 @@ export class SpheronClient {
   }
 
   async getOrganizationUsage(organizationId: string): Promise<UsageWithLimits> {
-    return await this.spheronApi.getOrganizationUsage(
+    const usage = await this.spheronApi.getOrganizationUsage(
       organizationId,
       "wa-global"
     );
+
+    const { usedStorageSkynet, storageSkynetLimit, ...resultWithoutSkynet } =
+      usage;
+    return resultWithoutSkynet;
   }
 
   async getTokenScope(): Promise<TokenScope> {

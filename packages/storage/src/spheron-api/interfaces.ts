@@ -125,7 +125,6 @@ export interface UsageWithLimits {
   usedBuildExecution?: number; // Seconds
   usedConcurrentBuild?: number;
   usedStorageArweave?: number; // Bytes
-  usedStorageSkynet?: number; // Bytes
   usedStorageFileCoin?: number; // Seconds
   usedStorageIPFS?: number; // Bytes
   usedDeploymentsPerDay?: number;
@@ -143,7 +142,6 @@ export interface UsageWithLimits {
   buildExecutionLimit?: number; // Seconds
   concurrentBuildLimit?: number;
   storageArweaveLimit?: number; // Bytes
-  storageSkynetLimit?: number; // Bytes
   storageFileCoinLimit?: number; // Bytes
   storageIPFSLimit?: number;
   deploymentsPerDayLimit?: number;
@@ -154,6 +152,11 @@ export interface UsageWithLimits {
   clusterAktLimit?: number;
   clusterBuildExecutionLimit?: number;
   passwordProtectionLimit?: number;
+}
+
+export interface UsageWithLimitsWithSkynet extends UsageWithLimits {
+  usedStorageSkynet?: number; // Bytes
+  storageSkynetLimit?: number; // Bytes
 }
 
 export { TokenScope, Project, Domain, Deployment, Configuration };
