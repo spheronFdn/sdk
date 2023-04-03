@@ -121,13 +121,13 @@ interface Deployment {
 }
 
 export interface UsageWithLimits {
-  usedBandwidth?: number; //bytes
-  usedBuildExecution?: number; //sec
+  usedBandwidth?: number; // Bytes
+  usedBuildExecution?: number; // Seconds
   usedConcurrentBuild?: number;
-  usedStorageArweave?: number; //bytes
-  usedStorageSkynet?: number; //bytes
-  usedStorageFileCoin?: number; //bytes
-  usedStorageIPFS?: number; //bytes
+  usedStorageArweave?: number; // Bytes
+  usedStorageSkynet?: number; // Bytes
+  usedStorageFileCoin?: number; // Seconds
+  usedStorageIPFS?: number; // Bytes
   usedDeploymentsPerDay?: number;
   lastDeploymentDate?: Date;
   usedDomains?: number;
@@ -139,12 +139,12 @@ export interface UsageWithLimits {
   usedNumberOfRequests?: number;
   usedPasswordProtections?: number;
   membersLimit?: number;
-  bandwidthLimit?: number; //bytes
-  buildExecutionLimit?: number; //sec
+  bandwidthLimit?: number; // Bytes
+  buildExecutionLimit?: number; // Seconds
   concurrentBuildLimit?: number;
-  storageArweaveLimit?: number; //bytes
-  storageSkynetLimit?: number; //bytes
-  storageFileCoinLimit?: number; //bytes
+  storageArweaveLimit?: number; // Bytes
+  storageSkynetLimit?: number; // Bytes
+  storageFileCoinLimit?: number; // Bytes
   storageIPFSLimit?: number;
   deploymentsPerDayLimit?: number;
   domainsLimit?: number;
