@@ -11,6 +11,7 @@ import {
   Configuration,
   Deployment,
   Domain,
+  UsageWithLimitsWithSkynet,
   Project,
   TokenScope,
 } from "./interfaces";
@@ -174,6 +175,19 @@ class SpheronApi {
       deployment: Deployment;
     }>(HttpMethods.GET, `/v1/deployment/${deploymentId}`);
     return deployment;
+  }
+
+  async getOrganizationUsage(
+    organizationId: string,
+    specialization: "wa-global" | "c-akash"
+  ): Promise<UsageWithLimitsWithSkynet> {
+    const { usage } = await this.sendApiRequest<{
+      usage: UsageWithLimitsWithSkynet;
+    }>(
+      HttpMethods.GET,
+      `/v1/organization/${organizationId}/subscription-usage/specialization/${specialization}`
+    );
+    return usage;
   }
 
   private async sendApiRequest<T>(

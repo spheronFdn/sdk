@@ -14,7 +14,7 @@
 
 <p align="center">  
   <a href="https://www.npmjs.com/package/@spheron/storage" target="_blank" rel="noreferrer">
-    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.8&color=green" />
+    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.9&color=green" />
   </a>
   <a href="https://github.com/spheronFdn/sdk/blob/main/LICENSE" target="_blank" rel="noreferrer">
     <img src="https://img.shields.io/static/v1?label=license&message=Apache%202.0&color=red" />
@@ -100,6 +100,10 @@ The `SpheronClient` instance provides several methods for working with buckets. 
   - used to get the uploads of the bucket. The default value for `skip` is 0. The default value for `limit` is 6.
 - `async  getUpload(uploadId: string): Promise<Upload>`
   - used to get the upload by its id.
+- `async  getOrganizationUsage(organizationId: string): Promise<UsageWithLimits>`
+  - used to get the usage of the current active subscription of the organization.
+- `async getTokenScope(): Promise<TokenScope>`
+  - used to get the scope of the token.
 
 Interfaces:
 
@@ -150,6 +154,20 @@ interface  Upload {
   memoryUsed: number;
   bucketId: string;
   protocol: string;
+}
+
+interface TokenScope {
+  user: {
+    id: string;
+    username: string;
+    name: string;
+    email: string;
+  };
+  organizations: {
+    id: string;
+    name: string;
+    username: string;
+  }[];
 }
 ```
 
