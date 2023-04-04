@@ -7,7 +7,7 @@ import {
   Organization,
   Project,
   User,
-} from "core";
+} from "@spheron/core";
 import Spinner from "../outputs/spinner";
 import SpheronApiService from "../services/spheron-api";
 import { readFromJsonFile } from "../utils";

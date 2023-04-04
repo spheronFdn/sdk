@@ -2,7 +2,7 @@ import configuration from "../configuration";
 import { fileExists, readFromJsonFile, writeToJsonFile } from "../utils";
 import { createConfiguration } from "./create-configuration";
 import Spinner from "../outputs/spinner";
-import { AppTypeEnum, Organization } from "core";
+import { AppTypeEnum, Organization } from "@spheron/core";
 import SpheronApiService from "../services/spheron-api";
 
 export async function createOrganization(

@@ -5,7 +5,7 @@ import configuration from "./configuration";
 import { commandHandler } from "./command-handler";
 import { FrameworkOptions } from "./commands/init";
 import { ResourceEnum } from "./commands/get-resources";
-import { DeploymentStatusEnum, ProjectStateEnum } from "core";
+import { DeploymentStatusEnum, ProjectStateEnum } from "@spheron/core";
 
 (async () => {
   console.log(`Spheron CLI ${configuration.version}\n`);

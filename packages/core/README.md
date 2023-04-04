@@ -1,4 +1,3 @@
 <p>
-To import this core package in any other sdk package, just add it as dependency 
-"core":"*"
+This is a core package that is used by all other packages in sdk.
 </p>

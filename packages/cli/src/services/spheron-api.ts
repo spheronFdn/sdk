@@ -9,7 +9,7 @@ import {
   SpheronApi,
   User,
   VerifiedTokenResponse,
-} from "core";
+} from "@spheron/core";
 import configuration from "../configuration";
 import { readFromJsonFile } from "../utils";
 

@@ -1,5 +1,5 @@
 {
-  "name": "core",
+  "name": "@spheron/core",
   "version": "1.0.0",
   "description": "Shared core package for all sdk packages",
   "keywords": [
