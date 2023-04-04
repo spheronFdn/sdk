@@ -1,37 +1,48 @@
 import { ProtocolEnum, UploadManager, UploadResult } from "@spheron/core";
 import { createPayloads } from "./file-payload-creator";
-import { decode } from "jsonwebtoken";
+import jwt_decode from "jwt-decode";
 
 export { ProtocolEnum };
-
-export interface SpheronClientConfiguration {
-  token: string;
-}
 
 const upload = async (
   files: File[],
   configuration: {
-    deploymentId: string;
+    uploadId: string;
     token: string;
     onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
   }
 ): Promise<UploadResult> => {
-  console.log(decode(configuration.token));
-  const { payloads, totalSize } = await createPayloads(files, 5 * 5 * 1024);
+  if (!files || files.length === 0) {
+    throw new Error("No files to upload.");
+  }
+
+  if (!configuration.uploadId) {
+    throw new Error("No deploymentId provided.");
+  }
+
+  if (!configuration.token) {
+    throw new Error("No token provided.");
+  }
+
+  const jwtPayload: { payloadSize: number; parallelUploadCount: number } =
+    jwt_decode(configuration.token);
+  const payloadSize = jwtPayload?.payloadSize ?? 5 * 5 * 1024;
+  const parallelUploadCount = jwtPayload?.parallelUploadCount ?? 3;
+
+  const { payloads, totalSize } = await createPayloads(files, payloadSize);
 
   const uploadManager = new UploadManager();
-
   const uploadPayloadsResult = await uploadManager.uploadPayloads(payloads, {
-    deploymentId: configuration.deploymentId,
+    deploymentId: configuration.uploadId,
     token: configuration.token,
-    parallelUploadCount: 3,
+    parallelUploadCount,
     onChunkUploaded: (uploadedSize: number) =>
       configuration.onChunkUploaded &&
       configuration.onChunkUploaded(uploadedSize, totalSize),
   });
 
   const result = await uploadManager.finalizeUploadDeployment(
-    configuration.deploymentId,
+    configuration.uploadId,
     uploadPayloadsResult.success,
     configuration.token
   );
