@@ -1,4 +1,4 @@
-import { createApp, templateTypesMap } from "../commands/create-app";
+import { createDapp, templateTypesMap } from "../commands/create-dapp";
 import { FrameworkOptions } from "../commands/init";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -101,7 +101,18 @@ export async function promptForInit(): Promise<any> {
   return inquirer.prompt(questions);
 }
 
-export async function promptForCreateApp(appName?: string): Promise<any> {
+export async function promptForConfigure(): Promise<any> {
+  const questions = [
+    {
+      type: "input",
+      name: "organization",
+      message: "Default organization ID:",
+    },
+  ];
+  return inquirer.prompt(questions);
+}
+
+export async function promptForCreateDapp(appName?: string): Promise<any> {
   inquirer
     .prompt([
       {
@@ -143,7 +154,7 @@ export async function promptForCreateApp(appName?: string): Promise<any> {
           console.log(
             `\nCreating a new ${answers.template.alias} dapp with project name: ${answers.project}. Time to become a wizard 🔮`
           );
-          await createApp(
+          await createDapp(
             answers.template,
             answers.project,
             answers.protocol.toLowerCase()

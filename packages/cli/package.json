@@ -1,6 +1,6 @@
 {
   "name": "@spheron/cli",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "CLI for working on projects and deploying them via Spheron ",
   "keywords": [
     "CLI",
@@ -19,7 +19,8 @@
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "prettier:write": "prettier --write '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
     "prettier:check": "prettier --check '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "preinstall": "node -e \"const v = process.versions.node.split('.').map(parseFloat); if (v[0] < 12 || (v[0] === 12 && v[1] < 17)) { console.error('Node.js version 12.17.0 or higher is required. Please upgrade Node.js and try again.'); process.exit(1); }\" 2>&1 >/dev/null"
   },
   "bin": {
     "spheron": "./dist/index.js"
@@ -40,7 +41,8 @@
     "prompts": "^2.4.2",
     "uuid": "^9.0.0",
     "yaml": "^2.2.1",
-    "yargs": "^17.6.2"
+    "yargs": "^17.6.2",
+    "core": "*"
   },
   "devDependencies": {
     "@babel/cli": "^7.21.0",
