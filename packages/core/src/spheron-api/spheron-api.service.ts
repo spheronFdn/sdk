@@ -1,4 +1,5 @@
 import axios from "axios";
+import config from "../config/env";
 import {
   DeploymentStatusEnum,
   DomainTypeEnum,
@@ -10,12 +11,12 @@ import {
   Configuration,
   Deployment,
   Domain,
+  UsageWithLimitsWithSkynet,
   Project,
   TokenScope,
 } from "./interfaces";
 
 class SpheronApi {
-  private readonly spheronApiUrl = "https://api-v2.spheron.network";
   private readonly token: string;
 
   constructor(token: string) {
@@ -176,6 +177,19 @@ class SpheronApi {
     return deployment;
   }
 
+  async getOrganizationUsage(
+    organizationId: string,
+    specialization: "wa-global" | "c-akash"
+  ): Promise<UsageWithLimitsWithSkynet> {
+    const { usage } = await this.sendApiRequest<{
+      usage: UsageWithLimitsWithSkynet;
+    }>(
+      HttpMethods.GET,
+      `/v1/organization/${organizationId}/subscription-usage/specialization/${specialization}`
+    );
+    return usage;
+  }
+
   private async sendApiRequest<T>(
     method: HttpMethods,
     path: string,
@@ -185,7 +199,7 @@ class SpheronApi {
     try {
       const response = await axios<T>({
         method,
-        url: `${this.spheronApiUrl}${path}`,
+        url: `${config.spheronApiUrl}${path}`,
         data: payload,
         headers: {
           Authorization: `Bearer ${this.token}`,

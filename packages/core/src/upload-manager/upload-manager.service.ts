@@ -2,6 +2,11 @@ import axios, { AxiosRequestConfig } from "axios";
 import FormData from "form-data";
 import pLimit from "p-limit";
 import { ProtocolEnum } from "../spheron-api";
+import config from "../config/env";
+
+export interface UploadMangerConfiguration {
+  token: string;
+}
 
 export interface UploadConfiguration {
   protocol: ProtocolEnum;
@@ -19,8 +24,6 @@ export interface UploadResult {
 }
 
 class UploadManager {
-  private readonly uploadApiUrl = "http://localhost:8002";
-
   public async initiateDeployment(configuration: {
     protocol: ProtocolEnum;
     name: string;
@@ -36,7 +39,7 @@ class UploadManager {
     try {
       this.validateUploadConfiguration(configuration);
 
-      let url = `${this.uploadApiUrl}/v1/upload-deployment?protocol=${configuration.protocol}&project=${configuration.name}`;
+      let url = `${config.spheronApiUrl}/v1/upload-deployment?protocol=${configuration.protocol}&project=${configuration.name}`;
 
       if (configuration.organizationId) {
         url += `&organization=${configuration.organizationId}`;
@@ -85,7 +88,7 @@ class UploadManager {
           return;
         }
         const { data } = await axios.post<{ uploadSize: number }>(
-          `${this.uploadApiUrl}/v1/upload-deployment/${deploymentId}/data`,
+          `${config.spheronApiUrl}/v1/upload-deployment/${deploymentId}/data`,
           payload,
           this.getAxiosRequestConfig(configuration.token)
         );
@@ -126,7 +129,7 @@ class UploadManager {
         affectedDomains: string[];
       }>(
         `${
-          this.uploadApiUrl
+          config.spheronApiUrl
         }/v1/upload-deployment/${deploymentId}/finish?action=${
           upload ? "UPLOAD" : "CANCEL"
         }`,

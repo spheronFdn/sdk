@@ -3,11 +3,11 @@
 
 <picture>
 
-<source  media="(prefers-color-scheme: dark)"  srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo-dark.svg">
+<source  media="(prefers-color-scheme: dark)"  srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/spheron-logo-dark.svg">
 
-<source  media="(prefers-color-scheme: light)"  srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo.svg">
+<source  media="(prefers-color-scheme: light)"  srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/spheron-logo.svg">
 
-<img  alt="Spheron"  src="https://github.com/spheronFdn/sdk/blob/main/.github/assets/logo.svg"  width="250">
+<img  alt="Spheron"  src="https://github.com/spheronFdn/sdk/blob/main/.github/assets/spheron-logo.svg" width="250">
 
 </picture>
 
@@ -29,7 +29,7 @@
 
 <a  href="https://www.npmjs.com/package/@spheron/storage"  target="_blank"  rel="noreferrer">
 
-<img  src="https://img.shields.io/static/v1?label=npm&message=v1.0.4&color=green"  />
+<img  src="https://img.shields.io/static/v1?label=npm&message=v1.0.5&color=green"  />
 
 </a>
 

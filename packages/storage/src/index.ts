@@ -3,6 +3,8 @@ import {
   ProtocolEnum,
   UploadManager,
   UploadResult,
+  TokenScope,
+  UsageWithLimits,
 } from "@spheron/core";
 import BucketManager, {
   Bucket,
@@ -22,6 +24,8 @@ export {
   Domain,
   DomainTypeEnum,
   UploadStatusEnum,
+  UsageWithLimits,
+  TokenScope,
 };
 
 export interface SpheronClientConfiguration {
@@ -190,6 +194,21 @@ export class SpheronClient {
 
   async getUpload(uploadId: string): Promise<Upload> {
     return await this.bucketManager.getUpload(uploadId);
+  }
+
+  async getOrganizationUsage(organizationId: string): Promise<UsageWithLimits> {
+    const usage = await this.spheronApi.getOrganizationUsage(
+      organizationId,
+      "wa-global"
+    );
+
+    const { usedStorageSkynet, storageSkynetLimit, ...resultWithoutSkynet } =
+      usage;
+    return resultWithoutSkynet;
+  }
+
+  async getTokenScope(): Promise<TokenScope> {
+    return await this.spheronApi.getTokenScope();
   }
 }
 
