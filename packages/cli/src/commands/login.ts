@@ -79,7 +79,7 @@ export async function login(provider: string): Promise<void> {
                 }
               }
               console.log(
-                `✖️  Error occured while logging in. Check if you have created an account on Spheron. You need to sign up first with ${provider} connection to be able to login with CLI.`
+                `✖️  Error occured while logging in, please try again.`
               );
               spinner.stop();
               process.exit(0);
