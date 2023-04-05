@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "es2016",
     "module": "commonjs",
     "strict": true,
     "skipLibCheck": true,
@@ -9,12 +9,11 @@
     "moduleResolution": "node",
     "useUnknownInCatchVariables": false,
     "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationDir": "types",
     "rootDir": "./src",
-    "outDir": "./dist/",
-    "plugins": [
-      { "name": "typescript-babel" }
-    ]
+    "outDir": "./dist/"
   },
-  "include": ["./src/**/*"],
+  "include": ["./src/**/*", "./types/**/*"],
   "exclude": ["node_modules"]
 }

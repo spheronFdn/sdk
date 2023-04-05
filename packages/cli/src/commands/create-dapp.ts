@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { execSync } from "child_process";
 import fs from "fs";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const rimraf = require("rimraf");
 import path from "path";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const chalk = require("chalk");
@@ -38,10 +41,16 @@ export async function createDapp(
 }
 
 function cleanUpFiles(folderName: string) {
-  fs.rmSync(path.join(process.cwd(), folderName, ".git"), {
-    recursive: true,
-    force: true,
-  });
+  if (fs.rmSync) {
+    // Use built-in fs.rmSync() method if available
+    fs.rmSync(path.join(process.cwd(), folderName, ".git"), {
+      recursive: true,
+      force: true,
+    });
+  } else {
+    // Use rimraf package as fallback for Node.js versions without fs.rmSync() method
+    rimraf.sync(path.join(process.cwd(), folderName, ".git"));
+  }
 }
 
 export enum DappCategory {

@@ -1,5 +1,7 @@
+import { changeDefaultOrganization } from "./commands/configure";
 import { createConfiguration } from "./commands/create-configuration";
 import { createOrganization } from "./commands/create-organization";
+import { ResourceEnum, ResourceFetcher } from "./commands/get-resources";
 import { init } from "./commands/init";
 import { login } from "./commands/login";
 import { logout } from "./commands/logout";
@@ -7,6 +9,7 @@ import { publish } from "./commands/publish";
 import { upload } from "./commands/upload";
 import configuration from "./configuration";
 import {
+  promptForConfigure,
   promptForCreateDapp,
   promptForCreateOrganization,
   promptForInit,
@@ -197,6 +200,87 @@ export async function commandHandler(options: any) {
         } else {
           await promptForCreateDapp();
         }
+      } catch (error) {
+        console.log(error.message);
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (options._[0] === "get") {
+    (async () => {
+      try {
+        if (options.resource) {
+          if (options.resource == ResourceEnum.DEPLOYMENT) {
+            const id = options.id;
+            await ResourceFetcher.getDeployment(id);
+          } else if (options.resource == ResourceEnum.DEPLOYMENTS) {
+            const projectId = options.projectId;
+            const skip = options.skip;
+            const limit = options.limit;
+            const status = options.status;
+            await ResourceFetcher.getProjectDeployments(
+              projectId,
+              skip,
+              limit,
+              status
+            );
+          } else if (options.resource == ResourceEnum.PROJECT) {
+            const id = options.id;
+            await ResourceFetcher.getProject(id);
+          } else if (options.resource == ResourceEnum.PROJECTS) {
+            const organizationId = options.organizationId;
+            const skip = options.skip;
+            const limit = options.limit;
+            const state = options.state;
+            await ResourceFetcher.getOrganizationProjects(
+              organizationId,
+              skip,
+              limit,
+              state
+            );
+          } else if (options.resource == ResourceEnum.ORGANIZATION) {
+            const id = options.id;
+            await ResourceFetcher.getOrganization(id);
+          } else if (options.resource == ResourceEnum.ORGANIZATIONS) {
+            await ResourceFetcher.getUserOrganizations();
+          } else if (options.resource == ResourceEnum.DOMAINS) {
+            const projectId = options.projectId;
+            await ResourceFetcher.getProjectDomains(projectId);
+          } else if (options.resource == ResourceEnum.DEPLOYMENT_ENVIRONMENTS) {
+            const projectId = options.projectId;
+            await ResourceFetcher.getProjectDeploymentEnvironments(projectId);
+          }
+        } else {
+          throw new Error("Resource needs to be specified");
+        }
+      } catch (error) {
+        console.log(error.message);
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (options._[0] === "configure") {
+    const validOptions = ["organization"];
+    const unknownOptions = Object.keys(options).filter(
+      (option) =>
+        option !== "_" && option !== "$0" && !validOptions.includes(option)
+    );
+    if (unknownOptions.length > 0) {
+      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
+    (async () => {
+      try {
+        let organizationId;
+        if (options.organization) {
+          organizationId = options.organization;
+        } else {
+          const prompt = await promptForConfigure();
+          organizationId = prompt.organization;
+        }
+        await changeDefaultOrganization(organizationId);
       } catch (error) {
         console.log(error.message);
         process.exit(1);

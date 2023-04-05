@@ -101,6 +101,17 @@ export async function promptForInit(): Promise<any> {
   return inquirer.prompt(questions);
 }
 
+export async function promptForConfigure(): Promise<any> {
+  const questions = [
+    {
+      type: "input",
+      name: "organization",
+      message: "Default organization ID:",
+    },
+  ];
+  return inquirer.prompt(questions);
+}
+
 export async function promptForCreateDapp(appName?: string): Promise<any> {
   inquirer
     .prompt([
