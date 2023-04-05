@@ -5,7 +5,7 @@ import configuration from "./configuration";
 import { commandHandler } from "./command-handler";
 import { FrameworkOptions } from "./commands/init";
 import { ResourceEnum } from "./commands/get-resources";
-import { DeploymentStatusEnum, ProjectStateEnum } from "@spheron/core";
+import { DeploymentStatusEnum, ProjectStateEnum } from "core-dusanv";
 
 (async () => {
   console.log(`Spheron CLI ${configuration.version}\n`);
@@ -94,8 +94,7 @@ import { DeploymentStatusEnum, ProjectStateEnum } from "@spheron/core";
         - get project                 : options: --id
         - get projects                : options: --organizationId (optional), --skip (optional), --limit (optional), --state (optional)
         - get domains                 : options: --projectId
-        - get deployment-environmetns : options: --projectId
-      
+        - get deployment-environments : options: --projectId
         Note* : 
         deployment status field can be ${Object.values(DeploymentStatusEnum)}
         project state field can be ${Object.values(ProjectStateEnum)} 
