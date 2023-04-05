@@ -10,8 +10,11 @@ import BucketManager, {
   UploadStatusEnum,
 } from "./bucket-manager";
 import { TokenScope, UsageWithLimits } from "./spheron-api/interfaces";
+import { toV0, toV1 } from "./cid";
 
 export {
+  toV0,
+  toV1,
   ProtocolEnum,
   Bucket,
   Upload,
