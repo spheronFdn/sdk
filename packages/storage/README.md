@@ -173,7 +173,7 @@ interface TokenScope {
 
 ## Access Token
 
-To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/rest-api/#creating-an-access-token). Only tokens for web app organizations will work.
+To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/rest-api/#creating-an-access-token). When you are creating the tokens, please choose **web app** type in the dashboard.
 
 ## Notes
 
