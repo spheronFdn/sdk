@@ -175,7 +175,7 @@ interface TokenScope {
 
 The package also provides a couple of methods for transforming CID from V0 to V1 and vice verse.
 
-```
+```js
 import { ipfs } from "@spheron/storage";
 
 const cid = <CID_VALUE>;
