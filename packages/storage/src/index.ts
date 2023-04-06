@@ -10,8 +10,10 @@ import BucketManager, {
   UploadStatusEnum,
 } from "./bucket-manager";
 import { TokenScope, UsageWithLimits } from "./spheron-api/interfaces";
+import { ipfs } from "./ipfs.utils";
 
 export {
+  ipfs,
   ProtocolEnum,
   Bucket,
   Upload,
