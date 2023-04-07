@@ -28,7 +28,7 @@
 ```js
 import { upload } from "@spheron/browser-upload";
 
-const uploadToken = /* logic that would send a request to your BE and return the single use token */
+const uploadToken = /* logic that would send a request to your BE and return a single use token */
 
 let currentlyUploaded = 0;
 const uploadResult = await upload(files, {
