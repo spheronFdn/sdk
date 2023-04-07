@@ -1,4 +1,3 @@
-import UploadManager, { UploadResult } from "./upload-manager";
 import BucketManager, {
   Bucket,
   Upload,
@@ -11,8 +10,11 @@ import {
   ProtocolEnum,
   SpheronApi,
   TokenScope,
+  UploadManager,
+  UploadResult,
   UsageWithLimits,
 } from "@spheron/core";
+import { createPayloads } from "./fs-payload-creator";
 
 export {
   ProtocolEnum,
@@ -40,7 +42,7 @@ export class SpheronClient {
     this.configuration = configuration;
     this.spheronApi = new SpheronApi(this.configuration.token);
     this.bucketManager = new BucketManager(this.spheronApi);
-    this.uploadManager = new UploadManager(this.configuration);
+    this.uploadManager = new UploadManager();
   }
 
   async upload(
@@ -53,14 +55,47 @@ export class SpheronClient {
       onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
     }
   ): Promise<UploadResult> {
-    return await this.uploadManager.upload({
-      path,
-      name: configuration.name,
-      protocol: configuration.protocol,
-      organizationId: configuration.organizationId,
-      onChunkUploaded: configuration.onChunkUploaded,
-      onUploadInitiated: configuration.onUploadInitiated,
-    });
+    const { deploymentId, payloadSize, parallelUploadCount } =
+      await this.uploadManager.initiateDeployment({
+        protocol: configuration.protocol,
+        name: configuration.name,
+        organizationId: configuration.organizationId,
+        token: this.configuration.token,
+      });
+
+    const { payloads, totalSize } = await createPayloads(path, payloadSize);
+
+    configuration.onUploadInitiated &&
+      configuration.onUploadInitiated(deploymentId);
+
+    const uploadPayloadsResult = await this.uploadManager.uploadPayloads(
+      payloads,
+      {
+        deploymentId,
+        token: this.configuration.token,
+        parallelUploadCount,
+        onChunkUploaded: (uploadedSize: number) =>
+          configuration.onChunkUploaded &&
+          configuration.onChunkUploaded(uploadedSize, totalSize),
+      }
+    );
+
+    const result = await this.uploadManager.finalizeUploadDeployment(
+      deploymentId,
+      uploadPayloadsResult.success,
+      this.configuration.token
+    );
+
+    if (!result.success) {
+      throw new Error(`Upload failed. ${result.message}`);
+    }
+
+    return {
+      uploadId: result.deploymentId,
+      bucketId: result.projectId,
+      protocolLink: result.sitePreview,
+      dynamicLinks: result.affectedDomains,
+    };
   }
 
   async getBucket(bucketId: string): Promise<Bucket> {
