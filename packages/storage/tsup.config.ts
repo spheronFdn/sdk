@@ -5,7 +5,7 @@ const options: Options = {
   format: ["cjs"],
   dts: true,
   env: {
-    SPHERON_API_URL: "https://api-v2.spheron.network",
+    SPHERON_API_URL: "http://localhost:8080",
   },
 };
 
