@@ -25,7 +25,37 @@
 
 ## Usage:
 
+```js
+import { upload } from "@spheron/browser-upload";
+
+const uploadToken = /* logic that would send a request to your BE and return the single use token */
+
+let currentlyUploaded = 0;
+const uploadResult = await upload(files, {
+  token: res.uploadToken,
+  onChunkUploaded: (uploadedSize, totalSize) => {
+    currentlyUploaded += uploadedSize;
+    console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
+  },
+});
+
+```
+
+- The package export one function `upload(files: File[], configuration: { token: string; onChunkUploaded?: (uploadedSize: number, totalSize: number) => void; }): Promise<UploadResult>`
+  - Function `upload` has two parameters `client.upload(filePath, configuration);`
+    - `files` - files that will be uploaded.
+    - `configuration` - an object with parameters:
+      - `configuration.token` - a token used for a single upload. Check the **Access Token** section bellow for more information.
+      - `configuration.onChunkUploaded` - **optional** - callback function `(uploadedSize: number, totalSize: number) => void`. The function will be called multiple times, depending on the upload size. The function will be called each time a chunk is uploaded, with two parameters. the first one `uploadedSize` represents the size in Bytes for the uploaded chunk. The `totalSize` represents the total size of the upload in Bytes.
+  - The response of the upload function is an object with parameters:
+    - `uploadId` - the id of the upload.
+    - `bucketId` - the id of the bucket.
+    - `protocolLink` - is the protocol link of the upload.
+    - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
+
 ## Access Token
+
+To create a token you should use the method `createSingleUploadToken` from [@spheron/storage](https://www.npmjs.com/package/@spheron/storage) package on you Backend service. This method will generate a unique token that can be used only for a single upload.
 
 ## Notes
 

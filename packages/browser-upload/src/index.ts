@@ -2,15 +2,15 @@ import { ProtocolEnum, UploadManager, UploadResult } from "@spheron/core";
 import { createPayloads } from "./file-payload-creator";
 import jwt_decode from "jwt-decode";
 
-export { ProtocolEnum };
+export { ProtocolEnum, UploadResult };
 
-const upload = async (
+async function upload(
   files: File[],
   configuration: {
     token: string;
     onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
   }
-): Promise<UploadResult> => {
+): Promise<UploadResult> {
   if (!files || files.length === 0) {
     throw new Error("No files to upload.");
   }
@@ -60,6 +60,6 @@ const upload = async (
     protocolLink: result.sitePreview,
     dynamicLinks: result.affectedDomains,
   };
-};
+}
 
 export { upload };
