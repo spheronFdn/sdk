@@ -98,6 +98,22 @@ export class SpheronClient {
     };
   }
 
+  async getSingleUploadToken(configuration: {
+    name: string;
+    protocol: ProtocolEnum;
+  }): Promise<{ uploadToken: string }> {
+    const { singleDeploymentToken } =
+      await this.uploadManager.initiateDeployment({
+        protocol: configuration.protocol,
+        name: configuration.name,
+        token: this.configuration.token,
+        createSingleDeploymentToken: true,
+      });
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return { uploadToken: singleDeploymentToken! };
+  }
+
   async getBucket(bucketId: string): Promise<Bucket> {
     return await this.bucketManager.getBucket(bucketId);
   }

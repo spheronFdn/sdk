@@ -7,7 +7,6 @@ export { ProtocolEnum };
 const upload = async (
   files: File[],
   configuration: {
-    uploadId: string;
     token: string;
     onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
   }
@@ -16,16 +15,20 @@ const upload = async (
     throw new Error("No files to upload.");
   }
 
-  if (!configuration.uploadId) {
-    throw new Error("No deploymentId provided.");
-  }
-
   if (!configuration.token) {
     throw new Error("No token provided.");
   }
 
-  const jwtPayload: { payloadSize: number; parallelUploadCount: number } =
-    jwt_decode(configuration.token);
+  const jwtPayload: {
+    payloadSize: number;
+    parallelUploadCount: number;
+    deploymentId: string;
+  } = jwt_decode(configuration.token);
+  const uploadId = jwtPayload?.deploymentId ?? "";
+  if (!uploadId) {
+    throw new Error("The provided token is invalid.");
+  }
+
   const payloadSize = jwtPayload?.payloadSize ?? 5 * 5 * 1024;
   const parallelUploadCount = jwtPayload?.parallelUploadCount ?? 3;
 
@@ -33,7 +36,7 @@ const upload = async (
 
   const uploadManager = new UploadManager();
   const uploadPayloadsResult = await uploadManager.uploadPayloads(payloads, {
-    deploymentId: configuration.uploadId,
+    deploymentId: uploadId,
     token: configuration.token,
     parallelUploadCount,
     onChunkUploaded: (uploadedSize: number) =>
@@ -42,7 +45,7 @@ const upload = async (
   });
 
   const result = await uploadManager.finalizeUploadDeployment(
-    configuration.uploadId,
+    uploadId,
     uploadPayloadsResult.success,
     configuration.token
   );
