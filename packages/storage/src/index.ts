@@ -98,7 +98,7 @@ export class SpheronClient {
     };
   }
 
-  async getSingleUploadToken(configuration: {
+  async createSingleUploadToken(configuration: {
     name: string;
     protocol: ProtocolEnum;
   }): Promise<{ uploadToken: string }> {
