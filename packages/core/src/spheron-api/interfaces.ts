@@ -156,6 +156,45 @@ interface VerifiedTokenResponse {
   email: string;
 }
 
+interface UsageWithLimits {
+  usedBandwidth?: number; // Bytes
+  usedBuildExecution?: number; // Seconds
+  usedConcurrentBuild?: number;
+  usedStorageArweave?: number; // Bytes
+  usedStorageFileCoin?: number; // Seconds
+  usedStorageIPFS?: number; // Bytes
+  usedDeploymentsPerDay?: number;
+  lastDeploymentDate?: Date;
+  usedDomains?: number;
+  usedHnsDomains?: number;
+  usedEnsDomains?: number;
+  usedEnvironments?: number;
+  usedClusterAkt?: number;
+  usedClusterBuildExecution?: number;
+  usedNumberOfRequests?: number;
+  usedPasswordProtections?: number;
+  membersLimit?: number;
+  bandwidthLimit?: number; // Bytes
+  buildExecutionLimit?: number; // Seconds
+  concurrentBuildLimit?: number;
+  storageArweaveLimit?: number; // Bytes
+  storageFileCoinLimit?: number; // Bytes
+  storageIPFSLimit?: number;
+  deploymentsPerDayLimit?: number;
+  domainsLimit?: number;
+  hnsDomainsLimit?: number;
+  ensDomainsLimit?: number;
+  environmentsLimit?: number;
+  clusterAktLimit?: number;
+  clusterBuildExecutionLimit?: number;
+  passwordProtectionLimit?: number;
+}
+
+interface UsageWithLimitsWithSkynet extends UsageWithLimits {
+  usedStorageSkynet?: number; // Bytes
+  storageSkynetLimit?: number; // Bytes
+}
+
 export {
   TokenScope,
   Project,
@@ -166,4 +205,6 @@ export {
   VerifiedTokenResponse,
   User,
   DeploymentEnvironment,
+  UsageWithLimits,
+  UsageWithLimitsWithSkynet,
 };

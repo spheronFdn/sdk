@@ -1,6 +1,4 @@
 import UploadManager, { UploadResult } from "./upload-manager";
-import { ProtocolEnum } from "./enums";
-import SpheronApi from "./spheron-api";
 import BucketManager, {
   Bucket,
   Upload,
@@ -9,7 +7,12 @@ import BucketManager, {
   DomainTypeEnum,
   UploadStatusEnum,
 } from "./bucket-manager";
-import { TokenScope, UsageWithLimits } from "./spheron-api/interfaces";
+import {
+  ProtocolEnum,
+  SpheronApi,
+  TokenScope,
+  UsageWithLimits,
+} from "@spheron/core";
 
 export {
   ProtocolEnum,

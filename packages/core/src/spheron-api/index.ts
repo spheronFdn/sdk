@@ -17,6 +17,7 @@ import {
   User,
   DeploymentEnvironment,
   VerifiedTokenResponse,
+  UsageWithLimitsWithSkynet,
 } from "./interfaces";
 
 class SpheronApi {
@@ -255,6 +256,19 @@ class SpheronApi {
       `/auth/${provider}/cli/verify-token/${code}?port=${port}`
     );
     return verifiedToken;
+  }
+
+  async getOrganizationUsage(
+    organizationId: string,
+    specialization: "wa-global" | "c-akash"
+  ): Promise<UsageWithLimitsWithSkynet> {
+    const { usage } = await this.sendApiRequest<{
+      usage: UsageWithLimitsWithSkynet;
+    }>(
+      HttpMethods.GET,
+      `/v1/organization/${organizationId}/subscription-usage/specialization/${specialization}`
+    );
+    return usage;
   }
 
   private async sendApiRequest<T>(

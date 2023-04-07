@@ -1,4 +1,4 @@
-import { DomainTypeEnum, ProjectStateEnum } from "../spheron-api/enums";
+import { DomainTypeEnum, ProjectStateEnum } from "@spheron/core";
 
 interface Domain {
   id: string;
