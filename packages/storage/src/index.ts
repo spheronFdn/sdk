@@ -25,6 +25,7 @@ export {
   UploadStatusEnum,
   UsageWithLimits,
   TokenScope,
+  IPNSName,
 };
 
 export interface SpheronClientConfiguration {
