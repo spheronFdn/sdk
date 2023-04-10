@@ -25,10 +25,21 @@
 
 ## Usage:
 
+This package adds support to upload data directly from browser to IPFS, Filecoin or Arweave via Spheron.
+The general usage flow would be as:
+
+1. Send a request from your web app to your BE service to generate a token that can be used only for a single upload. In this request you can check if the user of you app has all the requirements to upload data.
+2. On your BE service, use the method `createSingleUploadToken` from [@spheron/storage](https://www.npmjs.com/package/@spheron/storage) package. This method will provide you with a unique token that can only be used for a single upload, and this token has a expiration of 10 minutes.
+3. Return to your web app the token you got from `createSingleUploadToken`, and using `upload` method from [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload), upload data directly from the Browser to the specified protocol.
+
+Using this flow, you can control who can use you API token and upload data from your web app.
+
+## Example:
+
 ```js
 import { upload } from "@spheron/browser-upload";
 
-const uploadToken = /* logic that would send a request to your BE and return a single use token */
+const uploadToken = /* logic that would send a request to your BE and return a token that can be used only for a single upload */
 
 let currentlyUploaded = 0;
 const uploadResult = await upload(files, {
@@ -41,7 +52,7 @@ const uploadResult = await upload(files, {
 
 ```
 
-- The package export one function `upload(files: File[], configuration: { token: string; onChunkUploaded?: (uploadedSize: number, totalSize: number) => void; }): Promise<UploadResult>`
+- The package exports one function `upload(files: File[], configuration: { token: string; onChunkUploaded?: (uploadedSize: number, totalSize: number) => void; }): Promise<UploadResult>`
   - Function `upload` has two parameters `client.upload(filePath, configuration);`
     - `files` - files that will be uploaded.
     - `configuration` - an object with parameters:
@@ -50,8 +61,8 @@ const uploadResult = await upload(files, {
   - The response of the upload function is an object with parameters:
     - `uploadId` - the id of the upload.
     - `bucketId` - the id of the bucket.
-    - `protocolLink` - is the protocol link of the upload.
-    - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
+    - `protocolLink` - the protocol link of the upload.
+    - `dynamicLinks` - domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
 
 ## Access Token
 
