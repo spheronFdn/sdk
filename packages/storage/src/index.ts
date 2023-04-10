@@ -204,35 +204,4 @@ export class SpheronClient {
   }
 }
 
-(async () => {
-  const spheronClient = new SpheronClient({
-    token:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlLZXkiOiJjMTQ2ZmVjY2E1NGNkNjU2YWJkZjViMzY5ZDc2MDUxY2MwMTg2OGZkMmY4YjIzMjIwNjhiYjNmYzZmZWM1Nzc3NWI0ZjFmZDM3ZmY1MDliYjY3ZTcwOTA5ODA0NmJjYTU3OGY5NjkyN2I2ZmNkOTFmYTFlNjZkYjdkZjM1NGQ5MyIsImlhdCI6MTY4MDg2OTkzNiwiaXNzIjoid3d3LnNwaGVyb24ubmV0d29yayJ9.DHbZWb9oCel05IcGcS90XPradGnLV0jC_KnBbGbZOlE",
-  });
-
-  const resp = await spheronClient.publishIPNS("642d7526dad7300012d3fb7c");
-  console.log("resp: ", resp);
-
-  const allipns = await spheronClient.getIPNSNamesForOrganization(
-    "642d7331dad7300012d3fb02"
-  );
-  console.log("allipns: ", allipns);
-
-  const allipnsdeployment = await spheronClient.getIPNSNamesForDeployment(
-    "642d7526dad7300012d3fb7c"
-  );
-  console.log("allipnsdeployment: ", allipnsdeployment);
-
-  const allipnsName = await spheronClient.getIPNSName(
-    "6433a64908a7d758d04b9e10"
-  );
-  console.log("allipnsName: ", allipnsName);
-
-  const updateIPNS = await spheronClient.updateIPNSName(
-    "6433a64908a7d758d04b9e10",
-    "642d7526dad7300012d3fb7c"
-  );
-  console.log("updateIPNS: ", updateIPNS);
-})();
-
 export default SpheronClient;
