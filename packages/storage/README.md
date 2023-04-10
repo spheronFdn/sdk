@@ -110,8 +110,8 @@ The `SpheronClient` instance provides several methods for working with buckets. 
   - used to update IPNS name to new deployment
 - `async getIPNSName(ipnsNameId: string): Promise<IPNSName>`
   - get IPNS name data by id
-- `async getIPNSNamesForDeployment(deploymentId: string): Promise<IPNSName[]>`
-  - get all IPNS names for a deployment
+- `async getIPNSNamesForUpload(uploadId: string): Promise<IPNSName[]>`
+  - get all IPNS names for an upload id
 - `async getIPNSNamesForOrganization(organizationId: string): Promise<IPNSName[]>`
   - get all IPNS names for an organization
 
