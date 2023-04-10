@@ -14,17 +14,8 @@ import {
   UsageWithLimitsWithSkynet,
   Project,
   TokenScope,
+  IPNSPublishResponse,
 } from "./interfaces";
-
-export interface IPNSPublishResponse {
-  _id: string;
-  publishedDeploymentId: string;
-  organizationId: string;
-  createdAt: string;
-  updatedAt: string;
-  keyId: string;
-  keyName: string;
-}
 
 class SpheronApi {
   private readonly token: string;

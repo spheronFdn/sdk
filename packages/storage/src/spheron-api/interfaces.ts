@@ -159,4 +159,14 @@ export interface UsageWithLimitsWithSkynet extends UsageWithLimits {
   storageSkynetLimit?: number; // Bytes
 }
 
+export interface IPNSPublishResponse {
+  _id: string;
+  publishedDeploymentId: string;
+  organizationId: string;
+  createdAt: string;
+  updatedAt: string;
+  keyId: string;
+  keyName: string;
+}
+
 export { TokenScope, Project, Domain, Deployment, Configuration };
