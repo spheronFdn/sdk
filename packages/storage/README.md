@@ -180,13 +180,14 @@ interface TokenScope {
   }[];
 }
 
-interface IIPNSName {
+interface IPNSName {
   id: string;
   publishedUploadId: string;
   organizationId: string;
   createdAt: string;
   updatedAt: string;
   ipnsHash: string;
+  ipnsLink: string;
 }
 ```
 

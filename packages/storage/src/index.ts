@@ -10,8 +10,7 @@ import BucketManager, {
   UploadStatusEnum,
 } from "./bucket-manager";
 import {
-  IIPNSName,
-  IPNSPublishResponse,
+  IPNSName,
   TokenScope,
   UsageWithLimits,
 } from "./spheron-api/interfaces";
@@ -140,28 +139,28 @@ export class SpheronClient {
     await this.bucketManager.unarchiveBucket(bucketId);
   }
 
-  async publishIPNS(uploadId: string): Promise<IIPNSName> {
+  async publishIPNS(uploadId: string): Promise<IPNSName> {
     return await this.spheronApi.publishIPNS(uploadId);
   }
 
   async updateIPNSName(
     ipnsNameId: string,
     uploadId: string
-  ): Promise<IIPNSName> {
+  ): Promise<IPNSName> {
     return await this.spheronApi.updateIPNSName(ipnsNameId, uploadId);
   }
 
-  async getIPNSName(ipnsNameId: string): Promise<IIPNSName> {
+  async getIPNSName(ipnsNameId: string): Promise<IPNSName> {
     return await this.spheronApi.getIPNSName(ipnsNameId);
   }
 
-  async getIPNSNamesForDeployment(deploymentId: string): Promise<IIPNSName[]> {
+  async getIPNSNamesForDeployment(deploymentId: string): Promise<IPNSName[]> {
     return await this.spheronApi.getIPNSNamesForDeployment(deploymentId);
   }
 
   async getIPNSNamesForOrganization(
     organizationId: string
-  ): Promise<IIPNSName[]> {
+  ): Promise<IPNSName[]> {
     return await this.spheronApi.getIPNSNamesForOrganization(organizationId);
   }
 

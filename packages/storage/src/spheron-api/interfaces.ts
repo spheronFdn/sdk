@@ -167,15 +167,17 @@ export interface IPNSPublishResponse {
   updatedAt: string;
   keyId: string;
   keyName: string;
+  ipnsLink: string;
 }
 
-export interface IIPNSName {
+interface IPNSName {
   id: string;
   publishedUploadId: string;
   organizationId: string;
   createdAt: string;
   updatedAt: string;
   ipnsHash: string;
+  ipnsLink: string;
 }
 
-export { TokenScope, Project, Domain, Deployment, Configuration };
+export { TokenScope, Project, Domain, Deployment, Configuration, IPNSName };
