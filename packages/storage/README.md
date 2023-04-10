@@ -104,6 +104,16 @@ The `SpheronClient` instance provides several methods for working with buckets. 
   - used to get the usage of the current active subscription of the organization.
 - `async getTokenScope(): Promise<TokenScope>`
   - used to get the scope of the token.
+- `async publishIPNS(uploadId: string): Promise<IIPNSName>`
+  - used to publish IPFS Deployment to IPNS
+- `async updateIPNSName(ipnsNameId: string, uploadId: string): Promise<IIPNSName>`
+  - used to update IPNS name to new deployment
+- `async getIPNSName(ipnsNameId: string): Promise<IIPNSName>`
+  - get IPNS name data by id
+- `async getIPNSNamesForDeployment(deploymentId: string): Promise<IIPNSName[]>`
+  - get all IPNS names for a deployment
+- `async getIPNSNamesForOrganization(organizationId: string): Promise<IIPNSName[]>`
+  - get all IPNS names for an organization
 
 Interfaces:
 
@@ -168,6 +178,15 @@ interface TokenScope {
     name: string;
     username: string;
   }[];
+}
+
+interface IIPNSName {
+  id: string;
+  publishedUploadId: string;
+  organizationId: string;
+  createdAt: string;
+  updatedAt: string;
+  ipnsHash: string;
 }
 ```
 

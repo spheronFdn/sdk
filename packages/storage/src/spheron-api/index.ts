@@ -15,6 +15,7 @@ import {
   Project,
   TokenScope,
   IPNSPublishResponse,
+  IIPNSName,
 } from "./interfaces";
 
 class SpheronApi {
@@ -191,12 +192,14 @@ class SpheronApi {
     return usage;
   }
 
-  public async publishIPNS(deploymentId: string): Promise<IPNSPublishResponse> {
+  public async publishIPNS(deploymentId: string): Promise<IIPNSName> {
     try {
-      return await this.sendApiRequest<IPNSPublishResponse>(
+      const resp = await this.sendApiRequest<IPNSPublishResponse>(
         HttpMethods.POST,
         `/v1/ipns/deployments/${deploymentId}/names`
       );
+
+      return this.mapIPNSResponseToIPNSName(resp);
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
       throw new Error(errorMessage);
@@ -206,24 +209,26 @@ class SpheronApi {
   public async updateIPNSName(
     ipnsNameId: string,
     deploymentId: string
-  ): Promise<IPNSPublishResponse> {
+  ): Promise<IIPNSName> {
     try {
-      return await this.sendApiRequest<IPNSPublishResponse>(
+      const resp = await this.sendApiRequest<IPNSPublishResponse>(
         HttpMethods.PUT,
         `/v1/ipns/deployments/${deploymentId}/names/${ipnsNameId}`
       );
+      return this.mapIPNSResponseToIPNSName(resp);
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
       throw new Error(errorMessage);
     }
   }
 
-  public async getIPNSName(ipnsNameId: string): Promise<IPNSPublishResponse> {
+  public async getIPNSName(ipnsNameId: string): Promise<IIPNSName> {
     try {
-      return await this.sendApiRequest<IPNSPublishResponse>(
+      const resp = await this.sendApiRequest<IPNSPublishResponse>(
         HttpMethods.GET,
         `/v1/ipns/names/${ipnsNameId}`
       );
+      return this.mapIPNSResponseToIPNSName(resp);
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
       throw new Error(errorMessage);
@@ -232,12 +237,14 @@ class SpheronApi {
 
   public async getIPNSNamesForDeployment(
     deploymentId: string
-  ): Promise<IPNSPublishResponse[]> {
+  ): Promise<IIPNSName[]> {
     try {
-      return await this.sendApiRequest<IPNSPublishResponse[]>(
+      const resp = await this.sendApiRequest<IPNSPublishResponse[]>(
         HttpMethods.GET,
         `/v1/ipns/deployments/${deploymentId}/names`
       );
+
+      return resp.map((ipnsName) => this.mapIPNSResponseToIPNSName(ipnsName));
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
       throw new Error(errorMessage);
@@ -246,15 +253,17 @@ class SpheronApi {
 
   public async getIPNSNamesForOrganization(
     organizationId: string
-  ): Promise<IPNSPublishResponse[]> {
+  ): Promise<IIPNSName[]> {
     try {
-      return await this.sendApiRequest<IPNSPublishResponse[]>(
+      const resp = await this.sendApiRequest<IPNSPublishResponse[]>(
         HttpMethods.GET,
         `/v1/ipns/names`,
         {
           organizationId,
         }
       );
+
+      return resp.map((ipnsName) => this.mapIPNSResponseToIPNSName(ipnsName));
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
       throw new Error(errorMessage);
@@ -280,6 +289,19 @@ class SpheronApi {
     } catch (error) {
       throw new Error(error.response?.data?.message || error?.message);
     }
+  }
+
+  private mapIPNSResponseToIPNSName(
+    ipnsResponse: IPNSPublishResponse
+  ): IIPNSName {
+    return {
+      id: ipnsResponse._id,
+      publishedUploadId: ipnsResponse.publishedDeploymentId,
+      organizationId: ipnsResponse.organizationId,
+      createdAt: ipnsResponse.createdAt,
+      updatedAt: ipnsResponse.updatedAt,
+      ipnsHash: ipnsResponse.keyId,
+    };
   }
 }
 
