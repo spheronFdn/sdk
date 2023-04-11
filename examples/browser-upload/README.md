@@ -3,7 +3,7 @@ This is directory has a simple example on how to use the [@spheron/browser-uploa
 ## **client**
 
 - A react web app that uses [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload) to upload the data directly from browser.
-- It holds logic that will first send a request to the Backend Service ( which is in the project **server** directory ) to get the `uploadToken`, and after it gets the response it will use the token to upload data.
+- It holds logic that will first send a request to the Backend Service ( which is in the **server** directory ) to get the `uploadToken`, and after it gets the response it will use the token to upload data.
 
 To start the project:
 
