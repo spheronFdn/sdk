@@ -105,7 +105,7 @@ The `SpheronClient` instance provides several methods for working with buckets. 
 - `async getTokenScope(): Promise<TokenScope>`
   - used to get the scope of the token.
 - `async createSingleUploadToken(configuration: { name: string; protocol: ProtocolEnum; }): Promise<{ uploadToken: string }>`
-  - used to create a token for the **@spheron/browser-upload** package. The token can be used by your web app to enable users to directly upload their data from their browser to the specified protocol.
+  - used to create a token for the **@spheron/browser-upload** package. The token can be used by your web app to enable users to directly upload their data from their browser to the specified protocol. Checkout the [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload) package for more information.
 
 Interfaces:
 
