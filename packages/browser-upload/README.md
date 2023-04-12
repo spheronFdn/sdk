@@ -76,7 +76,7 @@ import { upload } from "@spheron/browser-upload";
 const response = await fetch(`<BACKEND_URL>/initiate-upload`); // from step 1
 const resJson = await response.json();
 const token =  resJson.uploadToken;
-const uploadResult = await upload(<FILES_YOU_WANT_TO_UPLOAD>, token);
+const uploadResult = await upload(<FILES_YOU_WANT_TO_UPLOAD>, { token });
 
 ...
 ```
