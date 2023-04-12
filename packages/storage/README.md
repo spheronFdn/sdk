@@ -14,7 +14,7 @@
 
 <p align="center">  
   <a href="https://www.npmjs.com/package/@spheron/storage" target="_blank" rel="noreferrer">
-    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.9&color=green" />
+    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.11&color=green" />
   </a>
   <a href="https://github.com/spheronFdn/sdk/blob/main/LICENSE" target="_blank" rel="noreferrer">
     <img src="https://img.shields.io/static/v1?label=license&message=Apache%202.0&color=red" />
@@ -104,6 +104,16 @@ The `SpheronClient` instance provides several methods for working with buckets. 
   - used to get the usage of the current active subscription of the organization.
 - `async getTokenScope(): Promise<TokenScope>`
   - used to get the scope of the token.
+- `async publishIPNS(uploadId: string): Promise<IPNSName>`
+  - used to publish IPFS Deployment to IPNS
+- `async updateIPNSName(ipnsNameId: string, uploadId: string): Promise<IPNSName>`
+  - used to update IPNS name to new deployment
+- `async getIPNSName(ipnsNameId: string): Promise<IPNSName>`
+  - get IPNS name data by id
+- `async getIPNSNamesForDeployment(deploymentId: string): Promise<IPNSName[]>`
+  - get all IPNS names for a deployment
+- `async getIPNSNamesForOrganization(organizationId: string): Promise<IPNSName[]>`
+  - get all IPNS names for an organization
 
 Interfaces:
 
@@ -169,6 +179,16 @@ interface TokenScope {
     username: string;
   }[];
 }
+
+interface IPNSName {
+  id: string;
+  publishedUploadId: string;
+  organizationId: string;
+  createdAt: string;
+  updatedAt: string;
+  ipnsHash: string;
+  ipnsLink: string;
+}
 ```
 
 ---
@@ -189,7 +209,7 @@ console.log("CID V0", v0);
 
 ## Access Token
 
-To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/api/rest-api-references#creating-an-access-token). Only tokens for web app organizations will work.
+To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/rest-api/#creating-an-access-token). When you are creating the tokens, please choose **web app** type in the dashboard.
 
 ## Notes
 
