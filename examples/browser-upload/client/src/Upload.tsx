@@ -23,31 +23,29 @@ function Upload() {
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!file) {
       alert("No file selected");
       return;
     }
 
-    setIsLoading(true);
-    fetch("http://localhost:8111/initiate-upload", {
-      method: "POST",
-    })
-      .then((res) => res.json()) // Parse response as JSON
-      .then(async (res) => {
-        const uploadResult = await upload([file], {
-          token: res.uploadToken,
-        });
-        setUploadLink(uploadResult.protocolLink);
-        setDynamicLink(uploadResult.dynamicLinks[0]);
-      })
-      .catch((err) => {
-        alert(err);
-      })
-      .finally(() => {
-        setIsLoading(false);
+    try {
+      setIsLoading(true);
+      const response = await fetch("http://localhost:8111/initiate-upload");
+      const responseJson = await response.json();
+      const uploadResult = await upload([file], {
+        token: responseJson.uploadToken,
       });
+
+      setUploadLink(uploadResult.protocolLink);
+      setDynamicLink(uploadResult.dynamicLinks[0]);
+    } catch (err) {
+      alert(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   return (
     <div className="App">
       <header className="App-header">

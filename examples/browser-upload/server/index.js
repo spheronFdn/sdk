@@ -11,7 +11,7 @@ const SPHERON_TOKEN = process.env.SPHERON_TOKEN;
 
 app.use(cors());
 
-app.post("/initiate-upload", async (req, res, next) => {
+app.get("/initiate-upload", async (req, res, next) => {
   try {
     const bucketName = "example-browser-upload";
     const protocol = ProtocolEnum.IPFS;
