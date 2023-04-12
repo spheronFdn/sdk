@@ -48,7 +48,7 @@ app.get("/initiate-upload", async (req, res, next) => {
     const protocol = ProtocolEnum.IPFS; // use which ever protocol you prefer
 
     const client = new SpheronClient({
-      token: <SPHERON_TOKEN>, // to create a token checkout the Access Token section in [@spheron/storage](https://www.npmjs.com/package/@spheron/storage
+      token: <SPHERON_TOKEN>,
     });
 
     const { uploadToken } = await client.createSingleUploadToken({
