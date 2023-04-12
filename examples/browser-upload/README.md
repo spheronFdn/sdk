@@ -14,6 +14,7 @@ To start the project:
 ## **server**
 
 - A express server that has one endpoint `POST: /initiate-upload`, that is used by the **client** project to get the `uploadToken` and to use it to upload data.
+- All the logic is in the `index.js`.
 
 To start the project:
 
