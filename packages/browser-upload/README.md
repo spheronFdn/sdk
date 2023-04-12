@@ -48,7 +48,7 @@ app.get("/initiate-upload", async (req, res, next) => {
     const protocol = ProtocolEnum.IPFS; // use which ever protocol you prefer
 
     const client = new SpheronClient({
-      token: <SPHERON_TOKEN>,
+      token: <SPHERON_TOKEN>, // to create a token checkout the Access Token section in [@spheron/storage](https://www.npmjs.com/package/@spheron/storage
     });
 
     const { uploadToken } = await client.createSingleUploadToken({
@@ -73,7 +73,7 @@ import { upload } from "@spheron/browser-upload";
 
 ...
 
-const response = await fetch(`<BACKEND_URL>/initiate-upload`); // step 1
+const response = await fetch(`<BACKEND_URL>/initiate-upload`); // from step 1
 const resJson = await response.json();
 const token =  resJson.uploadToken;
 const uploadResult = await upload(<FILES_YOU_WANT_TO_UPLOAD>, token);
