@@ -1,9 +1,9 @@
-This is directory has a simple example on how to use the [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload) package with [@spheron/storage](https://www.npmjs.com/package/@spheron/storage).
+This directory has a simple example on how to use the [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload) package with [@spheron/storage](https://www.npmjs.com/package/@spheron/storage).
 
 ## **client**
 
-- A react web app that uses [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload) to upload the data directly from browser.
-- It holds logic that will first send a request to the Backend Service ( which is in the **server** directory ) to get the `uploadToken`, and after it gets the response it will use the token to upload data.
+- A react web app that uses [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload) to upload the files directly from browser.
+- It holds logic that will first send a request to the Backend Service ( which is in the **server** directory ) to get the `uploadToken`, and after it gets the response it will use the token to upload files.
 - Checkout the `handleUpload` function in Upload.tsx, to see how to use the [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload).
 
 To start the project:
