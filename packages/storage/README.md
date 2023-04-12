@@ -14,7 +14,7 @@
 
 <p align="center">  
   <a href="https://www.npmjs.com/package/@spheron/storage" target="_blank" rel="noreferrer">
-    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.11&color=green" />
+    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.12&color=green" />
   </a>
   <a href="https://github.com/spheronFdn/sdk/blob/main/LICENSE" target="_blank" rel="noreferrer">
     <img src="https://img.shields.io/static/v1?label=license&message=Apache%202.0&color=red" />
@@ -27,7 +27,7 @@
   </a>
 </p>
 
-## Usage:
+### Upload Example
 
 In the example below you can see how to create an instance of `SpheronClient` and how to upload a file/directory to the specified protocol.
 
@@ -52,7 +52,6 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
 );
 ```
 
-- The `SpheronClient` constructor takes an object that has one property `token`.
 - Function `upload` has two parameters `client.upload(filePath, configuration);`
   - `filePath` - the path to the file/directory that will be uploaded
   - `configuration` - an object with parameters:
@@ -65,6 +64,56 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
     - `bucketId` - the id of the bucket
     - `protocolLink` - is the protocol link of the upload
     - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
+
+### IPNS Example
+
+In the example below you can see how to publish an upload to IPNS, update IPNS to another upload id and get all IPNS names for an organization.
+
+```js
+import { SpheronClient, ProtocolEnum } from "@spheron/storage";
+
+const client = new SpheronClient({ token });
+let currentlyUploaded = 0;
+const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
+  filePath,
+  {
+    protocol: ProtocolEnum.IPFS, // Only works with IPFS and Filecoin uploads
+    name,
+    onUploadInitiated: (uploadId) => {
+      console.log(`Upload with id ${uploadId} started...`);
+    },
+    onChunkUploaded: (uploadedSize, totalSize) => {
+      currentlyUploaded += uploadedSize;
+      console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
+    },
+  }
+);
+
+// Publish Upload to IPNS
+const ipnsData: IPNSName = await client.publishIPNS(uploadId);
+
+// Upload second file to Spheron
+const uploadIdTwo = await client.upload(filePath2, { ...uploadDetails });
+
+// Update IPNS Name to point to another upload
+const ipnsData: IPNSName = await client.updateIPNSName(
+  ipnsData.id,
+  uploadIdTwo
+);
+
+// Get all published IPNS Names for organization
+const orgIPNSNames: IPNSName[] = await client.getIPNSNamesForOrganization(
+  organizationId
+);
+```
+
+- Function `publishIPNS` has one parameter `client.upload(uploadId);`
+  - `uploadId` - the upload id of file uploaded using Spheron SDK
+- Function `updateIPNSName` has two parameters `client.updateIPNSName(ipnsNameId, uploadId);`
+  - `ipnsNameId` - the IPNS name id of a previously published upload
+  - `uploadId` - the new upload id you want IPNS Name to point to.
+- Function `orgIPNSNames` has one parameter `client.upload(organizationId);`
+  - `organizationId` - your organization id
 
 ---
 
@@ -105,13 +154,13 @@ The `SpheronClient` instance provides several methods for working with buckets. 
 - `async getTokenScope(): Promise<TokenScope>`
   - used to get the scope of the token.
 - `async publishIPNS(uploadId: string): Promise<IPNSName>`
-  - used to publish IPFS Deployment to IPNS
+  - used to publish IPFS Upload to IPNS
 - `async updateIPNSName(ipnsNameId: string, uploadId: string): Promise<IPNSName>`
-  - used to update IPNS name to new deployment
+  - used to update IPNS name to new upload id
 - `async getIPNSName(ipnsNameId: string): Promise<IPNSName>`
   - get IPNS name data by id
-- `async getIPNSNamesForDeployment(deploymentId: string): Promise<IPNSName[]>`
-  - get all IPNS names for a deployment
+- `async getIPNSNamesForUpload(uploadId: string): Promise<IPNSName[]>`
+  - get all IPNS names for an upload id
 - `async getIPNSNamesForOrganization(organizationId: string): Promise<IPNSName[]>`
   - get all IPNS names for an organization
 

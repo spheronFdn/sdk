@@ -155,8 +155,8 @@ export class SpheronClient {
     return await this.spheronApi.getIPNSName(ipnsNameId);
   }
 
-  async getIPNSNamesForDeployment(deploymentId: string): Promise<IPNSName[]> {
-    return await this.spheronApi.getIPNSNamesForDeployment(deploymentId);
+  async getIPNSNamesForUpload(uploadId: string): Promise<IPNSName[]> {
+    return await this.spheronApi.getIPNSNamesForUpload(uploadId);
   }
 
   async getIPNSNamesForOrganization(

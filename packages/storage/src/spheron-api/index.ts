@@ -219,12 +219,10 @@ class SpheronApi {
     return this.mapIPNSResponseToIPNSName(resp);
   }
 
-  public async getIPNSNamesForDeployment(
-    deploymentId: string
-  ): Promise<IPNSName[]> {
+  public async getIPNSNamesForUpload(uploadId: string): Promise<IPNSName[]> {
     const resp = await this.sendApiRequest<IPNSPublishResponse[]>(
       HttpMethods.GET,
-      `/v1/ipns/deployments/${deploymentId}/names`
+      `/v1/ipns/deployments/${uploadId}/names`
     );
     return resp.map((ipnsName) => this.mapIPNSResponseToIPNSName(ipnsName));
   }
