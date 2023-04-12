@@ -240,6 +240,22 @@ interface IPNSName {
 }
 ```
 
+---
+
+The package also provides a couple of methods for transforming CID from V0 to V1 and vice verse.
+
+```js
+import { ipfs } from "@spheron/storage";
+
+const cid = <CID_VALUE>;
+
+const v1 = ipfs.utils.toV1(cid);
+console.log("CID V1", v1);
+
+const v0 = ipfs.utils.toV0(cid);
+console.log("CID V0", v0);
+```
+
 ## Access Token
 
 To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/rest-api/#creating-an-access-token). When you are creating the tokens, please choose **web app** type in the dashboard.
