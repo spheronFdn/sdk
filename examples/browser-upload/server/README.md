@@ -1,3 +1,5 @@
+# Browser Upload Server Example
+
 - A express server that has one endpoint `GET: /initiate-upload`, that is used by the **client** project to get the `uploadToken` and to use it to upload data.
 - All the logic is in the `index.js`.
 

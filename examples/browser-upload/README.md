@@ -1,3 +1,5 @@
+# Browser Upload Example
+
 This directory has a simple example on how to use the [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload) package with [@spheron/storage](https://www.npmjs.com/package/@spheron/storage).
 
 ## **client**
