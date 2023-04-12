@@ -27,6 +27,110 @@
   </a>
 </p>
 
+### Upload
+
+In the example below you can see how to create an instance of `SpheronClient` and how to upload a file/directory to the specified protocol.
+
+```js
+import { SpheronClient, ProtocolEnum } from "@spheron/storage";
+
+const client = new SpheronClient({ token });
+let currentlyUploaded = 0;
+const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
+  filePath,
+  {
+    protocol: ProtocolEnum.IPFS,
+    name,
+    onUploadInitiated: (uploadId) => {
+      console.log(`Upload with id ${uploadId} started...`);
+    },
+    onChunkUploaded: (uploadedSize, totalSize) => {
+      currentlyUploaded += uploadedSize;
+      console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
+    },
+  }
+);
+```
+
+- Function `upload` has two parameters `client.upload(filePath, configuration);`
+  - `filePath` - the path to the file/directory that will be uploaded
+  - `configuration` - an object with parameters:
+    - `configuration.name` - represents the name of the bucket on which you are uploading the data.
+    - `configuration.protocol` - a protocol on which the data will be uploaded. The supported protocols are [ `ARWEAVE`, `IPFS`, `FILECOIN`].
+    - `configuration.onUploadInitiated` - **optional** - callback function `(uploadId: string) => void`. The function will be called once, when the upload is initiated, right before the data is uploaded. The function will be called with one parameter, `uploadId`, which represents the id of the started upload.
+    - `configuration.onChunkUploaded` - **optional** - callback function `(uploadedSize: number, totalSize: number) => void`. The function will be called multiple times, depending on the upload size. The function will be called each time a chunk is uploaded, with two parameters. the first one `uploadedSize` represents the size in Bytes for the uploaded chunk. The `totalSize` represents the total size of the upload in Bytes.
+  - The response of the upload function is an object with parameters:
+    - `uploadId` - the id of the upload
+    - `bucketId` - the id of the bucket
+    - `protocolLink` - is the protocol link of the upload
+    - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
+
+### IPNS
+
+In the example below you can see how to publish an upload to IPNS, update IPNS to another upload id and get all IPNS names for an organization.
+
+```js
+import { SpheronClient, ProtocolEnum } from "@spheron/storage";
+
+const client = new SpheronClient({ token });
+let currentlyUploaded = 0;
+const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
+  filePath,
+  {
+    protocol: ProtocolEnum.IPFS, // Only works with IPFS and Filecoin uploads
+    name,
+    onUploadInitiated: (uploadId) => {
+      console.log(`Upload with id ${uploadId} started...`);
+    },
+    onChunkUploaded: (uploadedSize, totalSize) => {
+      currentlyUploaded += uploadedSize;
+      console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
+    },
+  }
+);
+
+// Publish Upload to IPNS
+const ipnsData: IPNSName = await client.publishIPNS(uploadId);
+
+// Upload second file to Spheron
+const uploadIdTwo = await client.upload(filePath2, { ...uploadDetails });
+
+// Update IPNS Name to point to another upload
+const ipnsData: IPNSName = await client.updateIPNSName(
+  ipnsData.id,
+  uploadIdTwo
+);
+
+// Get all published IPNS Names for organization
+const orgIPNSNames: IPNSName[] = await client.getIPNSNamesForOrganization(
+  organizationId
+);
+```
+
+- Function `publishIPNS` has one parameter `client.upload(uploadId);`
+  - `uploadId` - the upload id of file uploaded using Spheron SDK
+- Function `updateIPNSName` has two parameters `client.updateIPNSName(ipnsNameId, uploadId);`
+  - `ipnsNameId` - the IPNS name id of a previously published upload
+  - `uploadId` - the new upload id you want IPNS Name to point to.
+- Function `orgIPNSNames` has one parameter `client.upload(organizationId);`
+  - `organizationId` - your organization id
+
+---
+
+Interfaces:
+
+```js
+interface IPNSName {
+  id: string;
+  publishedUploadId: string;
+  organizationId: string;
+  createdAt: string;
+  updatedAt: string;
+  ipnsHash: string;
+  ipnsLink: string;
+}
+```
+
 ## Usage:
 
 ---
@@ -143,110 +247,6 @@ interface TokenScope {
   }[];
 }
 
-interface IPNSName {
-  id: string;
-  publishedUploadId: string;
-  organizationId: string;
-  createdAt: string;
-  updatedAt: string;
-  ipnsHash: string;
-  ipnsLink: string;
-}
-```
-
-### Upload
-
-In the example below you can see how to create an instance of `SpheronClient` and how to upload a file/directory to the specified protocol.
-
-```js
-import { SpheronClient, ProtocolEnum } from "@spheron/storage";
-
-const client = new SpheronClient({ token });
-let currentlyUploaded = 0;
-const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
-  filePath,
-  {
-    protocol: ProtocolEnum.IPFS,
-    name,
-    onUploadInitiated: (uploadId) => {
-      console.log(`Upload with id ${uploadId} started...`);
-    },
-    onChunkUploaded: (uploadedSize, totalSize) => {
-      currentlyUploaded += uploadedSize;
-      console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
-    },
-  }
-);
-```
-
-- Function `upload` has two parameters `client.upload(filePath, configuration);`
-  - `filePath` - the path to the file/directory that will be uploaded
-  - `configuration` - an object with parameters:
-    - `configuration.name` - represents the name of the bucket on which you are uploading the data.
-    - `configuration.protocol` - a protocol on which the data will be uploaded. The supported protocols are [ `ARWEAVE`, `IPFS`, `FILECOIN`].
-    - `configuration.onUploadInitiated` - **optional** - callback function `(uploadId: string) => void`. The function will be called once, when the upload is initiated, right before the data is uploaded. The function will be called with one parameter, `uploadId`, which represents the id of the started upload.
-    - `configuration.onChunkUploaded` - **optional** - callback function `(uploadedSize: number, totalSize: number) => void`. The function will be called multiple times, depending on the upload size. The function will be called each time a chunk is uploaded, with two parameters. the first one `uploadedSize` represents the size in Bytes for the uploaded chunk. The `totalSize` represents the total size of the upload in Bytes.
-  - The response of the upload function is an object with parameters:
-    - `uploadId` - the id of the upload
-    - `bucketId` - the id of the bucket
-    - `protocolLink` - is the protocol link of the upload
-    - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
-
-### IPNS
-
-In the example below you can see how to publish an upload to IPNS, update IPNS to another upload id and get all IPNS names for an organization.
-
-```js
-import { SpheronClient, ProtocolEnum } from "@spheron/storage";
-
-const client = new SpheronClient({ token });
-let currentlyUploaded = 0;
-const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
-  filePath,
-  {
-    protocol: ProtocolEnum.IPFS, // Only works with IPFS and Filecoin uploads
-    name,
-    onUploadInitiated: (uploadId) => {
-      console.log(`Upload with id ${uploadId} started...`);
-    },
-    onChunkUploaded: (uploadedSize, totalSize) => {
-      currentlyUploaded += uploadedSize;
-      console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
-    },
-  }
-);
-
-// Publish Upload to IPNS
-const ipnsData: IPNSName = await client.publishIPNS(uploadId);
-
-// Upload second file to Spheron
-const uploadIdTwo = await client.upload(filePath2, { ...uploadDetails });
-
-// Update IPNS Name to point to another upload
-const ipnsData: IPNSName = await client.updateIPNSName(
-  ipnsData.id,
-  uploadIdTwo
-);
-
-// Get all published IPNS Names for organization
-const orgIPNSNames: IPNSName[] = await client.getIPNSNamesForOrganization(
-  organizationId
-);
-```
-
-- Function `publishIPNS` has one parameter `client.upload(uploadId);`
-  - `uploadId` - the upload id of file uploaded using Spheron SDK
-- Function `updateIPNSName` has two parameters `client.updateIPNSName(ipnsNameId, uploadId);`
-  - `ipnsNameId` - the IPNS name id of a previously published upload
-  - `uploadId` - the new upload id you want IPNS Name to point to.
-- Function `orgIPNSNames` has one parameter `client.upload(organizationId);`
-  - `organizationId` - your organization id
-
----
-
-Interfaces:
-
-```js
 interface IPNSName {
   id: string;
   publishedUploadId: string;
