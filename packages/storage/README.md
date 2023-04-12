@@ -27,7 +27,7 @@
   </a>
 </p>
 
-### Upload
+### Upload Example
 
 In the example below you can see how to create an instance of `SpheronClient` and how to upload a file/directory to the specified protocol.
 
@@ -65,7 +65,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
     - `protocolLink` - is the protocol link of the upload
     - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
 
-### IPNS
+### IPNS Example
 
 In the example below you can see how to publish an upload to IPNS, update IPNS to another upload id and get all IPNS names for an organization.
 
@@ -114,24 +114,6 @@ const orgIPNSNames: IPNSName[] = await client.getIPNSNamesForOrganization(
   - `uploadId` - the new upload id you want IPNS Name to point to.
 - Function `orgIPNSNames` has one parameter `client.upload(organizationId);`
   - `organizationId` - your organization id
-
----
-
-Interfaces:
-
-```js
-interface IPNSName {
-  id: string;
-  publishedUploadId: string;
-  organizationId: string;
-  createdAt: string;
-  updatedAt: string;
-  ipnsHash: string;
-  ipnsLink: string;
-}
-```
-
-## Usage:
 
 ---
 
