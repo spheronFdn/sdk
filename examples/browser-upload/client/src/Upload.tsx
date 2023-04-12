@@ -1,8 +1,9 @@
 import React, { useRef, useState } from "react";
-import logo from "../logo.svg";
+import logo from "./logo.svg";
 import { upload } from "@spheron/browser-upload";
+import "./Upload.css";
 
-function Home() {
+function Upload() {
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -111,4 +112,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Upload;
