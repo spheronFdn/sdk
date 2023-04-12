@@ -25,12 +25,61 @@
 
 ## Usage:
 
-This package adds support to upload data directly from browser to IPFS, Filecoin or Arweave via Spheron.
+This package adds support to upload files directly from browser to IPFS, Filecoin or Arweave via Spheron.
 The general usage flow would be as:
 
 1. Send a request from your web app to your BE service to generate a token that can be used only for a single upload. In this request you can check if the user of you app has all the requirements to upload data.
+
+```js
+// Send a request to your Backend endpoint to create a token that will be used with the @spheron/browser-upload
+const response = await fetch(`<BACKEND_URL>/initiate-upload`);
+```
+
 2. On your BE service, use the method `createSingleUploadToken` from [@spheron/storage](https://www.npmjs.com/package/@spheron/storage) package. This method will provide you with a unique token that can only be used for a single upload, and this token has a expiration of 10 minutes.
+
+```js
+import { SpheronClient, ProtocolEnum } from "@spheron/storage";
+
+...
+
+app.get("/initiate-upload", async (req, res, next) => {
+  try {
+    const bucketName = "example-browser-upload"; // use which ever name you prefer
+    const protocol = ProtocolEnum.IPFS; // use which ever protocol you prefer
+
+    const client = new SpheronClient({
+      token: <SPHERON_TOKEN>,
+    });
+
+    const { uploadToken } = await client.createSingleUploadToken({
+      name: bucketName,
+      protocol,
+    });
+
+    res.status(200).json({
+      uploadToken,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+```
+
 3. Return to your web app the token you got from `createSingleUploadToken`, and using `upload` method from [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload), upload data directly from the Browser to the specified protocol.
+
+```js
+import { upload } from "@spheron/browser-upload";
+
+...
+
+const response = await fetch(`<BACKEND_URL>/initiate-upload`); // step 1
+const resJson = await response.json();
+const token =  resJson.uploadToken;
+const uploadResult = await upload(<FILES_YOU_WANT_TO_UPLOAD>, token);
+
+...
+```
 
 Using this flow, you can control who can use you API token and upload data from your web app.
 
