@@ -14,7 +14,7 @@
 
 <p align="center">  
   <a href="https://www.npmjs.com/package/@spheron/storage" target="_blank" rel="noreferrer">
-    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.12&color=green" />
+    <img src="https://img.shields.io/static/v1?label=npm&message=v1.0.13&color=green" />
   </a>
   <a href="https://github.com/spheronFdn/sdk/blob/main/LICENSE" target="_blank" rel="noreferrer">
     <img src="https://img.shields.io/static/v1?label=license&message=Apache%202.0&color=red" />
@@ -163,6 +163,8 @@ The `SpheronClient` instance provides several methods for working with buckets. 
   - get all IPNS names for an upload id
 - `async getIPNSNamesForOrganization(organizationId: string): Promise<IPNSName[]>`
   - get all IPNS names for an organization
+- `async createSingleUploadToken(configuration: { name: string; protocol: ProtocolEnum; }): Promise<{ uploadToken: string }>`
+  - used to create a token for the **@spheron/browser-upload** package. The token can be used by your web app to enable users to directly upload their data from their browser to the specified protocol. Checkout the [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload) package for more information.
 
 Interfaces:
 
