@@ -66,7 +66,7 @@ app.get("/initiate-upload", async (req, res, next) => {
 });
 ```
 
-3. Return to your web app the token you got from `createSingleUploadToken`, and using `upload` method from [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload), upload data directly from the Browser to the specified protocol.
+3. Return to your web app the token you got from `createSingleUploadToken`, and using `upload` method from [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload), upload files directly from the Browser to the specified protocol.
 
 ```js
 import { upload } from "@spheron/browser-upload";
