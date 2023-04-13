@@ -18,6 +18,8 @@ import {
   DeploymentEnvironment,
   VerifiedTokenResponse,
   UsageWithLimitsWithSkynet,
+  IPNSPublishResponse,
+  IPNSName,
 } from "./interfaces";
 
 class SpheronApi {
@@ -271,6 +273,54 @@ class SpheronApi {
     return usage;
   }
 
+  public async publishIPNS(deploymentId: string): Promise<IPNSName> {
+    const resp = await this.sendApiRequest<{ ipnsName: IPNSPublishResponse }>(
+      HttpMethods.POST,
+      `/v1/ipns/deployments/${deploymentId}/names`
+    );
+    return this.mapIPNSResponseToIPNSName(resp.ipnsName);
+  }
+
+  public async updateIPNSName(
+    ipnsNameId: string,
+    deploymentId: string
+  ): Promise<IPNSName> {
+    const resp = await this.sendApiRequest<{ ipnsName: IPNSPublishResponse }>(
+      HttpMethods.PUT,
+      `/v1/ipns/deployments/${deploymentId}/names/${ipnsNameId}`
+    );
+    return this.mapIPNSResponseToIPNSName(resp.ipnsName);
+  }
+
+  public async getIPNSName(ipnsNameId: string): Promise<IPNSName> {
+    const resp = await this.sendApiRequest<IPNSPublishResponse>(
+      HttpMethods.GET,
+      `/v1/ipns/names/${ipnsNameId}`
+    );
+    return this.mapIPNSResponseToIPNSName(resp);
+  }
+
+  public async getIPNSNamesForUpload(uploadId: string): Promise<IPNSName[]> {
+    const resp = await this.sendApiRequest<IPNSPublishResponse[]>(
+      HttpMethods.GET,
+      `/v1/ipns/deployments/${uploadId}/names`
+    );
+    return resp.map((ipnsName) => this.mapIPNSResponseToIPNSName(ipnsName));
+  }
+
+  public async getIPNSNamesForOrganization(
+    organizationId: string
+  ): Promise<IPNSName[]> {
+    const resp = await this.sendApiRequest<IPNSPublishResponse[]>(
+      HttpMethods.GET,
+      `/v1/ipns/names`,
+      {
+        organizationId,
+      }
+    );
+    return resp.map((ipnsName) => this.mapIPNSResponseToIPNSName(ipnsName));
+  }
+
   private async sendApiRequest<T>(
     method: HttpMethods,
     path: string,
@@ -290,6 +340,20 @@ class SpheronApi {
     } catch (error) {
       throw new Error(error.response?.data?.message || error?.message);
     }
+  }
+
+  private mapIPNSResponseToIPNSName(
+    ipnsResponse: IPNSPublishResponse
+  ): IPNSName {
+    return {
+      id: ipnsResponse._id,
+      publishedUploadId: ipnsResponse.publishedDeploymentId,
+      organizationId: ipnsResponse.organizationId,
+      createdAt: ipnsResponse.createdAt,
+      updatedAt: ipnsResponse.updatedAt,
+      ipnsHash: ipnsResponse.keyId,
+      ipnsLink: ipnsResponse.ipnsLink,
+    };
   }
 }
 
