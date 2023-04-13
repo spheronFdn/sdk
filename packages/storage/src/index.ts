@@ -7,6 +7,7 @@ import BucketManager, {
   UploadStatusEnum,
 } from "./bucket-manager";
 import {
+  IPNSName,
   ProtocolEnum,
   SpheronApi,
   TokenScope,
@@ -15,8 +16,10 @@ import {
   UsageWithLimits,
 } from "@spheron/core";
 import { createPayloads } from "./fs-payload-creator";
+import { ipfs } from "./ipfs.utils";
 
 export {
+  ipfs,
   ProtocolEnum,
   Bucket,
   Upload,
@@ -26,6 +29,7 @@ export {
   UploadStatusEnum,
   UsageWithLimits,
   TokenScope,
+  IPNSName,
 };
 
 export interface SpheronClientConfiguration {
@@ -187,6 +191,31 @@ export class SpheronClient {
 
   async unarchiveBucket(bucketId: string): Promise<void> {
     await this.bucketManager.unarchiveBucket(bucketId);
+  }
+
+  async publishIPNS(uploadId: string): Promise<IPNSName> {
+    return await this.spheronApi.publishIPNS(uploadId);
+  }
+
+  async updateIPNSName(
+    ipnsNameId: string,
+    uploadId: string
+  ): Promise<IPNSName> {
+    return await this.spheronApi.updateIPNSName(ipnsNameId, uploadId);
+  }
+
+  async getIPNSName(ipnsNameId: string): Promise<IPNSName> {
+    return await this.spheronApi.getIPNSName(ipnsNameId);
+  }
+
+  async getIPNSNamesForUpload(uploadId: string): Promise<IPNSName[]> {
+    return await this.spheronApi.getIPNSNamesForUpload(uploadId);
+  }
+
+  async getIPNSNamesForOrganization(
+    organizationId: string
+  ): Promise<IPNSName[]> {
+    return await this.spheronApi.getIPNSNamesForOrganization(organizationId);
   }
 
   async getBucketUploadCount(bucketId: string): Promise<{
