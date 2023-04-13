@@ -83,6 +83,8 @@ const uploadResult = await upload(<FILES_YOU_WANT_TO_UPLOAD>, { token });
 
 Using this flow, you can control who can use you API token and upload data from your web app.
 
+> Checkout the [LINK](https://github.com/spheronFdn/sdk/tree/SPH-1550-example/examples/browser-upload) for a working example.
+
 ## Example:
 
 ```js
