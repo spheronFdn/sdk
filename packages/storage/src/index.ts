@@ -1,6 +1,4 @@
 import UploadManager, { UploadResult } from "./upload-manager";
-import { ProtocolEnum } from "./enums";
-import SpheronApi from "./spheron-api";
 import BucketManager, {
   Bucket,
   Upload,
@@ -11,9 +9,11 @@ import BucketManager, {
 } from "./bucket-manager";
 import {
   IPNSName,
+  ProtocolEnum,
+  SpheronApi,
   TokenScope,
   UsageWithLimits,
-} from "./spheron-api/interfaces";
+} from "@spheron/core";
 import { ipfs } from "./ipfs.utils";
 
 export {

@@ -2,8 +2,8 @@ import axios, { AxiosRequestConfig } from "axios";
 import FormData from "form-data";
 import pLimit from "p-limit";
 import config from "../config/env";
-import { ProtocolEnum } from "../enums";
 import PayloadCreator from "./upload-context";
+import { ProtocolEnum } from "@spheron/core";
 
 export interface UploadMangerConfiguration {
   token: string;

@@ -1,9 +1,9 @@
-import SpheronApi from "../spheron-api";
 import {
   DomainTypeEnum,
   ProjectStateEnum,
   ProjectTypeEnum,
-} from "../spheron-api/enums";
+  SpheronApi,
+} from "@spheron/core";
 import {
   Bucket,
   Domain,
@@ -11,11 +11,7 @@ import {
   BucketStateEnum,
   UploadStatusEnum,
 } from "./interfaces";
-import {
-  Deployment,
-  Domain as ProjectDomain,
-  Project,
-} from "../spheron-api/interfaces";
+import { Deployment, Domain as ProjectDomain, Project } from "@spheron/core";
 
 class BucketManager {
   private readonly spheronApi: SpheronApi;
