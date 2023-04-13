@@ -23,7 +23,7 @@ import {
 } from "./interfaces";
 
 class SpheronApi {
-  private readonly spheronApiUrl: string = "http://localhost:8080";
+  private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
   private readonly token: string;
 
   constructor(token: string, url?: string) {
