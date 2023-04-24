@@ -11,6 +11,9 @@ import {
   UsageWithLimits,
   Deployment,
   StartDeploymentConfiguration,
+  DeploymentStatusEnum,
+  ProjectStateEnum,
+  Configuration,
 } from "@spheron/core";
 
 export {
@@ -24,6 +27,9 @@ export {
   ProviderEnum,
   Deployment,
   StartDeploymentConfiguration,
+  DeploymentStatusEnum,
+  ProjectStateEnum,
+  Configuration,
 };
 
 export interface SpheronClientConfiguration {
@@ -121,6 +127,52 @@ export class SpheronClient {
     root?: string;
   }): Promise<{ suggestedFramework: FrameworkEnum }> {
     return this.spheronApi.suggestFramework(options);
+  }
+
+  async getProject(projectId: string): Promise<Project> {
+    return this.spheronApi.getProject(projectId);
+  }
+
+  async getProjectDeployments(
+    projectId: string,
+    options: {
+      skip: number;
+      limit: number;
+      status?: DeploymentStatusEnum;
+    }
+  ): Promise<Deployment[]> {
+    return (await this.spheronApi.getProjectDeployments(projectId, options))
+      .deployments;
+  }
+
+  async getProjectDeploymentCount(projectId: string): Promise<{
+    total: number;
+    successful: number;
+    failed: number;
+    pending: number;
+  }> {
+    return await this.spheronApi.getProjectDeploymentCount(projectId);
+  }
+
+  async updateProjectState(
+    projectId: string,
+    state: ProjectStateEnum
+  ): Promise<{ message: string }> {
+    return await this.spheronApi.updateProjectState(projectId, state);
+  }
+
+  async updateProjectConfiguration(
+    projectId: string,
+    options: {
+      buildCommand: string;
+      installCommand: string;
+      workspace: string;
+      publishDir: string;
+      framework: FrameworkEnum | string;
+      nodeVersion: NodeVersionEnum | string;
+    }
+  ): Promise<{ configuration: Configuration }> {
+    return this.spheronApi.updateProjectConfiguration(projectId, options);
   }
 }
 
