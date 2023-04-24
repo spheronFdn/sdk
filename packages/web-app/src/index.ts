@@ -15,8 +15,9 @@ import {
   ProjectStateEnum,
   Configuration,
   EnvironmentVariable,
+  DeploymentEnvironmentStatusEnum,
+  DeploymentEnvironment,
 } from "@spheron/core";
-import { env } from "process";
 
 export {
   ProtocolEnum,
@@ -33,6 +34,7 @@ export {
   ProjectStateEnum,
   Configuration,
   EnvironmentVariable,
+  DeploymentEnvironmentStatusEnum,
 };
 
 export interface SpheronClientConfiguration {
@@ -211,6 +213,72 @@ export class SpheronClient {
     await this.spheronApi.deleteProjectEnvironmentVariable(
       projectId,
       environmentVariableId
+    );
+  }
+
+  async getDeploymentEnvironments(
+    projectId: string
+  ): Promise<DeploymentEnvironment[]> {
+    return await this.spheronApi.getDeploymentEnvironments(projectId);
+  }
+
+  async createDeploymentEnvironment(
+    projectId: string,
+    payload: {
+      name: string;
+      branches: string[];
+      protocol: ProtocolEnum;
+    }
+  ): Promise<DeploymentEnvironment> {
+    return await this.spheronApi.createDeploymentEnvironment(
+      projectId,
+      payload
+    );
+  }
+
+  async updateDeploymentEnvironment(
+    projectId: string,
+    deploymentEnvironmentId: string,
+    payload: {
+      name: string;
+      branches: string[];
+      protocol: ProtocolEnum;
+    }
+  ): Promise<DeploymentEnvironment> {
+    return await this.spheronApi.updateDeploymentEnvironment(
+      projectId,
+      deploymentEnvironmentId,
+      payload
+    );
+  }
+
+  async deleteDeploymentEnvironment(
+    projectId: string,
+    deploymentEnvironmentId: string
+  ): Promise<{ message: string }> {
+    return await this.spheronApi.deleteDeploymentEnvironment(
+      projectId,
+      deploymentEnvironmentId
+    );
+  }
+
+  async activateDeploymentEnvironment(
+    projectId: string,
+    deploymentEnvironmentId: string
+  ): Promise<DeploymentEnvironment> {
+    return await this.spheronApi.activateDeploymentEnvironment(
+      projectId,
+      deploymentEnvironmentId
+    );
+  }
+
+  async deactivateDeploymentEnvironment(
+    projectId: string,
+    deploymentEnvironmentId: string
+  ): Promise<DeploymentEnvironment> {
+    return await this.spheronApi.deactivateDeploymentEnvironment(
+      projectId,
+      deploymentEnvironmentId
     );
   }
 }

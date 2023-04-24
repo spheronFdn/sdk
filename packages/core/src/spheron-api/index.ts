@@ -6,6 +6,7 @@ import {
   FrameworkEnum,
   NodeVersionEnum,
   ProjectStateEnum,
+  ProtocolEnum,
   ProviderEnum,
 } from "./enums";
 
@@ -271,15 +272,6 @@ class SpheronApi {
     return result.user;
   }
 
-  async getDeploymentEnvironments(
-    projectId: string
-  ): Promise<DeploymentEnvironment[]> {
-    const response = await this.sendApiRequest<{
-      result: DeploymentEnvironment[];
-    }>(HttpMethods.GET, `/v1/project/${projectId}/deployment-environments`);
-    return response.result;
-  }
-
   async verfiyGitToken(
     provider: string,
     code: string,
@@ -482,6 +474,95 @@ class SpheronApi {
   }
 
   //#endregion Environment Variables
+
+  //#region Deployment Environment
+
+  async getDeploymentEnvironments(
+    projectId: string
+  ): Promise<DeploymentEnvironment[]> {
+    const response = await this.sendApiRequest<{
+      result: DeploymentEnvironment[];
+    }>(HttpMethods.GET, `/v1/project/${projectId}/deployment-environments`);
+    return response.result;
+  }
+
+  async createDeploymentEnvironment(
+    projectId: string,
+    payload: {
+      name: string;
+      branches: string[];
+      protocol: ProtocolEnum;
+    }
+  ): Promise<DeploymentEnvironment> {
+    const response = await this.sendApiRequest<{
+      newEnvironment: DeploymentEnvironment;
+    }>(
+      HttpMethods.POST,
+      `/v1/project/${projectId}/deployment-environments`,
+      payload
+    );
+    return response.newEnvironment;
+  }
+
+  async updateDeploymentEnvironment(
+    projectId: string,
+    deploymentEnvironmentId: string,
+    payload: {
+      name: string;
+      branches: string[];
+      protocol: ProtocolEnum;
+    }
+  ): Promise<DeploymentEnvironment> {
+    const response = await this.sendApiRequest<{
+      deploymentEnvironment: DeploymentEnvironment;
+    }>(
+      HttpMethods.PUT,
+      `/v1/project/${projectId}/deployment-environments/${deploymentEnvironmentId}`,
+      payload
+    );
+    return response.deploymentEnvironment;
+  }
+
+  async deleteDeploymentEnvironment(
+    projectId: string,
+    deploymentEnvironmentId: string
+  ): Promise<{ message: string }> {
+    const response = await this.sendApiRequest<{
+      message: string;
+    }>(
+      HttpMethods.DELETE,
+      `/v1/project/${projectId}/deployment-environments/${deploymentEnvironmentId}`
+    );
+    return response;
+  }
+
+  async activateDeploymentEnvironment(
+    projectId: string,
+    deploymentEnvironmentId: string
+  ): Promise<DeploymentEnvironment> {
+    const response = await this.sendApiRequest<{
+      deploymentEnvironment: DeploymentEnvironment;
+    }>(
+      HttpMethods.PATCH,
+      `/v1/project/${projectId}/deployment-environments/${deploymentEnvironmentId}/activate`
+    );
+    return response.deploymentEnvironment;
+  }
+
+  async deactivateDeploymentEnvironment(
+    projectId: string,
+    deploymentEnvironmentId: string
+  ): Promise<DeploymentEnvironment> {
+    const response = await this.sendApiRequest<{
+      deploymentEnvironment: DeploymentEnvironment;
+    }>(
+      HttpMethods.PATCH,
+      `/v1/project/${projectId}/deployment-environments/${deploymentEnvironmentId}/deactivate`
+    );
+    return response.deploymentEnvironment;
+  }
+
+  //#endregion Deployment Environment
 
   private async sendApiRequest<T>(
     method: HttpMethods,
