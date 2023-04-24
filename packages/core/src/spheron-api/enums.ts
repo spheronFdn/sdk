@@ -78,6 +78,12 @@ enum AppTypeEnum {
   COMPUTE = "compute",
 }
 
+enum ProviderEnum {
+  GITHUB = "GITHUB",
+  GITLAB = "GITLAB",
+  BITBUCKET = "GITLAB",
+}
+
 export {
   ProjectTypeEnum,
   DeploymentEnvironmentStatusEnum,
@@ -88,4 +94,5 @@ export {
   DomainApplicationTypeEnum,
   DeploymentStatusEnum,
   AppTypeEnum,
+  ProviderEnum,
 };

@@ -6,7 +6,9 @@ import {
   FrameworkEnum,
   NodeVersionEnum,
   ProjectStateEnum,
+  ProviderEnum,
 } from "./enums";
+
 import {
   Configuration,
   Deployment,
@@ -20,6 +22,7 @@ import {
   UsageWithLimitsWithSkynet,
   IPNSPublishResponse,
   IPNSName,
+  StartDeploymentConfiguration,
 } from "./interfaces";
 
 class SpheronApi {
@@ -180,12 +183,7 @@ class SpheronApi {
     );
   }
 
-  async getDeployment(deploymentId: string): Promise<Deployment> {
-    const { deployment } = await this.sendApiRequest<{
-      deployment: Deployment;
-    }>(HttpMethods.GET, `/v1/deployment/${deploymentId}`);
-    return deployment;
-  }
+  //#region Organization Endpoints
 
   async createOrganization(
     username: string,
@@ -211,6 +209,22 @@ class SpheronApi {
     return organization;
   }
 
+  async updateOrganization(
+    organizationId: string,
+    options: {
+      name: string;
+      username: string;
+      image: string;
+    }
+  ): Promise<Organization> {
+    const organization = await this.sendApiRequest<Organization>(
+      HttpMethods.PUT,
+      `/v1/organization/${organizationId}`,
+      options
+    );
+    return organization;
+  }
+
   async getOrganizationProjects(
     id: string,
     options: {
@@ -230,6 +244,23 @@ class SpheronApi {
     );
     return result.projects;
   }
+
+  async getOrganizationProjectCount(
+    id: string,
+    options: {
+      state?: string;
+    }
+  ): Promise<number> {
+    const result = await this.sendApiRequest<{ count: number }>(
+      HttpMethods.GET,
+      `/v1/organization/${id}/projects/count${
+        options.state ? `?state=${options.state}` : ""
+      }`
+    );
+    return result.count;
+  }
+
+  //#endregion Organization Endpoints
 
   async getProfile(): Promise<User> {
     const result = await this.sendApiRequest<{ user: User }>(
@@ -320,6 +351,91 @@ class SpheronApi {
     );
     return resp.map((ipnsName) => this.mapIPNSResponseToIPNSName(ipnsName));
   }
+
+  //#region Deployments
+
+  public async startDeployment(
+    configuration: StartDeploymentConfiguration
+  ): Promise<{
+    success: boolean;
+    message: string;
+    topic: string;
+    deploymentId: string;
+    projectId: string;
+    deployment: Deployment;
+  }> {
+    const response = await this.sendApiRequest<{
+      success: boolean;
+      message: string;
+      topic: string;
+      deploymentId: string;
+      projectId: string;
+      deployment: Deployment;
+    }>(HttpMethods.POST, `/v1/deployment`, configuration);
+    return response;
+  }
+
+  async authorizeDeployment(deploymentId: string): Promise<Deployment> {
+    const { deployment } = await this.sendApiRequest<{
+      deployment: Deployment;
+    }>(HttpMethods.POST, `/v1/deployment/${deploymentId}/authorize`);
+    return deployment;
+  }
+
+  async cancelDeployment(
+    deploymentId: string
+  ): Promise<{ message: string; canceled: true; killing: true }> {
+    const response = await this.sendApiRequest<{
+      message: string;
+      canceled: true;
+      killing: true;
+    }>(HttpMethods.POST, `/v1/deployment/${deploymentId}/cancel`);
+    return response;
+  }
+
+  async redeployDeployment(deploymentId: string): Promise<{
+    success: boolean;
+    message: string;
+    topic: string;
+    deploymentId: string;
+    projectId: string;
+    deployment: Deployment;
+  }> {
+    const response = await this.sendApiRequest<{
+      success: boolean;
+      message: string;
+      topic: string;
+      deploymentId: string;
+      projectId: string;
+      deployment: Deployment;
+    }>(HttpMethods.POST, `/v1/deployment/${deploymentId}/redeploy`);
+    return response;
+  }
+
+  async getDeployment(deploymentId: string): Promise<Deployment> {
+    const { deployment } = await this.sendApiRequest<{
+      deployment: Deployment;
+    }>(HttpMethods.GET, `/v1/deployment/${deploymentId}`);
+    return deployment;
+  }
+
+  async suggestFramework(options: {
+    owner: string;
+    branch: string;
+    provider: ProviderEnum;
+    repositoryName: string;
+    root?: string;
+  }): Promise<{ suggestedFramework: FrameworkEnum }> {
+    const response = await this.sendApiRequest<{
+      suggestedFramework: FrameworkEnum;
+    }>(
+      HttpMethods.GET,
+      `/v1/deployment/framework/suggestion?owner=${options.owner}&branch=${options.branch}&provider=${options.provider}&repo=${options.repositoryName}&root=${options.root}`
+    );
+    return response;
+  }
+
+  //#endregion Deployments
 
   private async sendApiRequest<T>(
     method: HttpMethods,

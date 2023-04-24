@@ -1,4 +1,4 @@
-import { AppTypeEnum, ProtocolEnum } from "./enums";
+import { AppTypeEnum, ProtocolEnum, ProviderEnum } from "./enums";
 import {
   DeploymentEnvironmentStatusEnum,
   DeploymentStatusEnum,
@@ -123,7 +123,6 @@ interface Deployment {
 
 interface Organization {
   _id: string;
-  appType: AppTypeEnum;
   profile: {
     name: string;
     image: string;
@@ -132,6 +131,7 @@ interface Organization {
   users: [string];
   registries: string[];
   overdue: boolean;
+  appType: AppTypeEnum;
 }
 
 interface User {
@@ -216,6 +216,32 @@ interface IPNSName {
   ipnsLink: string;
 }
 
+interface StartDeploymentConfiguration {
+  organizationId: string;
+  gitUrl: string;
+  repoName: string;
+  branch: string;
+  protocol: ProtocolEnum;
+  provider: ProviderEnum;
+  createDefaultWebhook: boolean;
+  configuration: {
+    buildCommand: string;
+    installCommand: string;
+    workspace: string;
+    publishDir: string;
+    framework: FrameworkEnum | string;
+    nodeVersion: NodeVersionEnum;
+  };
+  env?: Record<string, string>;
+  gitProviderPreferences?: {
+    prComments?: boolean;
+    commitComments?: boolean;
+    buildStatus?: boolean;
+    githubDeployment?: boolean;
+  };
+  uniqueTopicId?: string;
+}
+
 export {
   TokenScope,
   Project,
@@ -230,4 +256,5 @@ export {
   UsageWithLimitsWithSkynet,
   IPNSPublishResponse,
   IPNSName,
+  StartDeploymentConfiguration,
 };
