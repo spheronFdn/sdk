@@ -23,6 +23,7 @@ import {
   IPNSPublishResponse,
   IPNSName,
   StartDeploymentConfiguration,
+  EnvironmentVariable,
 } from "./interfaces";
 
 class SpheronApi {
@@ -436,6 +437,51 @@ class SpheronApi {
   }
 
   //#endregion Deployments
+
+  //#region Environment Variables
+
+  async addProjectEnvironmentVariables(
+    projectId: string,
+    environmentVariables: {
+      name: string;
+      value: string;
+      environments: string[];
+    }[]
+  ): Promise<{ environmentVariables: EnvironmentVariable[] }> {
+    const response = await this.sendApiRequest<{
+      environmentVariables: EnvironmentVariable[];
+    }>(HttpMethods.POST, `/v1/project/${projectId}/environment-variables`, {
+      environmentVariables,
+    });
+    return response;
+  }
+
+  async updateProjectEnvironmentVariable(
+    projectId: string,
+    environmentVariableId: string,
+    payload: { name: string; value: string; environments: string[] }
+  ): Promise<EnvironmentVariable> {
+    const response = await this.sendApiRequest<{
+      updated: EnvironmentVariable;
+    }>(
+      HttpMethods.PUT,
+      `/v1/project/${projectId}/environment-variables/${environmentVariableId}`,
+      payload
+    );
+    return response.updated;
+  }
+
+  async deleteProjectEnvironmentVariable(
+    projectId: string,
+    environmentVariableId: string
+  ): Promise<void> {
+    await this.sendApiRequest<{ success: boolean }>(
+      HttpMethods.DELETE,
+      `/v1/project/${projectId}/environment-variables/${environmentVariableId}`
+    );
+  }
+
+  //#endregion Environment Variables
 
   private async sendApiRequest<T>(
     method: HttpMethods,

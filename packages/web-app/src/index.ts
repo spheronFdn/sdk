@@ -14,7 +14,9 @@ import {
   DeploymentStatusEnum,
   ProjectStateEnum,
   Configuration,
+  EnvironmentVariable,
 } from "@spheron/core";
+import { env } from "process";
 
 export {
   ProtocolEnum,
@@ -30,6 +32,7 @@ export {
   DeploymentStatusEnum,
   ProjectStateEnum,
   Configuration,
+  EnvironmentVariable,
 };
 
 export interface SpheronClientConfiguration {
@@ -172,7 +175,43 @@ export class SpheronClient {
       nodeVersion: NodeVersionEnum | string;
     }
   ): Promise<{ configuration: Configuration }> {
-    return this.spheronApi.updateProjectConfiguration(projectId, options);
+    return await this.spheronApi.updateProjectConfiguration(projectId, options);
+  }
+
+  async addProjectEnvironmentVariables(
+    projectId: string,
+    environmentVariables: {
+      name: string;
+      value: string;
+      environments: string[];
+    }[]
+  ): Promise<{ environmentVariables: EnvironmentVariable[] }> {
+    return await this.spheronApi.addProjectEnvironmentVariables(
+      projectId,
+      environmentVariables
+    );
+  }
+
+  async updateProjectEnvironmentVariable(
+    projectId: string,
+    environmentVariableId: string,
+    configuration: { name: string; value: string; environments: string[] }
+  ): Promise<EnvironmentVariable> {
+    return await this.spheronApi.updateProjectEnvironmentVariable(
+      projectId,
+      environmentVariableId,
+      configuration
+    );
+  }
+
+  async deleteProjectEnvironmentVariable(
+    projectId: string,
+    environmentVariableId: string
+  ): Promise<void> {
+    await this.spheronApi.deleteProjectEnvironmentVariable(
+      projectId,
+      environmentVariableId
+    );
   }
 }
 

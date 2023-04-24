@@ -242,6 +242,13 @@ interface StartDeploymentConfiguration {
   uniqueTopicId?: string;
 }
 
+interface EnvironmentVariable {
+  _id: string;
+  name: string;
+  value: string;
+  deploymentEnvironments: DeploymentEnvironment[];
+}
+
 export {
   TokenScope,
   Project,
@@ -257,4 +264,5 @@ export {
   IPNSPublishResponse,
   IPNSName,
   StartDeploymentConfiguration,
+  EnvironmentVariable,
 };
