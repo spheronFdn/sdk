@@ -72,6 +72,8 @@ class SpheronApi {
     return { deployments };
   }
 
+  //#region Project Domains
+
   async getProjectDomains(projectId: string): Promise<{ domains: Domain[] }> {
     return this.sendApiRequest<{ domains: Domain[] }>(
       HttpMethods.GET,
@@ -92,9 +94,9 @@ class SpheronApi {
   async addProjectDomain(
     projectId: string,
     options: {
-      link: string;
+      link?: string;
       type: DomainTypeEnum | string;
-      deploymentEnvironments: string[];
+      deploymentEnvironments?: string[];
       name: string;
     }
   ): Promise<{ domain: Domain }> {
@@ -109,8 +111,8 @@ class SpheronApi {
     projectId: string,
     domainIdentifier: string,
     options: {
-      link: string;
-      deploymentEnvironments: string[];
+      link?: string;
+      deploymentEnvironments?: string[];
       name: string;
     }
   ): Promise<{ domain: Domain }> {
@@ -141,6 +143,8 @@ class SpheronApi {
       `/v1/project/${projectId}/domains/${domainIdentifier}`
     );
   }
+
+  //#endregion Project Domains
 
   async getProjectDeploymentCount(projectId: string): Promise<{
     total: number;

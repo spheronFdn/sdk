@@ -17,6 +17,8 @@ import {
   EnvironmentVariable,
   DeploymentEnvironmentStatusEnum,
   DeploymentEnvironment,
+  Domain,
+  DomainTypeEnum,
 } from "@spheron/core";
 
 export {
@@ -35,6 +37,8 @@ export {
   Configuration,
   EnvironmentVariable,
   DeploymentEnvironmentStatusEnum,
+  Domain,
+  DomainTypeEnum,
 };
 
 export interface SpheronClientConfiguration {
@@ -280,6 +284,62 @@ export class SpheronClient {
       projectId,
       deploymentEnvironmentId
     );
+  }
+
+  async getProjectDomains(projectId: string): Promise<{ domains: Domain[] }> {
+    return await this.spheronApi.getProjectDomains(projectId);
+  }
+
+  async getProjectDomain(
+    projectId: string,
+    domainIdentifier: string
+  ): Promise<{ domain: Domain }> {
+    return await this.spheronApi.getProjectDomain(projectId, domainIdentifier);
+  }
+
+  async addProjectDomain(
+    projectId: string,
+    payload: {
+      link?: string;
+      type: DomainTypeEnum | string;
+      deploymentEnvironments?: string[];
+      name: string;
+    }
+  ): Promise<{ domain: Domain }> {
+    return await this.spheronApi.addProjectDomain(projectId, payload);
+  }
+
+  async updateProjectDomain(
+    projectId: string,
+    domainIdentifier: string,
+    payload: {
+      link?: string;
+      deploymentEnvironments?: string[];
+      name: string;
+    }
+  ): Promise<{ domain: Domain }> {
+    return await this.spheronApi.patchProjectDomain(
+      projectId,
+      domainIdentifier,
+      payload
+    );
+  }
+
+  async verifyProjectDomain(
+    projectId: string,
+    domainIdentifier: string
+  ): Promise<{ success: boolean; domain: Domain }> {
+    return await this.spheronApi.verifyProjectDomain(
+      projectId,
+      domainIdentifier
+    );
+  }
+
+  async deleteProjectDomain(
+    projectId: string,
+    domainIdentifier: string
+  ): Promise<void> {
+    await this.spheronApi.deleteProjectDomain(projectId, domainIdentifier);
   }
 }
 
