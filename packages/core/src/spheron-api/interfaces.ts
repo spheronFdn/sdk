@@ -1,4 +1,13 @@
-import { AppTypeEnum, ProtocolEnum } from "./enums";
+import {
+  AppTypeEnum,
+  ClusterInstanceStateEnum,
+  ClusterStateEnum,
+  ClusterTemplateCategoryEnum,
+  HealthStatusEnum,
+  PersistentStorageClassEnum,
+  ProtocolEnum,
+  ProviderEnum,
+} from "./enums";
 import {
   DeploymentEnvironmentStatusEnum,
   DeploymentStatusEnum,
@@ -216,6 +225,171 @@ interface IPNSName {
   ipnsLink: string;
 }
 
+interface Cluster {
+  _id: string;
+  name: string;
+  url: string;
+  proivder: ProviderEnum;
+  createdBy: string;
+  state: ClusterStateEnum;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ClusterInstancesInfo {
+  active: number;
+  starting: number;
+  failedToStart: number;
+  closed: number;
+  total: number;
+}
+
+interface ClusterFundsUsage {
+  dailyUsage: number;
+  usedTillNow: number;
+}
+
+interface ClusterInstance {
+  _id?: string;
+  state: ClusterInstanceStateEnum;
+  name: string;
+  orders: Array<string>;
+  cluster: string;
+  activeOrder: string;
+  latestUrlPreview: string;
+  agreedMachineImageType: MachineImageType;
+  retrievableAkt: number;
+  withdrawnAkt: number;
+  healthCheck: HealthCheck;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ExtendedClusterInstance extends ClusterInstance {
+  cpu: number;
+  memory: string;
+  storage: string;
+  ami: string;
+  defaultDailyTopup: number;
+  image: string;
+  leasePricePerBlock: number;
+  tag: string;
+  topupReport?: TopupReport;
+}
+
+interface MachineImageType {
+  machineType: string;
+  agreementDate: number;
+}
+
+interface TopupReport {
+  dailyUsage: number;
+  usedTillNow: number;
+}
+
+interface HealthCheck {
+  url: string;
+  port?: Port;
+  status?: HealthStatusEnum;
+  timestamp?: Date;
+}
+
+interface Port {
+  containerPort: number;
+  exposedPort: number;
+}
+
+interface ClusterTemplate {
+  _id: string;
+  name: string;
+  metadata: ClusterTemplateMetadata;
+  serviceData: ClusterTemplateServiceData;
+}
+
+interface ClusterTemplateMetadata {
+  description: string;
+  icon: string;
+  image: string;
+  docsLink: string;
+  websiteLink: string;
+  category: ClusterTemplateCategoryEnum;
+  usage: number;
+}
+
+interface ClusterTemplateServiceData {
+  defaultAkashMachineImageId: string;
+  dockerImage: string;
+  dockerImageTag: string;
+  provider: string;
+  instanceCount: number;
+  variables: IClusterTemplateVariable[];
+  ports: IClusterTemplatePort[];
+  commands: string[];
+  args: string[];
+}
+
+interface IClusterTemplateVariable {
+  name: string;
+  defaultValue: string;
+  label: string;
+  required?: string;
+  hidden: boolean;
+}
+
+interface IClusterTemplatePort {
+  containerValue: number;
+  defaultExposedValue: number;
+}
+
+interface ClusterInstanceOrder {
+  type: string;
+  commitId: string;
+  status: string;
+  buildTime: number;
+  topic: string;
+  env: any;
+  logs: [{ time: string; log: Array<string> }];
+  topups: ClusterInstanceTopup[];
+  closingLogs: [{ time: string; log: string }];
+  clusterLogs: Array<string>;
+  clusterEvents: Array<string>;
+  clusterInstance: string;
+  clusterInstanceConfiguration: string;
+  lastTopup: ClusterInstanceTopup;
+  deploymentConfigBase64: string;
+  protocolData: any; // unique data related to protocol. ex: akash : dseq,oseq,gseq
+  urlPrewiew: string;
+  akashWalletId: string;
+  deploymentInitiator: string;
+}
+
+interface Env {
+  value: string;
+  isSecret: boolean;
+}
+
+interface IPersistentStorage {
+  size: string;
+  class: PersistentStorageClassEnum;
+  mountPoint: string;
+}
+
+interface ClusterInstanceTopup {
+  time: number;
+  amount: number;
+  txhash: string;
+}
+
+interface ComputeMachine {
+  name: string;
+  cpu: number;
+  storage: string;
+  memory: string;
+  maxPricePerBlock: number; //akt per block
+  defaultDailyTopUp: number;
+  topupThreashold: number;
+}
+
 export {
   TokenScope,
   Project,
@@ -230,4 +404,16 @@ export {
   UsageWithLimitsWithSkynet,
   IPNSPublishResponse,
   IPNSName,
+  Cluster,
+  ClusterInstancesInfo,
+  ClusterFundsUsage,
+  ClusterInstance,
+  ExtendedClusterInstance,
+  ClusterInstanceOrder,
+  ClusterInstanceTopup,
+  Env,
+  Port,
+  IPersistentStorage,
+  ClusterTemplate,
+  ComputeMachine,
 };

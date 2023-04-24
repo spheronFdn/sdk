@@ -78,6 +78,49 @@ enum AppTypeEnum {
   COMPUTE = "compute",
 }
 
+enum ProviderEnum {
+  DOCKERHUB = "DOCKERHUB",
+}
+
+enum ClusterStateEnum {
+  MAINTAINED = "MAINTAINED",
+  ARCHIVED = "ARCHIVED",
+}
+
+enum ClusterInstanceStateEnum {
+  STARTING = "Starting",
+  FAILED_START = "Failed-start",
+  ACTIVE = "Active",
+  CLOSED = "Closed",
+}
+
+enum HealthStatusEnum {
+  ACTIVE = "Active",
+  INACTIVE = "Inactive",
+  UNKNOWN = "Unknown",
+}
+
+enum ClusterTemplateCategoryEnum {
+  DATABASE = "Database",
+  NODE = "Node",
+  TOOLS = "Tools",
+}
+
+enum InstanceLogType {
+  LOGS = "logs",
+  INSTANCE_LOGS = "instanceLogs",
+  INSTANCE_EVENTS = "instanceEvents",
+}
+
+enum PersistentStorageClassEnum {
+  BETA1 = "beta1",
+  BETA2 = "beta2",
+  BETA3 = "beta3",
+}
+enum ClusterProtocolEnum {
+  AKASH = "akash",
+}
+
 export {
   ProjectTypeEnum,
   DeploymentEnvironmentStatusEnum,
@@ -88,4 +131,12 @@ export {
   DomainApplicationTypeEnum,
   DeploymentStatusEnum,
   AppTypeEnum,
+  ProviderEnum,
+  ClusterStateEnum,
+  ClusterInstanceStateEnum,
+  HealthStatusEnum,
+  ClusterTemplateCategoryEnum,
+  InstanceLogType,
+  PersistentStorageClassEnum,
+  ClusterProtocolEnum,
 };

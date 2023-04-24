@@ -1,0 +1,44 @@
+{
+  "name": "@spheron/compute",
+  "version": "0.0.1",
+  "description": "Typescript library for deploying compute instances to Akash via Spheron",
+  "keywords": [
+    "Compute",
+    "Typescript",
+    "Badass",
+    "IPFS",
+    "Akash",
+    "SDK",
+    "Deploy"
+  ],
+  "author": "Spheron Team",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
+    "prettier:write": "prettier --write '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
+    "prettier:check": "prettier --check '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
+    "lint": "eslint . --ext .ts"
+  },
+  "devDependencies": {
+    "@types/node": "^18.13.0",
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/parser": "^5.51.0",
+    "eslint": "^8.33.0",
+    "prettier": "^2.8.3",
+    "tsup": "^6.5.0",
+    "typescript": "^4.9.5"
+  },
+  "files": [
+    "dist/"
+  ],
+  "dependencies": {
+    "@spheron/core": "^1.0.1"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/spheronFdn/sdk.git"
+  }
+}

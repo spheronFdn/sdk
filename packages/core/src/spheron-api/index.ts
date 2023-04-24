@@ -4,6 +4,7 @@ import {
   DeploymentStatusEnum,
   DomainTypeEnum,
   FrameworkEnum,
+  InstanceLogType,
   NodeVersionEnum,
   ProjectStateEnum,
 } from "./enums";
@@ -20,7 +21,20 @@ import {
   UsageWithLimitsWithSkynet,
   IPNSPublishResponse,
   IPNSName,
+  Cluster,
+  ClusterInstancesInfo,
+  ClusterFundsUsage,
+  ExtendedClusterInstance,
+  ClusterInstance,
+  ClusterInstanceOrder,
+  ClusterTemplate,
+  ComputeMachine,
 } from "./interfaces";
+import {
+  CreateClusterInstanceFromTemplateRequest,
+  CreateClusterInstanceRequest,
+  UpdateClusterInstaceRequest,
+} from "./request-interfaces";
 
 class SpheronApi {
   private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
@@ -321,11 +335,277 @@ class SpheronApi {
     return resp.map((ipnsName) => this.mapIPNSResponseToIPNSName(ipnsName));
   }
 
+  async getCluster(id: string): Promise<Cluster> {
+    return this.sendApiRequest<Cluster>(HttpMethods.GET, `/v1/cluster/${id}`);
+  }
+
+  async deleteCluster(id: string): Promise<void> {
+    await this.sendApiRequest<Cluster>(HttpMethods.DELETE, `/v1/cluster/${id}`);
+  }
+
+  async getClusterInstancesDetails(id: string): Promise<ClusterInstancesInfo> {
+    return this.sendApiRequest<ClusterInstancesInfo>(
+      HttpMethods.GET,
+      `/v1/cluster/${id}/instances/count`
+    );
+  }
+
+  async getClusterFundsUsage(id: string): Promise<ClusterFundsUsage> {
+    return this.sendApiRequest<ClusterFundsUsage>(
+      HttpMethods.GET,
+      `/v1/cluster/${id}/funds-usage`
+    );
+  }
+
+  async getClusterInstances(
+    id: string,
+    options: {
+      skip: number;
+      limit: number;
+      includeReport?: boolean;
+    }
+  ): Promise<{ extendedInstances: ExtendedClusterInstance[] }> {
+    if (options.skip < 0 || options.limit < 0) {
+      throw new Error(`Skip and Limit cannot be negative numbers.`);
+    }
+
+    return this.sendApiRequest<{
+      extendedInstances: ExtendedClusterInstance[];
+    }>(HttpMethods.GET, `/v1/cluster/${id}/funds-usage`, null, {
+      skip: options.skip,
+      limit: options.limit,
+      topupReport: options.includeReport && "y",
+    });
+  }
+
+  async getClusterTemplates(): Promise<{
+    clusterTemplates: ClusterTemplate[];
+  }> {
+    return this.sendApiRequest<{ clusterTemplates: ClusterTemplate[] }>(
+      HttpMethods.GET,
+      `/v1/cluster-templates`
+    );
+  }
+
+  async getClusterTemplate(id: string): Promise<ClusterTemplate> {
+    return this.sendApiRequest<ClusterTemplate>(
+      HttpMethods.GET,
+      `/v1/cluster-templates/${id}`
+    );
+  }
+
+  async getClusterCategories(): Promise<{ categories: string[] }> {
+    return this.sendApiRequest<{ categories: string[] }>(
+      HttpMethods.GET,
+      `/v1/cluster-templates/categories`
+    );
+  }
+
+  async getClusterInstance(
+    id: string,
+    options?: {
+      includeReport?: boolean;
+    }
+  ): Promise<ClusterInstance> {
+    return this.sendApiRequest<ClusterInstance>(
+      HttpMethods.GET,
+      `/v1/cluster-instance/${id}`,
+      null,
+      {
+        topupReport: options && options.includeReport && "y",
+      }
+    );
+  }
+
+  async deleteClusterInstance(id: string): Promise<void> {
+    await this.sendApiRequest<ClusterInstance>(
+      HttpMethods.DELETE,
+      `/v1/cluster-instance/${id}`
+    );
+  }
+
+  async updateClusterInstance(
+    id: string,
+    clusterInstance: UpdateClusterInstaceRequest
+  ): Promise<{
+    message: string;
+    success: boolean;
+    topic: string;
+    clusterInstanceId: string;
+    clusterId: string;
+  }> {
+    return this.sendApiRequest<{
+      message: string;
+      success: boolean;
+      topic: string;
+      clusterInstanceId: string;
+      clusterId: string;
+    }>(HttpMethods.PATCH, `/v1/cluster-instance/${id}/update`, clusterInstance);
+  }
+
+  async updateClusterInstanceHealthCheckInfo(
+    id: string,
+    healthCheck: { path: string; cointainerPort: number }
+  ): Promise<{ message: string; updated: boolean }> {
+    return this.sendApiRequest<{
+      message: string;
+      updated: boolean;
+    }>(HttpMethods.PATCH, `/v1/cluster-instance/${id}/update/health-check`, {
+      healthCheckUrl: healthCheck.path,
+      healthCheckPort: healthCheck.cointainerPort,
+    });
+  }
+
+  async closeClusterInstance(
+    id: string
+  ): Promise<{ message: string; success: boolean }> {
+    return this.sendApiRequest<{
+      message: string;
+      success: boolean;
+    }>(HttpMethods.POST, `/v1/cluster-instance/${id}/close`);
+  }
+
+  async getClusterInstanceOrder(id: string): Promise<ClusterInstanceOrder> {
+    return this.sendApiRequest<ClusterInstanceOrder>(
+      HttpMethods.POST,
+      `/v1/cluster-instance/order/${id}`
+    );
+  }
+
+  async getClusterInstanceOrderLogs(
+    id: string,
+    logsOptions: {
+      from: number;
+      to: number;
+      logType: InstanceLogType;
+      search?: string;
+    }
+  ): Promise<ClusterInstanceOrder> {
+    if (logsOptions.from < 0 || logsOptions.to < 0) {
+      throw new Error(`From and To cannot be negative numbers.`);
+    }
+
+    return this.sendApiRequest<ClusterInstanceOrder>(
+      HttpMethods.GET,
+      `/v1/cluster-instance/order/${id}/logs`,
+      null,
+      logsOptions
+    );
+  }
+
+  async createClusterInstance(
+    clusterInstance: CreateClusterInstanceRequest
+  ): Promise<ClusterInstanceOrder> {
+    return this.sendApiRequest<ClusterInstanceOrder>(
+      HttpMethods.POST,
+      `/v1/cluster-instance/create`,
+      clusterInstance
+    );
+  }
+
+  async createClusterInstanceFromTemplate(
+    clusterInstance: CreateClusterInstanceFromTemplateRequest
+  ): Promise<ClusterInstanceOrder> {
+    return this.sendApiRequest<ClusterInstanceOrder>(
+      HttpMethods.POST,
+      `/v1/cluster-instance/template`,
+      clusterInstance
+    );
+  }
+
+  async getClusterInstanceDomains(id: string): Promise<{ domains: Domain[] }> {
+    return this.sendApiRequest<{ domains: Domain[] }>(
+      HttpMethods.GET,
+      `/v1/cluster-instance/${id}/domains`
+    );
+  }
+
+  async addClusterInstanceDomain(
+    instanceId: string,
+    doamin: {
+      link: string;
+      type: DomainTypeEnum | string;
+      name: string;
+    }
+  ): Promise<Domain> {
+    return this.sendApiRequest<Domain>(
+      HttpMethods.POST,
+      `/v1/cluster-instance/${instanceId}/domains`,
+      doamin
+    );
+  }
+
+  async updateClusterInstanceDomain(
+    instanceId: string,
+    domainId: string,
+    doamin: {
+      link: string;
+      type: DomainTypeEnum | string;
+      name: string;
+    }
+  ): Promise<Domain> {
+    return this.sendApiRequest<Domain>(
+      HttpMethods.PATCH,
+      `/v1/cluster-instance/${instanceId}/domains/${domainId}`,
+      doamin
+    );
+  }
+
+  async deleteClusterInstanceDomain(
+    instanceId: string,
+    domainId: string
+  ): Promise<void> {
+    await this.sendApiRequest<Domain>(
+      HttpMethods.DELETE,
+      `/v1/cluster-instance/${instanceId}/domains/${domainId}`
+    );
+  }
+
+  async verifyClusterInstanceDomain(
+    instanceId: string,
+    domainId: string
+  ): Promise<void> {
+    await this.sendApiRequest<Domain>(
+      HttpMethods.PATCH,
+      `/v1/cluster-instance/${instanceId}/domains/${domainId}/verify`
+    );
+  }
+
+  async getComputeMachines(options: {
+    skip: number;
+    limit: number;
+    searchString: string;
+  }): Promise<{
+    akashMachineImages: ComputeMachine[];
+    totalCount: number;
+  }> {
+    if (options.limit < 0 || options.skip < 0) {
+      throw new Error(`Limit and Skip cannot be negative numbers.`);
+    }
+
+    return this.sendApiRequest<{
+      akashMachineImages: ComputeMachine[];
+      totalCount: number;
+    }>(HttpMethods.GET, `/v1/compute-machine-image`, null, options);
+  }
+
+  async getComputeMachineRegions(): Promise<{
+    regions: string[];
+    totalCount: number;
+  }> {
+    return this.sendApiRequest<{
+      regions: string[];
+      totalCount: number;
+    }>(HttpMethods.GET, `/v1/compute-machine-image/regions`);
+  }
+
   private async sendApiRequest<T>(
     method: HttpMethods,
     path: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    payload?: any
+    payload?: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    params?: any
   ): Promise<T> {
     try {
       const response = await axios<T>({
@@ -335,6 +615,7 @@ class SpheronApi {
         headers: {
           Authorization: `Bearer ${this.token}`,
         },
+        params: params,
       });
       return response.data;
     } catch (error) {
