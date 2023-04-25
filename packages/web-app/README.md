@@ -58,6 +58,61 @@ interface TokenScope {
 }
 ```
 
+#### Organization Methods
+
+- `async getOrganization(organizationId: string): Promise<Organization>`
+  - used to fetch an organization based on id.
+
+```
+interface Organization {
+    _id: string;
+    profile: {
+        name: string;
+        image: string;
+        username: string;
+    };
+    users: [string];
+    registries: string[];
+    overdue: boolean;
+    appType: AppTypeEnum;
+}
+```
+
+- `async getOrganizationProjects( organizationId: string, options: { skip: number; limit: number; state?: ProjectStateEnum; } ): Promise<Project[]>`
+  - used to fetch the projects of the organization
+
+```ts
+enum ProjectStateEnum {
+  MAINTAINED = "MAINTAINED",
+  ARCHIVED = "ARCHIVED",
+}
+
+interface Project {
+  _id: string;
+  name: string;
+  type: ProjectTypeEnum;
+  url: string;
+  environmentVariables: EnvironmentVariable[];
+  deploymentEnvironments: DeploymentEnvironment[];
+  organization: string;
+  state: ProjectStateEnum;
+  hookId: string;
+  provider: string;
+  prCommentIds: {
+    prId: string;
+    commentId: string;
+  }[];
+  configuration: Configuration[];
+  passwordProtection: PasswordProtection;
+  createdAt: Date;
+  updatedAt: Date;
+  domains: Domain[];
+}
+```
+
+- `async getOrganizationProjectCount( organizationId: string, options: { state?: ProjectStateEnum; }): Promise<number>`
+  - used to get the number of projects for the organization.
+
 ## Access Token
 
 To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/rest-api/#creating-an-access-token). When you are creating the tokens, please choose **web app** type in the dashboard.
@@ -68,4 +123,3 @@ You can learn more about Spheron and Storage SDK here:
 
 - [Spheron Discord](https://discord.com/invite/ahxuCtm)
 - [Spheron Twitter](https://twitter.com/SpheronFdn)
-  s
