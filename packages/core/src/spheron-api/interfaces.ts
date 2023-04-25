@@ -250,7 +250,7 @@ interface ClusterFundsUsage {
 }
 
 interface ClusterInstance {
-  _id?: string;
+  _id: string;
   state: ClusterInstanceStateEnum;
   name: string;
   orders: Array<string>;
@@ -342,6 +342,7 @@ interface IClusterTemplatePort {
 }
 
 interface ClusterInstanceOrder {
+  _id: string;
   type: string;
   commitId: string;
   status: string;
@@ -381,6 +382,7 @@ interface ClusterInstanceTopup {
 }
 
 interface ComputeMachine {
+  _id: string;
   name: string;
   cpu: number;
   storage: string;

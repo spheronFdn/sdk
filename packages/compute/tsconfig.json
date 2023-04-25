@@ -12,6 +12,6 @@
     "rootDir": "./src",
     "outDir": "./dist/"
   },
-  "include": ["./src/**/*"],
+  "include": ["./src/**/*", "../core/src/cluster-manager.ts"],
   "exclude": ["node_modules"]
 }

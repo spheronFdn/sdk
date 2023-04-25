@@ -9,6 +9,11 @@ import {
   SpheronApi,
   UpdateClusterInstaceRequest,
 } from "@spheron/core";
+import {
+  ClusterInstanceFromTemplateResponse,
+  ClusterInstanceResponse,
+} from "@spheron/core/dist/types/spheron-api/response-interfaces";
+import { v4 as uuidv4 } from "uuid";
 
 class ClusterInstanceManager {
   private readonly spheronApi: SpheronApi;
@@ -33,13 +38,7 @@ class ClusterInstanceManager {
   async updateClusterInstance(
     id: string,
     clusterInstance: UpdateClusterInstaceRequest
-  ): Promise<{
-    message: string;
-    success: boolean;
-    topic: string;
-    clusterInstanceId: string;
-    clusterId: string;
-  }> {
+  ): Promise<ClusterInstanceResponse> {
     return this.spheronApi.updateClusterInstance(id, clusterInstance);
   }
 
@@ -59,7 +58,9 @@ class ClusterInstanceManager {
     return this.spheronApi.closeClusterInstance(id);
   }
 
-  async getClusterInstanceOrder(id: string): Promise<ClusterInstanceOrder> {
+  async getClusterInstanceOrder(
+    id: string
+  ): Promise<{ order: ClusterInstanceOrder; liveLogs: string[] }> {
     return this.spheronApi.getClusterInstanceOrder(id);
   }
 
@@ -81,17 +82,21 @@ class ClusterInstanceManager {
 
   async createClusterInstance(
     clusterInstance: CreateClusterInstanceRequest
-  ): Promise<ClusterInstanceOrder> {
+  ): Promise<ClusterInstanceResponse> {
+    clusterInstance.uniqueTopicId = clusterInstance.uniqueTopicId ?? uuidv4();
+
     return this.spheronApi.createClusterInstance(clusterInstance);
   }
 
   async createClusterInstanceFromTemplate(
     clusterInstance: CreateClusterInstanceFromTemplateRequest
-  ): Promise<ClusterInstanceOrder> {
+  ): Promise<ClusterInstanceFromTemplateResponse> {
+    clusterInstance.uniqueTopicId = clusterInstance.uniqueTopicId ?? uuidv4();
+
     return this.spheronApi.createClusterInstanceFromTemplate(clusterInstance);
   }
 
-  async getClusterInstanceDomains(id: string): Promise<{ domains: Domain[] }> {
+  async getClusterInstanceDomains(id: string): Promise<Domain[]> {
     return this.spheronApi.getClusterInstanceDomains(id);
   }
 

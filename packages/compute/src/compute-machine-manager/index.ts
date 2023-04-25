@@ -10,22 +10,18 @@ class ClusterMachineManager {
   async getComputeMachines(options: {
     skip: number;
     limit: number;
-    searchString: string;
-  }): Promise<{
-    akashMachineImages: ComputeMachine[];
-    totalCount: number;
-  }> {
-    if (options.limit < 0 || options.skip < 0) {
-      throw new Error(`Limit and Skip cannot be negative numbers.`);
+    searchString?: string;
+  }): Promise<ComputeMachine[]> {
+    if (options.limit < 1 || options.skip < 0) {
+      throw new Error(
+        `Limit and Skip cannot be negative numbers. Limit must be greater thatn 1.`
+      );
     }
 
     return this.spheronApi.getComputeMachines(options);
   }
 
-  async getComputeMachineRegions(): Promise<{
-    regions: string[];
-    totalCount: number;
-  }> {
+  async getComputeMachineRegions(): Promise<string[]> {
     return this.spheronApi.getComputeMachineRegions();
   }
 }

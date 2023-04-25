@@ -13,6 +13,16 @@ class ClusterManager {
     this.spheronApi = spheronApi;
   }
 
+  async getClustersForOrganisation(
+    organisationId: string,
+    options: {
+      skip: number;
+      limit: number;
+    }
+  ): Promise<Cluster[]> {
+    return this.spheronApi.getOrganizationClusters(organisationId, options);
+  }
+
   async getCluster(id: string): Promise<Cluster> {
     return this.spheronApi.getCluster(id);
   }
@@ -36,7 +46,7 @@ class ClusterManager {
       limit: number;
       includeReport?: boolean;
     }
-  ): Promise<{ extendedInstances: ExtendedClusterInstance[] }> {
+  ): Promise<ExtendedClusterInstance[]> {
     if (options.skip < 0 || options.limit < 0) {
       throw new Error(`Skip and Limit cannot be negative numbers.`);
     }

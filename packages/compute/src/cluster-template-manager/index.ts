@@ -1,6 +1,7 @@
 import { ClusterTemplate, SpheronApi } from "@spheron/core";
 
 class ClusterTemplateManager {
+  //marketplace
   private readonly spheronApi: SpheronApi;
 
   constructor(spheronApi: SpheronApi) {
@@ -17,7 +18,7 @@ class ClusterTemplateManager {
     return this.spheronApi.getClusterTemplate(id);
   }
 
-  async getClusterCategories(): Promise<{ categories: string[] }> {
+  async getClusterCategories(): Promise<string[]> {
     return this.spheronApi.getClusterCategories();
   }
 }

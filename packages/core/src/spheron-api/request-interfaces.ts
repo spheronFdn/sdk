@@ -3,14 +3,14 @@ import { Env, Port } from "./interfaces";
 
 interface CreateClusterInstanceRequest {
   organizationId: string;
-  uniqueTopicId: string;
+  uniqueTopicId?: string;
   configuration: CreateClusterInstanceConfig;
   instanceName?: string;
   clusterUrl: string;
   clusterProvider: string;
   clusterName: string;
   healthCheckUrl: string;
-  healthCheckPort: string;
+  healthCheckPort: number;
 }
 
 interface CreateClusterInstanceConfig {
@@ -26,6 +26,7 @@ interface CreateClusterInstanceConfig {
   command: Array<string>;
   args: Array<string>;
   region: string;
+  akashMachineImageName: string;
 }
 
 interface CreateClusterInstanceFromTemplateRequest {
@@ -33,7 +34,7 @@ interface CreateClusterInstanceFromTemplateRequest {
   environmentVariables: ClusterTemplateDeploymentVariable[];
   organizationId: string;
   akashImageId: string;
-  uniqueTopicId: string;
+  uniqueTopicId?: string;
   region: string;
 }
 
@@ -47,10 +48,9 @@ interface UpdateClusterInstaceRequest {
   env: Array<Env>;
   command: Array<string>;
   args: Array<string>;
-  organizationId: string;
   uniqueTopicId: string;
-  healthCheckUrl: string;
-  healthCheckPort: string;
+  healthCheckUrl?: string;
+  healthCheckPort?: string;
   tag: string;
 }
 
