@@ -42,6 +42,22 @@ const client = new SpheronClient({ token });
 - `async getTokenScope(): Promise<TokenScope>`
   - returns the scope of the token that was used to initialize the `SpheronClient`.
 
+```ts
+interface TokenScope {
+  user: {
+    id: string;
+    username: string;
+    name: string;
+    email: string;
+  };
+  organizations: {
+    id: string;
+    name: string;
+    username: string;
+  }[];
+}
+```
+
 ## Access Token
 
 To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/rest-api/#creating-an-access-token). When you are creating the tokens, please choose **web app** type in the dashboard.
