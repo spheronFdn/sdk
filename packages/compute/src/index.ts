@@ -7,10 +7,10 @@ import {
   ClusterInstancesInfo,
   ClusterProtocolEnum,
   ClusterStateEnum,
-  ClusterTemplate,
-  ClusterTemplateCategoryEnum,
+  MarketplaceApp,
+  MarketplaceCategoryEnum,
   ComputeMachine,
-  CreateClusterInstanceFromTemplateRequest,
+  CreateClusterInstanceFromMarketplaceRequest,
   CreateClusterInstanceRequest,
   Domain,
   DomainTypeEnum,
@@ -23,23 +23,23 @@ import {
   UpdateClusterInstaceRequest,
 } from "@spheron/core";
 import { ClusterManager } from "./cluster-manager";
-import { ClusterTemplateManager } from "./cluster-template-manager";
+import { ClusterMarketplaceManager } from "./cluster-marketplace-manager";
 import { ClusterInstanceManager } from "./cluster-instance-manager";
 import { ClusterMachineManager } from "./compute-machine-manager";
 import {
-  ClusterInstanceFromTemplateResponse,
+  ClusterInstanceFromMarketplaceResponse,
   ClusterInstanceResponse,
 } from "@spheron/core";
 
 export {
   ClusterInstance,
   ClusterInstanceOrder,
-  CreateClusterInstanceFromTemplateRequest,
+  ClusterInstanceFromMarketplaceResponse,
   CreateClusterInstanceRequest,
   Cluster,
   ClusterFundsUsage,
   ClusterInstancesInfo,
-  ClusterTemplate,
+  MarketplaceApp,
   ComputeMachine,
   Domain,
   DomainTypeEnum,
@@ -50,10 +50,10 @@ export {
   ClusterStateEnum,
   ClusterInstanceStateEnum,
   HealthStatusEnum,
-  ClusterTemplateCategoryEnum,
+  MarketplaceCategoryEnum,
   PersistentStorageClassEnum,
   ClusterProtocolEnum,
-  ClusterInstanceFromTemplateResponse,
+  CreateClusterInstanceFromMarketplaceRequest,
   ClusterInstanceResponse,
 };
 
@@ -65,7 +65,7 @@ export class SpheronComputeClient {
   private readonly configuration: SpheronClientConfiguration;
   private readonly spheronApi: SpheronApi;
   public readonly cluster: ClusterManager;
-  public readonly clusterTemplate: ClusterTemplateManager;
+  public readonly clusterMarketplace: ClusterMarketplaceManager;
   public readonly clusterInstance: ClusterInstanceManager;
   public readonly clusterMachine: ClusterMachineManager;
 
@@ -74,7 +74,7 @@ export class SpheronComputeClient {
     this.spheronApi = new SpheronApi(this.configuration.token);
 
     this.cluster = new ClusterManager(this.spheronApi);
-    this.clusterTemplate = new ClusterTemplateManager(this.spheronApi);
+    this.clusterMarketplace = new ClusterMarketplaceManager(this.spheronApi);
     this.clusterInstance = new ClusterInstanceManager(this.spheronApi);
     this.clusterMachine = new ClusterMachineManager(this.spheronApi);
   }

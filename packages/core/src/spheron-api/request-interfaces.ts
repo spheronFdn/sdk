@@ -29,16 +29,16 @@ interface CreateClusterInstanceConfig {
   akashMachineImageName: string;
 }
 
-interface CreateClusterInstanceFromTemplateRequest {
+interface CreateClusterInstanceFromMarketplaceRequest {
   templateId: string;
-  environmentVariables: ClusterTemplateDeploymentVariable[];
+  environmentVariables: ClusterDeploymentVariable[];
   organizationId: string;
   akashImageId: string;
   uniqueTopicId?: string;
   region: string;
 }
 
-interface ClusterTemplateDeploymentVariable {
+interface ClusterDeploymentVariable {
   label: string;
   value: string;
   isSecret: boolean;
@@ -49,14 +49,14 @@ interface UpdateClusterInstaceRequest {
   command: Array<string>;
   args: Array<string>;
   uniqueTopicId: string;
+  tag: string;
   healthCheckUrl?: string;
   healthCheckPort?: string;
-  tag: string;
 }
 
 export {
   CreateClusterInstanceRequest,
   CreateClusterInstanceConfig,
-  CreateClusterInstanceFromTemplateRequest,
+  CreateClusterInstanceFromMarketplaceRequest,
   UpdateClusterInstaceRequest,
 };

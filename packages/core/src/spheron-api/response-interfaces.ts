@@ -1,4 +1,4 @@
-import { ClusterTemplate } from "./interfaces";
+import { MarketplaceApp } from "./interfaces";
 
 interface ClusterInstanceResponse {
   clusterId: string;
@@ -6,13 +6,13 @@ interface ClusterInstanceResponse {
   clusterInstanceOrderId: string;
   topic: string;
 }
-interface ClusterInstanceFromTemplateResponse {
+interface ClusterInstanceFromMarketplaceResponse {
   clusterId: string;
   clusterInstanceId: string;
   clusterInstanceOrderId: string;
-  template: ClusterTemplate;
+  template: MarketplaceApp;
   templateId: string;
   topic: string;
 }
 
-export { ClusterInstanceResponse, ClusterInstanceFromTemplateResponse };
+export { ClusterInstanceResponse, ClusterInstanceFromMarketplaceResponse };

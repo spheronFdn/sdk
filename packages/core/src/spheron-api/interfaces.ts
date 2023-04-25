@@ -2,8 +2,8 @@ import {
   AppTypeEnum,
   ClusterInstanceStateEnum,
   ClusterStateEnum,
-  ClusterTemplateCategoryEnum,
   HealthStatusEnum,
+  MarketplaceCategoryEnum,
   PersistentStorageClassEnum,
   ProtocolEnum,
   ProviderEnum,
@@ -299,24 +299,24 @@ interface Port {
   exposedPort: number;
 }
 
-interface ClusterTemplate {
+interface MarketplaceApp {
   _id: string;
   name: string;
-  metadata: ClusterTemplateMetadata;
-  serviceData: ClusterTemplateServiceData;
+  metadata: MarketplaceAppMetadata;
+  serviceData: MarketplaceAppServiceData;
 }
 
-interface ClusterTemplateMetadata {
+interface MarketplaceAppMetadata {
   description: string;
   icon: string;
   image: string;
   docsLink: string;
   websiteLink: string;
-  category: ClusterTemplateCategoryEnum;
+  category: MarketplaceCategoryEnum;
   usage: number;
 }
 
-interface ClusterTemplateServiceData {
+interface MarketplaceAppServiceData {
   defaultAkashMachineImageId: string;
   dockerImage: string;
   dockerImageTag: string;
@@ -416,6 +416,6 @@ export {
   Env,
   Port,
   IPersistentStorage,
-  ClusterTemplate,
+  MarketplaceApp,
   ComputeMachine,
 };

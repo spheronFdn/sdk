@@ -1,7 +1,7 @@
 import {
   ClusterInstance,
   ClusterInstanceOrder,
-  CreateClusterInstanceFromTemplateRequest,
+  CreateClusterInstanceFromMarketplaceRequest,
   CreateClusterInstanceRequest,
   Domain,
   DomainTypeEnum,
@@ -10,7 +10,7 @@ import {
   UpdateClusterInstaceRequest,
 } from "@spheron/core";
 import {
-  ClusterInstanceFromTemplateResponse,
+  ClusterInstanceFromMarketplaceResponse,
   ClusterInstanceResponse,
 } from "@spheron/core/dist/types/spheron-api/response-interfaces";
 import { v4 as uuidv4 } from "uuid";
@@ -37,9 +37,14 @@ class ClusterInstanceManager {
 
   async updateClusterInstance(
     id: string,
+    organisationId: string,
     clusterInstance: UpdateClusterInstaceRequest
   ): Promise<ClusterInstanceResponse> {
-    return this.spheronApi.updateClusterInstance(id, clusterInstance);
+    return this.spheronApi.updateClusterInstance(
+      id,
+      organisationId,
+      clusterInstance
+    );
   }
 
   async updateClusterInstanceHealthCheckInfo(
@@ -89,8 +94,8 @@ class ClusterInstanceManager {
   }
 
   async createClusterInstanceFromTemplate(
-    clusterInstance: CreateClusterInstanceFromTemplateRequest
-  ): Promise<ClusterInstanceFromTemplateResponse> {
+    clusterInstance: CreateClusterInstanceFromMarketplaceRequest
+  ): Promise<ClusterInstanceFromMarketplaceResponse> {
     clusterInstance.uniqueTopicId = clusterInstance.uniqueTopicId ?? uuidv4();
 
     return this.spheronApi.createClusterInstanceFromTemplate(clusterInstance);

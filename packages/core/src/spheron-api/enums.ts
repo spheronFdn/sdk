@@ -100,7 +100,7 @@ enum HealthStatusEnum {
   UNKNOWN = "Unknown",
 }
 
-enum ClusterTemplateCategoryEnum {
+enum MarketplaceCategoryEnum {
   DATABASE = "Database",
   NODE = "Node",
   TOOLS = "Tools",
@@ -135,7 +135,7 @@ export {
   ClusterStateEnum,
   ClusterInstanceStateEnum,
   HealthStatusEnum,
-  ClusterTemplateCategoryEnum,
+  MarketplaceCategoryEnum,
   InstanceLogType,
   PersistentStorageClassEnum,
   ClusterProtocolEnum,
