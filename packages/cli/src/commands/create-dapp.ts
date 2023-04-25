@@ -115,6 +115,17 @@ export const templateDappsMap: Map<string, ITemplateApp> = new Map<
       defaultProjectName: "my-linktree-app",
     },
   ],
+  [
+    "template-lync-NFT-CollectionClaimer",
+    {
+      alias: "LYNC NFT Collection Claimer",
+      dappType: DappCategory.Template,
+      url: "https://github.com/LYNC-WORLD/NFT-Collection-dApp-Template.git",
+      framework: FrameworkOptions.React,
+      rootPath: "./",
+      defaultProjectName: "my-NFTCollection-claimer",
+    },
+  ],
 ]);
 
 export interface ITemplateCategory {
