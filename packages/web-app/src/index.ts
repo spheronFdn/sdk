@@ -1,6 +1,5 @@
 import {
   FrameworkEnum,
-  IPNSName,
   NodeVersionEnum,
   Organization,
   Project,
@@ -8,7 +7,6 @@ import {
   SpheronApi,
   TokenScope,
   ProviderEnum,
-  UsageWithLimits,
   Deployment,
   StartDeploymentConfiguration,
   DeploymentStatusEnum,
@@ -23,9 +21,7 @@ import {
 
 export {
   ProtocolEnum,
-  UsageWithLimits,
   TokenScope,
-  IPNSName,
   Organization,
   NodeVersionEnum,
   FrameworkEnum,
