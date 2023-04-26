@@ -1,7 +1,6 @@
 import {
   FrameworkEnum,
   NodeVersionEnum,
-  Organization,
   Project,
   ProtocolEnum,
   SpheronApi,
@@ -17,7 +16,10 @@ import {
   DeploymentEnvironment,
   Domain,
   DomainTypeEnum,
+  UsageWithLimits,
 } from "@spheron/core";
+import OrganizationManager from "./organization-manager";
+import { Organization } from "./interfaces";
 
 export {
   ProtocolEnum,
@@ -35,6 +37,7 @@ export {
   DeploymentEnvironmentStatusEnum,
   Domain,
   DomainTypeEnum,
+  UsageWithLimits,
 };
 
 export interface SpheronClientConfiguration {
@@ -45,37 +48,16 @@ export class SpheronClient {
   private readonly configuration: SpheronClientConfiguration;
   private readonly spheronApi: SpheronApi;
 
+  public readonly organizations: OrganizationManager;
+
   constructor(configuration: SpheronClientConfiguration) {
     this.configuration = configuration;
     this.spheronApi = new SpheronApi(this.configuration.token);
+    this.organizations = new OrganizationManager(this.spheronApi);
   }
 
   async getTokenScope(): Promise<TokenScope> {
     return await this.spheronApi.getTokenScope();
-  }
-
-  async getOrganization(organizationId: string): Promise<Organization> {
-    return await this.spheronApi.getOrganization(organizationId);
-  }
-
-  async getOrganizationProjects(
-    organizationId: string,
-    options: {
-      skip: number;
-      limit: number;
-      state?: string;
-    }
-  ): Promise<Project[]> {
-    return this.spheronApi.getOrganizationProjects(organizationId, options);
-  }
-
-  async getOrganizationProjectCount(
-    organizationId: string,
-    options: {
-      state?: string;
-    }
-  ): Promise<number> {
-    return this.spheronApi.getOrganizationProjectCount(organizationId, options);
   }
 
   public async startDeployment(

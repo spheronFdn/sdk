@@ -236,7 +236,7 @@ class SpheronApi {
     options: {
       skip: number;
       limit: number;
-      state?: string;
+      state?: ProjectStateEnum;
     }
   ): Promise<Project[]> {
     if (options.skip < 0 || options.limit < 0) {
@@ -254,7 +254,7 @@ class SpheronApi {
   async getOrganizationProjectCount(
     id: string,
     options: {
-      state?: string;
+      state?: ProjectStateEnum;
     }
   ): Promise<number> {
     const result = await this.sendApiRequest<{ count: number }>(

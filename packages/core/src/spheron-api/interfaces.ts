@@ -84,9 +84,9 @@ interface Project {
   organization: string;
   state: ProjectStateEnum;
   hookId: string;
-  provider: string;
+  provider: ProviderEnum;
   prCommentIds: { prId: string; commentId: string }[];
-  configuration: Configuration[];
+  configuration: Configuration;
   passwordProtection: PasswordProtection;
   createdAt: Date;
   updatedAt: Date;
