@@ -110,7 +110,7 @@ interface Deployment {
   project: Project;
   branch: string;
   externalRepositoryName: string;
-  protocol: string;
+  protocol: ProtocolEnum;
   deploymentEnvironmentName: string;
   failedMessage: string;
   isFromRequest: boolean;

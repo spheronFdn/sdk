@@ -1,18 +1,19 @@
 import {
-  EnvironmentVariable as CoreEnvironmentVariable,
-  DeploymentEnvironment as CoreDeploymentEnvironment,
   ProjectStateEnum,
   SpheronApi,
   ProtocolEnum,
   DomainTypeEnum,
+  DeploymentStatusEnum,
 } from "@spheron/core";
 import {
   Configuration,
+  Deployment,
   DeploymentEnvironment,
   Domain,
   EnvironmentVariable,
   Project,
   mapCoreConfiguration,
+  mapCoreDeployment,
   mapCoreDeploymentEnvironment,
   mapCoreDomain,
   mapCoreEnvironmentVariable,
@@ -242,6 +243,30 @@ class ProjectManager {
     domainIdentifier: string
   ): Promise<void> {
     await this.spheronApi.deleteProjectDomain(projectId, domainIdentifier);
+  }
+
+  async getDeployments(
+    projectId: string,
+    options: {
+      skip: number;
+      limit: number;
+      status?: DeploymentStatusEnum;
+    }
+  ): Promise<Deployment[]> {
+    const { deployments } = await this.spheronApi.getProjectDeployments(
+      projectId,
+      options
+    );
+    return deployments.map((x) => mapCoreDeployment(x));
+  }
+
+  async getDeploymentCount(projectId: string): Promise<{
+    total: number;
+    successful: number;
+    failed: number;
+    pending: number;
+  }> {
+    return await this.spheronApi.getProjectDeploymentCount(projectId);
   }
 }
 

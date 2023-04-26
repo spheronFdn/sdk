@@ -1,16 +1,18 @@
 import {
   Organization as CoreOrganization,
   Project as CoreProject,
+  Configuration as CoreConfiguration,
+  EnvironmentVariable as CoreEnvironmentVariable,
+  DeploymentEnvironment as CoreDeploymentEnvironment,
+  Deployment as CoreDeployment,
   FrameworkEnum,
   NodeVersionEnum,
   ProjectStateEnum,
   ProviderEnum,
-  Configuration as CoreConfiguration,
-  EnvironmentVariable as CoreEnvironmentVariable,
-  DeploymentEnvironment as CoreDeploymentEnvironment,
   ProtocolEnum,
   DomainTypeEnum,
   Domain as CoreDomain,
+  DeploymentStatusEnum,
 } from "@spheron/core";
 
 interface Organization {
@@ -137,6 +139,48 @@ const mapCoreDomain = (coreDomain: CoreDomain): Domain => {
   };
 };
 
+interface Deployment {
+  id: string;
+  status: DeploymentStatusEnum;
+  configuration: Configuration;
+  buildTime: number;
+  memoryUsed: number;
+  deploymentEnvironmentName: string;
+  commitId: string;
+  branch: string;
+  protocol: ProtocolEnum;
+  sitePreview: string;
+}
+
+const mapCoreDeployment = (coreDeployment: CoreDeployment): Deployment => {
+  return {
+    id: coreDeployment._id,
+    status: coreDeployment.status,
+    configuration: mapCoreConfiguration(coreDeployment.configuration),
+    buildTime: coreDeployment.buildTime,
+    memoryUsed: coreDeployment.memoryUsed,
+    deploymentEnvironmentName: coreDeployment.deploymentEnvironmentName,
+    commitId: coreDeployment.commitId,
+    branch: coreDeployment.branch,
+    protocol: coreDeployment.protocol,
+    sitePreview: coreDeployment.sitePreview,
+  };
+};
+
+interface DeploymentLog {
+  log: string;
+  time: string;
+}
+
+const mapCoreDeploymentLogs = (
+  coreDeployment: CoreDeployment
+): DeploymentLog[] => {
+  return coreDeployment.logs.map((x) => ({
+    log: x.log,
+    time: x.time,
+  }));
+};
+
 export {
   Organization,
   mapCoreOrganization,
@@ -150,4 +194,8 @@ export {
   mapCoreEnvironmentVariable,
   Domain,
   mapCoreDomain,
+  Deployment,
+  mapCoreDeployment,
+  DeploymentLog,
+  mapCoreDeploymentLogs,
 };
