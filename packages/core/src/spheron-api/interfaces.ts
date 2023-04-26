@@ -66,7 +66,7 @@ interface Domain {
   type: DomainTypeEnum;
   verified: boolean;
   projectId: string;
-  deploymentEnvironmentIds: DeploymentEnvironment[];
+  deploymentEnvironmentIds: string[];
   version: string;
   credentials: Credentials[];
   appType: DomainApplicationTypeEnum;

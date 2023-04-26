@@ -6,6 +6,11 @@ import {
   ProjectStateEnum,
   ProviderEnum,
   Configuration as CoreConfiguration,
+  EnvironmentVariable as CoreEnvironmentVariable,
+  DeploymentEnvironment as CoreDeploymentEnvironment,
+  ProtocolEnum,
+  DomainTypeEnum,
+  Domain as CoreDomain,
 } from "@spheron/core";
 
 interface Organization {
@@ -74,6 +79,64 @@ const mapCoreProject = (coreProject: CoreProject): Project => {
   };
 };
 
+interface DeploymentEnvironment {
+  id: string;
+  name: string;
+  protocol: ProtocolEnum;
+  branches: string[];
+}
+
+const mapCoreDeploymentEnvironment = (
+  deploymentEnvironment: CoreDeploymentEnvironment
+): DeploymentEnvironment => {
+  return {
+    id: deploymentEnvironment._id,
+    name: deploymentEnvironment.name,
+    protocol: deploymentEnvironment.protocol,
+    branches: deploymentEnvironment.branches,
+  };
+};
+
+interface EnvironmentVariable {
+  id: string;
+  name: string;
+  value: string;
+  environments: string[];
+}
+
+const mapCoreEnvironmentVariable = (
+  coreVariable: CoreEnvironmentVariable
+): EnvironmentVariable => {
+  return {
+    id: coreVariable._id,
+    name: coreVariable.name,
+    value: coreVariable.value,
+    environments: coreVariable.deploymentEnvironments.map((x) => x.name),
+  };
+};
+
+interface Domain {
+  id: string;
+  name: string;
+  verified: boolean;
+  link: string;
+  type: DomainTypeEnum;
+  projectId: string;
+  deploymentEnvironmentIds: string[];
+}
+
+const mapCoreDomain = (coreDomain: CoreDomain): Domain => {
+  return {
+    id: coreDomain._id,
+    name: coreDomain.name,
+    verified: coreDomain.verified,
+    link: coreDomain.link,
+    type: coreDomain.type,
+    projectId: coreDomain.projectId,
+    deploymentEnvironmentIds: coreDomain.deploymentEnvironmentIds,
+  };
+};
+
 export {
   Organization,
   mapCoreOrganization,
@@ -81,4 +144,10 @@ export {
   mapCoreConfiguration,
   Project,
   mapCoreProject,
+  DeploymentEnvironment,
+  mapCoreDeploymentEnvironment,
+  EnvironmentVariable,
+  mapCoreEnvironmentVariable,
+  Domain,
+  mapCoreDomain,
 };
