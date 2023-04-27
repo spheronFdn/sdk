@@ -123,7 +123,7 @@ export const templateDappsMap: Map<string, ITemplateApp> = new Map<
       url: "https://github.com/LYNC-WORLD/NFT-Collection-dApp-Template.git",
       framework: FrameworkOptions.React,
       rootPath: "./",
-      defaultProjectName: "my-NFTCollection-claimer",
+      defaultProjectName: "LYNC-claimer-page",
     },
   ],
 ]);
