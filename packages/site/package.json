@@ -1,5 +1,5 @@
 {
-  "name": "@spheron/web-app",
+  "name": "@spheron/site",
   "version": "1.0.0",
   "description": "Typescript library for working with Spheron Web-App Organizations.",
   "keywords": [

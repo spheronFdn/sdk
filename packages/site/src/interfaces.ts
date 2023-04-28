@@ -181,6 +181,24 @@ const mapCoreDeploymentLogs = (
   }));
 };
 
+interface StartDeploymentConfiguration {
+  organizationId: string;
+  gitUrl: string;
+  projectName: string;
+  branch: string;
+  protocol: ProtocolEnum;
+  provider: ProviderEnum;
+  configuration: {
+    buildCommand: string;
+    installCommand: string;
+    workspace: string;
+    publishDir: string;
+    framework: FrameworkEnum | string;
+    nodeVersion: NodeVersionEnum;
+  };
+  env?: Record<string, string>;
+}
+
 export {
   Organization,
   mapCoreOrganization,
@@ -198,4 +216,5 @@ export {
   mapCoreDeployment,
   DeploymentLog,
   mapCoreDeploymentLogs,
+  StartDeploymentConfiguration,
 };

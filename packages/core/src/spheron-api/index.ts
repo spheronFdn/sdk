@@ -372,11 +372,23 @@ class SpheronApi {
     return response;
   }
 
-  async authorizeDeployment(deploymentId: string): Promise<Deployment> {
-    const { deployment } = await this.sendApiRequest<{
+  async authorizeDeployment(deploymentId: string): Promise<{
+    success: boolean;
+    message: string;
+    topic: string;
+    deploymentId: string;
+    projectId: string;
+    deployment: Deployment;
+  }> {
+    const response = await this.sendApiRequest<{
+      success: boolean;
+      message: string;
+      topic: string;
+      deploymentId: string;
+      projectId: string;
       deployment: Deployment;
     }>(HttpMethods.POST, `/v1/deployment/${deploymentId}/authorize`);
-    return deployment;
+    return response;
   }
 
   async cancelDeployment(

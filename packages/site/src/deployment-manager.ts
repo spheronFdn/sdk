@@ -1,13 +1,8 @@
-import {
-  Deployment as CoreDeployment,
-  FrameworkEnum,
-  ProviderEnum,
-  SpheronApi,
-  StartDeploymentConfiguration,
-} from "@spheron/core";
+import { SpheronApi } from "@spheron/core";
 import {
   Deployment,
   DeploymentLog,
+  StartDeploymentConfiguration,
   mapCoreDeployment,
   mapCoreDeploymentLogs,
 } from "./interfaces";
@@ -34,21 +29,25 @@ class DeploymentManger {
     return deployment.buildDirectory;
   }
 
-  public async start(configuration: StartDeploymentConfiguration): Promise<{
+  public async deploy(configuration: StartDeploymentConfiguration): Promise<{
     success: boolean;
     message: string;
-    topic: string;
     deploymentId: string;
     projectId: string;
-    deployment: CoreDeployment;
+    deployment: Deployment;
   }> {
-    return await this.spheronApi.startDeployment({
+    const response = await this.spheronApi.startDeployment({
       ...configuration,
-      configuration: {
-        ...configuration.configuration,
-        framework: FrameworkEnum.SIMPLE_JAVASCRIPT_APP,
-      },
+      repoName: configuration.projectName,
+      createDefaultWebhook: true,
     });
+    return {
+      success: response.success,
+      message: response.message,
+      deploymentId: response.deploymentId,
+      projectId: response.projectId,
+      deployment: mapCoreDeployment(response.deployment),
+    };
   }
 
   public async cancel(deploymentId: string): Promise<{
@@ -59,29 +58,38 @@ class DeploymentManger {
     return await this.spheronApi.cancelDeployment(deploymentId);
   }
 
-  public async authorize(deploymentId: string): Promise<CoreDeployment> {
-    return await this.spheronApi.authorizeDeployment(deploymentId);
+  public async authorize(deploymentId: string): Promise<{
+    success: boolean;
+    message: string;
+    deploymentId: string;
+    projectId: string;
+    deployment: Deployment;
+  }> {
+    const response = await this.spheronApi.authorizeDeployment(deploymentId);
+    return {
+      success: response.success,
+      message: response.message,
+      deploymentId: response.deploymentId,
+      projectId: response.projectId,
+      deployment: mapCoreDeployment(response.deployment),
+    };
   }
 
   public async redeploy(deploymentId: string): Promise<{
     success: boolean;
     message: string;
-    topic: string;
     deploymentId: string;
     projectId: string;
-    deployment: CoreDeployment;
+    deployment: Deployment;
   }> {
-    return await this.spheronApi.redeployDeployment(deploymentId);
-  }
-
-  async suggestFramework(options: {
-    owner: string;
-    branch: string;
-    provider: ProviderEnum;
-    repositoryName: string;
-    root?: string;
-  }): Promise<{ suggestedFramework: FrameworkEnum }> {
-    return this.spheronApi.suggestFramework(options);
+    const response = await this.spheronApi.redeployDeployment(deploymentId);
+    return {
+      success: response.success,
+      message: response.message,
+      deploymentId: response.deploymentId,
+      projectId: response.projectId,
+      deployment: mapCoreDeployment(response.deployment),
+    };
   }
 }
 
