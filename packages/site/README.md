@@ -32,7 +32,7 @@
 The package exports `SpheronClient` class, which includes methods for working with organizations, projects, deployments and their configurations. The constructor of `SpheronClient` takes in one parameter `token`. Check the **Access Token** section for information on how to create a token.
 
 ```js
-import { SpheronClient } from "@spheron/storage";
+import { SpheronClient } from "@spheron/site";
 
 ...
 
