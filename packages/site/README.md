@@ -34,84 +34,32 @@ The package exports `SpheronClient` class, which includes methods for working wi
 ```js
 import { SpheronClient } from "@spheron/storage";
 
-const client = new SpheronClient({ token });
+...
+
+const spheron = new SpheronClient({ token });
+
+await spheron.deployments.deploy({
+  gitUrl, // the url of the repository
+  projectName, // if the project for the repository does not exists, a new project will be created with this name
+  organizationId, // organization id
+  env: {
+    KEY_1: "value1",
+  },
+  provider: ProviderEnum.GITHUB, // the provider of the git url
+  branch: "main", // the branch name that should be deployed
+  protocol: ProtocolEnum.IPFS, // the protocol on which the deployment should be uploaded
+  configuration: {
+    framework: FrameworkEnum.REACT,
+    workspace: "",
+    installCommand: "yarn install",
+    buildCommand: "yarn build",
+    publishDir: "build",
+    nodeVersion: NodeVersionEnum.V_16,
+  },
+});
 ```
 
-### Methods
-
-- `async getTokenScope(): Promise<TokenScope>`
-  - returns the scope of the token that was used to initialize the `SpheronClient`.
-
-```ts
-interface TokenScope {
-  user: {
-    id: string;
-    username: string;
-    name: string;
-    email: string;
-  };
-  organizations: {
-    id: string;
-    name: string;
-    username: string;
-  }[];
-}
-```
-
-#### Organization Methods
-
-- `async getOrganization(organizationId: string): Promise<Organization>`
-  - used to fetch an organization based on id.
-
-```
-interface Organization {
-    _id: string;
-    profile: {
-        name: string;
-        image: string;
-        username: string;
-    };
-    users: [string];
-    registries: string[];
-    overdue: boolean;
-    appType: AppTypeEnum;
-}
-```
-
-- `async getOrganizationProjects( organizationId: string, options: { skip: number; limit: number; state?: ProjectStateEnum; } ): Promise<Project[]>`
-  - used to fetch the projects of the organization
-
-```ts
-enum ProjectStateEnum {
-  MAINTAINED = "MAINTAINED",
-  ARCHIVED = "ARCHIVED",
-}
-
-interface Project {
-  _id: string;
-  name: string;
-  type: ProjectTypeEnum;
-  url: string;
-  environmentVariables: EnvironmentVariable[];
-  deploymentEnvironments: DeploymentEnvironment[];
-  organization: string;
-  state: ProjectStateEnum;
-  hookId: string;
-  provider: string;
-  prCommentIds: {
-    prId: string;
-    commentId: string;
-  }[];
-  configuration: Configuration[];
-  passwordProtection: PasswordProtection;
-  createdAt: Date;
-  updatedAt: Date;
-  domains: Domain[];
-}
-```
-
-- `async getOrganizationProjectCount( organizationId: string, options: { state?: ProjectStateEnum; }): Promise<number>`
-  - used to get the number of projects for the organization.
+For more information about the Site methods, check out the [DOCS](https://docs.spheron.network/sdk/site/)
 
 ## Access Token
 
