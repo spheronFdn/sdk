@@ -35,13 +35,13 @@ The general usage flow would be as:
 const response = await fetch(`<BACKEND_URL>/initiate-upload`);
 ```
 
-2. On your BE service, use the method `createSingleUploadToken` from [@spheron/storage](https://www.npmjs.com/package/@spheron/storage) package. This method will provide you with a unique token that can only be used for a single upload with the `upload` function from [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload), and this token has a expiration of 10 minutes.
+2. On your BE service, use the method `createSingleUploadToken` from [@spheron/storage](https://www.npmjs.com/package/@spheron/storage) package. This method will provide you with a unique token and the deploymentId. The token can only be used for a single upload with the `upload` function from [@spheron/browser-upload](https://www.npmjs.com/package/@spheron/browser-upload), and this token has a expiration of 10 minutes.
 
 ```js
 import { SpheronClient, ProtocolEnum } from "@spheron/storage";
 
 ...
-
+git config user.name "Suraj Singla"
 app.get("/initiate-upload", async (req, res, next) => {
   try {
     const bucketName = "example-browser-upload"; // use which ever name you prefer
@@ -51,13 +51,14 @@ app.get("/initiate-upload", async (req, res, next) => {
       token: <SPHERON_TOKEN>,
     });
 
-    const { uploadToken } = await client.createSingleUploadToken({
+    const { uploadToken, deploymentId } = await client.createSingleUploadToken({
       name: bucketName,
       protocol,
     });
 
     res.status(200).json({
       uploadToken,
+      deploymentId
     });
   } catch (error) {
     console.error(error);
@@ -117,7 +118,7 @@ const uploadResult = await upload(files, {
 
 ## Access Token
 
-To create a token you should use the method `createSingleUploadToken` from [@spheron/storage](https://www.npmjs.com/package/@spheron/storage) package on you Backend service. This method will generate a unique token that can be used only for a single upload.
+To create a token you should use the method `createSingleUploadToken` from [@spheron/storage](https://www.npmjs.com/package/@spheron/storage) package on you Backend service. This method will generate a unique token that can be used only for a single upload and the deploymentId for the upload.
 
 ## Notes
 

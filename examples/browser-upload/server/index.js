@@ -20,13 +20,14 @@ app.get("/initiate-upload", async (req, res, next) => {
       token: SPHERON_TOKEN,
     });
 
-    const { uploadToken } = await client.createSingleUploadToken({
+    const { uploadToken, deploymentId } = await client.createSingleUploadToken({
       name: bucketName,
       protocol,
     });
 
     res.status(200).json({
       uploadToken,
+      deploymentId
     });
   } catch (error) {
     console.error(error);
