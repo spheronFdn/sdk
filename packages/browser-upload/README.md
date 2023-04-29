@@ -41,7 +41,6 @@ const response = await fetch(`<BACKEND_URL>/initiate-upload`);
 import { SpheronClient, ProtocolEnum } from "@spheron/storage";
 
 ...
-git config user.name "Suraj Singla"
 app.get("/initiate-upload", async (req, res, next) => {
   try {
     const bucketName = "example-browser-upload"; // use which ever name you prefer
