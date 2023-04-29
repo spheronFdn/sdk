@@ -452,13 +452,13 @@ class SpheronApi {
 
   async updateClusterInstance(
     id: string,
-    organisationId: string,
+    organizationId: string,
     clusterInstance: UpdateClusterInstaceRequest
   ): Promise<ClusterInstanceResponse> {
     return this.sendApiRequest<ClusterInstanceResponse>(
       HttpMethods.PATCH,
       `/v1/cluster-instance/${id}/update`,
-      { ...clusterInstance, organisationId }
+      { ...clusterInstance, organizationId }
     );
   }
 

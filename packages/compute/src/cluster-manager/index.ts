@@ -13,7 +13,7 @@ class ClusterManager {
     this.spheronApi = spheronApi;
   }
 
-  async getClustersForOrganisation(
+  async getAll(
     organisationId: string,
     options: {
       skip: number;
@@ -23,23 +23,23 @@ class ClusterManager {
     return this.spheronApi.getOrganizationClusters(organisationId, options);
   }
 
-  async getCluster(id: string): Promise<Cluster> {
+  async get(id: string): Promise<Cluster> {
     return this.spheronApi.getCluster(id);
   }
 
-  async deleteCluster(id: string): Promise<void> {
+  async delete(id: string): Promise<void> {
     await this.spheronApi.deleteCluster(id);
   }
 
-  async getClusterInstancesDetails(id: string): Promise<ClusterInstancesInfo> {
+  async getAllInstancesInfo(id: string): Promise<ClusterInstancesInfo> {
     return this.spheronApi.getClusterInstancesDetails(id);
   }
 
-  async getClusterFundsUsage(id: string): Promise<ClusterFundsUsage> {
+  async getFundsUsage(id: string): Promise<ClusterFundsUsage> {
     return this.spheronApi.getClusterFundsUsage(id);
   }
 
-  async getClusterInstances(
+  async getInstances(
     id: string,
     options: {
       skip: number;

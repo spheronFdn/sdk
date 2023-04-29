@@ -22,7 +22,15 @@ class ClusterInstanceManager {
     this.spheronApi = spheronApi;
   }
 
-  async getClusterInstance(
+  async create(
+    clusterInstance: CreateClusterInstanceRequest
+  ): Promise<ClusterInstanceResponse> {
+    clusterInstance.uniqueTopicId = clusterInstance.uniqueTopicId ?? uuidv4();
+
+    return this.spheronApi.createClusterInstance(clusterInstance);
+  }
+
+  async get(
     id: string,
     options?: {
       includeReport?: boolean;
@@ -31,11 +39,11 @@ class ClusterInstanceManager {
     return this.spheronApi.getClusterInstance(id, options);
   }
 
-  async deleteClusterInstance(id: string): Promise<void> {
+  async delete(id: string): Promise<void> {
     return this.spheronApi.deleteClusterInstance(id);
   }
 
-  async updateClusterInstance(
+  async update(
     id: string,
     organisationId: string,
     clusterInstance: UpdateClusterInstaceRequest
@@ -47,7 +55,7 @@ class ClusterInstanceManager {
     );
   }
 
-  async updateClusterInstanceHealthCheckInfo(
+  async updateHealthCheck(
     id: string,
     healthCheck: { path: string; cointainerPort: number }
   ): Promise<{ message: string; updated: boolean }> {
@@ -57,9 +65,7 @@ class ClusterInstanceManager {
     );
   }
 
-  async closeClusterInstance(
-    id: string
-  ): Promise<{ message: string; success: boolean }> {
+  async close(id: string): Promise<{ message: string; success: boolean }> {
     return this.spheronApi.closeClusterInstance(id);
   }
 
@@ -85,15 +91,7 @@ class ClusterInstanceManager {
     return this.spheronApi.getClusterInstanceOrderLogs(id, logsOptions);
   }
 
-  async createClusterInstance(
-    clusterInstance: CreateClusterInstanceRequest
-  ): Promise<ClusterInstanceResponse> {
-    clusterInstance.uniqueTopicId = clusterInstance.uniqueTopicId ?? uuidv4();
-
-    return this.spheronApi.createClusterInstance(clusterInstance);
-  }
-
-  async createClusterInstanceFromTemplate(
+  async createFromMartketplace(
     clusterInstance: CreateClusterInstanceFromMarketplaceRequest
   ): Promise<ClusterInstanceFromMarketplaceResponse> {
     clusterInstance.uniqueTopicId = clusterInstance.uniqueTopicId ?? uuidv4();
@@ -101,11 +99,11 @@ class ClusterInstanceManager {
     return this.spheronApi.createClusterInstanceFromTemplate(clusterInstance);
   }
 
-  async getClusterInstanceDomains(id: string): Promise<Domain[]> {
+  async getDomains(id: string): Promise<Domain[]> {
     return this.spheronApi.getClusterInstanceDomains(id);
   }
 
-  async addClusterInstanceDomain(
+  async addDomain(
     instanceId: string,
     doamin: {
       link: string;
@@ -116,7 +114,7 @@ class ClusterInstanceManager {
     return this.spheronApi.addClusterInstanceDomain(instanceId, doamin);
   }
 
-  async updateClusterInstanceDomain(
+  async updateDomain(
     instanceId: string,
     domainId: string,
     doamin: {
@@ -132,17 +130,11 @@ class ClusterInstanceManager {
     );
   }
 
-  async deleteClusterInstanceDomain(
-    instanceId: string,
-    domainId: string
-  ): Promise<void> {
+  async deleteDomain(instanceId: string, domainId: string): Promise<void> {
     return this.spheronApi.deleteClusterInstanceDomain(instanceId, domainId);
   }
 
-  async verifyClusterInstanceDomain(
-    instanceId: string,
-    domainId: string
-  ): Promise<void> {
+  async verifyDomain(instanceId: string, domainId: string): Promise<void> {
     return this.spheronApi.verifyClusterInstanceDomain(instanceId, domainId);
   }
 }

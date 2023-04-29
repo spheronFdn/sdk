@@ -7,7 +7,7 @@ class ClusterMachineManager {
     this.spheronApi = spheronApi;
   }
 
-  async getComputeMachines(options: {
+  async get(options: {
     skip: number;
     limit: number;
     searchString?: string;
@@ -21,7 +21,7 @@ class ClusterMachineManager {
     return this.spheronApi.getComputeMachines(options);
   }
 
-  async getComputeMachineRegions(): Promise<string[]> {
+  async getRegions(): Promise<string[]> {
     return this.spheronApi.getComputeMachineRegions();
   }
 }

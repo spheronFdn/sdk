@@ -8,17 +8,17 @@ class ClusterMarketplaceManager {
     this.spheronApi = spheronApi;
   }
 
-  async getMarketplaceApps(): Promise<{
+  async getAll(): Promise<{
     clusterTemplates: MarketplaceApp[];
   }> {
     return this.spheronApi.getClusterTemplates();
   }
 
-  async getMarketplaceApp(id: string): Promise<MarketplaceApp> {
+  async get(id: string): Promise<MarketplaceApp> {
     return this.spheronApi.getClusterTemplate(id);
   }
 
-  async getMarketplaceCategories(): Promise<string[]> {
+  async getCategories(): Promise<string[]> {
     return this.spheronApi.getClusterCategories();
   }
 }
