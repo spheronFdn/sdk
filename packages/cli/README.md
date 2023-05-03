@@ -59,9 +59,21 @@
 <h3>spheron create-dapp</h3>
 <p>Use <code>spheron create-dapp</code> to create a template project that will easily be deployed on Spheron later. </p>
 <pre><code>spheron create-dapp</code></pre> 
-This will open up a prompter that will allow you to select what kind of a template you want to create.
+This will open up a prompter that will allow you to select what kind of a template you want to create. If you want to directly call it without prompter you can use:
 
-<code>spheron init --protocol {protocol} [--project {project_name}] [--path {path}] [--framework {framework}]]</code>
+<code>spheron create-dapp --protocol {protocol} [--project {project_name}] [--path {path}] [--framework {framework}]</code>
+
+**_Params options_**
+
+**protocol\*** - [arweave/filecoin/ipfs]
+
+**project** - name (if not provided, path last segment will be taken by default)
+
+**path** - where is the location of dir/file that you want to upload (default is ./)
+
+**framework** -[static/react/vue/angular/next/preact/nuxt2/docusaurus/hugo/eleventy/svelte/gatsby/sanity/ionicreact/vite/scully/stencil/brunch/ionicangular]
+
+> **Note**: \* stands for mandatory (if all of mandatory params are not sent, prompter will be opened)
 
 #
 
@@ -70,16 +82,20 @@ This will open up a prompter that will allow you to select what kind of a templa
 <pre><code>spheron init</code></pre> 
 This will open up a prompter that will prompt you to describe your project. If you want to directly call it without prompter you can use:
 
-<code>spheron init --protocol {protocol} [--project {project_name}] [--path {path}] [--framework {framework}]]</code>
+<code>spheron init --protocol {protocol} [--project {project_name}] [--path {path}] [--framework {framework}]</code>
 You can update this file manually afterwards to change default settings.
 
 **_Params options_**
+
 **protocol\*** - [arweave/filecoin/ipfs]
+
 **project** - name (if not provided, path last segment will be taken by default)
+
 **path** - where is the location of dir/file that you want to upload (default is ./)
+
 **framework** -[static/react/vue/angular/next/preact/nuxt2/docusaurus/hugo/eleventy/svelte/gatsby/sanity/ionicreact/vite/scully/stencil/brunch/ionicangular]
 
-**Note**: \* stands for mandatory (if all of mandatory params are not sent, prompter will be opened)
+> **Note**: \* stands for mandatory (if all of mandatory params are not sent, prompter will be opened)
 
 #
 
@@ -98,12 +114,16 @@ This will open up a prompter that will prompt you to describe how you want to up
 <code>spheron upload --path {file_path} --protocol {protocol} [--project {project_name}] [--organization {organizationId}] </code>
 
 **_Params options_**
+
 **path\*** - where is the location of dir/file that you want to upload (default is ./)
+
 **protocol\*** - [arweave/filecoin/ipfs]
+
 **project** - name (if not provided, path last segment will be taken by default)
+
 **organization** - you can override organizationId that will be used. By default it will take one that you have received after executing <code>spheron login</code>
 
-**Note**: \* stands for mandatory (if all of mandatory params are not sent, prompter will be opened)
+> **Note**: \* stands for mandatory (if all of mandatory params are not sent, prompter will be opened)
 
 #
 
@@ -112,17 +132,19 @@ This will open up a prompter that will prompt you to describe how you want to up
 <pre><code>spheron create-organization</code></pre> 
 This will open up a prompter that will help you set up your new organization. If you want to directly call it without prompter you can use:
 
-<code>spheron upload --name {organization_name} --username {organization_username} </code>
+<code>spheron create-organization --name {organization_name} --username {organization_username} </code>
 
 **_Params options_**
+
 **name\*** - name of your organization
+
 **username\*** - username represent short name for your organization.
 
-**Note**: \* stands for mandatory (if all of mandatory params are not sent, prompter will be opened)
+> **Note**: \* stands for mandatory (if all of mandatory params are not sent, prompter will be opened)
 
 #
 
-  <h3>spheron login</h3>
+<h3>spheron login</h3>
 <p>Use <code>spheron login</code> to connect to your Spheron account. This command will allow you to authenticate to Spheron and is mandatory to execute before doing <code>upload</code> or <code>publish</code> commands.</p>
 <pre><code>spheron login</code></pre> 
 This will open up a prompter that will help you set up your new organization. If you want to directly call it without prompter you can use:
