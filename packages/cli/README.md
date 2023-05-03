@@ -125,6 +125,8 @@ This will open up a prompter that will prompt you to describe how you want to up
 
 > **Note**: \* stands for mandatory (if all of mandatory params are not sent, prompter will be opened)
 
+#
+
 <h3>spheron create-organization</h3>
 <p>Use <code>spheron create-organization</code> if you want to create a new organization. This will set that organization as default and will use it later for upload/publish commands by default. Keep in mind that first time you execute <code>spheron login</code> command, you will get new organization created if you already didn't have one set up.   </p>
 <pre><code>spheron create-organization</code></pre> 
