@@ -5,6 +5,7 @@ import {
   CreateClusterInstanceRequest,
   Domain,
   DomainTypeEnum,
+  EventProcessingFunction,
   InstanceLogType,
   SpheronApi,
   UpdateClusterInstaceRequest,
@@ -136,6 +137,33 @@ class ClusterInstanceManager {
 
   async verifyDomain(instanceId: string, domainId: string): Promise<void> {
     return this.spheronApi.verifyClusterInstanceDomain(instanceId, domainId);
+  }
+
+  async fetchLogs(
+    instanceId: string,
+    topicId: string
+  ): Promise<{
+    topicId: string;
+    message: string;
+  }> {
+    return this.spheronApi.triggerClusterInstanceLogFetch(instanceId, topicId);
+  }
+
+  async triggerHealthCheck(
+    instanceId: string,
+    topicId: string
+  ): Promise<{
+    topicId: string;
+    message: string;
+  }> {
+    return this.spheronApi.triggerClusterInstanceHealthCheck(
+      instanceId,
+      topicId
+    );
+  }
+
+  subscribeToEventStream(eventProcessingFunction: EventProcessingFunction) {
+    this.spheronApi.subscribeToEventStream(eventProcessingFunction);
   }
 }
 

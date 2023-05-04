@@ -21,6 +21,7 @@ import {
   ProviderEnum,
   SpheronApi,
   UpdateClusterInstaceRequest,
+  EventProcessingFunction,
 } from "@spheron/core";
 import { ClusterManager } from "./cluster-manager";
 import { ClusterMarketplaceManager } from "./cluster-marketplace-manager";
@@ -55,6 +56,7 @@ export {
   ClusterProtocolEnum,
   CreateClusterInstanceFromMarketplaceRequest,
   ClusterInstanceResponse,
+  EventProcessingFunction,
 };
 
 export interface SpheronClientConfiguration {

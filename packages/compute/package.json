@@ -1,12 +1,11 @@
 {
   "name": "@spheron/compute",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Typescript library for deploying compute instances to Akash via Spheron",
   "keywords": [
     "Compute",
     "Typescript",
     "Badass",
-    "IPFS",
     "Akash",
     "SDK",
     "Deploy"

@@ -19,6 +19,8 @@ import {
 } from "./enums";
 import { ProjectTypeEnum } from "./enums";
 
+type EventProcessingFunction = (event: any) => void;
+
 interface TokenScope {
   user: {
     id: string;
@@ -418,4 +420,5 @@ export {
   IPersistentStorage,
   MarketplaceApp,
   ComputeMachine,
+  EventProcessingFunction,
 };

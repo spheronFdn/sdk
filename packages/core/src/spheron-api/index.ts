@@ -29,6 +29,7 @@ import {
   ClusterInstanceOrder,
   MarketplaceApp,
   ComputeMachine,
+  EventProcessingFunction,
 } from "./interfaces";
 import {
   CreateClusterInstanceFromMarketplaceRequest,
@@ -39,6 +40,7 @@ import {
   ClusterInstanceResponse,
   ClusterInstanceFromMarketplaceResponse,
 } from "./response-interfaces";
+import EventSource from "eventsource";
 
 class SpheronApi {
   private readonly spheronApiUrl: string = "https://api-dev.spheron.network";
@@ -623,6 +625,69 @@ class SpheronApi {
     return result.regions;
   }
 
+  async triggerClusterInstanceHealthCheck(
+    instanceId: string,
+    topicId: string
+  ): Promise<{
+    topicId: string;
+    message: string;
+  }> {
+    return this.sendApiRequest<{
+      topicId: string;
+      message: string;
+    }>(
+      HttpMethods.POST,
+      `/v1/cluster-instance/${instanceId}/trigger/instance-health-check?topicId=${topicId}`
+    );
+  }
+
+  async triggerClusterInstanceStatusCheck(
+    instanceId: string,
+    topicId: string
+  ): Promise<{
+    topicId: string;
+    message: string;
+  }> {
+    return this.sendApiRequest<{
+      topicId: string;
+      message: string;
+    }>(
+      HttpMethods.POST,
+      `/v1/cluster-instance/${instanceId}/trigger/container-health-check?topicId=${topicId}`
+    );
+  }
+
+  async triggerClusterInstanceLogFetch(
+    instanceId: string,
+    topicId: string
+  ): Promise<{
+    topicId: string;
+    message: string;
+  }> {
+    return this.sendApiRequest<{
+      topicId: string;
+      message: string;
+    }>(
+      HttpMethods.POST,
+      `/v1/cluster-instance/${instanceId}/trigger/fetch-logs?topicId=${topicId}`
+    );
+  }
+
+  subscribeToEventStream(eventProcessingFunction: EventProcessingFunction) {
+    const eventSource = new EventSource(`${this.spheronApiUrl}/subscribe`);
+
+    // Add an event listener for the 'message' event
+    eventSource.onmessage = (event) => {
+      console.log("Received data:", event.data);
+      eventProcessingFunction(JSON.parse(event.data));
+    };
+
+    // Add an event listener for the 'error' event
+    eventSource.onerror = (event) => {
+      console.error("Error occurred:", event);
+    };
+  }
+
   private async sendApiRequest<T>(
     method: HttpMethods,
     path: string,
@@ -641,6 +706,9 @@ class SpheronApi {
         },
         params: params,
       });
+      console.log("----------------- RESPONSE ------------------");
+      console.log(response.status);
+      console.log(response.data);
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || error?.message);
