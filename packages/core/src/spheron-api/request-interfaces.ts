@@ -1,10 +1,24 @@
 import { ClusterProtocolEnum } from "./enums";
 import { Env, Port } from "./interfaces";
 
-interface CreateClusterInstanceRequest {
+interface CreateInstanceRequest {
   organizationId: string;
   uniqueTopicId?: string;
-  configuration: CreateClusterInstanceConfig;
+  configuration: {
+    branch?: string;
+    folderName: string; // folder where docker image is located in repo
+    protocol: ClusterProtocolEnum; // ex: akash
+    image: string; // name of the docker image if it is not located in repo
+    tag: string; // name of the docker image if it is not located in repo
+    instanceCount: number;
+    buildImage: boolean; // if container should build the image, or if user has already defined it
+    ports: Array<Port>;
+    env: Array<Env>;
+    command: Array<string>;
+    args: Array<string>;
+    region: string;
+    akashMachineImageName: string;
+  };
   instanceName?: string;
   clusterUrl: string;
   clusterProvider: string;
@@ -13,23 +27,7 @@ interface CreateClusterInstanceRequest {
   healthCheckPort: number;
 }
 
-interface CreateClusterInstanceConfig {
-  branch?: string;
-  folderName: string; // folder where docker image is located in repo
-  protocol: ClusterProtocolEnum; // ex: akash
-  image: string; // name of the docker image if it is not located in repo
-  tag: string; // name of the docker image if it is not located in repo
-  instanceCount: number;
-  buildImage: boolean; // if container should build the image, or if user has already defined it
-  ports: Array<Port>;
-  env: Array<Env>;
-  command: Array<string>;
-  args: Array<string>;
-  region: string;
-  akashMachineImageName: string;
-}
-
-interface CreateClusterInstanceFromMarketplaceRequest {
+interface CreateInstanceFromMarketplaceRequest {
   templateId: string;
   environmentVariables: ClusterDeploymentVariable[];
   organizationId: string;
@@ -44,7 +42,7 @@ interface ClusterDeploymentVariable {
   isSecret: boolean;
 }
 
-interface UpdateClusterInstaceRequest {
+interface UpdateInstaceRequest {
   env: Array<Env>;
   command: Array<string>;
   args: Array<string>;
@@ -55,8 +53,7 @@ interface UpdateClusterInstaceRequest {
 }
 
 export {
-  CreateClusterInstanceRequest,
-  CreateClusterInstanceConfig,
-  CreateClusterInstanceFromMarketplaceRequest,
-  UpdateClusterInstaceRequest,
+  CreateInstanceRequest,
+  CreateInstanceFromMarketplaceRequest,
+  UpdateInstaceRequest,
 };

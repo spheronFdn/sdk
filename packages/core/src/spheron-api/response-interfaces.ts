@@ -1,12 +1,12 @@
 import { MarketplaceApp } from "./interfaces";
 
-interface ClusterInstanceResponse {
+interface InstanceResponse {
   clusterId: string;
   clusterInstanceId: string;
   clusterInstanceOrderId: string;
   topic: string;
 }
-interface ClusterInstanceFromMarketplaceResponse {
+interface MarketplaceInstanceResponse {
   clusterId: string;
   clusterInstanceId: string;
   clusterInstanceOrderId: string;
@@ -15,4 +15,4 @@ interface ClusterInstanceFromMarketplaceResponse {
   topic: string;
 }
 
-export { ClusterInstanceResponse, ClusterInstanceFromMarketplaceResponse };
+export { InstanceResponse, MarketplaceInstanceResponse };

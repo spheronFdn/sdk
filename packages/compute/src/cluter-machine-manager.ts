@@ -1,4 +1,5 @@
-import { ComputeMachine, SpheronApi } from "@spheron/core";
+import { SpheronApi } from "@spheron/core";
+import { ComputeMachine, mapComputeMachine } from "./interfaces";
 
 class ClusterMachineManager {
   private readonly spheronApi: SpheronApi;
@@ -18,7 +19,9 @@ class ClusterMachineManager {
       );
     }
 
-    return this.spheronApi.getComputeMachines(options);
+    const computeMachines = await this.spheronApi.getComputeMachines(options);
+
+    return computeMachines.map((x) => mapComputeMachine(x));
   }
 
   async getRegions(): Promise<string[]> {

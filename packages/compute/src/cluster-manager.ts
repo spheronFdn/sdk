@@ -1,10 +1,12 @@
+import { SpheronApi } from "@spheron/core";
 import {
   Cluster,
+  ClusterInstanceExtendedInfo,
+  mapCluster,
+  mapClusterInstanceExtendedInfo,
   ClusterFundsUsage,
   ClusterInstancesInfo,
-  ExtendedClusterInstance,
-  SpheronApi,
-} from "@spheron/core";
+} from "./interfaces";
 
 class ClusterManager {
   private readonly spheronApi: SpheronApi;
@@ -13,29 +15,21 @@ class ClusterManager {
     this.spheronApi = spheronApi;
   }
 
-  async getAll(
-    organisationId: string,
-    options: {
-      skip: number;
-      limit: number;
-    }
-  ): Promise<Cluster[]> {
-    return this.spheronApi.getOrganizationClusters(organisationId, options);
-  }
-
   async get(id: string): Promise<Cluster> {
-    return this.spheronApi.getCluster(id);
+    const cluster = await this.spheronApi.getCluster(id);
+
+    return mapCluster(cluster);
   }
 
   async delete(id: string): Promise<void> {
     await this.spheronApi.deleteCluster(id);
   }
 
-  async getAllInstancesInfo(id: string): Promise<ClusterInstancesInfo> {
+  async getInstancesInfo(id: string): Promise<ClusterInstancesInfo> {
     return this.spheronApi.getClusterInstancesDetails(id);
   }
 
-  async getFundsUsage(id: string): Promise<ClusterFundsUsage> {
+  async getUsage(id: string): Promise<ClusterFundsUsage> {
     return this.spheronApi.getClusterFundsUsage(id);
   }
 
@@ -46,12 +40,17 @@ class ClusterManager {
       limit: number;
       includeReport?: boolean;
     }
-  ): Promise<ExtendedClusterInstance[]> {
+  ): Promise<ClusterInstanceExtendedInfo[]> {
     if (options.skip < 0 || options.limit < 0) {
       throw new Error(`Skip and Limit cannot be negative numbers.`);
     }
 
-    return this.spheronApi.getClusterInstances(id, options);
+    const clusterInstances = await this.spheronApi.getClusterInstances(
+      id,
+      options
+    );
+
+    return clusterInstances.map((x) => mapClusterInstanceExtendedInfo(x));
   }
 }
 

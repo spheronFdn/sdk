@@ -32,13 +32,13 @@ import {
   EventProcessingFunction,
 } from "./interfaces";
 import {
-  CreateClusterInstanceFromMarketplaceRequest,
-  CreateClusterInstanceRequest,
-  UpdateClusterInstaceRequest,
+  CreateInstanceFromMarketplaceRequest,
+  CreateInstanceRequest,
+  UpdateInstaceRequest,
 } from "./request-interfaces";
 import {
-  ClusterInstanceResponse,
-  ClusterInstanceFromMarketplaceResponse,
+  InstanceResponse,
+  MarketplaceInstanceResponse,
 } from "./response-interfaces";
 import EventSource from "eventsource";
 
@@ -404,13 +404,12 @@ class SpheronApi {
     return result.extendedInstances;
   }
 
-  async getClusterTemplates(): Promise<{
-    clusterTemplates: MarketplaceApp[];
-  }> {
-    return this.sendApiRequest<{ clusterTemplates: MarketplaceApp[] }>(
-      HttpMethods.GET,
-      `/v1/cluster-templates`
-    );
+  async getClusterTemplates(): Promise<MarketplaceApp[]> {
+    const response = await this.sendApiRequest<{
+      clusterTemplates: MarketplaceApp[];
+    }>(HttpMethods.GET, `/v1/cluster-templates`);
+
+    return response.clusterTemplates;
   }
 
   async getClusterTemplate(id: string): Promise<MarketplaceApp> {
@@ -455,9 +454,9 @@ class SpheronApi {
   async updateClusterInstance(
     id: string,
     organizationId: string,
-    clusterInstance: UpdateClusterInstaceRequest
-  ): Promise<ClusterInstanceResponse> {
-    return this.sendApiRequest<ClusterInstanceResponse>(
+    clusterInstance: UpdateInstaceRequest
+  ): Promise<InstanceResponse> {
+    return this.sendApiRequest<InstanceResponse>(
       HttpMethods.PATCH,
       `/v1/cluster-instance/${id}/update`,
       { ...clusterInstance, organizationId }
@@ -517,9 +516,9 @@ class SpheronApi {
   }
 
   async createClusterInstance(
-    clusterInstance: CreateClusterInstanceRequest
-  ): Promise<ClusterInstanceResponse> {
-    return this.sendApiRequest<ClusterInstanceResponse>(
+    clusterInstance: CreateInstanceRequest
+  ): Promise<InstanceResponse> {
+    return this.sendApiRequest<InstanceResponse>(
       HttpMethods.POST,
       `/v1/cluster-instance/create`,
       clusterInstance
@@ -527,9 +526,9 @@ class SpheronApi {
   }
 
   async createClusterInstanceFromTemplate(
-    clusterInstance: CreateClusterInstanceFromMarketplaceRequest
-  ): Promise<ClusterInstanceFromMarketplaceResponse> {
-    return this.sendApiRequest<ClusterInstanceFromMarketplaceResponse>(
+    clusterInstance: CreateInstanceFromMarketplaceRequest
+  ): Promise<MarketplaceInstanceResponse> {
+    return this.sendApiRequest<MarketplaceInstanceResponse>(
       HttpMethods.POST,
       `/v1/cluster-instance/template`,
       clusterInstance

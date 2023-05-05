@@ -324,13 +324,13 @@ interface MarketplaceAppServiceData {
   dockerImageTag: string;
   provider: string;
   instanceCount: number;
-  variables: IClusterTemplateVariable[];
-  ports: IClusterTemplatePort[];
+  variables: MarketplaceAppVariable[];
+  ports: MarketplaceAppPort[];
   commands: string[];
   args: string[];
 }
 
-interface IClusterTemplateVariable {
+interface MarketplaceAppVariable {
   name: string;
   defaultValue: string;
   label: string;
@@ -338,7 +338,7 @@ interface IClusterTemplateVariable {
   hidden: boolean;
 }
 
-interface IClusterTemplatePort {
+interface MarketplaceAppPort {
   containerValue: number;
   defaultExposedValue: number;
 }
@@ -421,4 +421,10 @@ export {
   MarketplaceApp,
   ComputeMachine,
   EventProcessingFunction,
+  MarketplaceAppMetadata,
+  MarketplaceAppServiceData,
+  MarketplaceAppPort,
+  MarketplaceAppVariable,
+  HealthCheck,
+  MachineImageType,
 };
