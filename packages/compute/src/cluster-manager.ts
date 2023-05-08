@@ -1,11 +1,11 @@
 import { SpheronApi } from "@spheron/core";
 import {
   Cluster,
-  ClusterInstanceExtendedInfo,
+  InstanceDetailed,
   mapCluster,
-  mapClusterInstanceExtendedInfo,
+  mapExtendedClusterInstance,
   ClusterFundsUsage,
-  ClusterInstancesInfo,
+  InstancesInfo,
 } from "./interfaces";
 
 class ClusterManager {
@@ -25,7 +25,7 @@ class ClusterManager {
     await this.spheronApi.deleteCluster(id);
   }
 
-  async getInstancesInfo(id: string): Promise<ClusterInstancesInfo> {
+  async getInstancesInfo(id: string): Promise<InstancesInfo> {
     return this.spheronApi.getClusterInstancesDetails(id);
   }
 
@@ -40,7 +40,7 @@ class ClusterManager {
       limit: number;
       includeReport?: boolean;
     }
-  ): Promise<ClusterInstanceExtendedInfo[]> {
+  ): Promise<InstanceDetailed[]> {
     if (options.skip < 0 || options.limit < 0) {
       throw new Error(`Skip and Limit cannot be negative numbers.`);
     }
@@ -50,7 +50,7 @@ class ClusterManager {
       options
     );
 
-    return clusterInstances.map((x) => mapClusterInstanceExtendedInfo(x));
+    return clusterInstances.map((x) => mapExtendedClusterInstance(x));
   }
 }
 

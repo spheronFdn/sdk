@@ -1,6 +1,6 @@
 import {
   AppTypeEnum,
-  ClusterInstanceStateEnum,
+  InstanceStateEnum,
   ClusterStateEnum,
   HealthStatusEnum,
   MarketplaceCategoryEnum,
@@ -253,7 +253,7 @@ interface ClusterFundsUsage {
 
 interface ClusterInstance {
   _id: string;
-  state: ClusterInstanceStateEnum;
+  state: InstanceStateEnum;
   name: string;
   orders: Array<string>;
   cluster: string;

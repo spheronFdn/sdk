@@ -87,7 +87,7 @@ enum ClusterStateEnum {
   ARCHIVED = "ARCHIVED",
 }
 
-enum ClusterInstanceStateEnum {
+enum InstanceStateEnum {
   STARTING = "Starting",
   FAILED_START = "Failed-start",
   ACTIVE = "Active",
@@ -133,7 +133,7 @@ export {
   AppTypeEnum,
   ProviderEnum,
   ClusterStateEnum,
-  ClusterInstanceStateEnum,
+  InstanceStateEnum,
   HealthStatusEnum,
   MarketplaceCategoryEnum,
   InstanceLogType,

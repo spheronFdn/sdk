@@ -14,20 +14,23 @@ import {
   Domain as CoreDomain,
   MarketplaceCategoryEnum,
   ClusterStateEnum,
-  ClusterInstanceStateEnum,
+  InstanceStateEnum,
   HealthCheck,
   MachineImageType,
   DeploymentEnvironment,
   ClusterFundsUsage,
-  ClusterInstancesInfo,
-  MarketplaceInstanceResponse,
+  ClusterInstancesInfo as InstancesInfo,
+  MarketplaceInstanceResponse as MarketplaceInstanceResponseCore,
   CreateInstanceRequest,
   CreateInstanceFromMarketplaceRequest,
   EventProcessingFunction,
   InstanceLogType,
   UpdateInstaceRequest,
-  InstanceResponse,
+  InstanceResponse as InstanceResponseCore,
   ClusterProtocolEnum,
+  MarketplaceDeploymentVariable,
+  Port,
+  Env,
 } from "@spheron/core";
 
 interface Organization {
@@ -140,13 +143,13 @@ const mapCluster = (input: ClusterCore): Cluster => {
   };
 };
 
-interface ClusterInstance {
+interface Instance {
   id: string;
-  state: ClusterInstanceStateEnum;
+  state: InstanceStateEnum;
   name: string;
-  orders: Array<string>;
+  deployments: Array<string>;
   cluster: string;
-  activeOrder: string;
+  activeDeployments: string;
   latestUrlPreview: string;
   agreedMachineImageType: MachineImageType;
   retrievableAkt: number;
@@ -156,7 +159,7 @@ interface ClusterInstance {
   updatedAt: Date;
 }
 
-interface ClusterInstanceExtendedInfo extends ClusterInstance {
+interface InstanceDetailed extends Instance {
   cpu: number;
   memory: string;
   storage: string;
@@ -165,14 +168,14 @@ interface ClusterInstanceExtendedInfo extends ClusterInstance {
   tag: string;
 }
 
-const mapClusterInstance = (input: ClusterInstanceCore): ClusterInstance => {
+const mapClusterInstance = (input: ClusterInstanceCore): Instance => {
   return {
     id: input._id,
     state: input.state,
     name: input.name,
-    orders: input.orders,
+    deployments: input.orders,
     cluster: input.cluster,
-    activeOrder: input.activeOrder,
+    activeDeployments: input.activeOrder,
     latestUrlPreview: input.latestUrlPreview,
     agreedMachineImageType: input.agreedMachineImageType,
     retrievableAkt: input.retrievableAkt,
@@ -183,9 +186,9 @@ const mapClusterInstance = (input: ClusterInstanceCore): ClusterInstance => {
   };
 };
 
-const mapClusterInstanceExtendedInfo = (
+const mapExtendedClusterInstance = (
   input: ExtendedClusterInstance
-): ClusterInstanceExtendedInfo => {
+): InstanceDetailed => {
   const baseClusterInstance = mapClusterInstance(input);
 
   return {
@@ -221,7 +224,7 @@ const mapDomain = (coreDomain: CoreDomain): Domain => {
   };
 };
 
-interface ClusterInstanceOrder {
+interface InstanceDeployment {
   id: string;
   type: string;
   commitId: string;
@@ -232,15 +235,15 @@ interface ClusterInstanceOrder {
   closingLogs: [{ time: string; log: string }];
   clusterLogs: Array<string>;
   clusterEvents: Array<string>;
-  clusterInstance: string;
-  clusterInstanceConfiguration: string;
+  instance: string;
+  instanceConfiguration: string;
   urlPrewiew: string;
   deploymentInitiator: string;
 }
 
-const mapClusterInstanceOrder = (
+const mapInstanceDeployment = (
   input: ClusterInstanceOrderCore
-): ClusterInstanceOrder => {
+): InstanceDeployment => {
   return {
     id: input._id,
     type: input.type,
@@ -252,10 +255,131 @@ const mapClusterInstanceOrder = (
     closingLogs: input.closingLogs,
     clusterLogs: input.clusterLogs,
     clusterEvents: input.clusterEvents,
-    clusterInstance: input.clusterInstance,
-    clusterInstanceConfiguration: input.clusterInstanceConfiguration,
+    instance: input.clusterInstance,
+    instanceConfiguration: input.clusterInstanceConfiguration,
     urlPrewiew: input.urlPrewiew,
     deploymentInitiator: input.deploymentInitiator,
+  };
+};
+
+interface InstanceCreationConfig {
+  uniqueTopicId?: string;
+  configuration: {
+    branch?: string;
+    folderName: string;
+    protocol: ClusterProtocolEnum;
+    image: string;
+    tag: string;
+    instanceCount: number;
+    buildImage: boolean;
+    ports: Array<Port>;
+    env: Array<EnvironmentVar>;
+    command: Array<string>;
+    args: Array<string>;
+    region: string;
+    machineImageName: string;
+  };
+  instanceName?: string;
+  clusterUrl: string;
+  clusterProvider: string;
+  clusterName: string;
+  healthCheckUrl: string;
+  healthCheckPort: number;
+}
+
+interface EnvironmentVar {
+  key: string;
+  value: string;
+  isSecret: boolean;
+}
+
+const mapCreateInstanceRequest = (
+  input: InstanceCreationConfig,
+  organizationId: string
+): CreateInstanceRequest => {
+  return {
+    organizationId,
+    uniqueTopicId: input.uniqueTopicId,
+    configuration: {
+      branch: input.configuration.branch,
+      folderName: input.configuration.folderName,
+      protocol: input.configuration.protocol,
+      image: input.configuration.image,
+      tag: input.configuration.tag,
+      instanceCount: input.configuration.instanceCount,
+      buildImage: input.configuration.buildImage,
+      ports: input.configuration.ports,
+      env: input.configuration.env.map((ev: EnvironmentVar): Env => {
+        return {
+          value: `${ev.key}=${ev.value}`,
+          isSecret: ev.isSecret,
+        };
+      }),
+      command: input.configuration.command,
+      args: input.configuration.args,
+      region: input.configuration.region,
+      akashMachineImageName: input.configuration.machineImageName,
+    },
+    instanceName: input.instanceName,
+    clusterUrl: input.clusterUrl,
+    clusterProvider: input.clusterProvider,
+    clusterName: input.clusterName,
+    healthCheckUrl: input.healthCheckUrl,
+    healthCheckPort: input.healthCheckPort,
+  };
+};
+
+interface MarketplaceInstanceCreationConfig {
+  templateId: string;
+  environmentVariables: MarketplaceDeploymentVariable[];
+  machineImageId: string;
+  uniqueTopicId?: string;
+  region: string;
+}
+
+const mapMarketplaceInstanceCreationConfig = (
+  input: MarketplaceInstanceCreationConfig,
+  organizationId: string
+): CreateInstanceFromMarketplaceRequest => {
+  return {
+    templateId: input.templateId,
+    environmentVariables: input.environmentVariables,
+    organizationId: organizationId,
+    akashImageId: input.machineImageId,
+    uniqueTopicId: input.uniqueTopicId,
+    region: input.region,
+  };
+};
+
+interface InstanceResponse {
+  clusterId: string;
+  instanceId: string;
+  instanceDeploymentId: string;
+  topic: string;
+}
+interface MarketplaceInstanceResponse extends InstanceResponse {
+  template: MarketplaceApp;
+  templateId: string;
+}
+
+const mapInstanceResponse = (input: InstanceResponseCore): InstanceResponse => {
+  return {
+    clusterId: input.clusterId,
+    instanceId: input.clusterInstanceId,
+    instanceDeploymentId: input.clusterInstanceOrderId,
+    topic: input.topic,
+  };
+};
+
+const mapMarketplaceInstanceResponse = (
+  input: MarketplaceInstanceResponseCore
+): MarketplaceInstanceResponse => {
+  const baseInstanceResponse = mapInstanceResponse(input);
+
+  return {
+    ...baseInstanceResponse,
+    template: mapMarketplaceApp(input.template),
+    templateId: input.templateId,
   };
 };
 
@@ -271,25 +395,30 @@ export {
   Cluster,
   ClusterStateEnum,
   mapCluster,
-  ClusterInstance,
-  ClusterInstanceExtendedInfo,
+  Instance,
+  InstanceDetailed,
   mapClusterInstance,
-  mapClusterInstanceExtendedInfo,
+  mapExtendedClusterInstance,
   Domain,
   DomainTypeEnum,
   mapDomain,
-  ClusterInstanceOrder,
-  mapClusterInstanceOrder,
+  InstanceDeployment,
+  mapInstanceDeployment,
   ClusterFundsUsage,
-  ClusterInstancesInfo,
+  InstancesInfo,
   MarketplaceInstanceResponse,
-  CreateInstanceRequest,
   EventProcessingFunction,
   InstanceLogType,
   UpdateInstaceRequest,
   InstanceResponse,
-  CreateInstanceFromMarketplaceRequest,
   ClusterProtocolEnum,
   ProviderEnum,
-  ClusterInstanceStateEnum,
+  InstanceStateEnum,
+  InstanceCreationConfig,
+  EnvironmentVar,
+  mapCreateInstanceRequest,
+  MarketplaceInstanceCreationConfig,
+  mapMarketplaceInstanceCreationConfig,
+  mapInstanceResponse,
+  mapMarketplaceInstanceResponse,
 };

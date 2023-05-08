@@ -1,35 +1,48 @@
 import { SpheronApi } from "@spheron/core";
 import { v4 as uuidv4 } from "uuid";
 import {
-  ClusterInstance,
-  ClusterInstanceOrder,
+  Instance,
+  InstanceDeployment,
   Domain,
   DomainTypeEnum,
   mapClusterInstance,
-  mapClusterInstanceOrder,
+  mapInstanceDeployment,
   mapDomain,
-  CreateInstanceRequest,
   InstanceResponse,
   UpdateInstaceRequest,
   InstanceLogType,
-  CreateInstanceFromMarketplaceRequest,
+  MarketplaceInstanceCreationConfig,
   MarketplaceInstanceResponse,
   EventProcessingFunction,
+  InstanceCreationConfig,
+  mapCreateInstanceRequest,
+  mapMarketplaceInstanceCreationConfig,
+  mapMarketplaceInstanceResponse,
+  mapInstanceResponse,
 } from "./interfaces";
+import Utils from "./utils";
 
-class ClusterInstanceManager {
+class InstanceManager {
   private readonly spheronApi: SpheronApi;
+  private readonly utils: Utils;
 
-  constructor(spheronApi: SpheronApi) {
+  constructor(spheronApi: SpheronApi, utils: Utils) {
     this.spheronApi = spheronApi;
+    this.utils = utils;
   }
 
   async create(
-    clusterInstance: CreateInstanceRequest
+    creationConfig: InstanceCreationConfig
   ): Promise<InstanceResponse> {
-    clusterInstance.uniqueTopicId = clusterInstance.uniqueTopicId ?? uuidv4();
+    creationConfig.uniqueTopicId = creationConfig.uniqueTopicId ?? uuidv4();
 
-    return this.spheronApi.createClusterInstance(clusterInstance);
+    const organizationId = await this.utils.getOrganizationId();
+
+    const response = await this.spheronApi.createClusterInstance(
+      mapCreateInstanceRequest(creationConfig, organizationId)
+    );
+
+    return mapInstanceResponse(response);
   }
 
   async get(
@@ -37,7 +50,7 @@ class ClusterInstanceManager {
     options?: {
       includeReport?: boolean;
     }
-  ): Promise<ClusterInstance> {
+  ): Promise<Instance> {
     const clusterInstance = await this.spheronApi.getClusterInstance(
       id,
       options
@@ -52,14 +65,17 @@ class ClusterInstanceManager {
 
   async update(
     id: string,
-    organisationId: string,
     clusterInstance: UpdateInstaceRequest
   ): Promise<InstanceResponse> {
-    return this.spheronApi.updateClusterInstance(
+    const organizationId = await this.utils.getOrganizationId();
+
+    const response = await this.spheronApi.updateClusterInstance(
       id,
-      organisationId,
+      organizationId,
       clusterInstance
     );
+
+    return mapInstanceResponse(response);
   }
 
   async updateHealthCheck(
@@ -78,13 +94,13 @@ class ClusterInstanceManager {
 
   async getClusterInstanceOrder(
     id: string
-  ): Promise<{ order: ClusterInstanceOrder; liveLogs: string[] }> {
+  ): Promise<{ order: InstanceDeployment; liveLogs: string[] }> {
     const clusterInstanceOrder = await this.spheronApi.getClusterInstanceOrder(
       id
     );
 
     return {
-      order: mapClusterInstanceOrder(clusterInstanceOrder.order),
+      order: mapInstanceDeployment(clusterInstanceOrder.order),
       liveLogs: clusterInstanceOrder.liveLogs,
     };
   }
@@ -97,7 +113,7 @@ class ClusterInstanceManager {
       logType: InstanceLogType;
       search?: string;
     }
-  ): Promise<ClusterInstanceOrder> {
+  ): Promise<InstanceDeployment> {
     if (logsOptions.from < 0 || logsOptions.to < 0) {
       throw new Error(`From and To cannot be negative numbers.`);
     }
@@ -107,15 +123,21 @@ class ClusterInstanceManager {
       logsOptions
     );
 
-    return mapClusterInstanceOrder(order);
+    return mapInstanceDeployment(order);
   }
 
   async createFromMartketplace(
-    clusterInstance: CreateInstanceFromMarketplaceRequest
+    createConfig: MarketplaceInstanceCreationConfig
   ): Promise<MarketplaceInstanceResponse> {
-    clusterInstance.uniqueTopicId = clusterInstance.uniqueTopicId ?? uuidv4();
+    createConfig.uniqueTopicId = createConfig.uniqueTopicId ?? uuidv4();
 
-    return this.spheronApi.createClusterInstanceFromTemplate(clusterInstance);
+    const organizationId = await this.utils.getOrganizationId();
+
+    const response = await this.spheronApi.createClusterInstanceFromTemplate(
+      mapMarketplaceInstanceCreationConfig(createConfig, organizationId)
+    );
+
+    return mapMarketplaceInstanceResponse(response);
   }
 
   async getDomains(id: string): Promise<Domain[]> {
@@ -166,7 +188,7 @@ class ClusterInstanceManager {
     return this.spheronApi.verifyClusterInstanceDomain(instanceId, domainId);
   }
 
-  async triggerLogFetch(
+  async triggerLatestLog(
     instanceId: string,
     topicId: string
   ): Promise<{
@@ -176,7 +198,7 @@ class ClusterInstanceManager {
     return this.spheronApi.triggerClusterInstanceLogFetch(instanceId, topicId);
   }
 
-  async triggerHealthCheck(
+  async triggerLatestHealth(
     instanceId: string,
     topicId: string
   ): Promise<{
@@ -194,4 +216,4 @@ class ClusterInstanceManager {
   }
 }
 
-export { ClusterInstanceManager };
+export { InstanceManager };

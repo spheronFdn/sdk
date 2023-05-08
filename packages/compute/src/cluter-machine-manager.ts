@@ -1,7 +1,7 @@
 import { SpheronApi } from "@spheron/core";
 import { ComputeMachine, mapComputeMachine } from "./interfaces";
 
-class ClusterMachineManager {
+class ComputeMachineManager {
   private readonly spheronApi: SpheronApi;
 
   constructor(spheronApi: SpheronApi) {
@@ -29,4 +29,4 @@ class ClusterMachineManager {
   }
 }
 
-export { ClusterMachineManager };
+export { ComputeMachineManager };

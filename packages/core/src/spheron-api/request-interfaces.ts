@@ -29,14 +29,14 @@ interface CreateInstanceRequest {
 
 interface CreateInstanceFromMarketplaceRequest {
   templateId: string;
-  environmentVariables: ClusterDeploymentVariable[];
+  environmentVariables: MarketplaceDeploymentVariable[];
   organizationId: string;
   akashImageId: string;
   uniqueTopicId?: string;
   region: string;
 }
 
-interface ClusterDeploymentVariable {
+interface MarketplaceDeploymentVariable {
   label: string;
   value: string;
   isSecret: boolean;
@@ -55,5 +55,6 @@ interface UpdateInstaceRequest {
 export {
   CreateInstanceRequest,
   CreateInstanceFromMarketplaceRequest,
+  MarketplaceDeploymentVariable,
   UpdateInstaceRequest,
 };
