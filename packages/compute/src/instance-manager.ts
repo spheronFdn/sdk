@@ -92,20 +92,20 @@ class InstanceManager {
     return this.spheronApi.closeClusterInstance(id);
   }
 
-  async getClusterInstanceOrder(
+  async getInstanceDeployment(
     id: string
-  ): Promise<{ order: InstanceDeployment; liveLogs: string[] }> {
+  ): Promise<{ deployment: InstanceDeployment; liveLogs: string[] }> {
     const clusterInstanceOrder = await this.spheronApi.getClusterInstanceOrder(
       id
     );
 
     return {
-      order: mapInstanceDeployment(clusterInstanceOrder.order),
+      deployment: mapInstanceDeployment(clusterInstanceOrder.order),
       liveLogs: clusterInstanceOrder.liveLogs,
     };
   }
 
-  async getClusterInstanceOrderLogs(
+  async getInstanceDeploymentLogs(
     id: string,
     logsOptions: {
       from: number;

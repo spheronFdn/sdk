@@ -37,7 +37,7 @@ import SpheronComputeClient from "@spheron/compute";
 const computeClient = new SpheronComputeClient({ token });
 await computeClient.clusterInstance.create(
     {
-    organizationId: "63612a842e50ee3ffbebcf06",
+    organizationId: computeOrganizationId,
     configuration: {
       folderName: "",
       protocol: ClusterProtocolEnum.AKASH,
@@ -45,8 +45,8 @@ await computeClient.clusterInstance.create(
       tag: dockerImageTag,
       instanceCount: numberOfInstances,
       buildImage: false,
-      ports: [{ containerPort: 8000, exposedPort: 8000 }],
-      env: [{ value: "t=t", isSecret: false }],
+      ports: [{ containerPort: containerPort, exposedPort: exposedPort }],
+      env: [{ value: "key=value", isSecret: isSecret }],
       command: [],
       args: [],
       region: deployReegion,

@@ -413,10 +413,11 @@ class SpheronApi {
   }
 
   async getClusterTemplate(id: string): Promise<MarketplaceApp> {
-    return this.sendApiRequest<MarketplaceApp>(
-      HttpMethods.GET,
-      `/v1/cluster-templates/${id}`
-    );
+    const response = await this.sendApiRequest<{
+      clusterTemplate: MarketplaceApp;
+    }>(HttpMethods.GET, `/v1/cluster-templates/${id}`);
+
+    return response.clusterTemplate;
   }
 
   async getClusterCategories(): Promise<string[]> {

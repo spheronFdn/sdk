@@ -31,6 +31,7 @@ import {
   MarketplaceDeploymentVariable,
   Port,
   Env,
+  UsageWithLimits,
 } from "@spheron/core";
 
 interface Organization {
@@ -76,6 +77,8 @@ interface MarketplaceApp {
 }
 
 const mapMarketplaceApp = (input: MarketplaceAppCore): MarketplaceApp => {
+  console.log("--------------------------------------------");
+  console.log(JSON.stringify(input));
   return {
     id: input._id,
     name: input.name,
@@ -149,7 +152,7 @@ interface Instance {
   name: string;
   deployments: Array<string>;
   cluster: string;
-  activeDeployments: string;
+  activeDeployment: string;
   latestUrlPreview: string;
   agreedMachineImageType: MachineImageType;
   retrievableAkt: number;
@@ -175,7 +178,7 @@ const mapClusterInstance = (input: ClusterInstanceCore): Instance => {
     name: input.name,
     deployments: input.orders,
     cluster: input.cluster,
-    activeDeployments: input.activeOrder,
+    activeDeployment: input.activeOrder,
     latestUrlPreview: input.latestUrlPreview,
     agreedMachineImageType: input.agreedMachineImageType,
     retrievableAkt: input.retrievableAkt,
@@ -385,25 +388,18 @@ const mapMarketplaceInstanceResponse = (
 
 export {
   Organization,
-  mapOrganization,
   MarketplaceApp,
   MarketplaceAppPort,
+  UsageWithLimits,
   MarketplaceAppVariable,
-  mapMarketplaceApp,
   ComputeMachine,
-  mapComputeMachine,
   Cluster,
   ClusterStateEnum,
-  mapCluster,
   Instance,
   InstanceDetailed,
-  mapClusterInstance,
-  mapExtendedClusterInstance,
   Domain,
   DomainTypeEnum,
-  mapDomain,
   InstanceDeployment,
-  mapInstanceDeployment,
   ClusterFundsUsage,
   InstancesInfo,
   MarketplaceInstanceResponse,
@@ -416,8 +412,16 @@ export {
   InstanceStateEnum,
   InstanceCreationConfig,
   EnvironmentVar,
-  mapCreateInstanceRequest,
   MarketplaceInstanceCreationConfig,
+  mapDomain,
+  mapCluster,
+  mapOrganization,
+  mapMarketplaceApp,
+  mapComputeMachine,
+  mapInstanceDeployment,
+  mapClusterInstance,
+  mapExtendedClusterInstance,
+  mapCreateInstanceRequest,
   mapMarketplaceInstanceCreationConfig,
   mapInstanceResponse,
   mapMarketplaceInstanceResponse,

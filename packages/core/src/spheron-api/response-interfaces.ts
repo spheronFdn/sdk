@@ -6,13 +6,9 @@ interface InstanceResponse {
   clusterInstanceOrderId: string;
   topic: string;
 }
-interface MarketplaceInstanceResponse {
-  clusterId: string;
-  clusterInstanceId: string;
-  clusterInstanceOrderId: string;
+interface MarketplaceInstanceResponse extends InstanceResponse {
   template: MarketplaceApp;
   templateId: string;
-  topic: string;
 }
 
 export { InstanceResponse, MarketplaceInstanceResponse };
