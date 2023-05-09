@@ -35,9 +35,8 @@ The package exports `SpheronComputeClient` class, which includes methods for wor
 import SpheronComputeClient from "@spheron/compute";
 ...
 const computeClient = new SpheronComputeClient({ token });
-await computeClient.clusterInstance.create(
+await computeClient.instance.create(
     {
-    organizationId: computeOrganizationId,
     configuration: {
       folderName: "",
       protocol: ClusterProtocolEnum.AKASH,
@@ -46,7 +45,7 @@ await computeClient.clusterInstance.create(
       instanceCount: numberOfInstances,
       buildImage: false,
       ports: [{ containerPort: containerPort, exposedPort: exposedPort }],
-      env: [{ value: "key=value", isSecret: isSecret }],
+      env: [{ key="key", value: "value", isSecret: isSecret }],
       command: [],
       args: [],
       region: deployReegion,

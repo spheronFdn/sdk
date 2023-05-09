@@ -1,6 +1,5 @@
 import {
   Organization as CoreOrganization,
-  DeploymentEnvironment as CoreDeploymentEnvironment,
   MarketplaceApp as MarketplaceAppCore,
   ComputeMachine as ComputeMachineCore,
   Cluster as ClusterCore,
@@ -233,6 +232,7 @@ interface InstanceDeployment {
   commitId: string;
   status: string;
   buildTime: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   env: any;
   logs: [{ time: string; log: Array<string> }];
   closingLogs: [{ time: string; log: string }];

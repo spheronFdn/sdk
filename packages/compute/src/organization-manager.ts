@@ -45,6 +45,7 @@ class OrganizationManager {
       "c-akash"
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { usedStorageSkynet, storageSkynetLimit, ...resultWithoutSkynet } =
       usage;
     return resultWithoutSkynet;

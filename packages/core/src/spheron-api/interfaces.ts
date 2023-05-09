@@ -19,6 +19,7 @@ import {
 } from "./enums";
 import { ProjectTypeEnum } from "./enums";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type EventProcessingFunction = (event: any) => void;
 
 interface TokenScope {
@@ -350,6 +351,7 @@ interface ClusterInstanceOrder {
   status: string;
   buildTime: number;
   topic: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   env: any;
   logs: [{ time: string; log: Array<string> }];
   topups: ClusterInstanceTopup[];
@@ -360,6 +362,7 @@ interface ClusterInstanceOrder {
   clusterInstanceConfiguration: string;
   lastTopup: ClusterInstanceTopup;
   deploymentConfigBase64: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protocolData: any; // unique data related to protocol. ex: akash : dseq,oseq,gseq
   urlPrewiew: string;
   akashWalletId: string;
