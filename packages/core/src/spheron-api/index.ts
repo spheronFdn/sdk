@@ -674,7 +674,11 @@ class SpheronApi {
   }
 
   subscribeToEventStream(eventProcessingFunction: EventProcessingFunction) {
-    const eventSource = new EventSource(`${this.spheronApiUrl}/subscribe`);
+    const eventSource = new EventSource(`${this.spheronApiUrl}/subscribe`, {
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+      },
+    });
 
     // Add an event listener for the 'message' event
     eventSource.onmessage = (event) => {
