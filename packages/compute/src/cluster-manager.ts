@@ -38,7 +38,6 @@ class ClusterManager {
     options: {
       skip: number;
       limit: number;
-      includeReport?: boolean;
     }
   ): Promise<InstanceDetailed[]> {
     if (options.skip < 0 || options.limit < 0) {

@@ -3,9 +3,9 @@ import {
   MarketplaceApp as MarketplaceAppCore,
   ComputeMachine as ComputeMachineCore,
   Cluster as ClusterCore,
-  ClusterInstance as ClusterInstanceCore,
-  ClusterInstanceOrder as ClusterInstanceOrderCore,
-  ExtendedClusterInstance,
+  Instance as InstanceCore,
+  InstanceOrder as InstanceOrderCore,
+  ExtendedInstance,
   MarketplaceAppPort,
   MarketplaceAppVariable,
   ProviderEnum,
@@ -18,7 +18,7 @@ import {
   MachineImageType,
   DeploymentEnvironment,
   ClusterFundsUsage,
-  ClusterInstancesInfo as InstancesInfo,
+  InstancesInfo,
   MarketplaceInstanceResponse as MarketplaceInstanceResponseCore,
   CreateInstanceRequest,
   CreateInstanceFromMarketplaceRequest,
@@ -76,8 +76,6 @@ interface MarketplaceApp {
 }
 
 const mapMarketplaceApp = (input: MarketplaceAppCore): MarketplaceApp => {
-  console.log("--------------------------------------------");
-  console.log(JSON.stringify(input));
   return {
     id: input._id,
     name: input.name,
@@ -170,7 +168,7 @@ interface InstanceDetailed extends Instance {
   tag: string;
 }
 
-const mapClusterInstance = (input: ClusterInstanceCore): Instance => {
+const mapClusterInstance = (input: InstanceCore): Instance => {
   return {
     id: input._id,
     state: input.state,
@@ -189,7 +187,7 @@ const mapClusterInstance = (input: ClusterInstanceCore): Instance => {
 };
 
 const mapExtendedClusterInstance = (
-  input: ExtendedClusterInstance
+  input: ExtendedInstance
 ): InstanceDetailed => {
   const baseClusterInstance = mapClusterInstance(input);
 
@@ -245,7 +243,7 @@ interface InstanceDeployment {
 }
 
 const mapInstanceDeployment = (
-  input: ClusterInstanceOrderCore
+  input: InstanceOrderCore
 ): InstanceDeployment => {
   return {
     id: input._id,
@@ -266,15 +264,10 @@ const mapInstanceDeployment = (
 };
 
 interface InstanceCreationConfig {
-  uniqueTopicId?: string;
   configuration: {
-    branch?: string;
-    folderName: string;
-    protocol: ClusterProtocolEnum;
     image: string;
     tag: string;
     instanceCount: number;
-    buildImage: boolean;
     ports: Array<Port>;
     env: Array<EnvironmentVar>;
     command: Array<string>;
@@ -282,11 +275,9 @@ interface InstanceCreationConfig {
     region: string;
     machineImageName: string;
   };
-  instanceName?: string;
-  clusterUrl: string;
-  clusterProvider: string;
+  uniqueTopicId?: string;
   clusterName: string;
-  healthCheckUrl: string;
+  healthCheckPath: string;
   healthCheckPort: number;
 }
 
@@ -304,13 +295,12 @@ const mapCreateInstanceRequest = (
     organizationId,
     uniqueTopicId: input.uniqueTopicId,
     configuration: {
-      branch: input.configuration.branch,
-      folderName: input.configuration.folderName,
-      protocol: input.configuration.protocol,
+      folderName: "",
+      protocol: ClusterProtocolEnum.AKASH,
       image: input.configuration.image,
       tag: input.configuration.tag,
       instanceCount: input.configuration.instanceCount,
-      buildImage: input.configuration.buildImage,
+      buildImage: false,
       ports: input.configuration.ports,
       env: input.configuration.env.map((ev: EnvironmentVar): Env => {
         return {
@@ -323,11 +313,10 @@ const mapCreateInstanceRequest = (
       region: input.configuration.region,
       akashMachineImageName: input.configuration.machineImageName,
     },
-    instanceName: input.instanceName,
-    clusterUrl: input.clusterUrl,
-    clusterProvider: input.clusterProvider,
+    clusterUrl: input.configuration.image,
+    clusterProvider: ProviderEnum.DOCKERHUB,
     clusterName: input.clusterName,
-    healthCheckUrl: input.healthCheckUrl,
+    healthCheckUrl: input.healthCheckPath,
     healthCheckPort: input.healthCheckPort,
   };
 };

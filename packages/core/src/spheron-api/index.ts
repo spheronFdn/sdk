@@ -22,11 +22,11 @@ import {
   IPNSPublishResponse,
   IPNSName,
   Cluster,
-  ClusterInstancesInfo,
+  InstancesInfo,
   ClusterFundsUsage,
-  ExtendedClusterInstance,
-  ClusterInstance,
-  ClusterInstanceOrder,
+  ExtendedInstance,
+  Instance,
+  InstanceOrder,
   MarketplaceApp,
   ComputeMachine,
   EventProcessingFunction,
@@ -43,7 +43,7 @@ import {
 import EventSource from "eventsource";
 
 class SpheronApi {
-  private readonly spheronApiUrl: string = "https://api-dev.spheron.network";
+  private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
   private readonly token: string;
 
   constructor(token: string, url?: string) {
@@ -366,8 +366,8 @@ class SpheronApi {
     await this.sendApiRequest<Cluster>(HttpMethods.DELETE, `/v1/cluster/${id}`);
   }
 
-  async getClusterInstancesDetails(id: string): Promise<ClusterInstancesInfo> {
-    return this.sendApiRequest<ClusterInstancesInfo>(
+  async getClusterInstancesDetails(id: string): Promise<InstancesInfo> {
+    return this.sendApiRequest<InstancesInfo>(
       HttpMethods.GET,
       `/v1/cluster/${id}/instances/count`
     );
@@ -387,14 +387,14 @@ class SpheronApi {
       limit: number;
       includeReport?: boolean;
     }
-  ): Promise<ExtendedClusterInstance[]> {
+  ): Promise<ExtendedInstance[]> {
     if (options.skip < 0 || options.limit < 0) {
       throw new Error(`Skip and Limit cannot be negative numbers.`);
     }
 
-    const result: { extendedInstances: ExtendedClusterInstance[] } =
+    const result: { extendedInstances: ExtendedInstance[] } =
       await this.sendApiRequest<{
-        extendedInstances: ExtendedClusterInstance[];
+        extendedInstances: ExtendedInstance[];
       }>(HttpMethods.GET, `/v1/cluster/${id}/instances`, null, {
         skip: options.skip,
         limit: options.limit,
@@ -433,11 +433,11 @@ class SpheronApi {
     options?: {
       includeReport?: boolean;
     }
-  ): Promise<ClusterInstance> {
-    const response: { success: boolean; instance: ClusterInstance } =
+  ): Promise<Instance> {
+    const response: { success: boolean; instance: Instance } =
       await this.sendApiRequest<{
         success: boolean;
-        instance: ClusterInstance;
+        instance: Instance;
       }>(HttpMethods.GET, `/v1/cluster-instance/${id}`, null, {
         topupReport: options && options.includeReport && "y",
       });
@@ -446,7 +446,7 @@ class SpheronApi {
   }
 
   async deleteClusterInstance(id: string): Promise<void> {
-    await this.sendApiRequest<ClusterInstance>(
+    await this.sendApiRequest<Instance>(
       HttpMethods.DELETE,
       `/v1/cluster-instance/${id}`
     );
@@ -488,9 +488,9 @@ class SpheronApi {
 
   async getClusterInstanceOrder(
     id: string
-  ): Promise<{ order: ClusterInstanceOrder; liveLogs: string[] }> {
+  ): Promise<{ order: InstanceOrder; liveLogs: string[] }> {
     return this.sendApiRequest<{
-      order: ClusterInstanceOrder;
+      order: InstanceOrder;
       liveLogs: string[];
     }>(HttpMethods.GET, `/v1/cluster-instance/order/${id}`);
   }
@@ -503,12 +503,12 @@ class SpheronApi {
       logType: InstanceLogType;
       search?: string;
     }
-  ): Promise<ClusterInstanceOrder> {
+  ): Promise<InstanceOrder> {
     if (logsOptions.from < 0 || logsOptions.to < 0) {
       throw new Error(`From and To cannot be negative numbers.`);
     }
 
-    return this.sendApiRequest<ClusterInstanceOrder>(
+    return this.sendApiRequest<InstanceOrder>(
       HttpMethods.GET,
       `/v1/cluster-instance/order/${id}/logs`,
       null,

@@ -239,7 +239,7 @@ interface Cluster {
   updatedAt: Date;
 }
 
-interface ClusterInstancesInfo {
+interface InstancesInfo {
   active: number;
   starting: number;
   failedToStart: number;
@@ -252,7 +252,7 @@ interface ClusterFundsUsage {
   usedTillNow: number;
 }
 
-interface ClusterInstance {
+interface Instance {
   _id: string;
   state: InstanceStateEnum;
   name: string;
@@ -268,7 +268,7 @@ interface ClusterInstance {
   updatedAt: Date;
 }
 
-interface ExtendedClusterInstance extends ClusterInstance {
+interface ExtendedInstance extends Instance {
   cpu: number;
   memory: string;
   storage: string;
@@ -344,7 +344,7 @@ interface MarketplaceAppPort {
   defaultExposedValue: number;
 }
 
-interface ClusterInstanceOrder {
+interface InstanceOrder {
   _id: string;
   type: string;
   commitId: string;
@@ -354,13 +354,13 @@ interface ClusterInstanceOrder {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   env: any;
   logs: [{ time: string; log: Array<string> }];
-  topups: ClusterInstanceTopup[];
+  topups: InstanceTopup[];
   closingLogs: [{ time: string; log: string }];
   clusterLogs: Array<string>;
   clusterEvents: Array<string>;
   clusterInstance: string;
   clusterInstanceConfiguration: string;
-  lastTopup: ClusterInstanceTopup;
+  lastTopup: InstanceTopup;
   deploymentConfigBase64: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protocolData: any; // unique data related to protocol. ex: akash : dseq,oseq,gseq
@@ -380,7 +380,7 @@ interface IPersistentStorage {
   mountPoint: string;
 }
 
-interface ClusterInstanceTopup {
+interface InstanceTopup {
   time: number;
   amount: number;
   txhash: string;
@@ -412,12 +412,12 @@ export {
   IPNSPublishResponse,
   IPNSName,
   Cluster,
-  ClusterInstancesInfo,
+  InstancesInfo,
   ClusterFundsUsage,
-  ClusterInstance,
-  ExtendedClusterInstance,
-  ClusterInstanceOrder,
-  ClusterInstanceTopup,
+  Instance,
+  ExtendedInstance,
+  InstanceOrder,
+  InstanceTopup,
   Env,
   Port,
   IPersistentStorage,
