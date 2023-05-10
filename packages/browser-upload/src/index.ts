@@ -34,21 +34,35 @@ async function upload(
 
   const { payloads, totalSize } = await createPayloads(files, payloadSize);
 
+  let success = true;
+  let caughtError: Error | undefined = undefined;
   const uploadManager = new UploadManager();
-  const uploadPayloadsResult = await uploadManager.uploadPayloads(payloads, {
-    deploymentId: uploadId,
-    token: configuration.token,
-    parallelUploadCount,
-    onChunkUploaded: (uploadedSize: number) =>
-      configuration.onChunkUploaded &&
-      configuration.onChunkUploaded(uploadedSize, totalSize),
-  });
+  try {
+    const uploadPayloadsResult = await uploadManager.uploadPayloads(payloads, {
+      deploymentId: uploadId,
+      token: configuration.token,
+      parallelUploadCount,
+      onChunkUploaded: (uploadedSize: number) =>
+        configuration.onChunkUploaded &&
+        configuration.onChunkUploaded(uploadedSize, totalSize),
+    });
+    if (!uploadPayloadsResult.success) {
+      throw new Error(uploadPayloadsResult.errorMessage);
+    }
+  } catch (error) {
+    success = false;
+    caughtError = error;
+  }
 
   const result = await uploadManager.finalizeUploadDeployment(
     uploadId,
-    uploadPayloadsResult.success,
+    success,
     configuration.token
   );
+
+  if (caughtError) {
+    throw caughtError;
+  }
 
   if (!result.success) {
     throw new Error(`Upload failed. ${result.message}`);

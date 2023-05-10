@@ -67,28 +67,42 @@ export class SpheronClient {
         token: this.configuration.token,
       });
 
-    const { payloads, totalSize } = await createPayloads(path, payloadSize);
+    let success = true;
+    let caughtError: Error | undefined = undefined;
+    try {
+      const { payloads, totalSize } = await createPayloads(path, payloadSize);
 
-    configuration.onUploadInitiated &&
-      configuration.onUploadInitiated(deploymentId);
+      configuration.onUploadInitiated &&
+        configuration.onUploadInitiated(deploymentId);
 
-    const uploadPayloadsResult = await this.uploadManager.uploadPayloads(
-      payloads,
-      {
-        deploymentId,
-        token: this.configuration.token,
-        parallelUploadCount,
-        onChunkUploaded: (uploadedSize: number) =>
-          configuration.onChunkUploaded &&
-          configuration.onChunkUploaded(uploadedSize, totalSize),
+      const uploadPayloadsResult = await this.uploadManager.uploadPayloads(
+        payloads,
+        {
+          deploymentId,
+          token: this.configuration.token,
+          parallelUploadCount,
+          onChunkUploaded: (uploadedSize: number) =>
+            configuration.onChunkUploaded &&
+            configuration.onChunkUploaded(uploadedSize, totalSize),
+        }
+      );
+      if (!uploadPayloadsResult.success) {
+        throw new Error(uploadPayloadsResult.errorMessage);
       }
-    );
+    } catch (error) {
+      success = false;
+      caughtError = error;
+    }
 
     const result = await this.uploadManager.finalizeUploadDeployment(
       deploymentId,
-      uploadPayloadsResult.success,
+      success,
       this.configuration.token
     );
+
+    if (caughtError) {
+      throw caughtError;
+    }
 
     if (!result.success) {
       throw new Error(`Upload failed. ${result.message}`);
