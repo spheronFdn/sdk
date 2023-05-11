@@ -13,7 +13,7 @@ import {
   InstanceLogType,
   MarketplaceInstanceCreationConfig,
   MarketplaceInstanceResponse,
-  EventProcessingFunction,
+  EventHandler,
   InstanceCreationConfig,
   mapCreateInstanceRequest,
   mapMarketplaceInstanceCreationConfig,
@@ -211,8 +211,8 @@ class InstanceManager {
     );
   }
 
-  subscribeToEventStream(eventProcessingFunction: EventProcessingFunction) {
-    this.spheronApi.subscribeToEventStream(eventProcessingFunction);
+  subscribeToEventStream(eventHandler: EventHandler) {
+    this.spheronApi.subscribeToEventStream(eventHandler);
   }
 }
 

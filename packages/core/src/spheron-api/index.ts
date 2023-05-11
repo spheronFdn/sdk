@@ -29,7 +29,7 @@ import {
   InstanceOrder,
   MarketplaceApp,
   ComputeMachine,
-  EventProcessingFunction,
+  EventHandler,
 } from "./interfaces";
 import {
   CreateInstanceFromMarketplaceRequest,
@@ -43,7 +43,7 @@ import {
 import EventSource from "eventsource";
 
 class SpheronApi {
-  private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
+  private readonly spheronApiUrl: string = "https://api-dev.spheron.network";
   private readonly token: string;
 
   constructor(token: string, url?: string) {
@@ -637,7 +637,7 @@ class SpheronApi {
       message: string;
     }>(
       HttpMethods.POST,
-      `/v1/cluster-instance/${instanceId}/trigger/instance-health-check?topicId=${topicId}`
+      `/v1/cluster-instance/${instanceId}/trigger/container-health-check?topicId=${topicId}`
     );
   }
 
@@ -673,7 +673,7 @@ class SpheronApi {
     );
   }
 
-  subscribeToEventStream(eventProcessingFunction: EventProcessingFunction) {
+  subscribeToEventStream(eventHandler: EventHandler) {
     const eventSource = new EventSource(`${this.spheronApiUrl}/subscribe`, {
       headers: {
         Authorization: `Bearer ${this.token}`,
@@ -682,13 +682,12 @@ class SpheronApi {
 
     // Add an event listener for the 'message' event
     eventSource.onmessage = (event) => {
-      console.log("Received data:", event.data);
-      eventProcessingFunction(JSON.parse(event.data));
+      eventHandler(JSON.parse(event.data));
     };
 
     // Add an event listener for the 'error' event
     eventSource.onerror = (event) => {
-      console.error("Error occurred:", event);
+      eventHandler(JSON.parse(event.data));
     };
   }
 

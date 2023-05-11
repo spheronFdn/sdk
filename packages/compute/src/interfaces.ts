@@ -22,7 +22,7 @@ import {
   MarketplaceInstanceResponse as MarketplaceInstanceResponseCore,
   CreateInstanceRequest,
   CreateInstanceFromMarketplaceRequest,
-  EventProcessingFunction,
+  EventHandler,
   InstanceLogType,
   UpdateInstaceRequest,
   InstanceResponse as InstanceResponseCore,
@@ -31,6 +31,8 @@ import {
   Port,
   Env,
   UsageWithLimits,
+  EventTypeEnum,
+  Event,
 } from "@spheron/core";
 
 interface Organization {
@@ -392,7 +394,9 @@ export {
   ClusterFundsUsage,
   InstancesInfo,
   MarketplaceInstanceResponse,
-  EventProcessingFunction,
+  EventHandler,
+  Event,
+  EventTypeEnum,
   InstanceLogType,
   UpdateInstaceRequest,
   InstanceResponse,
