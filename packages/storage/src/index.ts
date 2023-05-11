@@ -13,10 +13,10 @@ import {
   TokenScope,
   UploadManager,
   UploadResult,
-  UsageWithLimits,
 } from "@spheron/core";
 import { createPayloads } from "./fs-payload-creator";
 import { ipfs } from "./ipfs.utils";
+import { UsageWithLimits } from "./bucket-manager/interfaces";
 
 export {
   ipfs,
@@ -261,9 +261,35 @@ export class SpheronClient {
       "wa-global"
     );
 
-    const { usedStorageSkynet, storageSkynetLimit, ...resultWithoutSkynet } =
-      usage;
-    return resultWithoutSkynet;
+    return {
+      usedBandwidth: usage.usedBandwidth,
+      usedBuildExecution: usage.usedBuildExecution,
+      usedConcurrentBuild: usage.usedConcurrentBuild,
+      usedStorageArweave: usage.usedStorageArweave,
+      usedStorageIPFS: usage.usedStorageIPFS,
+      usedDeploymentsPerDay: usage.usedDeploymentsPerDay,
+      lastDeploymentDate: usage.lastDeploymentDate,
+      usedDomains: usage.usedDomains,
+      usedHnsDomains: usage.usedHnsDomains,
+      usedEnsDomains: usage.usedEnsDomains,
+      usedEnvironments: usage.usedEnvironments,
+      usedNumberOfRequests: usage.usedNumberOfRequests,
+      usedPasswordProtections: usage.usedPasswordProtections,
+      membersLimit: usage.membersLimit,
+      bandwidthLimit: usage.bandwidthLimit,
+      buildExecutionLimit: usage.buildExecutionLimit,
+      concurrentBuildLimit: usage.concurrentBuildLimit,
+      storageArweaveLimit: usage.storageArweaveLimit,
+      storageIPFSLimit: usage.storageIPFSLimit,
+      deploymentsPerDayLimit: usage.deploymentsPerDayLimit,
+      domainsLimit: usage.domainsLimit,
+      hnsDomainsLimit: usage.hnsDomainsLimit,
+      ensDomainsLimit: usage.ensDomainsLimit,
+      environmentsLimit: usage.environmentsLimit,
+      passwordProtectionLimit: usage.passwordProtectionLimit,
+      usedParallelUploads: usage.usedParallelUploads,
+      parallelUploadsLimit: usage.parallelUploadsLimit,
+    };
   }
 
   async getTokenScope(): Promise<TokenScope> {
