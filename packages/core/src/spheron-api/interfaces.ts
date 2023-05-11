@@ -161,7 +161,6 @@ interface UsageWithLimits {
   usedBuildExecution?: number; // Seconds
   usedConcurrentBuild?: number;
   usedStorageArweave?: number; // Bytes
-  usedStorageFileCoin?: number; // Seconds
   usedStorageIPFS?: number; // Bytes
   usedDeploymentsPerDay?: number;
   lastDeploymentDate?: Date;

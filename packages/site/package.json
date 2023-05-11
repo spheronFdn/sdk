@@ -22,6 +22,7 @@
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
+    "@types/async-lock": "^1.4.0",
     "@types/node": "^18.13.0",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "@typescript-eslint/parser": "^5.51.0",
@@ -34,7 +35,8 @@
     "dist/"
   ],
   "dependencies": {
-    "@spheron/core": "1.0.2"
+    "@spheron/core": "1.0.2",
+    "async-lock": "^1.4.0"
   },
   "license": "Apache-2.0",
   "repository": {
