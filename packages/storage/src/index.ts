@@ -286,7 +286,6 @@ export class SpheronClient {
       hnsDomainsLimit: usage.hnsDomainsLimit,
       ensDomainsLimit: usage.ensDomainsLimit,
       environmentsLimit: usage.environmentsLimit,
-      passwordProtectionLimit: usage.passwordProtectionLimit,
       usedParallelUploads: usage.usedParallelUploads,
       parallelUploadsLimit: usage.parallelUploadsLimit,
     };

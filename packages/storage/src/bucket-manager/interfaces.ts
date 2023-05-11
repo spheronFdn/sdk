@@ -62,7 +62,6 @@ interface UsageWithLimits {
   hnsDomainsLimit?: number;
   ensDomainsLimit?: number;
   environmentsLimit?: number;
-  passwordProtectionLimit?: number;
   usedParallelUploads?: number;
   parallelUploadsLimit?: number;
 }
