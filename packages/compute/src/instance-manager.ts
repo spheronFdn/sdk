@@ -120,7 +120,7 @@ class InstanceManager {
     return mapInstanceDeployment(order);
   }
 
-  async createFromMartketplace(
+  async createFromMarketplace(
     createConfig: MarketplaceInstanceCreationConfig
   ): Promise<MarketplaceInstanceResponse> {
     createConfig.topicId = createConfig.topicId ?? uuidv4();
