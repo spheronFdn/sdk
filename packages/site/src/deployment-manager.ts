@@ -1,16 +1,20 @@
 import { SpheronApi } from "@spheron/core";
 import {
+  CancelDeploymentResponse,
   Deployment,
   DeploymentLog,
+  DeploymentResponse,
   StartDeploymentConfiguration,
   mapCoreDeployment,
   mapCoreDeploymentLogs,
 } from "./interfaces";
+import OrganizationIdExtractor from "./organizationId-extractor";
 
-class DeploymentManger {
+class DeploymentManger extends OrganizationIdExtractor {
   private readonly spheronApi: SpheronApi;
 
   constructor(spheronApi: SpheronApi) {
+    super(spheronApi);
     this.spheronApi = spheronApi;
   }
 
@@ -24,15 +28,13 @@ class DeploymentManger {
     return mapCoreDeploymentLogs(deployment);
   }
 
-  public async deploy(configuration: StartDeploymentConfiguration): Promise<{
-    success: boolean;
-    message: string;
-    deploymentId: string;
-    projectId: string;
-    deployment: Deployment;
-  }> {
+  public async deploy(
+    configuration: StartDeploymentConfiguration
+  ): Promise<DeploymentResponse> {
     const response = await this.spheronApi.startDeployment({
+      organizationId: await this.getOrganizationIdFromToken(),
       ...configuration,
+      env: configuration.environmentVariables,
       repoName: configuration.projectName,
       createDefaultWebhook: true,
     });
@@ -45,11 +47,7 @@ class DeploymentManger {
     };
   }
 
-  public async cancel(deploymentId: string): Promise<{
-    message: string;
-    canceled: true;
-    killing: true;
-  }> {
+  public async cancel(deploymentId: string): Promise<CancelDeploymentResponse> {
     return await this.spheronApi.cancelDeployment(deploymentId);
   }
 

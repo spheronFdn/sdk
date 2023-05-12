@@ -145,7 +145,7 @@ interface Deployment {
   status: DeploymentStatusEnum;
   configuration: Configuration;
   buildTime: number;
-  memoryUsed: number;
+  fileSize: number;
   deploymentEnvironmentName: string;
   commitId: string;
   branch: string;
@@ -159,7 +159,7 @@ const mapCoreDeployment = (coreDeployment: CoreDeployment): Deployment => {
     status: coreDeployment.status,
     configuration: mapCoreConfiguration(coreDeployment.configuration),
     buildTime: coreDeployment.buildTime,
-    memoryUsed: coreDeployment.memoryUsed,
+    fileSize: coreDeployment.memoryUsed,
     deploymentEnvironmentName: coreDeployment.deploymentEnvironmentName,
     commitId: coreDeployment.commitId,
     branch: coreDeployment.branch,
@@ -183,7 +183,6 @@ const mapCoreDeploymentLogs = (
 };
 
 interface StartDeploymentConfiguration {
-  organizationId: string;
   gitUrl: string;
   projectName: string;
   branch: string;
@@ -197,7 +196,7 @@ interface StartDeploymentConfiguration {
     framework: FrameworkEnum | string;
     nodeVersion: NodeVersionEnum;
   };
-  env?: Record<string, string>;
+  environmentVariables?: Record<string, string>;
 }
 
 interface UsageWithLimits {
@@ -271,6 +270,20 @@ interface DeploymentCount {
   pending: number;
 }
 
+interface DeploymentResponse {
+  success: boolean;
+  message: string;
+  deploymentId: string;
+  projectId: string;
+  deployment: Deployment;
+}
+
+interface CancelDeploymentResponse {
+  message: string;
+  canceled: boolean;
+  killing: boolean;
+}
+
 export {
   Organization,
   mapCoreOrganization,
@@ -292,4 +305,6 @@ export {
   UsageWithLimits,
   mapCoreUsageWithLimits,
   DeploymentCount,
+  DeploymentResponse,
+  CancelDeploymentResponse,
 };

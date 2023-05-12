@@ -1,4 +1,3 @@
-import asyncLock from "async-lock";
 import { ProjectStateEnum, SpheronApi } from "@spheron/core";
 import {
   Organization,
@@ -8,15 +7,14 @@ import {
   mapCoreProject,
   mapCoreUsageWithLimits,
 } from "./interfaces";
+import OrganizationIdExtractor from "./organizationId-extractor";
 
-class OrganizationManager {
+class OrganizationManager extends OrganizationIdExtractor {
   private readonly spheronApi: SpheronApi;
-  private organizationId = "";
-  private lock: asyncLock;
 
   constructor(spheronApi: SpheronApi) {
+    super(spheronApi);
     this.spheronApi = spheronApi;
-    this.lock = new asyncLock();
   }
 
   async get(): Promise<Organization> {
@@ -60,19 +58,6 @@ class OrganizationManager {
     const { usedStorageSkynet, storageSkynetLimit, ...resultWithoutSkynet } =
       usage;
     return mapCoreUsageWithLimits(resultWithoutSkynet);
-  }
-
-  private async getOrganizationIdFromToken(): Promise<string> {
-    if (!this.organizationId) {
-      await this.lock.acquire("getOrganizationIdFromToken", async () => {
-        if (!this.organizationId) {
-          const scope = await this.spheronApi.getTokenScope();
-          this.organizationId = scope.organizations[0].id;
-        }
-      });
-    }
-
-    return this.organizationId;
   }
 }
 

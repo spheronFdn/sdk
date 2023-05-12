@@ -7,6 +7,8 @@ import {
   EnvironmentVariable,
   DeploymentEnvironment,
   DeploymentCount,
+  Deployment,
+  DeploymentResponse,
 } from "./interfaces";
 import ProjectManager from "./project-manager";
 import DeploymentManger from "./deployment-manager";
@@ -18,6 +20,7 @@ import {
   ProviderEnum,
   FrameworkEnum,
   ProtocolEnum,
+  DeploymentStatusEnum,
 } from "@spheron/core";
 
 export {
@@ -34,6 +37,10 @@ export {
   DeploymentEnvironment,
   ProtocolEnum,
   DeploymentCount,
+  Deployment,
+  DeploymentStatusEnum,
+  DeploymentResponse,
+  CancelDeploymentResponse,
 };
 
 export interface SpheronClientConfiguration {
