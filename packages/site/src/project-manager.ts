@@ -8,6 +8,7 @@ import {
 import {
   Configuration,
   Deployment,
+  DeploymentCount,
   DeploymentEnvironment,
   Domain,
   EnvironmentVariable,
@@ -260,12 +261,7 @@ class ProjectManager {
     return deployments.map((x) => mapCoreDeployment(x));
   }
 
-  async getDeploymentCount(projectId: string): Promise<{
-    total: number;
-    successful: number;
-    failed: number;
-    pending: number;
-  }> {
+  async getDeploymentCount(projectId: string): Promise<DeploymentCount> {
     return await this.spheronApi.getProjectDeploymentCount(projectId);
   }
 }

@@ -264,6 +264,13 @@ const mapCoreUsageWithLimits = (
   };
 };
 
+interface DeploymentCount {
+  total: number;
+  successful: number;
+  failed: number;
+  pending: number;
+}
+
 export {
   Organization,
   mapCoreOrganization,
@@ -284,4 +291,5 @@ export {
   StartDeploymentConfiguration,
   UsageWithLimits,
   mapCoreUsageWithLimits,
+  DeploymentCount,
 };
