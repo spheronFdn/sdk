@@ -1,10 +1,38 @@
 import OrganizationManager from "./organization-manager";
-import { Organization, Project, UsageWithLimits } from "./interfaces";
+import {
+  Organization,
+  Project,
+  UsageWithLimits,
+  Configuration,
+  EnvironmentVariable,
+  DeploymentEnvironment,
+} from "./interfaces";
 import ProjectManager from "./project-manager";
 import DeploymentManger from "./deployment-manager";
-import { ProjectStateEnum, SpheronApi, TokenScope } from "@spheron/core";
+import {
+  ProjectStateEnum,
+  SpheronApi,
+  TokenScope,
+  NodeVersionEnum,
+  ProviderEnum,
+  FrameworkEnum,
+  ProtocolEnum,
+} from "@spheron/core";
 
-export { TokenScope, Organization, Project, UsageWithLimits, ProjectStateEnum };
+export {
+  TokenScope,
+  Organization,
+  Project,
+  UsageWithLimits,
+  ProjectStateEnum,
+  Configuration,
+  NodeVersionEnum,
+  ProviderEnum,
+  FrameworkEnum,
+  EnvironmentVariable,
+  DeploymentEnvironment,
+  ProtocolEnum,
+};
 
 export interface SpheronClientConfiguration {
   token: string;
