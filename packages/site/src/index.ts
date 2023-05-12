@@ -9,6 +9,7 @@ import {
   DeploymentCount,
   Deployment,
   DeploymentResponse,
+  CancelDeploymentResponse,
 } from "./interfaces";
 import ProjectManager from "./project-manager";
 import DeploymentManger from "./deployment-manager";

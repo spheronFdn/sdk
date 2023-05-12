@@ -6,7 +6,7 @@
   </picture>
 </p>
 
-<h1 align="center">Web-App SDK</h1>
+<h1 align="center">Site SDK</h1>
 
 <p align="center">
   This package provides support for working with Spheron Web-App organization.
@@ -41,8 +41,7 @@ const spheron = new SpheronClient({ token });
 await spheron.deployments.deploy({
   gitUrl, // the url of the repository
   projectName, // if the project for the repository does not exists, a new project will be created with this name
-  organizationId, // organization id
-  env: {
+  environmentVariables: {
     KEY_1: "value1",
   },
   provider: ProviderEnum.GITHUB, // the provider of the git url
