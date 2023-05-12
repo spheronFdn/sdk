@@ -36,23 +36,18 @@ import SpheronComputeClient from "@spheron/compute";
 ...
 const computeClient = new SpheronComputeClient({ token });
 await computeClient.instance.create(
-    {
     configuration: {
-      folderName: "",
-      protocol: ClusterProtocolEnum.AKASH,
       image: dockerImage,
       tag: dockerImageTag,
       instanceCount: numberOfInstances,
-      buildImage: false,
       ports: [{ containerPort: containerPort, exposedPort: exposedPort }],
-      env: [{ key="key", value: "value", isSecret: isSecret }],
-      command: [],
+      env: [{ key:"key", value: "value", isSecret: isSecret }],
+      commands: [],
       args: [],
       region: deployReegion,
-      akashMachineImageName: machineType,
+      machineImageName: machineType,
     },
-    clusterUrl: dockerImage,
-    clusterProvider: ProviderEnum.DOCKERHUB,
+    topicId: eventStreamSession,
     clusterName: clusterName,
     healthCheckUrl: healthCheckPath,
     healthCheckPort: healthChekcPort,
@@ -60,15 +55,15 @@ await computeClient.instance.create(
 );
 ```
 
-For more information about the Site methods, check out the [DOCS](https://docs.spheron.network/sdk/compute/)
+For more information about the Compute methods, check out the [DOCS](https://docs.spheron.network/sdk/compute/)
 
 ## Access Token
 
-To create the `token` that is used with the `SpheronComputeClient`, follow the instructions in the [DOCS](https://docs.spheron.network/rest-api/#creating-an-access-token). When you are creating the tokens, please choose **compute app** type in the dashboard.
+To create the `token` that is used with the `SpheronComputeClient`, follow the instructions in the [DOCS](https://docs.spheron.network/rest-api/#creating-an-access-token). When you are creating the tokens, please choose **compute** type in the dashboard.
 
 ## Learn More
 
-You can learn more about Spheron and Storage SDK here:
+You can learn more about Spheron and Compute SDK here:
 
 - [Spheron Discord](https://discord.com/invite/ahxuCtm)
 - [Spheron Twitter](https://twitter.com/SpheronFdn)

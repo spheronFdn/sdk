@@ -1,9 +1,11 @@
-import { SpheronApi, UsageWithLimits } from "@spheron/core";
+import { SpheronApi } from "@spheron/core";
 import {
   Cluster,
   Organization,
+  UsageWithLimits,
   mapCluster,
   mapOrganization,
+  mapUsageWithLimits,
 } from "./interfaces";
 import Utils from "./utils";
 
@@ -48,7 +50,7 @@ class OrganizationManager {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { usedStorageSkynet, storageSkynetLimit, ...resultWithoutSkynet } =
       usage;
-    return resultWithoutSkynet;
+    return mapUsageWithLimits(resultWithoutSkynet);
   }
 }
 

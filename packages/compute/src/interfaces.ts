@@ -30,9 +30,10 @@ import {
   MarketplaceDeploymentVariable,
   Port,
   Env,
-  UsageWithLimits,
+  UsageWithLimits as UsageWithLimitsCore,
   EventTypeEnum,
   Event,
+  PersistentStorage,
 } from "@spheron/core";
 
 interface Organization {
@@ -107,7 +108,6 @@ interface ComputeMachine {
   cpu: number;
   storage: string;
   memory: string;
-  maxPricePerBlock: number;
 }
 
 const mapComputeMachine = (input: ComputeMachineCore): ComputeMachine => {
@@ -117,7 +117,6 @@ const mapComputeMachine = (input: ComputeMachineCore): ComputeMachine => {
     cpu: input.cpu,
     storage: input.storage,
     memory: input.memory,
-    maxPricePerBlock: input.maxPricePerBlock,
   };
 };
 
@@ -226,22 +225,46 @@ const mapDomain = (coreDomain: CoreDomain): Domain => {
   };
 };
 
+enum DeploymentStatusEnum {
+  QUEUED = "Queued",
+  PENDING = "Pending",
+  DEPLOYED = "Deployed",
+  FAILED = "Failed",
+  DEPRECATED = "Deprecated",
+  DEPRECATED_PROVIDER = "Deprecated-Provider",
+}
+
 interface InstanceDeployment {
   id: string;
   type: string;
   commitId: string;
-  status: string;
+  status: DeploymentStatusEnum;
   buildTime: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  env: any;
   logs: [{ time: string; log: Array<string> }];
   closingLogs: [{ time: string; log: string }];
   clusterLogs: Array<string>;
   clusterEvents: Array<string>;
   instance: string;
-  instanceConfiguration: string;
   urlPrewiew: string;
   deploymentInitiator: string;
+  instanceConfiguration: {
+    image: string;
+    tag: string;
+    instanceCount: number;
+    ports: Array<Port>;
+    env: Array<EnvironmentVar>;
+    commands: Array<string>;
+    args: Array<string>;
+    region: string;
+    agreedMachineImage: {
+      machineType: string;
+      agreementDate: number;
+      cpu: number;
+      memory: string;
+      storage: string;
+      persistentStorage?: PersistentStorage;
+    };
+  };
 }
 
 const mapInstanceDeployment = (
@@ -251,15 +274,43 @@ const mapInstanceDeployment = (
     id: input._id,
     type: input.type,
     commitId: input.commitId,
-    status: input.status,
+    status: input.status as DeploymentStatusEnum,
     buildTime: input.buildTime,
-    env: input.env,
     logs: input.logs,
     closingLogs: input.closingLogs,
     clusterLogs: input.clusterLogs,
     clusterEvents: input.clusterEvents,
     instance: input.clusterInstance,
-    instanceConfiguration: input.clusterInstanceConfiguration,
+    instanceConfiguration: {
+      image: input.clusterInstanceConfiguration.image,
+      tag: input.clusterInstanceConfiguration.tag,
+      instanceCount: input.clusterInstanceConfiguration.instanceCount,
+      ports: input.clusterInstanceConfiguration.ports,
+      env: input.clusterInstanceConfiguration.env.map(
+        (ev: Env): EnvironmentVar => {
+          return {
+            key: ev.value.split("=")[0],
+            value: ev.value.split("=")[1],
+            isSecret: ev.isSecret,
+          };
+        }
+      ),
+      commands: input.clusterInstanceConfiguration.command,
+      args: input.clusterInstanceConfiguration.args,
+      region: input.clusterInstanceConfiguration.region,
+      agreedMachineImage: {
+        machineType:
+          input.clusterInstanceConfiguration.agreedMachineImage.machineType,
+        agreementDate:
+          input.clusterInstanceConfiguration.agreedMachineImage.agreementDate,
+        cpu: input.clusterInstanceConfiguration.agreedMachineImage.cpu,
+        memory: input.clusterInstanceConfiguration.agreedMachineImage.memory,
+        storage: input.clusterInstanceConfiguration.agreedMachineImage.storage,
+        persistentStorage:
+          input.clusterInstanceConfiguration.agreedMachineImage
+            .persistentStorage,
+      },
+    },
     urlPrewiew: input.urlPrewiew,
     deploymentInitiator: input.deploymentInitiator,
   };
@@ -272,12 +323,12 @@ interface InstanceCreationConfig {
     instanceCount: number;
     ports: Array<Port>;
     env: Array<EnvironmentVar>;
-    command: Array<string>;
+    commands: Array<string>;
     args: Array<string>;
     region: string;
     machineImageName: string;
   };
-  uniqueTopicId?: string;
+  topicId?: string;
   clusterName: string;
   healthCheckPath: string;
   healthCheckPort: number;
@@ -295,7 +346,7 @@ const mapCreateInstanceRequest = (
 ): CreateInstanceRequest => {
   return {
     organizationId,
-    uniqueTopicId: input.uniqueTopicId,
+    uniqueTopicId: input.topicId,
     configuration: {
       folderName: "",
       protocol: ClusterProtocolEnum.AKASH,
@@ -310,7 +361,7 @@ const mapCreateInstanceRequest = (
           isSecret: ev.isSecret,
         };
       }),
-      command: input.configuration.command,
+      command: input.configuration.commands,
       args: input.configuration.args,
       region: input.configuration.region,
       akashMachineImageName: input.configuration.machineImageName,
@@ -324,10 +375,10 @@ const mapCreateInstanceRequest = (
 };
 
 interface MarketplaceInstanceCreationConfig {
-  templateId: string;
+  marketplaceAppId: string;
   environmentVariables: MarketplaceDeploymentVariable[];
   machineImageId: string;
-  uniqueTopicId?: string;
+  topicId?: string;
   region: string;
 }
 
@@ -336,11 +387,11 @@ const mapMarketplaceInstanceCreationConfig = (
   organizationId: string
 ): CreateInstanceFromMarketplaceRequest => {
   return {
-    templateId: input.templateId,
+    templateId: input.marketplaceAppId,
     environmentVariables: input.environmentVariables,
     organizationId: organizationId,
     akashImageId: input.machineImageId,
-    uniqueTopicId: input.uniqueTopicId,
+    uniqueTopicId: input.topicId,
     region: input.region,
   };
 };
@@ -349,11 +400,11 @@ interface InstanceResponse {
   clusterId: string;
   instanceId: string;
   instanceDeploymentId: string;
-  topic: string;
+  topicId: string;
 }
 interface MarketplaceInstanceResponse extends InstanceResponse {
-  template: MarketplaceApp;
-  templateId: string;
+  marketplaceApp: MarketplaceApp;
+  marketplaceAppId: string;
 }
 
 const mapInstanceResponse = (input: InstanceResponseCore): InstanceResponse => {
@@ -361,7 +412,7 @@ const mapInstanceResponse = (input: InstanceResponseCore): InstanceResponse => {
     clusterId: input.clusterId,
     instanceId: input.clusterInstanceId,
     instanceDeploymentId: input.clusterInstanceOrderId,
-    topic: input.topic,
+    topicId: input.topic,
   };
 };
 
@@ -372,8 +423,95 @@ const mapMarketplaceInstanceResponse = (
 
   return {
     ...baseInstanceResponse,
-    template: mapMarketplaceApp(input.template),
-    templateId: input.templateId,
+    marketplaceApp: mapMarketplaceApp(input.template),
+    marketplaceAppId: input.templateId,
+  };
+};
+
+interface InstanceUpdateConfig {
+  env: Array<EnvironmentVar>;
+  commands: Array<string>;
+  args: Array<string>;
+  topicId: string;
+  tag: string;
+}
+
+const mapInstanceUpdateRequest = (
+  input: InstanceUpdateConfig
+): UpdateInstaceRequest => {
+  return {
+    env: input.env.map((ev: EnvironmentVar): Env => {
+      return {
+        value: `${ev.key}=${ev.value}`,
+        isSecret: ev.isSecret,
+      };
+    }),
+    command: input.commands,
+    args: input.args,
+    uniqueTopicId: input.topicId,
+    tag: input.tag,
+  };
+};
+
+interface UsageWithLimits {
+  used: {
+    bandwidth?: number; // Bytes
+    buildExecution?: number; // Seconds
+    concurrentBuild?: number;
+    storageArweave?: number; // Bytes
+    storageIPFS?: number; // Bytes
+    deploymentsPerDay?: number;
+    domains?: number;
+    hnsDomains?: number;
+    ensDomains?: number;
+    environments?: number;
+    numberOfRequests?: number;
+    passwordProtection?: number;
+  };
+  limit: {
+    bandwidth?: number; // Bytes
+    buildExecution?: number; // Seconds
+    concurrentBuild?: number;
+    storageArweave?: number; // Bytes
+    storageIPFS?: number; // Bytes
+    deploymentsPerDay?: number;
+    domains?: number;
+    hnsDomains?: number;
+    ensDomains?: number;
+    environments?: number;
+    membersLimit?: number;
+  };
+}
+
+const mapUsageWithLimits = (usage: UsageWithLimitsCore): UsageWithLimits => {
+  return {
+    used: {
+      bandwidth: usage.usedBandwidth,
+      buildExecution: usage.usedBuildExecution,
+      concurrentBuild: usage.usedConcurrentBuild,
+      storageArweave: usage.usedStorageArweave,
+      storageIPFS: usage.usedStorageIPFS,
+      deploymentsPerDay: usage.usedDeploymentsPerDay,
+      domains: usage.usedDomains,
+      hnsDomains: usage.usedHnsDomains,
+      ensDomains: usage.usedEnsDomains,
+      environments: usage.usedEnvironments,
+      numberOfRequests: usage.usedNumberOfRequests,
+      passwordProtection: usage.usedPasswordProtections,
+    },
+    limit: {
+      bandwidth: usage.bandwidthLimit,
+      buildExecution: usage.buildExecutionLimit,
+      concurrentBuild: usage.concurrentBuildLimit,
+      storageArweave: usage.storageArweaveLimit,
+      storageIPFS: usage.storageIPFSLimit,
+      deploymentsPerDay: usage.deploymentsPerDayLimit,
+      domains: usage.domainsLimit,
+      hnsDomains: usage.hnsDomainsLimit,
+      ensDomains: usage.ensDomainsLimit,
+      environments: usage.environmentsLimit,
+      membersLimit: usage.membersLimit,
+    },
   };
 };
 
@@ -404,8 +542,10 @@ export {
   ProviderEnum,
   InstanceStateEnum,
   InstanceCreationConfig,
+  InstanceUpdateConfig,
   EnvironmentVar,
   MarketplaceInstanceCreationConfig,
+  DeploymentStatusEnum,
   mapDomain,
   mapCluster,
   mapOrganization,
@@ -415,7 +555,9 @@ export {
   mapClusterInstance,
   mapExtendedClusterInstance,
   mapCreateInstanceRequest,
+  mapInstanceUpdateRequest,
   mapMarketplaceInstanceCreationConfig,
   mapInstanceResponse,
   mapMarketplaceInstanceResponse,
+  mapUsageWithLimits,
 };

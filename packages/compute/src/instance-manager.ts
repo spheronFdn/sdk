@@ -19,6 +19,8 @@ import {
   mapMarketplaceInstanceCreationConfig,
   mapMarketplaceInstanceResponse,
   mapInstanceResponse,
+  mapInstanceUpdateRequest,
+  InstanceUpdateConfig,
 } from "./interfaces";
 import Utils from "./utils";
 
@@ -34,7 +36,7 @@ class InstanceManager {
   async create(
     creationConfig: InstanceCreationConfig
   ): Promise<InstanceResponse> {
-    creationConfig.uniqueTopicId = creationConfig.uniqueTopicId ?? uuidv4();
+    creationConfig.topicId = creationConfig.topicId ?? uuidv4();
 
     const organizationId = await this.utils.getOrganizationId();
 
@@ -45,16 +47,8 @@ class InstanceManager {
     return mapInstanceResponse(response);
   }
 
-  async get(
-    id: string,
-    options?: {
-      includeReport?: boolean;
-    }
-  ): Promise<Instance> {
-    const clusterInstance = await this.spheronApi.getClusterInstance(
-      id,
-      options
-    );
+  async get(id: string): Promise<Instance> {
+    const clusterInstance = await this.spheronApi.getClusterInstance(id);
 
     return mapClusterInstance(clusterInstance);
   }
@@ -65,14 +59,14 @@ class InstanceManager {
 
   async update(
     id: string,
-    clusterInstance: UpdateInstaceRequest
+    updateConfig: InstanceUpdateConfig
   ): Promise<InstanceResponse> {
     const organizationId = await this.utils.getOrganizationId();
 
     const response = await this.spheronApi.updateClusterInstance(
       id,
       organizationId,
-      clusterInstance
+      mapInstanceUpdateRequest(updateConfig)
     );
 
     return mapInstanceResponse(response);
@@ -129,7 +123,7 @@ class InstanceManager {
   async createFromMartketplace(
     createConfig: MarketplaceInstanceCreationConfig
   ): Promise<MarketplaceInstanceResponse> {
-    createConfig.uniqueTopicId = createConfig.uniqueTopicId ?? uuidv4();
+    createConfig.topicId = createConfig.topicId ?? uuidv4();
 
     const organizationId = await this.utils.getOrganizationId();
 

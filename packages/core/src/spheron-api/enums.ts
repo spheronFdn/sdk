@@ -107,7 +107,7 @@ enum MarketplaceCategoryEnum {
 }
 
 enum InstanceLogType {
-  LOGS = "logs",
+  DEPLOYMENT_LOGS = "logs",
   INSTANCE_LOGS = "instanceLogs",
   INSTANCE_EVENTS = "instanceEvents",
 }

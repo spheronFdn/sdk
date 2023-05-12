@@ -43,7 +43,7 @@ import {
 import EventSource from "eventsource";
 
 class SpheronApi {
-  private readonly spheronApiUrl: string = "https://api-dev.spheron.network";
+  private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
   private readonly token: string;
 
   constructor(token: string, url?: string) {

@@ -368,7 +368,32 @@ interface InstanceOrder {
   clusterLogs: Array<string>;
   clusterEvents: Array<string>;
   clusterInstance: string;
-  clusterInstanceConfiguration: string;
+  clusterInstanceConfiguration: {
+    branch: string;
+    folderName: string; // folder where docker image is located in repo
+    protocol: string; // ex: akash
+    image: string; // name of the docker image if it is not located in repo
+    tag: string; // name of the docker image if it is not located in repo
+    instanceCount: number;
+    buildImage: boolean; // if container should build the image, or if user has already defined it
+    ports: Array<Port>;
+    env: Array<Env>;
+    command: Array<string>;
+    args: Array<string>;
+    region: string;
+    agreedMachineImage: {
+      machineType: string;
+      agreementDate: number;
+      cpu: number;
+      memory: string;
+      storage: string;
+      persistentStorage?: PersistentStorage;
+      maxPricePerBlock: number;
+      leasePricePerBlock: number;
+      defaultDailyTopUp: number;
+      topupThreashold: number;
+    };
+  };
   lastTopup: InstanceTopup;
   deploymentConfigBase64: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -383,7 +408,7 @@ interface Env {
   isSecret: boolean;
 }
 
-interface IPersistentStorage {
+interface PersistentStorage {
   size: string;
   class: PersistentStorageClassEnum;
   mountPoint: string;
@@ -429,7 +454,7 @@ export {
   InstanceTopup,
   Env,
   Port,
-  IPersistentStorage,
+  PersistentStorage,
   MarketplaceApp,
   ComputeMachine,
   EventHandler,
