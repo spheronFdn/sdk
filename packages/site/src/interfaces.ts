@@ -223,7 +223,6 @@ interface UsageWithLimits {
   environmentsLimit?: number;
   usedNumberOfRequests?: number;
   usedPasswordProtections?: number;
-  passwordProtectionLimit?: number;
   membersLimit?: number;
 }
 
@@ -253,7 +252,6 @@ const mapCoreUsageWithLimits = (
     usedEnvironments: usage.usedEnvironments,
     usedNumberOfRequests: usage.usedNumberOfRequests,
     usedPasswordProtections: usage.usedPasswordProtections,
-    passwordProtectionLimit: usage.passwordProtectionLimit,
     membersLimit: usage.membersLimit,
   };
 };
