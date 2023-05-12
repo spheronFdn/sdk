@@ -24,11 +24,6 @@ class DeploymentManger {
     return mapCoreDeploymentLogs(deployment);
   }
 
-  public async getBuildDirectory(deploymentId: string): Promise<string[]> {
-    const deployment = await this.spheronApi.getDeployment(deploymentId);
-    return deployment.buildDirectory;
-  }
-
   public async deploy(configuration: StartDeploymentConfiguration): Promise<{
     success: boolean;
     message: string;
