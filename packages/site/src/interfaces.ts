@@ -201,58 +201,66 @@ interface StartDeploymentConfiguration {
 }
 
 interface UsageWithLimits {
-  usedBandwidth?: number; // Bytes
-  bandwidthLimit?: number; // Bytes
-  usedBuildExecution?: number; // Seconds
-  buildExecutionLimit?: number; // Seconds
-  usedConcurrentBuild?: number;
-  concurrentBuildLimit?: number;
-  usedStorageArweave?: number; // Bytes
-  storageArweaveLimit?: number; // Bytes
-  usedStorageIPFS?: number; // Bytes
-  storageIPFSLimit?: number;
-  usedDeploymentsPerDay?: number;
-  deploymentsPerDayLimit?: number;
-  usedDomains?: number;
-  domainsLimit?: number;
-  usedHnsDomains?: number;
-  hnsDomainsLimit?: number;
-  usedEnsDomains?: number;
-  ensDomainsLimit?: number;
-  usedEnvironments?: number;
-  environmentsLimit?: number;
-  usedNumberOfRequests?: number;
-  usedPasswordProtections?: number;
-  membersLimit?: number;
+  used: {
+    bandwidth?: number; // Bytes
+    buildExecution?: number; // Seconds
+    concurrentBuild?: number;
+    storageArweave?: number; // Bytes
+    storageIPFS?: number; // Bytes
+    deploymentsPerDay?: number;
+    domains?: number;
+    hnsDomains?: number;
+    ensDomains?: number;
+    environments?: number;
+    numberOfRequests?: number;
+    passwordProtection?: number;
+  };
+  limit: {
+    bandwidth?: number; // Bytes
+    buildExecution?: number; // Seconds
+    concurrentBuild?: number;
+    storageArweave?: number; // Bytes
+    storageIPFS?: number; // Bytes
+    deploymentsPerDay?: number;
+    domains?: number;
+    hnsDomains?: number;
+    ensDomains?: number;
+    environments?: number;
+    membersLimit?: number;
+  };
 }
 
 const mapCoreUsageWithLimits = (
   usage: CoreUsageWithLimits
 ): UsageWithLimits => {
   return {
-    usedBandwidth: usage.usedBandwidth,
-    bandwidthLimit: usage.bandwidthLimit,
-    usedBuildExecution: usage.usedBuildExecution,
-    buildExecutionLimit: usage.buildExecutionLimit,
-    usedConcurrentBuild: usage.usedConcurrentBuild,
-    concurrentBuildLimit: usage.concurrentBuildLimit,
-    usedStorageArweave: usage.usedStorageArweave,
-    storageArweaveLimit: usage.storageArweaveLimit,
-    usedStorageIPFS: usage.usedStorageIPFS,
-    storageIPFSLimit: usage.storageIPFSLimit,
-    usedDeploymentsPerDay: usage.usedDeploymentsPerDay,
-    deploymentsPerDayLimit: usage.deploymentsPerDayLimit,
-    usedDomains: usage.usedDomains,
-    domainsLimit: usage.domainsLimit,
-    usedHnsDomains: usage.usedHnsDomains,
-    hnsDomainsLimit: usage.hnsDomainsLimit,
-    usedEnsDomains: usage.usedEnsDomains,
-    ensDomainsLimit: usage.ensDomainsLimit,
-    environmentsLimit: usage.environmentsLimit,
-    usedEnvironments: usage.usedEnvironments,
-    usedNumberOfRequests: usage.usedNumberOfRequests,
-    usedPasswordProtections: usage.usedPasswordProtections,
-    membersLimit: usage.membersLimit,
+    used: {
+      bandwidth: usage.usedBandwidth,
+      buildExecution: usage.usedBuildExecution,
+      concurrentBuild: usage.usedConcurrentBuild,
+      storageArweave: usage.usedStorageArweave,
+      storageIPFS: usage.usedStorageIPFS,
+      deploymentsPerDay: usage.usedDeploymentsPerDay,
+      domains: usage.usedDomains,
+      hnsDomains: usage.usedHnsDomains,
+      ensDomains: usage.usedEnsDomains,
+      environments: usage.usedEnvironments,
+      numberOfRequests: usage.usedNumberOfRequests,
+      passwordProtection: usage.usedPasswordProtections,
+    },
+    limit: {
+      bandwidth: usage.bandwidthLimit,
+      buildExecution: usage.buildExecutionLimit,
+      concurrentBuild: usage.concurrentBuildLimit,
+      storageArweave: usage.storageArweaveLimit,
+      storageIPFS: usage.storageIPFSLimit,
+      deploymentsPerDay: usage.deploymentsPerDayLimit,
+      domains: usage.domainsLimit,
+      hnsDomains: usage.hnsDomainsLimit,
+      ensDomains: usage.ensDomainsLimit,
+      environments: usage.environmentsLimit,
+      membersLimit: usage.membersLimit,
+    },
   };
 };
 
