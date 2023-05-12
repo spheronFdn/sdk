@@ -39,29 +39,14 @@ interface Upload {
 
 interface UsageWithLimits {
   usedBandwidth?: number; // Bytes
-  usedBuildExecution?: number; // Seconds
-  usedConcurrentBuild?: number;
   usedStorageArweave?: number; // Bytes
   usedStorageIPFS?: number; // Bytes
-  usedDeploymentsPerDay?: number;
-  lastDeploymentDate?: Date;
   usedDomains?: number;
-  usedHnsDomains?: number;
-  usedEnsDomains?: number;
-  usedEnvironments?: number;
   usedNumberOfRequests?: number;
-  usedPasswordProtections?: number;
-  membersLimit?: number;
   bandwidthLimit?: number; // Bytes
-  buildExecutionLimit?: number; // Seconds
-  concurrentBuildLimit?: number;
   storageArweaveLimit?: number; // Bytes
   storageIPFSLimit?: number;
-  deploymentsPerDayLimit?: number;
   domainsLimit?: number;
-  hnsDomainsLimit?: number;
-  ensDomainsLimit?: number;
-  environmentsLimit?: number;
   usedParallelUploads?: number;
   parallelUploadsLimit?: number;
 }
