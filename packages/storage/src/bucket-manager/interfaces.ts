@@ -38,17 +38,21 @@ interface Upload {
 }
 
 interface UsageWithLimits {
-  usedBandwidth?: number; // Bytes
-  usedStorageArweave?: number; // Bytes
-  usedStorageIPFS?: number; // Bytes
-  usedDomains?: number;
-  usedNumberOfRequests?: number;
-  bandwidthLimit?: number; // Bytes
-  storageArweaveLimit?: number; // Bytes
-  storageIPFSLimit?: number;
-  domainsLimit?: number;
-  usedParallelUploads?: number;
-  parallelUploadsLimit?: number;
+  used: {
+    bandwidth?: number; // Bytes
+    storageArweave?: number; // Bytes
+    storageIPFS?: number; // Bytes
+    domains?: number;
+    numberOfRequests?: number;
+    parallelUploads?: number;
+  };
+  limit: {
+    bandwidth?: number; // Bytes
+    storageArweave?: number; // Bytes
+    storageIPFS?: number; // Bytes
+    domains?: number;
+    parallelUploads?: number;
+  };
 }
 
 export {
