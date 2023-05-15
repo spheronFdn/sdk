@@ -161,7 +161,6 @@ interface InstanceCreationConfig {
     region: string;
     machineImageName: string;
   };
-  topicId?: string;
   clusterName: string;
   healthCheckConfig?: {
     path: string;
@@ -179,7 +178,6 @@ interface MarketplaceInstanceCreationConfig {
   marketplaceAppId: string;
   environmentVariables: MarketplaceDeploymentVariable[];
   machineImageId: string;
-  topicId?: string;
   region: string;
 }
 
@@ -187,7 +185,6 @@ interface InstanceResponse {
   clusterId: string;
   instanceId: string;
   instanceDeploymentId: string;
-  topicId: string;
 }
 
 interface MarketplaceInstanceResponse extends InstanceResponse {
@@ -199,7 +196,6 @@ interface InstanceUpdateConfig {
   env: Array<EnvironmentVar>;
   commands: Array<string>;
   args: Array<string>;
-  topicId: string;
   tag: string;
 }
 

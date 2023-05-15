@@ -9,7 +9,6 @@ import {
   InstanceLogType,
   MarketplaceInstanceCreationConfig,
   MarketplaceInstanceResponse,
-  EventHandler,
   InstanceCreationConfig,
   InstanceUpdateConfig,
 } from "./interfaces";
@@ -37,8 +36,6 @@ class InstanceManager {
   async create(
     creationConfig: InstanceCreationConfig
   ): Promise<InstanceResponse> {
-    creationConfig.topicId = creationConfig.topicId ?? uuidv4();
-
     const organizationId = await this.utils.getOrganizationId();
 
     const response = await this.spheronApi.createClusterInstance(
@@ -124,8 +121,6 @@ class InstanceManager {
   async createFromMarketplace(
     createConfig: MarketplaceInstanceCreationConfig
   ): Promise<MarketplaceInstanceResponse> {
-    createConfig.topicId = createConfig.topicId ?? uuidv4();
-
     const organizationId = await this.utils.getOrganizationId();
 
     const response = await this.spheronApi.createClusterInstanceFromTemplate(
@@ -183,31 +178,19 @@ class InstanceManager {
     return this.spheronApi.verifyClusterInstanceDomain(instanceId, domainId);
   }
 
-  async triggerLatestLog(
-    instanceId: string,
-    topicId: string
-  ): Promise<{
-    topicId: string;
+  async triggerLatestLog(instanceId: string): Promise<{
     message: string;
   }> {
-    return this.spheronApi.triggerClusterInstanceLogFetch(instanceId, topicId);
+    return this.spheronApi.triggerClusterInstanceLogFetch(instanceId, uuidv4());
   }
 
-  async triggerLatestHealth(
-    instanceId: string,
-    topicId: string
-  ): Promise<{
-    topicId: string;
+  async triggerLatestHealth(instanceId: string): Promise<{
     message: string;
   }> {
     return this.spheronApi.triggerClusterInstanceHealthCheck(
       instanceId,
-      topicId
+      uuidv4()
     );
-  }
-
-  subscribeToEventStream(eventHandler: EventHandler) {
-    this.spheronApi.subscribeToEventStream(eventHandler);
   }
 }
 

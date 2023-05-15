@@ -121,15 +121,6 @@ enum ClusterProtocolEnum {
   AKASH = "akash",
 }
 
-enum EventTypeEnum {
-  INSTANCE_LOGS = 1,
-  DEPLOYMENT_FINISHED = 2,
-  DEPLOYMENT_FAILED = 3,
-  CONNECTION = "connection",
-  LATEST_HEALTH = "health-check",
-  LATEST_LOGS = "log-events",
-}
-
 export {
   ProjectTypeEnum,
   DeploymentEnvironmentStatusEnum,
@@ -148,5 +139,4 @@ export {
   InstanceLogType,
   PersistentStorageClassEnum,
   ClusterProtocolEnum,
-  EventTypeEnum,
 };

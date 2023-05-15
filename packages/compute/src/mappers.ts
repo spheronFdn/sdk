@@ -36,6 +36,7 @@ import {
   MarketplaceInstanceResponse,
   UsageWithLimits,
 } from "./interfaces";
+import { v4 as uuidv4 } from "uuid";
 
 const mapOrganization = (input: CoreOrganization): Organization => {
   return {
@@ -197,7 +198,7 @@ const mapCreateInstanceRequest = (
 ): CreateInstanceRequest => {
   return {
     organizationId,
-    uniqueTopicId: input.topicId,
+    uniqueTopicId: uuidv4(),
     configuration: {
       folderName: "",
       protocol: ClusterProtocolEnum.AKASH,
@@ -234,7 +235,7 @@ const mapMarketplaceInstanceCreationConfig = (
     environmentVariables: input.environmentVariables,
     organizationId: organizationId,
     akashImageId: input.machineImageId,
-    uniqueTopicId: input.topicId,
+    uniqueTopicId: uuidv4(),
     region: input.region,
   };
 };
@@ -244,7 +245,6 @@ const mapInstanceResponse = (input: InstanceResponseCore): InstanceResponse => {
     clusterId: input.clusterId,
     instanceId: input.clusterInstanceId,
     instanceDeploymentId: input.clusterInstanceOrderId,
-    topicId: input.topic,
   };
 };
 
@@ -272,7 +272,7 @@ const mapInstanceUpdateRequest = (
     }),
     command: input.commands,
     args: input.args,
-    uniqueTopicId: input.topicId,
+    uniqueTopicId: uuidv4(),
     tag: input.tag,
   };
 };

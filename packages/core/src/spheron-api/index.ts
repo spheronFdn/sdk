@@ -29,7 +29,6 @@ import {
   InstanceOrder,
   MarketplaceApp,
   ComputeMachine,
-  EventHandler,
 } from "./interfaces";
 import {
   CreateInstanceFromMarketplaceRequest,
@@ -40,7 +39,6 @@ import {
   InstanceResponse,
   MarketplaceInstanceResponse,
 } from "./response-interfaces";
-import EventSource from "eventsource";
 
 class SpheronApi {
   private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
@@ -671,24 +669,6 @@ class SpheronApi {
       HttpMethods.POST,
       `/v1/cluster-instance/${instanceId}/trigger/fetch-logs?topicId=${topicId}`
     );
-  }
-
-  subscribeToEventStream(eventHandler: EventHandler) {
-    const eventSource = new EventSource(`${this.spheronApiUrl}/subscribe`, {
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-      },
-    });
-
-    // Add an event listener for the 'message' event
-    eventSource.onmessage = (event) => {
-      eventHandler(JSON.parse(event.data));
-    };
-
-    // Add an event listener for the 'error' event
-    eventSource.onerror = (event) => {
-      eventHandler(JSON.parse(event.data));
-    };
   }
 
   private async sendApiRequest<T>(

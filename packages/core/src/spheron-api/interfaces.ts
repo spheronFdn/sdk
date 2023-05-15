@@ -7,7 +7,6 @@ import {
   PersistentStorageClassEnum,
   ProtocolEnum,
   ProviderEnum,
-  EventTypeEnum,
 } from "./enums";
 import {
   DeploymentEnvironmentStatusEnum,
@@ -19,17 +18,6 @@ import {
   ProjectStateEnum,
 } from "./enums";
 import { ProjectTypeEnum } from "./enums";
-
-type EventHandler = (event: Event) => void;
-
-interface Event {
-  type: EventTypeEnum;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
-  session: string;
-  error?: string;
-  mesage?: string;
-}
 
 interface TokenScope {
   user: {
@@ -461,12 +449,10 @@ export {
   PersistentStorage,
   MarketplaceApp,
   ComputeMachine,
-  EventHandler,
   MarketplaceAppMetadata,
   MarketplaceAppServiceData,
   MarketplaceAppPort,
   MarketplaceAppVariable,
   HealthCheck,
   MachineImageType,
-  Event,
 };
