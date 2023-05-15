@@ -23,8 +23,8 @@ interface CreateInstanceRequest {
   clusterUrl: string;
   clusterProvider: string;
   clusterName: string;
-  healthCheckUrl: string;
-  healthCheckPort: number;
+  healthCheckUrl?: string;
+  healthCheckPort?: number;
 }
 
 interface CreateInstanceFromMarketplaceRequest {

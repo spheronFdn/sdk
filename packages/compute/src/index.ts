@@ -10,7 +10,7 @@ export interface SpheronClientConfiguration {
   token: string;
 }
 
-export class SpheronComputeClient {
+export class SpheronClient {
   private readonly configuration: SpheronClientConfiguration;
   private readonly spheronApi: SpheronApi;
   private readonly utils: Utils;
@@ -35,4 +35,4 @@ export class SpheronComputeClient {
 }
 
 export * from "./interfaces";
-export default SpheronComputeClient;
+export default SpheronClient;

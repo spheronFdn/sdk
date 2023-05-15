@@ -292,6 +292,10 @@ interface ExtendedInstance extends Instance {
 interface MachineImageType {
   machineType: string;
   agreementDate: number;
+  cpu?: number;
+  memory?: string;
+  storage?: string;
+  persistentStorage?: PersistentStorage;
 }
 
 interface TopupReport {

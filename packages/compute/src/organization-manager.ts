@@ -1,13 +1,7 @@
 import { SpheronApi } from "@spheron/core";
-import {
-  Cluster,
-  Organization,
-  UsageWithLimits,
-  mapCluster,
-  mapOrganization,
-  mapUsageWithLimits,
-} from "./interfaces";
+import { Cluster, Organization, UsageWithLimits } from "./interfaces";
 import Utils from "./utils";
+import { mapOrganization, mapCluster, mapUsageWithLimits } from "./mappers";
 
 class OrganizationManager {
   private readonly spheronApi: SpheronApi;

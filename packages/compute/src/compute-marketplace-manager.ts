@@ -1,5 +1,6 @@
 import { SpheronApi } from "@spheron/core";
-import { MarketplaceApp, mapMarketplaceApp } from "./interfaces";
+import { MarketplaceApp } from "./interfaces";
+import { mapMarketplaceApp } from "./mappers";
 
 class ComputeMarketplaceManager {
   private readonly spheronApi: SpheronApi;

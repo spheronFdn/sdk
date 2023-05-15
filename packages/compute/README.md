@@ -29,13 +29,13 @@
 
 ### Usage
 
-The package exports `SpheronComputeClient` class, which includes methods for working with clusters, marketplace apps, cluster instances and their configurations. The constructor of `SpheronComputeClient` takes in one parameter `token`. Check the **Access Token** section for information on how to create a token.
+The package exports `SpheronClient` class, which includes methods for working with clusters, marketplace apps, cluster instances and their configurations. The constructor of `SpheronClient` takes in one parameter `token`. Check the **Access Token** section for information on how to create a token.
 
 ```js
-import SpheronComputeClient from "@spheron/compute";
+import SpheronClient from "@spheron/compute";
 ...
-const computeClient = new SpheronComputeClient({ token });
-await computeClient.instance.create(
+const client = new SpheronClient({ token });
+await client.instance.create(
     configuration: {
       image: dockerImage,
       tag: dockerImageTag,
@@ -49,8 +49,10 @@ await computeClient.instance.create(
     },
     topicId: eventStreamSession,
     clusterName: clusterName,
-    healthCheckUrl: healthCheckPath,
-    healthCheckPort: healthChekcPort,
+    healthCheckConfig: {
+      path: healthCheckPath,
+      port: healthCheckPort,
+    },
   }
 );
 ```
@@ -59,7 +61,7 @@ For more information about the Compute methods, check out the [DOCS](https://doc
 
 ## Access Token
 
-To create the `token` that is used with the `SpheronComputeClient`, follow the instructions in the [DOCS](https://docs.spheron.network/rest-api/#creating-an-access-token). When you are creating the tokens, please choose **compute** type in the dashboard.
+To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/rest-api/#creating-an-access-token). When you are creating the tokens, please choose **compute** type in the dashboard.
 
 ## Learn More
 

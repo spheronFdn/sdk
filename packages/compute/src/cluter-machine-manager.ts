@@ -1,5 +1,6 @@
 import { SpheronApi } from "@spheron/core";
-import { ComputeMachine, mapComputeMachine } from "./interfaces";
+import { ComputeMachine } from "./interfaces";
+import { mapComputeMachine } from "./mappers";
 
 class ComputeMachineManager {
   private readonly spheronApi: SpheronApi;

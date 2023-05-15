@@ -2,11 +2,10 @@ import { SpheronApi } from "@spheron/core";
 import {
   Cluster,
   InstanceDetailed,
-  mapCluster,
-  mapExtendedClusterInstance,
   ClusterFundsUsage,
   InstancesInfo,
 } from "./interfaces";
+import { mapCluster, mapExtendedClusterInstance } from "./mappers";
 
 class ClusterManager {
   private readonly spheronApi: SpheronApi;

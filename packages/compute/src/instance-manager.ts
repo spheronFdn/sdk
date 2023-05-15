@@ -5,24 +5,25 @@ import {
   InstanceDeployment,
   Domain,
   DomainTypeEnum,
-  mapClusterInstance,
-  mapInstanceDeployment,
-  mapDomain,
   InstanceResponse,
-  UpdateInstaceRequest,
   InstanceLogType,
   MarketplaceInstanceCreationConfig,
   MarketplaceInstanceResponse,
   EventHandler,
   InstanceCreationConfig,
-  mapCreateInstanceRequest,
-  mapMarketplaceInstanceCreationConfig,
-  mapMarketplaceInstanceResponse,
-  mapInstanceResponse,
-  mapInstanceUpdateRequest,
   InstanceUpdateConfig,
 } from "./interfaces";
 import Utils from "./utils";
+import {
+  mapCreateInstanceRequest,
+  mapInstanceResponse,
+  mapClusterInstance,
+  mapInstanceUpdateRequest,
+  mapInstanceDeployment,
+  mapMarketplaceInstanceCreationConfig,
+  mapMarketplaceInstanceResponse,
+  mapDomain,
+} from "./mappers";
 
 class InstanceManager {
   private readonly spheronApi: SpheronApi;
