@@ -12,7 +12,6 @@ import {
   InstanceResponse as InstanceResponseCore,
   Env,
   UsageWithLimits as UsageWithLimitsCore,
-  HealthCheck as HealthCheckCore,
   ExtendedInstance,
   ClusterProtocolEnum,
   ProviderEnum,
