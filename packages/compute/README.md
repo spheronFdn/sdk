@@ -36,6 +36,7 @@ import SpheronClient from "@spheron/compute";
 ...
 const client = new SpheronClient({ token });
 await client.instance.create(
+    clusterName: clusterName,
     configuration: {
       image: dockerImage,
       tag: dockerImageTag,
@@ -44,11 +45,9 @@ await client.instance.create(
       env: [{ key:"key", value: "value", isSecret: isSecret }],
       commands: [],
       args: [],
-      region: deployReegion,
-      machineImageName: machineType,
+      region: deployRegion,
+      machineImageName: computeMachineName,
     },
-    topicId: eventStreamSession,
-    clusterName: clusterName,
     healthCheckConfig: {
       path: healthCheckPath,
       port: healthCheckPort,
