@@ -53,19 +53,9 @@ const mapMarketplaceApp = (input: MarketplaceAppCore): MarketplaceApp => {
   return {
     id: input._id,
     name: input.name,
-    metadata: {
-      description: input.metadata.description,
-      category: input.metadata.category,
-    },
-    serviceData: {
-      dockerImage: input.serviceData.dockerImage,
-      dockerImageTag: input.serviceData.dockerImageTag,
-      provider: input.serviceData.provider,
-      variables: input.serviceData.variables,
-      ports: input.serviceData.ports,
-      commands: input.serviceData.commands,
-      args: input.serviceData.args,
-    },
+    description: input.metadata.description,
+    category: input.metadata.category,
+    variables: input.serviceData.variables,
   };
 };
 
@@ -102,7 +92,7 @@ const mapClusterInstance = (input: InstanceCore): Instance => {
     activeDeployment: input.activeOrder,
     latestUrlPreview: input.latestUrlPreview,
     agreedMachine: {
-      machineType: input.agreedMachineImageType.machineType,
+      machineName: input.agreedMachineImageType.machineName,
       agreementDate: input.agreedMachineImageType.agreementDate,
     },
     healthCheck: {
@@ -138,8 +128,7 @@ const mapDomain = (coreDomain: CoreDomain): Domain => {
     verified: coreDomain.verified,
     link: coreDomain.link,
     type: coreDomain.type,
-    projectId: coreDomain.projectId,
-    deploymentEnvironmentIds: coreDomain.deploymentEnvironmentIds,
+    instanceId: coreDomain.projectId,
   };
 };
 
@@ -149,7 +138,6 @@ const mapInstanceDeployment = (
   return {
     id: input._id,
     type: input.type as DeploymentTypeEnum,
-    commitId: input.commitId,
     status: input.status as DeploymentStatusEnum,
     buildTime: input.buildTime,
     logs: input.logs,
@@ -160,7 +148,7 @@ const mapInstanceDeployment = (
     instanceConfiguration: {
       image: input.clusterInstanceConfiguration.image,
       tag: input.clusterInstanceConfiguration.tag,
-      instanceCount: input.clusterInstanceConfiguration.instanceCount,
+      scale: input.clusterInstanceConfiguration.instanceCount,
       ports: input.clusterInstanceConfiguration.ports,
       env: input.clusterInstanceConfiguration.env.map(
         (ev: Env): EnvironmentVar => {
@@ -175,7 +163,7 @@ const mapInstanceDeployment = (
       args: input.clusterInstanceConfiguration.args,
       region: input.clusterInstanceConfiguration.region,
       agreedMachine: {
-        machineType:
+        machineName:
           input.clusterInstanceConfiguration.agreedMachineImage.machineType,
         agreementDate:
           input.clusterInstanceConfiguration.agreedMachineImage.agreementDate,
@@ -194,7 +182,8 @@ const mapInstanceDeployment = (
 
 const mapCreateInstanceRequest = (
   input: InstanceCreationConfig,
-  organizationId: string
+  organizationId: string,
+  machineImageName: string
 ): CreateInstanceRequest => {
   return {
     organizationId,
@@ -204,7 +193,7 @@ const mapCreateInstanceRequest = (
       protocol: ClusterProtocolEnum.AKASH,
       image: input.configuration.image,
       tag: input.configuration.tag,
-      instanceCount: input.configuration.instanceCount,
+      instanceCount: input.configuration.scale,
       buildImage: false,
       ports: input.configuration.ports,
       env: input.configuration.env.map((ev: EnvironmentVar): Env => {
@@ -216,7 +205,7 @@ const mapCreateInstanceRequest = (
       command: input.configuration.commands,
       args: input.configuration.args,
       region: input.configuration.region,
-      akashMachineImageName: input.configuration.machineImageName,
+      akashMachineImageName: machineImageName,
     },
     clusterUrl: input.configuration.image,
     clusterProvider: ProviderEnum.DOCKERHUB,
@@ -277,34 +266,27 @@ const mapInstanceUpdateRequest = (
   };
 };
 
-const mapUsageWithLimits = (usage: UsageWithLimitsCore): UsageWithLimits => {
+const mapUsageWithLimits = (
+  usage: UsageWithLimitsCore,
+  tokenPrice: number
+): UsageWithLimits => {
   return {
     used: {
-      bandwidth: usage.usedBandwidth,
-      buildExecution: usage.usedBuildExecution,
-      concurrentBuild: usage.usedConcurrentBuild,
-      storageArweave: usage.usedStorageArweave,
-      storageIPFS: usage.usedStorageIPFS,
-      deploymentsPerDay: usage.usedDeploymentsPerDay,
-      domains: usage.usedDomains,
-      hnsDomains: usage.usedHnsDomains,
-      ensDomains: usage.usedEnsDomains,
-      environments: usage.usedEnvironments,
+      computeCredit: usage.usedClusterAkt
+        ? (usage.usedClusterAkt / 1000000) * tokenPrice
+        : 0,
+      computeBuildExecution: usage.usedClusterBuildExecution,
       numberOfRequests: usage.usedNumberOfRequests,
-      passwordProtection: usage.usedPasswordProtections,
+      bandwidth: usage.usedBandwidth,
+      domains: usage.usedDomains,
     },
     limit: {
+      computeCredit: usage.clusterAktLimit
+        ? (usage.clusterAktLimit / 1000000) * tokenPrice
+        : 0,
+      computeBuildExecution: usage.clusterBuildExecutionLimit,
       bandwidth: usage.bandwidthLimit,
-      buildExecution: usage.buildExecutionLimit,
-      concurrentBuild: usage.concurrentBuildLimit,
-      storageArweave: usage.storageArweaveLimit,
-      storageIPFS: usage.storageIPFSLimit,
-      deploymentsPerDay: usage.deploymentsPerDayLimit,
       domains: usage.domainsLimit,
-      hnsDomains: usage.hnsDomainsLimit,
-      ensDomains: usage.ensDomainsLimit,
-      environments: usage.environmentsLimit,
-      membersLimit: usage.membersLimit,
     },
   };
 };

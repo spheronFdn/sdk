@@ -7,17 +7,13 @@ import {
   ClusterStateEnum,
   InstanceStateEnum,
   MachineImageType,
-  DeploymentEnvironment,
   ClusterFundsUsage,
   InstancesInfo,
-  EventHandler,
   InstanceLogType,
   UpdateInstaceRequest,
   ClusterProtocolEnum,
   MarketplaceDeploymentVariable,
   Port,
-  EventTypeEnum,
-  Event,
   HealthStatusEnum,
 } from "@spheron/core";
 
@@ -33,19 +29,9 @@ interface Organization {
 interface MarketplaceApp {
   id: string;
   name: string;
-  metadata: {
-    description: string;
-    category: MarketplaceCategoryEnum;
-  };
-  serviceData: {
-    dockerImage: string;
-    dockerImageTag: string;
-    provider: string;
-    variables: MarketplaceAppVariable[];
-    ports: MarketplaceAppPort[];
-    commands: string[];
-    args: string[];
-  };
+  description: string;
+  category: MarketplaceCategoryEnum;
+  variables: MarketplaceAppVariable[];
 }
 
 interface ComputeMachine {
@@ -105,8 +91,7 @@ interface Domain {
   verified: boolean;
   link: string;
   type: DomainTypeEnum;
-  projectId: string;
-  deploymentEnvironmentIds: DeploymentEnvironment[];
+  instanceId: string;
 }
 
 enum DeploymentStatusEnum {
@@ -126,7 +111,6 @@ enum DeploymentTypeEnum {
 interface InstanceDeployment {
   id: string;
   type: DeploymentTypeEnum;
-  commitId: string;
   status: DeploymentStatusEnum;
   buildTime: number;
   logs: [{ time: string; log: Array<string> }];
@@ -139,7 +123,7 @@ interface InstanceDeployment {
   instanceConfiguration: {
     image: string;
     tag: string;
-    instanceCount: number;
+    scale: number;
     ports: Array<Port>;
     env: Array<EnvironmentVar>;
     commands: Array<string>;
@@ -153,13 +137,13 @@ interface InstanceCreationConfig {
   configuration: {
     image: string;
     tag: string;
-    instanceCount: number;
+    scale: number;
     ports: Array<Port>;
     env: Array<EnvironmentVar>;
     commands: Array<string>;
     args: Array<string>;
     region: string;
-    machineImageName: string;
+    machineImageId: string;
   };
   clusterName: string;
   healthCheckConfig?: {
@@ -201,31 +185,17 @@ interface InstanceUpdateConfig {
 
 interface UsageWithLimits {
   used: {
-    bandwidth?: number; // Bytes
-    buildExecution?: number; // Seconds
-    concurrentBuild?: number;
-    storageArweave?: number; // Bytes
-    storageIPFS?: number; // Bytes
-    deploymentsPerDay?: number;
-    domains?: number;
-    hnsDomains?: number;
-    ensDomains?: number;
-    environments?: number;
+    computeCredit?: number; // price in usd
+    computeBuildExecution?: number; // Seconds
     numberOfRequests?: number;
-    passwordProtection?: number;
+    bandwidth?: number;
+    domains?: number;
   };
   limit: {
-    bandwidth?: number; // Bytes
-    buildExecution?: number; // Seconds
-    concurrentBuild?: number;
-    storageArweave?: number; // Bytes
-    storageIPFS?: number; // Bytes
-    deploymentsPerDay?: number;
+    computeCredit?: number; // Bytes
+    computeBuildExecution?: number; // Seconds
+    bandwidth?: number;
     domains?: number;
-    hnsDomains?: number;
-    ensDomains?: number;
-    environments?: number;
-    membersLimit?: number;
   };
 }
 
@@ -246,9 +216,6 @@ export {
   ClusterFundsUsage,
   InstancesInfo,
   MarketplaceInstanceResponse,
-  EventHandler,
-  Event,
-  EventTypeEnum,
   InstanceLogType,
   UpdateInstaceRequest,
   InstanceResponse,

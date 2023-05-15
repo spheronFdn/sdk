@@ -38,10 +38,27 @@ class InstanceManager {
   ): Promise<InstanceResponse> {
     const organizationId = await this.utils.getOrganizationId();
 
-    const response = await this.spheronApi.createClusterInstance(
-      mapCreateInstanceRequest(creationConfig, organizationId)
+    const computeMachines = await this.spheronApi.getComputeMachines({
+      skip: 0,
+      limit: 10,
+    });
+    const computeMachine = computeMachines.find(
+      (m) => m._id === creationConfig.configuration.machineImageId
     );
 
+    if (!computeMachine) {
+      throw new Error(
+        `Compute machine with id ${creationConfig.configuration.machineImageId} not found`
+      );
+    }
+
+    const response = await this.spheronApi.createClusterInstance(
+      mapCreateInstanceRequest(
+        creationConfig,
+        organizationId,
+        computeMachine.name
+      )
+    );
     return mapInstanceResponse(response);
   }
 

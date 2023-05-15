@@ -41,10 +41,12 @@ class OrganizationManager {
       "c-akash"
     );
 
+    const pricePerToken = await this.spheronApi.getPriceForToken(7431);
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { usedStorageSkynet, storageSkynetLimit, ...resultWithoutSkynet } =
       usage;
-    return mapUsageWithLimits(resultWithoutSkynet);
+    return mapUsageWithLimits(resultWithoutSkynet, pricePerToken);
   }
 }
 

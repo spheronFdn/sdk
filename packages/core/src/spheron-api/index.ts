@@ -671,6 +671,15 @@ class SpheronApi {
     );
   }
 
+  async getPriceForToken(tokenId: number): Promise<number> {
+    const response = await this.sendApiRequest<{
+      message: string;
+      price: number;
+    }>(HttpMethods.GET, `/v1/price/liveTokenPrice/${tokenId}`);
+
+    return response.price;
+  }
+
   private async sendApiRequest<T>(
     method: HttpMethods,
     path: string,

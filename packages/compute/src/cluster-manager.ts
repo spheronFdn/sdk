@@ -29,7 +29,13 @@ class ClusterManager {
   }
 
   async getUsage(id: string): Promise<ClusterFundsUsage> {
-    return this.spheronApi.getClusterFundsUsage(id);
+    const response = await this.spheronApi.getClusterFundsUsage(id);
+    const pricePerToken = await this.spheronApi.getPriceForToken(7431);
+
+    return {
+      dailyUsage: (response.dailyUsage / 1000000) * pricePerToken,
+      usedTillNow: (response.usedTillNow / 1000000) * pricePerToken,
+    };
   }
 
   async getInstances(
