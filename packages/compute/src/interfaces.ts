@@ -48,7 +48,6 @@ interface Cluster {
   url: string;
   proivder: ProviderEnum;
   createdBy: string;
-  state: ClusterStateEnum;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -62,7 +61,7 @@ interface Instance {
   activeDeployment: string;
   latestUrlPreview: string;
   agreedMachine: {
-    machineType: string;
+    machineName: string;
     agreementDate: number;
   };
   healthCheck: HealthCheck;

@@ -76,7 +76,6 @@ const mapCluster = (input: ClusterCore): Cluster => {
     url: input.url,
     proivder: input.proivder,
     createdBy: input.createdBy,
-    state: input.state,
     createdAt: input.createdAt,
     updatedAt: input.updatedAt,
   };
