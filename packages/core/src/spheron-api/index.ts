@@ -29,6 +29,7 @@ import {
   InstanceOrder,
   MarketplaceApp,
   ComputeMachine,
+  InstanceOrderLogs,
 } from "./interfaces";
 import {
   CreateInstanceFromMarketplaceRequest,
@@ -501,12 +502,12 @@ class SpheronApi {
       logType: InstanceLogType;
       search?: string;
     }
-  ): Promise<InstanceOrder> {
+  ): Promise<InstanceOrderLogs> {
     if (logsOptions.from < 0 || logsOptions.to < 0) {
       throw new Error(`From and To cannot be negative numbers.`);
     }
 
-    return this.sendApiRequest<InstanceOrder>(
+    return this.sendApiRequest<InstanceOrderLogs>(
       HttpMethods.GET,
       `/v1/cluster-instance/order/${id}/logs`,
       null,

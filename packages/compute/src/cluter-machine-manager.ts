@@ -12,7 +12,7 @@ class ComputeMachineManager {
   async get(options: {
     skip: number;
     limit: number;
-    searchString?: string;
+    search?: string;
   }): Promise<ComputeMachine[]> {
     if (options.limit < 1 || options.skip < 0) {
       throw new Error(

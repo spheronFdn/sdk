@@ -101,17 +101,12 @@ class InstanceManager {
     return this.spheronApi.closeClusterInstance(id);
   }
 
-  async getInstanceDeployment(
-    id: string
-  ): Promise<{ deployment: InstanceDeployment; liveLogs: string[] }> {
+  async getInstanceDeployment(id: string): Promise<InstanceDeployment> {
     const clusterInstanceOrder = await this.spheronApi.getClusterInstanceOrder(
       id
     );
 
-    return {
-      deployment: mapInstanceDeployment(clusterInstanceOrder.order),
-      liveLogs: clusterInstanceOrder.liveLogs,
-    };
+    return mapInstanceDeployment(clusterInstanceOrder.order);
   }
 
   async getInstanceDeploymentLogs(
@@ -122,17 +117,17 @@ class InstanceManager {
       logType: InstanceLogType;
       search?: string;
     }
-  ): Promise<InstanceDeployment> {
+  ): Promise<Array<string>> {
     if (logsOptions.from < 0 || logsOptions.to < 0) {
       throw new Error(`From and To cannot be negative numbers.`);
     }
 
-    const order = await this.spheronApi.getClusterInstanceOrderLogs(
+    const logsResponse = await this.spheronApi.getClusterInstanceOrderLogs(
       id,
       logsOptions
     );
 
-    return mapInstanceDeployment(order);
+    return logsResponse.logs;
   }
 
   async createFromMarketplace(

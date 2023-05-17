@@ -17,7 +17,7 @@ import {
   ProviderEnum,
   UpdateInstaceRequest,
   MarketplaceDeploymentVariable,
-  MarketplaceAppVariable as MarketplaceAppVariableCore,
+  InstancesInfo as InstancesInfoCore,
 } from "@spheron/core";
 import {
   InstanceDetailed,
@@ -38,6 +38,7 @@ import {
   MarketplaceInstanceResponse,
   UsageWithLimits,
   MarketplaceAppVariable,
+  InstancesInfo,
 } from "./interfaces";
 import { v4 as uuidv4 } from "uuid";
 
@@ -162,10 +163,6 @@ const mapInstanceDeployment = (
     type: input.type as DeploymentTypeEnum,
     status: input.status as DeploymentStatusEnum,
     buildTime: input.buildTime,
-    logs: input.logs,
-    closingLogs: input.closingLogs,
-    clusterLogs: input.clusterLogs,
-    clusterEvents: input.clusterEvents,
     instance: input.clusterInstance,
     instanceConfiguration: {
       image: input.clusterInstanceConfiguration.image,
@@ -323,6 +320,16 @@ const mapUsageWithLimits = (
   };
 };
 
+const mapInstancesInfo = (input: InstancesInfoCore): InstancesInfo => {
+  return {
+    provisioned: input.provisioned,
+    provisioning: input.starting,
+    failedToProvision: input.failedToStart,
+    closed: input.closed,
+    total: input.total,
+  };
+};
+
 export {
   mapDomain,
   mapCluster,
@@ -338,4 +345,5 @@ export {
   mapInstanceResponse,
   mapMarketplaceInstanceResponse,
   mapUsageWithLimits,
+  mapInstancesInfo,
 };

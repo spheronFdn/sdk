@@ -357,8 +357,8 @@ interface InstanceOrder {
   logs: [{ time: string; log: Array<string> }];
   topups: InstanceTopup[];
   closingLogs: [{ time: string; log: string }];
-  clusterLogs: Array<string>;
-  clusterEvents: Array<string>;
+  instanceLogs: Array<string>;
+  instanceEvents: Array<string>;
   clusterInstance: string;
   clusterInstanceConfiguration: {
     branch: string;
@@ -393,6 +393,12 @@ interface InstanceOrder {
   urlPrewiew: string;
   akashWalletId: string;
   deploymentInitiator: string;
+}
+
+interface InstanceOrderLogs {
+  _id: string;
+  logs: Array<string>;
+  logsLength: number;
 }
 
 interface Env {
@@ -455,4 +461,5 @@ export {
   MarketplaceAppVariable,
   HealthCheck,
   MachineImageType,
+  InstanceOrderLogs,
 };

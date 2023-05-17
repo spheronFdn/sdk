@@ -6,7 +6,6 @@ import {
   ClusterStateEnum,
   InstanceStateEnum,
   ClusterFundsUsage,
-  InstancesInfo,
   InstanceLogType,
   UpdateInstaceRequest,
   ClusterProtocolEnum,
@@ -112,10 +111,6 @@ interface InstanceDeployment {
   type: DeploymentTypeEnum;
   status: DeploymentStatusEnum;
   buildTime: number;
-  logs: [{ time: string; log: Array<string> }];
-  closingLogs: [{ time: string; log: string }];
-  clusterLogs: Array<string>;
-  clusterEvents: Array<string>;
   instance: string;
   connectionUrls: Array<string>;
   deploymentInitiator: string;
@@ -130,6 +125,12 @@ interface InstanceDeployment {
     region: string;
     agreedMachine: MachineImageType;
   };
+}
+
+interface InstanceDeploymentLogs {
+  _id: string;
+  logs: Array<string>;
+  logsLength: number;
 }
 
 interface MachineImageType {
@@ -205,6 +206,14 @@ interface UsageWithLimits {
     bandwidth?: number;
     domains?: number;
   };
+}
+
+interface InstancesInfo {
+  provisioned: number;
+  provisioning: number;
+  failedToProvision: number;
+  closed: number;
+  total: number;
 }
 
 export {

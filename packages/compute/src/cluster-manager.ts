@@ -5,7 +5,11 @@ import {
   ClusterFundsUsage,
   InstancesInfo,
 } from "./interfaces";
-import { mapCluster, mapExtendedClusterInstance } from "./mappers";
+import {
+  mapCluster,
+  mapExtendedClusterInstance,
+  mapInstancesInfo,
+} from "./mappers";
 
 class ClusterManager {
   private readonly spheronApi: SpheronApi;
@@ -25,7 +29,9 @@ class ClusterManager {
   }
 
   async getInstancesInfo(id: string): Promise<InstancesInfo> {
-    return this.spheronApi.getClusterInstancesDetails(id);
+    const response = await this.spheronApi.getClusterInstancesDetails(id);
+
+    return mapInstancesInfo(response);
   }
 
   async getUsage(id: string): Promise<ClusterFundsUsage> {
