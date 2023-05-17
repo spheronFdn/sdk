@@ -1,20 +1,18 @@
 import {
   MarketplaceAppPort,
-  MarketplaceAppVariable,
   ProviderEnum,
   DomainTypeEnum,
   MarketplaceCategoryEnum,
   ClusterStateEnum,
   InstanceStateEnum,
-  MachineImageType,
   ClusterFundsUsage,
   InstancesInfo,
   InstanceLogType,
   UpdateInstaceRequest,
   ClusterProtocolEnum,
-  MarketplaceDeploymentVariable,
   Port,
   HealthStatusEnum,
+  PersistentStorage,
 } from "@spheron/core";
 
 interface Organization {
@@ -32,6 +30,12 @@ interface MarketplaceApp {
   description: string;
   category: MarketplaceCategoryEnum;
   variables: MarketplaceAppVariable[];
+}
+
+interface MarketplaceAppVariable {
+  defaultValue: string;
+  key: string;
+  required?: string;
 }
 
 interface ComputeMachine {
@@ -59,11 +63,7 @@ interface Instance {
   deployments: Array<string>;
   cluster: string;
   activeDeployment: string;
-  latestUrlPreview: string;
-  agreedMachine: {
-    machineName: string;
-    agreementDate: number;
-  };
+  agreedMachine: MachineImageType;
   healthCheck: HealthCheck;
   createdAt: Date;
   updatedAt: Date;
@@ -117,19 +117,28 @@ interface InstanceDeployment {
   clusterLogs: Array<string>;
   clusterEvents: Array<string>;
   instance: string;
-  urlPrewiew: string;
+  connectionUrls: Array<string>;
   deploymentInitiator: string;
   instanceConfiguration: {
     image: string;
     tag: string;
     scale: number;
     ports: Array<Port>;
-    env: Array<EnvironmentVar>;
+    environmentVariables: Array<EnvironmentVariable>;
     commands: Array<string>;
     args: Array<string>;
     region: string;
     agreedMachine: MachineImageType;
   };
+}
+
+interface MachineImageType {
+  machineName: string;
+  agreementDate: number;
+  cpu?: number;
+  memory?: string;
+  storage?: string;
+  persistentStorage?: PersistentStorage;
 }
 
 interface InstanceCreationConfig {
@@ -138,7 +147,7 @@ interface InstanceCreationConfig {
     tag: string;
     scale: number;
     ports: Array<Port>;
-    env: Array<EnvironmentVar>;
+    environmentVariables: Array<EnvironmentVariable>;
     commands: Array<string>;
     args: Array<string>;
     region: string;
@@ -151,7 +160,7 @@ interface InstanceCreationConfig {
   };
 }
 
-interface EnvironmentVar {
+interface EnvironmentVariable {
   key: string;
   value: string;
   isSecret: boolean;
@@ -159,7 +168,7 @@ interface EnvironmentVar {
 
 interface MarketplaceInstanceCreationConfig {
   marketplaceAppId: string;
-  environmentVariables: MarketplaceDeploymentVariable[];
+  environmentVariables: EnvironmentVariable[];
   machineImageId: string;
   region: string;
 }
@@ -176,7 +185,7 @@ interface MarketplaceInstanceResponse extends InstanceResponse {
 }
 
 interface InstanceUpdateConfig {
-  env: Array<EnvironmentVar>;
+  environmentVariables: Array<EnvironmentVariable>;
   commands: Array<string>;
   args: Array<string>;
   tag: string;
@@ -223,7 +232,7 @@ export {
   InstanceStateEnum,
   InstanceCreationConfig,
   InstanceUpdateConfig,
-  EnvironmentVar,
+  EnvironmentVariable as EnvironmentVar,
   MarketplaceInstanceCreationConfig,
   DeploymentStatusEnum,
   DeploymentTypeEnum,

@@ -16,6 +16,8 @@ import {
   ClusterProtocolEnum,
   ProviderEnum,
   UpdateInstaceRequest,
+  MarketplaceDeploymentVariable,
+  MarketplaceAppVariable as MarketplaceAppVariableCore,
 } from "@spheron/core";
 import {
   InstanceDetailed,
@@ -35,6 +37,7 @@ import {
   InstanceResponse,
   MarketplaceInstanceResponse,
   UsageWithLimits,
+  MarketplaceAppVariable,
 } from "./interfaces";
 import { v4 as uuidv4 } from "uuid";
 
@@ -55,7 +58,15 @@ const mapMarketplaceApp = (input: MarketplaceAppCore): MarketplaceApp => {
     name: input.name,
     description: input.metadata.description,
     category: input.metadata.category,
-    variables: input.serviceData.variables,
+    variables: input.serviceData.variables.map(
+      (env): MarketplaceAppVariable => {
+        return {
+          defaultValue: env.defaultValue,
+          key: env.label,
+          required: env.required,
+        };
+      }
+    ),
   };
 };
 
@@ -89,9 +100,8 @@ const mapClusterInstance = (input: InstanceCore): Instance => {
     deployments: input.orders,
     cluster: input.cluster,
     activeDeployment: input.activeOrder,
-    latestUrlPreview: input.latestUrlPreview,
     agreedMachine: {
-      machineName: input.agreedMachineImageType.machineName,
+      machineName: input.agreedMachineImageType.machineType,
       agreementDate: input.agreedMachineImageType.agreementDate,
     },
     healthCheck: {
@@ -134,6 +144,19 @@ const mapDomain = (coreDomain: CoreDomain): Domain => {
 const mapInstanceDeployment = (
   input: InstanceOrderCore
 ): InstanceDeployment => {
+  const urlList: Array<string> = [];
+  if (input.urlPrewiew && input.urlPrewiew !== "") {
+    urlList.push(input.urlPrewiew);
+  }
+  if (
+    input.protocolData?.providerHost &&
+    input.protocolData?.providerHost != ""
+  ) {
+    input.clusterInstanceConfiguration.ports.forEach((port) => {
+      urlList.push(`${input.protocolData.providerHost}:${port.exposedPort}`);
+    });
+  }
+
   return {
     id: input._id,
     type: input.type as DeploymentTypeEnum,
@@ -149,7 +172,7 @@ const mapInstanceDeployment = (
       tag: input.clusterInstanceConfiguration.tag,
       scale: input.clusterInstanceConfiguration.instanceCount,
       ports: input.clusterInstanceConfiguration.ports,
-      env: input.clusterInstanceConfiguration.env.map(
+      environmentVariables: input.clusterInstanceConfiguration.env.map(
         (ev: Env): EnvironmentVar => {
           return {
             key: ev.value.split("=")[0],
@@ -174,7 +197,7 @@ const mapInstanceDeployment = (
             .persistentStorage,
       },
     },
-    urlPrewiew: input.urlPrewiew ?? input.protocolData?.providerHost,
+    connectionUrls: urlList,
     deploymentInitiator: input.deploymentInitiator,
   };
 };
@@ -195,12 +218,14 @@ const mapCreateInstanceRequest = (
       instanceCount: input.configuration.scale,
       buildImage: false,
       ports: input.configuration.ports,
-      env: input.configuration.env.map((ev: EnvironmentVar): Env => {
-        return {
-          value: `${ev.key}=${ev.value}`,
-          isSecret: ev.isSecret,
-        };
-      }),
+      env: input.configuration.environmentVariables.map(
+        (ev: EnvironmentVar): Env => {
+          return {
+            value: `${ev.key}=${ev.value}`,
+            isSecret: ev.isSecret,
+          };
+        }
+      ),
       command: input.configuration.commands,
       args: input.configuration.args,
       region: input.configuration.region,
@@ -220,7 +245,15 @@ const mapMarketplaceInstanceCreationConfig = (
 ): CreateInstanceFromMarketplaceRequest => {
   return {
     templateId: input.marketplaceAppId,
-    environmentVariables: input.environmentVariables,
+    environmentVariables: input.environmentVariables.map(
+      (env): MarketplaceDeploymentVariable => {
+        return {
+          label: env.key,
+          value: env.value,
+          isSecret: env.isSecret,
+        };
+      }
+    ),
     organizationId: organizationId,
     akashImageId: input.machineImageId,
     uniqueTopicId: uuidv4(),
@@ -252,7 +285,7 @@ const mapInstanceUpdateRequest = (
   input: InstanceUpdateConfig
 ): UpdateInstaceRequest => {
   return {
-    env: input.env.map((ev: EnvironmentVar): Env => {
+    env: input.environmentVariables.map((ev: EnvironmentVar): Env => {
       return {
         value: `${ev.key}=${ev.value}`,
         isSecret: ev.isSecret,

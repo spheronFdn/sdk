@@ -48,7 +48,7 @@ class InstanceManager {
 
     if (!computeMachine) {
       throw new Error(
-        `Compute machine with id ${creationConfig.configuration.machineImageId} not found`
+        `Compute machine with id ${creationConfig.configuration.machineImageId} not found!`
       );
     }
 
