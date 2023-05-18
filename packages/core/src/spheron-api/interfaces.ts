@@ -161,7 +161,6 @@ interface UsageWithLimits {
   usedBuildExecution?: number; // Seconds
   usedConcurrentBuild?: number;
   usedStorageArweave?: number; // Bytes
-  usedStorageFileCoin?: number; // Seconds
   usedStorageIPFS?: number; // Bytes
   usedDeploymentsPerDay?: number;
   lastDeploymentDate?: Date;
@@ -178,7 +177,6 @@ interface UsageWithLimits {
   buildExecutionLimit?: number; // Seconds
   concurrentBuildLimit?: number;
   storageArweaveLimit?: number; // Bytes
-  storageFileCoinLimit?: number; // Bytes
   storageIPFSLimit?: number;
   deploymentsPerDayLimit?: number;
   domainsLimit?: number;
@@ -188,6 +186,8 @@ interface UsageWithLimits {
   clusterAktLimit?: number;
   clusterBuildExecutionLimit?: number;
   passwordProtectionLimit?: number;
+  usedParallelUploads?: number;
+  parallelUploadsLimit?: number;
 }
 
 interface UsageWithLimitsWithSkynet extends UsageWithLimits {
