@@ -263,19 +263,19 @@ export class SpheronClient {
 
     return {
       used: {
-        bandwidth: usage.usedBandwidth,
-        storageArweave: usage.usedStorageArweave,
-        storageIPFS: usage.usedStorageIPFS,
-        domains: usage.usedDomains,
-        numberOfRequests: usage.usedNumberOfRequests,
-        parallelUploads: usage.usedParallelUploads,
+        bandwidth: usage.usedBandwidth ?? 0,
+        storageArweave: usage.usedStorageArweave ?? 0,
+        storageIPFS: usage.usedStorageIPFS ?? 0,
+        domains: usage.usedDomains ?? 0,
+        numberOfRequests: usage.usedNumberOfRequests ?? 0,
+        parallelUploads: usage.usedParallelUploads ?? 0,
       },
       limit: {
-        bandwidth: usage.bandwidthLimit,
-        storageArweave: usage.storageArweaveLimit,
-        storageIPFS: usage.storageIPFSLimit,
-        domains: usage.domainsLimit,
-        parallelUploads: usage.parallelUploadsLimit,
+        bandwidth: usage.bandwidthLimit ?? 0,
+        storageArweave: usage.storageArweaveLimit ?? 0,
+        storageIPFS: usage.storageIPFSLimit ?? 0,
+        domains: usage.domainsLimit ?? 0,
+        parallelUploads: usage.parallelUploadsLimit ?? 0,
       },
     };
   }
