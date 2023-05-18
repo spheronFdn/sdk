@@ -131,6 +131,25 @@ export class SpheronClient {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return { uploadToken: singleDeploymentToken! };
   }
+  async pinCID(configuration: {
+    name: string;
+    protocol: ProtocolEnum;
+    organizationId?: string;
+    cid: string;
+  }): Promise<{ deploymentId: string, affectedDomains: string[] }> {
+    const { deploymentId, affectedDomains } =
+      await this.uploadManager.pinnedCIDDeployment({
+        protocol: configuration.protocol,
+        name: configuration.name,
+        organizationId: configuration.organizationId,
+        token: this.configuration.token,
+        createSingleDeploymentToken: true,
+        cid: configuration.cid,
+      });
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return { deploymentId, affectedDomains };
+  }
 
   async getBucket(bucketId: string): Promise<Bucket> {
     return await this.bucketManager.getBucket(bucketId);

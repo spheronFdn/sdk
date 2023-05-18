@@ -70,6 +70,48 @@ class UploadManager {
       throw new Error(errorMessage);
     }
   }
+  public async pinnedCIDDeployment(configuration: {
+    protocol: ProtocolEnum;
+    name: string;
+    organizationId?: string;
+    token: string;
+    createSingleDeploymentToken?: boolean;
+    cid: string;
+  }): Promise<{
+    deploymentId: string;
+    affectedDomains: string[];
+  }> {
+    try {
+      this.validateUploadConfiguration(configuration);
+
+      let url = `${this.spheronApiUrl}/v1/upload-deployment/ipfs/pin/${configuration.cid}/protocol=${configuration.protocol}&project=${configuration.name}`;
+
+      if (configuration.organizationId) {
+        url += `&organization=${configuration.organizationId}`;
+      }
+
+      if (configuration.createSingleDeploymentToken) {
+        url += `&create_single_deployment_token=${configuration.createSingleDeploymentToken}`;
+      }
+
+      const response = await axios.post<{
+        deploymentId: string;
+        affectedDomains: string[];
+      }>(
+        url,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${configuration.token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message || error?.message;
+      throw new Error(errorMessage);
+    }
+  }
 
   public async uploadPayloads(
     payloads: FormData[],
