@@ -89,12 +89,20 @@ class InstanceManager {
 
   async updateHealthCheck(
     id: string,
-    healthCheck: { path: string; cointainerPort: number }
-  ): Promise<{ message: string; updated: boolean }> {
-    return this.spheronApi.updateClusterInstanceHealthCheckInfo(
+    healthCheckConfig: {
+      path: string;
+      port: number;
+    }
+  ): Promise<{ message: string; success: boolean }> {
+    const response = await this.spheronApi.updateClusterInstanceHealthCheckInfo(
       id,
-      healthCheck
+      {
+        path: healthCheckConfig.path,
+        cointainerPort: healthCheckConfig.port,
+      }
     );
+
+    return { message: response.message, success: response.updated };
   }
 
   async close(id: string): Promise<{ message: string; success: boolean }> {
