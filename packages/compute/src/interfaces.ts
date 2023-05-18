@@ -128,7 +128,7 @@ interface InstanceDeployment {
 }
 
 interface InstanceDeploymentLogs {
-  _id: string;
+  id: string;
   logs: Array<string>;
   logsLength: number;
 }

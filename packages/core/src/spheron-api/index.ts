@@ -507,12 +507,17 @@ class SpheronApi {
       throw new Error(`From and To cannot be negative numbers.`);
     }
 
-    return this.sendApiRequest<InstanceOrderLogs>(
+    const response = await this.sendApiRequest<{
+      success: boolean;
+      order: InstanceOrderLogs;
+    }>(
       HttpMethods.GET,
       `/v1/cluster-instance/order/${id}/logs`,
       null,
       logsOptions
     );
+
+    return response.order;
   }
 
   async createClusterInstance(

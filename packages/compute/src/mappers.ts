@@ -322,7 +322,7 @@ const mapUsageWithLimits = (
 
 const mapInstancesInfo = (input: InstancesInfoCore): InstancesInfo => {
   return {
-    provisioned: input.provisioned,
+    provisioned: input.active,
     provisioning: input.starting,
     failedToProvision: input.failedToStart,
     closed: input.closed,
