@@ -127,12 +127,6 @@ interface InstanceDeployment {
   };
 }
 
-interface InstanceDeploymentLogs {
-  id: string;
-  logs: Array<string>;
-  logsLength: number;
-}
-
 interface MachineImageType {
   machineName: string;
   agreementDate: number;
