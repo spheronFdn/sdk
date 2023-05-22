@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
   Organization as CoreOrganization,
   MarketplaceApp as MarketplaceAppCore,
@@ -301,21 +302,17 @@ const mapUsageWithLimits = (
 ): UsageWithLimits => {
   return {
     used: {
-      computeCredit: usage.usedClusterAkt
-        ? (usage.usedClusterAkt / 1000000) * tokenPrice
-        : 0,
-      computeBuildExecution: usage.usedClusterBuildExecution,
-      numberOfRequests: usage.usedNumberOfRequests,
-      bandwidth: usage.usedBandwidth,
-      domains: usage.usedDomains,
+      computeCredit: (usage.usedClusterAkt! / 1000000) * tokenPrice,
+      computeBuildExecution: usage.usedClusterBuildExecution!,
+      numberOfRequests: usage.usedNumberOfRequests!,
+      bandwidth: usage.usedBandwidth!,
+      domains: usage.usedDomains!,
     },
     limit: {
-      computeCredit: usage.clusterAktLimit
-        ? (usage.clusterAktLimit / 1000000) * tokenPrice
-        : 0,
-      computeBuildExecution: usage.clusterBuildExecutionLimit,
-      bandwidth: usage.bandwidthLimit,
-      domains: usage.domainsLimit,
+      computeCredit: (usage.clusterAktLimit! / 1000000) * tokenPrice,
+      computeBuildExecution: usage.clusterBuildExecutionLimit!,
+      bandwidth: usage.bandwidthLimit!,
+      domains: usage.domainsLimit!,
     },
   };
 };

@@ -188,17 +188,17 @@ interface InstanceUpdateConfig {
 
 interface UsageWithLimits {
   used: {
-    computeCredit?: number; // price in usd
-    computeBuildExecution?: number; // Seconds
-    numberOfRequests?: number;
-    bandwidth?: number;
-    domains?: number;
+    computeCredit: number; // price in usd
+    computeBuildExecution: number; // Seconds
+    numberOfRequests: number;
+    bandwidth: number;
+    domains: number;
   };
   limit: {
-    computeCredit?: number; // Bytes
-    computeBuildExecution?: number; // Seconds
-    bandwidth?: number;
-    domains?: number;
+    computeCredit: number; // Bytes
+    computeBuildExecution: number; // Seconds
+    bandwidth: number;
+    domains: number;
   };
 }
 
