@@ -40,6 +40,7 @@ import {
   UsageWithLimits,
   MarketplaceAppVariable,
   InstancesInfo,
+  DomainTypeEnum,
 } from "./interfaces";
 import { v4 as uuidv4 } from "uuid";
 
@@ -138,7 +139,7 @@ const mapDomain = (coreDomain: CoreDomain): Domain => {
     name: coreDomain.name,
     verified: coreDomain.verified,
     link: coreDomain.link,
-    type: coreDomain.type,
+    type: coreDomain.type as DomainTypeEnum,
     instanceId: coreDomain.projectId,
   };
 };
@@ -159,6 +160,23 @@ const mapInstanceDeployment = (
     });
   }
 
+  const env: EnvironmentVar[] = [];
+  const secretEnv: EnvironmentVar[] = [];
+
+  input.clusterInstanceConfiguration.env.forEach((ev: Env) => {
+    if (ev.isSecret) {
+      secretEnv.push({
+        key: ev.value.split("=")[0],
+        value: ev.value.split("=")[1],
+      });
+    } else {
+      env.push({
+        key: ev.value.split("=")[0],
+        value: ev.value.split("=")[1],
+      });
+    }
+  });
+
   return {
     id: input._id,
     type: input.type as DeploymentTypeEnum,
@@ -168,17 +186,9 @@ const mapInstanceDeployment = (
     instanceConfiguration: {
       image: input.clusterInstanceConfiguration.image,
       tag: input.clusterInstanceConfiguration.tag,
-      scale: input.clusterInstanceConfiguration.instanceCount,
       ports: input.clusterInstanceConfiguration.ports,
-      environmentVariables: input.clusterInstanceConfiguration.env.map(
-        (ev: Env): EnvironmentVar => {
-          return {
-            key: ev.value.split("=")[0],
-            value: ev.value.split("=")[1],
-            isSecret: ev.isSecret,
-          };
-        }
-      ),
+      environmentVariables: env,
+      secretEnvironmentVariables: secretEnv,
       commands: input.clusterInstanceConfiguration.command,
       args: input.clusterInstanceConfiguration.args,
       region: input.clusterInstanceConfiguration.region,
@@ -213,17 +223,13 @@ const mapCreateInstanceRequest = (
       protocol: ClusterProtocolEnum.AKASH,
       image: input.configuration.image,
       tag: input.configuration.tag,
-      instanceCount: input.configuration.scale,
+      instanceCount: 1,
       buildImage: false,
       ports: input.configuration.ports,
-      env: input.configuration.environmentVariables.map(
-        (ev: EnvironmentVar): Env => {
-          return {
-            value: `${ev.key}=${ev.value}`,
-            isSecret: ev.isSecret,
-          };
-        }
-      ),
+      env: [
+        ...mapVariables(input.configuration.environmentVariables, false),
+        ...mapVariables(input.configuration.secretEnvironmentVariables, true),
+      ],
       command: input.configuration.commands,
       args: input.configuration.args,
       region: input.configuration.region,
@@ -248,7 +254,6 @@ const mapMarketplaceInstanceCreationConfig = (
         return {
           label: env.key,
           value: env.value,
-          isSecret: env.isSecret,
         };
       }
     ),
@@ -283,12 +288,10 @@ const mapInstanceUpdateRequest = (
   input: InstanceUpdateConfig
 ): UpdateInstaceRequest => {
   return {
-    env: input.environmentVariables.map((ev: EnvironmentVar): Env => {
-      return {
-        value: `${ev.key}=${ev.value}`,
-        isSecret: ev.isSecret,
-      };
-    }),
+    env: [
+      ...mapVariables(input.environmentVariables, false),
+      ...mapVariables(input.secretEnvironmentVariables, true),
+    ],
     command: input.commands,
     args: input.args,
     uniqueTopicId: uuidv4(),
@@ -325,6 +328,27 @@ const mapInstancesInfo = (input: InstancesInfoCore): InstancesInfo => {
     closed: input.closed,
     total: input.total,
   };
+};
+
+const mapVariables = (
+  variables: EnvironmentVar[],
+  isSecret: boolean
+): Env[] => {
+  return variables.map((ev: EnvironmentVar) => ({
+    value: `${ev.key}=${ev.value}`,
+    isSecret,
+  }));
+};
+
+const mapMarketplaceVariables = (
+  variables: EnvironmentVar[],
+  isSecret: boolean
+): MarketplaceDeploymentVariable[] => {
+  return variables.map((ev: EnvironmentVar) => ({
+    label: ev.key,
+    value: ev.value,
+    isSecret,
+  }));
 };
 
 export {

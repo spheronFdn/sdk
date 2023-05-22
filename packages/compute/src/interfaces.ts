@@ -1,7 +1,6 @@
 import {
   MarketplaceAppPort,
   ProviderEnum,
-  DomainTypeEnum,
   MarketplaceCategoryEnum,
   ClusterStateEnum,
   InstanceStateEnum,
@@ -117,9 +116,9 @@ interface InstanceDeployment {
   instanceConfiguration: {
     image: string;
     tag: string;
-    scale: number;
     ports: Array<Port>;
     environmentVariables: Array<EnvironmentVariable>;
+    secretEnvironmentVariables: Array<EnvironmentVariable>;
     commands: Array<string>;
     args: Array<string>;
     region: string;
@@ -140,9 +139,9 @@ interface InstanceCreationConfig {
   configuration: {
     image: string;
     tag: string;
-    scale: number;
     ports: Array<Port>;
     environmentVariables: Array<EnvironmentVariable>;
+    secretEnvironmentVariables: Array<EnvironmentVariable>;
     commands: Array<string>;
     args: Array<string>;
     region: string;
@@ -158,7 +157,6 @@ interface InstanceCreationConfig {
 interface EnvironmentVariable {
   key: string;
   value: string;
-  isSecret: boolean;
 }
 
 interface MarketplaceInstanceCreationConfig {
@@ -181,6 +179,7 @@ interface MarketplaceInstanceResponse extends InstanceResponse {
 
 interface InstanceUpdateConfig {
   environmentVariables: Array<EnvironmentVariable>;
+  secretEnvironmentVariables: Array<EnvironmentVariable>;
   commands: Array<string>;
   args: Array<string>;
   tag: string;
@@ -208,6 +207,11 @@ interface InstancesInfo {
   failedToProvision: number;
   closed: number;
   total: number;
+}
+
+enum DomainTypeEnum {
+  DOMAIN,
+  SUBDOMAIN,
 }
 
 export {

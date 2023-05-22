@@ -39,7 +39,6 @@ interface CreateInstanceFromMarketplaceRequest {
 interface MarketplaceDeploymentVariable {
   label: string;
   value: string;
-  isSecret: boolean;
 }
 
 interface UpdateInstaceRequest {

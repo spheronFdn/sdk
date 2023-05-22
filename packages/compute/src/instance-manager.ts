@@ -1,4 +1,7 @@
-import { SpheronApi } from "@spheron/core";
+import {
+  SpheronApi,
+  DomainTypeEnum as DomainTypeEnumCore,
+} from "@spheron/core";
 import { v4 as uuidv4 } from "uuid";
 import {
   Instance,
@@ -117,22 +120,22 @@ class InstanceManager {
     return mapInstanceDeployment(clusterInstanceOrder.order);
   }
 
-  async getInstanceDeploymentLogs(
+  async getInstanceLogs(
     id: string,
-    logsOptions: {
+    options: {
       from: number;
       to: number;
       logType: InstanceLogType;
       search?: string;
     }
   ): Promise<Array<string>> {
-    if (logsOptions.from < 0 || logsOptions.to < 0) {
+    if (options.from < 0 || options.to < 0) {
       throw new Error(`From and To cannot be negative numbers.`);
     }
 
     const logsResponse = await this.spheronApi.getClusterInstanceOrderLogs(
       id,
-      logsOptions
+      options
     );
 
     return logsResponse.logs;
@@ -164,10 +167,11 @@ class InstanceManager {
       name: string;
     }
   ): Promise<Domain> {
-    const domain = await this.spheronApi.addClusterInstanceDomain(
-      instanceId,
-      doamin
-    );
+    const domain = await this.spheronApi.addClusterInstanceDomain(instanceId, {
+      link: doamin.link,
+      type: doamin.type as DomainTypeEnumCore,
+      name: doamin.name,
+    });
 
     return mapDomain(domain);
   }
@@ -184,7 +188,11 @@ class InstanceManager {
     const domain = await this.spheronApi.updateClusterInstanceDomain(
       instanceId,
       domainId,
-      doamin
+      {
+        link: doamin.link,
+        type: doamin.type as DomainTypeEnumCore,
+        name: doamin.name,
+      }
     );
 
     return mapDomain(domain);
