@@ -93,6 +93,12 @@ interface StartDeploymentConfiguration {
     nodeVersion: NodeVersionEnum;
   };
   environmentVariables?: Record<string, string>;
+  gitProviderPreferences?: {
+    prComments?: boolean;
+    commitComments?: boolean;
+    buildStatus?: boolean;
+    githubDeployment?: boolean;
+  };
 }
 
 interface UsageWithLimits {
