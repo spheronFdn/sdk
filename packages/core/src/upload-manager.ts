@@ -79,13 +79,13 @@ class UploadManager {
       parallelUploadCount: number;
       onChunkUploaded?: (uploadedSize: number) => void;
     }
-  ): Promise<{ success: boolean }> {
-    let errorFlag = false;
+  ): Promise<{ success: boolean; errorMessage: string }> {
+    let errorMessage = "";
     const limit = pLimit(configuration.parallelUploadCount);
 
     const uploadPayload = async (payload: FormData, deploymentId: string) => {
       try {
-        if (errorFlag) {
+        if (errorMessage) {
           return;
         }
         const { data } = await axios.post<{ uploadSize: number }>(
@@ -96,7 +96,7 @@ class UploadManager {
         configuration.onChunkUploaded &&
           configuration.onChunkUploaded(data.uploadSize);
       } catch (error) {
-        errorFlag = true;
+        errorMessage = error?.response?.data?.message || error?.message;
       }
     };
 
@@ -105,7 +105,7 @@ class UploadManager {
         limit(() => uploadPayload(payload, configuration.deploymentId))
       )
     );
-    return { success: !errorFlag };
+    return { success: !errorMessage, errorMessage: errorMessage };
   }
 
   public async finalizeUploadDeployment(

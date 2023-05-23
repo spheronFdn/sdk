@@ -13,10 +13,10 @@ import {
   TokenScope,
   UploadManager,
   UploadResult,
-  UsageWithLimits,
 } from "@spheron/core";
 import { createPayloads } from "./fs-payload-creator";
 import { ipfs } from "./ipfs.utils";
+import { UsageWithLimits } from "./bucket-manager/interfaces";
 
 export {
   ipfs,
@@ -67,28 +67,42 @@ export class SpheronClient {
         token: this.configuration.token,
       });
 
-    const { payloads, totalSize } = await createPayloads(path, payloadSize);
+    let success = true;
+    let caughtError: Error | undefined = undefined;
+    try {
+      const { payloads, totalSize } = await createPayloads(path, payloadSize);
 
-    configuration.onUploadInitiated &&
-      configuration.onUploadInitiated(deploymentId);
+      configuration.onUploadInitiated &&
+        configuration.onUploadInitiated(deploymentId);
 
-    const uploadPayloadsResult = await this.uploadManager.uploadPayloads(
-      payloads,
-      {
-        deploymentId,
-        token: this.configuration.token,
-        parallelUploadCount,
-        onChunkUploaded: (uploadedSize: number) =>
-          configuration.onChunkUploaded &&
-          configuration.onChunkUploaded(uploadedSize, totalSize),
+      const uploadPayloadsResult = await this.uploadManager.uploadPayloads(
+        payloads,
+        {
+          deploymentId,
+          token: this.configuration.token,
+          parallelUploadCount,
+          onChunkUploaded: (uploadedSize: number) =>
+            configuration.onChunkUploaded &&
+            configuration.onChunkUploaded(uploadedSize, totalSize),
+        }
+      );
+      if (!uploadPayloadsResult.success) {
+        throw new Error(uploadPayloadsResult.errorMessage);
       }
-    );
+    } catch (error) {
+      success = false;
+      caughtError = error;
+    }
 
     const result = await this.uploadManager.finalizeUploadDeployment(
       deploymentId,
-      uploadPayloadsResult.success,
+      success,
       this.configuration.token
     );
+
+    if (caughtError) {
+      throw caughtError;
+    }
 
     if (!result.success) {
       throw new Error(`Upload failed. ${result.message}`);
@@ -247,9 +261,23 @@ export class SpheronClient {
       "wa-global"
     );
 
-    const { usedStorageSkynet, storageSkynetLimit, ...resultWithoutSkynet } =
-      usage;
-    return resultWithoutSkynet;
+    return {
+      used: {
+        bandwidth: usage.usedBandwidth ?? 0,
+        storageArweave: usage.usedStorageArweave ?? 0,
+        storageIPFS: usage.usedStorageIPFS ?? 0,
+        domains: usage.usedDomains ?? 0,
+        numberOfRequests: usage.usedNumberOfRequests ?? 0,
+        parallelUploads: usage.usedParallelUploads ?? 0,
+      },
+      limit: {
+        bandwidth: usage.bandwidthLimit ?? 0,
+        storageArweave: usage.storageArweaveLimit ?? 0,
+        storageIPFS: usage.storageIPFSLimit ?? 0,
+        domains: usage.domainsLimit ?? 0,
+        parallelUploads: usage.parallelUploadsLimit ?? 0,
+      },
+    };
   }
 
   async getTokenScope(): Promise<TokenScope> {

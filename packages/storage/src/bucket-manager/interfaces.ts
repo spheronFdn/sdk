@@ -37,4 +37,29 @@ interface Upload {
   protocol: string;
 }
 
-export { Bucket, Domain, Upload, BucketStateEnum, UploadStatusEnum };
+interface UsageWithLimits {
+  used: {
+    bandwidth: number; // Bytes
+    storageArweave: number; // Bytes
+    storageIPFS: number; // Bytes
+    domains: number;
+    numberOfRequests: number;
+    parallelUploads: number;
+  };
+  limit: {
+    bandwidth: number; // Bytes
+    storageArweave: number; // Bytes
+    storageIPFS: number; // Bytes
+    domains: number;
+    parallelUploads: number;
+  };
+}
+
+export {
+  Bucket,
+  Domain,
+  Upload,
+  BucketStateEnum,
+  UploadStatusEnum,
+  UsageWithLimits,
+};
