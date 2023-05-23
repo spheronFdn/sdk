@@ -22,6 +22,22 @@ export interface UploadResult {
   dynamicLinks: string[];
 }
 
+export default interface IDeployment {
+  _id: string;
+  project: IProject;
+  status: DeploymentStatusEnum;
+}
+
+export enum DeploymentStatusEnum {
+  DEPLOYED = "Deployed",
+  FAILED = "Failed",
+  CANCELED = "Canceled",
+}
+
+export interface IProject {
+  _id: string;
+}
+
 class UploadManager {
   private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
 
@@ -71,31 +87,29 @@ class UploadManager {
     }
   }
   public async pinnedCIDDeployment(configuration: {
-    protocol: ProtocolEnum;
+    protocol: ProtocolEnum.IPFS;
     name: string;
     organizationId?: string;
     token: string;
-    createSingleDeploymentToken?: boolean;
     cid: string;
   }): Promise<{
-    deploymentId: string;
+    deployment: IDeployment;
+    sitePreview: string;
     affectedDomains: string[];
   }> {
     try {
-      this.validateUploadConfiguration(configuration);
-
-      let url = `${this.spheronApiUrl}/v1/upload-deployment/ipfs/pin/${configuration.cid}/protocol=${configuration.protocol}&project=${configuration.name}`;
+      if (!configuration.name) {
+        throw new Error("Name is not provided.");
+      }
+      let url = `${this.spheronApiUrl}/v1/ipfs/pin/${configuration.cid}?project=${configuration.name}`;
 
       if (configuration.organizationId) {
         url += `&organization=${configuration.organizationId}`;
       }
 
-      if (configuration.createSingleDeploymentToken) {
-        url += `&create_single_deployment_token=${configuration.createSingleDeploymentToken}`;
-      }
-
       const response = await axios.post<{
-        deploymentId: string;
+        deployment: IDeployment;
+        sitePreview: string;
         affectedDomains: string[];
       }>(
         url,
