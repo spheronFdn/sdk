@@ -5,10 +5,9 @@ import {
   DeploymentLog,
   DeploymentResponse,
   StartDeploymentConfiguration,
-  mapCoreDeployment,
-  mapCoreDeploymentLogs,
 } from "./interfaces";
 import OrganizationIdExtractor from "./organizationId-extractor";
+import { mapCoreDeployment, mapCoreDeploymentLogs } from "./interface-mappers";
 
 class DeploymentManger extends OrganizationIdExtractor {
   private readonly spheronApi: SpheronApi;

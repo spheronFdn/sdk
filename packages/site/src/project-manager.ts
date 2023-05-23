@@ -13,13 +13,15 @@ import {
   Domain,
   EnvironmentVariable,
   Project,
+} from "./interfaces";
+import {
+  mapCoreProject,
   mapCoreConfiguration,
   mapCoreDeployment,
   mapCoreDeploymentEnvironment,
   mapCoreDomain,
   mapCoreEnvironmentVariable,
-  mapCoreProject,
-} from "./interfaces";
+} from "./interface-mappers";
 
 class ProjectManager {
   private readonly spheronApi: SpheronApi;

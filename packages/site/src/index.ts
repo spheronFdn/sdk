@@ -1,13 +1,16 @@
 import OrganizationManager from "./organization-manager";
 import {
   Organization,
-  Project,
-  UsageWithLimits,
   Configuration,
-  EnvironmentVariable,
+  Project,
   DeploymentEnvironment,
-  DeploymentCount,
+  EnvironmentVariable,
+  Domain,
   Deployment,
+  DeploymentLog,
+  StartDeploymentConfiguration,
+  UsageWithLimits,
+  DeploymentCount,
   DeploymentResponse,
   CancelDeploymentResponse,
 } from "./interfaces";
@@ -42,6 +45,9 @@ export {
   DeploymentStatusEnum,
   DeploymentResponse,
   CancelDeploymentResponse,
+  Domain,
+  DeploymentLog,
+  StartDeploymentConfiguration,
 };
 
 export interface SpheronClientConfiguration {
