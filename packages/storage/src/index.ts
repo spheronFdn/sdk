@@ -133,7 +133,6 @@ export class SpheronClient {
   }
   async pinCID(configuration: {
     name: string;
-    organizationId?: string;
     cid: string;
   }): Promise<{
     uploadId: string;
@@ -144,7 +143,6 @@ export class SpheronClient {
     const { deploymentId, projectId, sitePreview, affectedDomains } =
       await this.uploadManager.pinCID({
         name: configuration.name,
-        organizationId: configuration.organizationId,
         token: this.configuration.token,
         cid: configuration.cid,
       });
