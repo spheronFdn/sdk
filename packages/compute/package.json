@@ -1,6 +1,6 @@
 {
   "name": "@spheron/compute",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Typescript library for deploying compute instances to Decentralised Compute via Spheron",
   "keywords": [
     "Compute",
