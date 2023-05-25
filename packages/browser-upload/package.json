@@ -1,6 +1,6 @@
 {
   "name": "@spheron/browser-upload",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Typescript library for uploading files or directory from the Browser to  IPFS, Filecoin or Arweave via Spheron",
   "keywords": [
     "Storage",
@@ -35,7 +35,7 @@
     "dist/"
   ],
   "dependencies": {
-    "@spheron/core": "1.0.1",
+    "@spheron/core": "1.0.2",
     "form-data": "^4.0.0",
     "jwt-decode": "^3.1.2"
   },

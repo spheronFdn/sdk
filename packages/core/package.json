@@ -1,6 +1,6 @@
 {
   "name": "@spheron/core",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Shared core package for all sdk packages",
   "keywords": [
     "Storage",

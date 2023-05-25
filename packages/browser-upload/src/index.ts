@@ -5,13 +5,21 @@ import jwt_decode from "jwt-decode";
 export { ProtocolEnum, UploadResult };
 
 async function upload(
-  files: File[],
+  files: File[] | FileList,
   configuration: {
     token: string;
     onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
   }
 ): Promise<UploadResult> {
-  if (!files || files.length === 0) {
+  let fileList: File[] = [];
+
+  if (files instanceof FileList) {
+    fileList = Array.from(files);
+  } else if (Array.isArray(files)) {
+    fileList = files;
+  }
+
+  if (!fileList || fileList.length === 0) {
     throw new Error("No files to upload.");
   }
 
@@ -32,23 +40,37 @@ async function upload(
   const payloadSize = jwtPayload?.payloadSize ?? 5 * 5 * 1024;
   const parallelUploadCount = jwtPayload?.parallelUploadCount ?? 3;
 
-  const { payloads, totalSize } = await createPayloads(files, payloadSize);
+  const { payloads, totalSize } = await createPayloads(fileList, payloadSize);
 
+  let success = true;
+  let caughtError: Error | undefined = undefined;
   const uploadManager = new UploadManager();
-  const uploadPayloadsResult = await uploadManager.uploadPayloads(payloads, {
-    deploymentId: uploadId,
-    token: configuration.token,
-    parallelUploadCount,
-    onChunkUploaded: (uploadedSize: number) =>
-      configuration.onChunkUploaded &&
-      configuration.onChunkUploaded(uploadedSize, totalSize),
-  });
+  try {
+    const uploadPayloadsResult = await uploadManager.uploadPayloads(payloads, {
+      deploymentId: uploadId,
+      token: configuration.token,
+      parallelUploadCount,
+      onChunkUploaded: (uploadedSize: number) =>
+        configuration.onChunkUploaded &&
+        configuration.onChunkUploaded(uploadedSize, totalSize),
+    });
+    if (!uploadPayloadsResult.success) {
+      throw new Error(uploadPayloadsResult.errorMessage);
+    }
+  } catch (error) {
+    success = false;
+    caughtError = error;
+  }
 
   const result = await uploadManager.finalizeUploadDeployment(
     uploadId,
-    uploadPayloadsResult.success,
+    success,
     configuration.token
   );
+
+  if (caughtError) {
+    throw caughtError;
+  }
 
   if (!result.success) {
     throw new Error(`Upload failed. ${result.message}`);
