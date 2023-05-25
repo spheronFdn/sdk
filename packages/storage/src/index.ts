@@ -142,7 +142,7 @@ export class SpheronClient {
     dynamicLinks: string[];
   }> {
     const { deploymentId, projectId, sitePreview, affectedDomains } =
-      await this.uploadManager.pinnedCIDDeployment({
+      await this.uploadManager.pinCID({
         name: configuration.name,
         organizationId: configuration.organizationId,
         token: this.configuration.token,
@@ -161,8 +161,8 @@ export class SpheronClient {
     return await this.bucketManager.getBucket(bucketId);
   }
 
-  async getCIDStatus(CID: string): Promise<Bucket> {
-    return await this.uploadManager.CIDStatus(CID);
+  async getCIDStatus(CID: string): Promise<{ pinStatus: string }> {
+    return await this.uploadManager.getCIDStatus(CID);
   }
 
   async getBucketDomains(bucketId: string): Promise<Domain[]> {

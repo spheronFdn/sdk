@@ -70,7 +70,7 @@ class UploadManager {
       throw new Error(errorMessage);
     }
   }
-  public async pinnedCIDDeployment(configuration: {
+  public async pinCID(configuration: {
     name: string;
     organizationId?: string;
     token: string;
@@ -112,7 +112,7 @@ class UploadManager {
     }
   }
 
-  public async CIDStatus(CID: string): Promise<{ pinStatus: string }> {
+  public async getCIDStatus(CID: string): Promise<{ pinStatus: string }> {
     try {
       if (!CID) {
         throw new Error("CID is not provided.");
