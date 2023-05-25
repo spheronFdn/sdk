@@ -22,22 +22,6 @@ export interface UploadResult {
   dynamicLinks: string[];
 }
 
-export default interface IDeployment {
-  _id: string;
-  project: IProject;
-  status: DeploymentStatusEnum;
-}
-
-export enum DeploymentStatusEnum {
-  DEPLOYED = "Deployed",
-  FAILED = "Failed",
-  CANCELED = "Canceled",
-}
-
-export interface IProject {
-  _id: string;
-}
-
 class UploadManager {
   private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
 
@@ -87,13 +71,13 @@ class UploadManager {
     }
   }
   public async pinnedCIDDeployment(configuration: {
-    protocol: ProtocolEnum.IPFS;
     name: string;
     organizationId?: string;
     token: string;
     cid: string;
   }): Promise<{
-    deployment: IDeployment;
+    deploymentId: string;
+    projectId: string;
     sitePreview: string;
     affectedDomains: string[];
   }> {
@@ -108,7 +92,8 @@ class UploadManager {
       }
 
       const response = await axios.post<{
-        deployment: IDeployment;
+        deploymentId: string;
+        projectId: string;
         sitePreview: string;
         affectedDomains: string[];
       }>(
