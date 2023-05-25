@@ -112,6 +112,21 @@ class UploadManager {
     }
   }
 
+  public async CIDStatus(CID: string): Promise<{ pinStatus: string }> {
+    try {
+      if (!CID) {
+        throw new Error("CID is not provided.");
+      }
+      const url = `${this.spheronApiUrl}/v1/ipfs/pins/${CID}/status`;
+      const response = await axios.get<{ pinStatus: string }>(url);
+      return response.data;
+
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message || error?.message;
+      throw new Error(errorMessage);
+    }
+  }
+
   public async uploadPayloads(
     payloads: FormData[],
     configuration: {

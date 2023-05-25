@@ -149,7 +149,6 @@ export class SpheronClient {
         cid: configuration.cid,
       });
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return {
       uploadId: deploymentId,
       bucketId: projectId,
@@ -160,6 +159,10 @@ export class SpheronClient {
 
   async getBucket(bucketId: string): Promise<Bucket> {
     return await this.bucketManager.getBucket(bucketId);
+  }
+
+  async getCIDStatus(CID: string): Promise<Bucket> {
+    return await this.uploadManager.CIDStatus(CID);
   }
 
   async getBucketDomains(bucketId: string): Promise<Domain[]> {
