@@ -1,4 +1,13 @@
-import { AppTypeEnum, ProtocolEnum } from "./enums";
+import {
+  AppTypeEnum,
+  InstanceStateEnum,
+  ClusterStateEnum,
+  HealthStatusEnum,
+  MarketplaceCategoryEnum,
+  PersistentStorageClassEnum,
+  ProtocolEnum,
+  ProviderEnum,
+} from "./enums";
 import {
   DeploymentEnvironmentStatusEnum,
   DeploymentStatusEnum,
@@ -216,6 +225,210 @@ interface IPNSName {
   ipnsLink: string;
 }
 
+interface Cluster {
+  _id: string;
+  name: string;
+  url: string;
+  proivder: ProviderEnum;
+  createdBy: string;
+  state: ClusterStateEnum;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface InstancesInfo {
+  active: number;
+  starting: number;
+  failedToStart: number;
+  closed: number;
+  total: number;
+}
+
+interface ClusterFundsUsage {
+  dailyUsage: number;
+  usedTillNow: number;
+}
+
+interface Instance {
+  _id: string;
+  state: InstanceStateEnum;
+  name: string;
+  orders: Array<string>;
+  cluster: string;
+  activeOrder: string;
+  latestUrlPreview: string;
+  agreedMachineImageType: MachineImageType;
+  retrievableAkt: number;
+  withdrawnAkt: number;
+  healthCheck: HealthCheck;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ExtendedInstance extends Instance {
+  cpu: number;
+  memory: string;
+  storage: string;
+  ami: string;
+  defaultDailyTopup: number;
+  image: string;
+  leasePricePerBlock: number;
+  tag: string;
+  topupReport?: TopupReport;
+}
+
+interface MachineImageType {
+  machineType: string;
+  agreementDate: number;
+  cpu?: number;
+  memory?: string;
+  storage?: string;
+  persistentStorage?: PersistentStorage;
+}
+
+interface TopupReport {
+  dailyUsage: number;
+  usedTillNow: number;
+}
+
+interface HealthCheck {
+  url: string;
+  port?: Port;
+  status?: HealthStatusEnum;
+  timestamp?: Date;
+}
+
+interface Port {
+  containerPort: number;
+  exposedPort: number;
+}
+
+interface MarketplaceApp {
+  _id: string;
+  name: string;
+  metadata: MarketplaceAppMetadata;
+  serviceData: MarketplaceAppServiceData;
+}
+
+interface MarketplaceAppMetadata {
+  description: string;
+  icon: string;
+  image: string;
+  docsLink: string;
+  websiteLink: string;
+  category: MarketplaceCategoryEnum;
+  usage: number;
+}
+
+interface MarketplaceAppServiceData {
+  defaultAkashMachineImageId: string;
+  dockerImage: string;
+  dockerImageTag: string;
+  provider: string;
+  instanceCount: number;
+  variables: MarketplaceAppVariable[];
+  ports: MarketplaceAppPort[];
+  commands: string[];
+  args: string[];
+}
+
+interface MarketplaceAppVariable {
+  name: string;
+  defaultValue: string;
+  label: string;
+  required?: string;
+  hidden: boolean;
+}
+
+interface MarketplaceAppPort {
+  containerValue: number;
+  defaultExposedValue: number;
+}
+
+interface InstanceOrder {
+  _id: string;
+  type: string;
+  commitId: string;
+  status: string;
+  buildTime: number;
+  topic: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  env: any;
+  logs: [{ time: string; log: Array<string> }];
+  topups: InstanceTopup[];
+  closingLogs: [{ time: string; log: string }];
+  instanceLogs: Array<string>;
+  instanceEvents: Array<string>;
+  clusterInstance: string;
+  clusterInstanceConfiguration: {
+    branch: string;
+    folderName: string; // folder where docker image is located in repo
+    protocol: string; // ex: akash
+    image: string; // name of the docker image if it is not located in repo
+    tag: string; // name of the docker image if it is not located in repo
+    instanceCount: number;
+    buildImage: boolean; // if container should build the image, or if user has already defined it
+    ports: Array<Port>;
+    env: Array<Env>;
+    command: Array<string>;
+    args: Array<string>;
+    region: string;
+    agreedMachineImage: {
+      machineType: string;
+      agreementDate: number;
+      cpu: number;
+      memory: string;
+      storage: string;
+      persistentStorage?: PersistentStorage;
+      maxPricePerBlock: number;
+      leasePricePerBlock: number;
+      defaultDailyTopUp: number;
+      topupThreashold: number;
+    };
+  };
+  lastTopup: InstanceTopup;
+  deploymentConfigBase64: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protocolData: any; // unique data related to protocol. ex: akash : dseq,oseq,gseq
+  urlPrewiew: string;
+  akashWalletId: string;
+  deploymentInitiator: string;
+}
+
+interface InstanceOrderLogs {
+  _id: string;
+  logs: Array<string>;
+  logsLength: number;
+}
+
+interface Env {
+  value: string;
+  isSecret: boolean;
+}
+
+interface PersistentStorage {
+  size: string;
+  class: PersistentStorageClassEnum;
+  mountPoint: string;
+}
+
+interface InstanceTopup {
+  time: number;
+  amount: number;
+  txhash: string;
+}
+
+interface ComputeMachine {
+  _id: string;
+  name: string;
+  cpu: number;
+  storage: string;
+  memory: string;
+  maxPricePerBlock: number; //akt per block
+  defaultDailyTopUp: number;
+  topupThreashold: number;
+}
+
 export {
   TokenScope,
   Project,
@@ -230,4 +443,23 @@ export {
   UsageWithLimitsWithSkynet,
   IPNSPublishResponse,
   IPNSName,
+  Cluster,
+  InstancesInfo,
+  ClusterFundsUsage,
+  Instance,
+  ExtendedInstance,
+  InstanceOrder,
+  InstanceTopup,
+  Env,
+  Port,
+  PersistentStorage,
+  MarketplaceApp,
+  ComputeMachine,
+  MarketplaceAppMetadata,
+  MarketplaceAppServiceData,
+  MarketplaceAppPort,
+  MarketplaceAppVariable,
+  HealthCheck,
+  MachineImageType,
+  InstanceOrderLogs,
 };
