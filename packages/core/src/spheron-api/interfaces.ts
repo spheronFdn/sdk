@@ -216,6 +216,31 @@ interface IPNSName {
   ipnsLink: string;
 }
 
+interface PeerData {
+  peername: string;
+  ipfs_peer_id: string;
+  ipfs_peer_addresses: string[];
+  status: string;
+  timestamp: string;
+  error: string;
+  attempt_count: number;
+  priority_pin: boolean;
+}
+
+interface PinStatus {
+  cid: string;
+  name: string;
+  allocations: string[];
+  origins: string[];
+  created: string;
+  metadata: null;
+  peer_map: { [key: string]: PeerData };
+}
+
+interface RootObject {
+  pinStatus: PinStatus;
+}
+
 export {
   TokenScope,
   Project,
@@ -230,4 +255,5 @@ export {
   UsageWithLimitsWithSkynet,
   IPNSPublishResponse,
   IPNSName,
+  RootObject,
 };

@@ -2,6 +2,7 @@ import axios, { AxiosRequestConfig } from "axios";
 import FormData from "form-data";
 import pLimit from "p-limit";
 import { ProtocolEnum } from "./spheron-api/enums";
+import { RootObject } from "./spheron-api/interfaces";
 
 export interface UploadMangerConfiguration {
   token: string;
@@ -112,13 +113,13 @@ class UploadManager {
     }
   }
 
-  public async getCIDStatus(CID: string): Promise<{ pinStatus: string }> {
+  public async getCIDStatus(CID: string): Promise<{ pinStatus: RootObject }> {
     try {
       if (!CID) {
         throw new Error("CID is not provided.");
       }
       const url = `${this.spheronApiUrl}/v1/ipfs/pins/${CID}/status`;
-      const response = await axios.get<{ pinStatus: string }>(url);
+      const response = await axios.get<{ pinStatus: RootObject }>(url);
       return response.data;
 
     } catch (error) {
