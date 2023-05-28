@@ -7,11 +7,13 @@ import {
   Organization,
   Project,
   User,
+  Cluster,
 } from "@spheron/core";
 import Spinner from "../outputs/spinner";
 import SpheronApiService from "../services/spheron-api";
 import { readFromJsonFile } from "../utils";
 import configuration from "../configuration";
+import { Instance } from "chalk";
 
 export const ResourceFetcher = {
   async getOrganization(id: string) {
@@ -203,6 +205,55 @@ export const ResourceFetcher = {
       spinner.stop();
     }
   },
+
+  async getCluster(clusterId: string) {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching ");
+      const cluster: Cluster = await SpheronApiService.getCluster(clusterId);
+      console.log(`Cluster: ${JSON.stringify(cluster, null, 2)}`);
+      spinner.success(``);
+    } catch (error) {
+      console.log(`✖️  Error while fetching deployment environments`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
+
+  async getInstance(instanceId: string) {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching ");
+      const instance: Instance = await SpheronApiService.getInstance(
+        instanceId
+      );
+      console.log(`Instance: ${JSON.stringify(instance, null, 2)}`);
+      spinner.success(``);
+    } catch (error) {
+      console.log(`✖️  Error while fetching deployment environments`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
+
+  async getInstances(clusterId: string) {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching ");
+      const instances: Instance[] = await SpheronApiService.getInstances(
+        clusterId
+      );
+      console.log(`Instances : ${JSON.stringify(instances, null, 2)}`);
+      spinner.success(``);
+    } catch (error) {
+      console.log(`✖️  Error while fetching deployment environments`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
 };
 
 export enum ResourceEnum {
@@ -214,6 +265,9 @@ export enum ResourceEnum {
   ORGANIZATIONS = "organizations",
   DOMAINS = "domains",
   DEPLOYMENT_ENVIRONMENTS = "deployment-environments",
+  CLUSTER = "cluster",
+  INSTANCE = "instance",
+  INSTANCES = "instances",
 }
 
 interface OrganizationDTO {

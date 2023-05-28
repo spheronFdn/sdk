@@ -152,6 +152,40 @@ export async function commandHandler(options: any) {
     })();
   }
 
+  if (options._[0] === "create-instance") {
+    const validOptions = ["name"];
+    const unknownOptions = Object.keys(options).filter(
+      (option) =>
+        option !== "_" && option !== "$0" && !validOptions.includes(option)
+    );
+    if (unknownOptions.length > 0) {
+      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
+    (async () => {
+      try {
+        let name;
+        if (options.name) {
+          name = options.name;
+        } else {
+          const prompt = await promptForCreateOrganization();
+          name = prompt.name;
+        }
+        if (!name) {
+          throw new Error("Please insert a name for organization.");
+        }
+        try {
+          await createInstance(name);
+        } catch (error) {
+          process.exit(1);
+        }
+      } catch (error) {
+        console.log(error.message);
+        process.exit(1);
+      }
+    })();
+  }
+
   if (options._[0] === "init") {
     const validOptions = ["protocol", "project", "path", "framework"];
     const unknownOptions = Object.keys(options).filter(
@@ -250,6 +284,15 @@ export async function commandHandler(options: any) {
           } else if (options.resource == ResourceEnum.DEPLOYMENT_ENVIRONMENTS) {
             const projectId = options.projectId;
             await ResourceFetcher.getProjectDeploymentEnvironments(projectId);
+          } else if (options.resource == ResourceEnum.CLUSTER) {
+            const clusterId = options.clusterId;
+            await ResourceFetcher.getCluster(clusterId);
+          } else if (options.resource == ResourceEnum.INSTANCE) {
+            const instanceId = options.instanceId;
+            await ResourceFetcher.getInstance(instanceId);
+          } else if (options.resource == ResourceEnum.INSTANCES) {
+            const clusterId = options.clusterId;
+            await ResourceFetcher.getInstances(clusterId);
           }
         } else {
           throw new Error("Resource needs to be specified");

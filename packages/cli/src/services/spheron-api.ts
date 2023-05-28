@@ -9,6 +9,8 @@ import {
   SpheronApi,
   User,
   VerifiedTokenResponse,
+  Cluster,
+  Instance,
 } from "@spheron/core";
 import configuration from "../configuration";
 import { readFromJsonFile } from "../utils";
@@ -144,6 +146,26 @@ const SpheronApiService = {
     const deploymentEnvironments: DeploymentEnvironment[] =
       await client.getDeploymentEnvironments(projectId);
     return deploymentEnvironments;
+  },
+
+  async getCluster(id: string): Promise<Cluster> {
+    const client: SpheronApi = await this.initialize();
+    const cluster = await client.getCluster(id);
+    return cluster;
+  },
+
+  async getInstance(id: string): Promise<Instance> {
+    const client: SpheronApi = await this.initialize();
+    const instance: Instance = await client.getInstance(id);
+
+    return instance;
+  },
+
+  async getInstances(id: string): Promise<Instance> {
+    const client: SpheronApi = await this.initialize();
+    const instances: Instance[] = await client.getInstances(id);
+
+    return instances;
   },
 };
 
