@@ -30,6 +30,9 @@ import { DeploymentStatusEnum, ProjectStateEnum } from "@spheron/core";
     .command("logout", "Logs out of your account", (yargs: any) => {
       yargs.version(false).usage("Usage: $0 logout").help();
     })
+    .command("build", "Build", (yargs: any) => {
+      yargs.version(false).usage("Usage: $0 build").help();
+    })
     .command("upload", "Upload", (yargs: any) => {
       yargs
         .option("path", {

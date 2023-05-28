@@ -1,3 +1,4 @@
+import { build } from "./commands/build";
 import { changeDefaultOrganization } from "./commands/configure";
 import { createConfiguration } from "./commands/create-configuration";
 import { createOrganization } from "./commands/create-organization";
@@ -93,6 +94,16 @@ export async function commandHandler(options: any) {
       }
       try {
         await upload(path, protocol, organizationId, projectName);
+      } catch (error) {
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (options._[0] === "build") {
+    (async () => {
+      try {
+        await build();
       } catch (error) {
         process.exit(1);
       }
