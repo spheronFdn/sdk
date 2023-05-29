@@ -18,6 +18,7 @@ import {
 } from "@spheron/core";
 import { createPayloads } from "./fs-payload-creator";
 import { ipfs } from "./ipfs.utils";
+import { UsageWithLimits } from "./bucket-manager/interfaces";
 
 export {
   ipfs,
@@ -290,9 +291,23 @@ export class SpheronClient {
       "wa-global"
     );
 
-    const { usedStorageSkynet, storageSkynetLimit, ...resultWithoutSkynet } =
-      usage;
-    return resultWithoutSkynet;
+    return {
+      used: {
+        bandwidth: usage.usedBandwidth ?? 0,
+        storageArweave: usage.usedStorageArweave ?? 0,
+        storageIPFS: usage.usedStorageIPFS ?? 0,
+        domains: usage.usedDomains ?? 0,
+        numberOfRequests: usage.usedNumberOfRequests ?? 0,
+        parallelUploads: usage.usedParallelUploads ?? 0,
+      },
+      limit: {
+        bandwidth: usage.bandwidthLimit ?? 0,
+        storageArweave: usage.storageArweaveLimit ?? 0,
+        storageIPFS: usage.storageIPFSLimit ?? 0,
+        domains: usage.domainsLimit ?? 0,
+        parallelUploads: usage.parallelUploadsLimit ?? 0,
+      },
+    };
   }
 
   async getTokenScope(): Promise<TokenScope> {

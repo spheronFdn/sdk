@@ -1,16 +1,14 @@
 {
-  "name": "@spheron/storage",
-  "version": "1.0.15",
-  "description": "Typescript library for uploading files or directory to  IPFS, Filecoin or Arweave via Spheron",
+  "name": "@spheron/compute",
+  "version": "1.0.1",
+  "description": "Typescript library for deploying compute instances to Decentralised Compute via Spheron",
   "keywords": [
-    "Storage",
+    "Compute",
     "Typescript",
     "Badass",
-    "IPFS",
-    "Filecoin",
-    "Arweave",
+    "Marketplace",
     "SDK",
-    "Upload"
+    "Deploy"
   ],
   "author": "Spheron Team",
   "main": "./dist/index.js",
@@ -35,9 +33,7 @@
     "dist/"
   ],
   "dependencies": {
-    "@spheron/core": "1.0.3",
-    "form-data": "^4.0.0",
-    "multiformats": "^9.9.0"
+    "@spheron/core": "^1.0.4"
   },
   "license": "Apache-2.0",
   "repository": {
