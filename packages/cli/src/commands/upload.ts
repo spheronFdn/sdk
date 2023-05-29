@@ -47,7 +47,7 @@ export async function upload(
         name: projectName,
         organizationId,
         onUploadInitiated: (deploymentId: any) => {
-          console.log("Upload started, ID of deployment: " + deploymentId);
+          console.log("Upload started, ID of upload: " + deploymentId);
         },
         onChunkUploaded(uploadedSize: any, totalSize: any) {
           if (!uploadStarted) {
