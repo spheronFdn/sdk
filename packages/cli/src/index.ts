@@ -89,8 +89,8 @@ import { DeploymentStatusEnum, ProjectStateEnum } from "@spheron/core";
       Examples:
         - get organization            : options: --id 
         - get organizations           : (all organization for your user will be returned)
-        - get deployment              : options: --id, --skip (optional), --limit (optional), --status (optional)
-        - get deployments             : options: --projectId  
+        - get deployment              : options: --id
+        - get deployments             : options: --projectId, --skip (optional), --limit (optional), --status (optional)  
         - get project                 : options: --id
         - get projects                : options: --organizationId (optional), --skip (optional), --limit (optional), --state (optional)
         - get domains                 : options: --projectId

@@ -82,6 +82,46 @@ enum ProviderEnum {
   GITHUB = "GITHUB",
   GITLAB = "GITLAB",
   BITBUCKET = "GITLAB",
+  DOCKERHUB = "DOCKERHUB",
+}
+
+enum ClusterStateEnum {
+  MAINTAINED = "MAINTAINED",
+  ARCHIVED = "ARCHIVED",
+}
+
+enum InstanceStateEnum {
+  STARTING = "Starting",
+  FAILED_START = "Failed-start",
+  ACTIVE = "Active",
+  CLOSED = "Closed",
+}
+
+enum HealthStatusEnum {
+  ACTIVE = "Active",
+  INACTIVE = "Inactive",
+  UNKNOWN = "Unknown",
+}
+
+enum MarketplaceCategoryEnum {
+  DATABASE = "Database",
+  NODE = "Node",
+  TOOLS = "Tools",
+}
+
+enum InstanceLogType {
+  DEPLOYMENT_LOGS = "logs",
+  INSTANCE_LOGS = "instanceLogs",
+  INSTANCE_EVENTS = "instanceEvents",
+}
+
+enum PersistentStorageClassEnum {
+  BETA1 = "beta1",
+  BETA2 = "beta2",
+  BETA3 = "beta3",
+}
+enum ClusterProtocolEnum {
+  AKASH = "akash",
 }
 
 export {
@@ -95,4 +135,11 @@ export {
   DeploymentStatusEnum,
   AppTypeEnum,
   ProviderEnum,
+  ClusterStateEnum,
+  InstanceStateEnum,
+  HealthStatusEnum,
+  MarketplaceCategoryEnum,
+  InstanceLogType,
+  PersistentStorageClassEnum,
+  ClusterProtocolEnum,
 };

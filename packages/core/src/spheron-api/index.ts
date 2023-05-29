@@ -4,6 +4,7 @@ import {
   DeploymentStatusEnum,
   DomainTypeEnum,
   FrameworkEnum,
+  InstanceLogType,
   NodeVersionEnum,
   ProjectStateEnum,
   ProtocolEnum,
@@ -25,7 +26,25 @@ import {
   IPNSName,
   StartDeploymentConfiguration,
   EnvironmentVariable,
+  Cluster,
+  InstancesInfo,
+  ClusterFundsUsage,
+  ExtendedInstance,
+  Instance,
+  InstanceOrder,
+  MarketplaceApp,
+  ComputeMachine,
+  InstanceOrderLogs,
 } from "./interfaces";
+import {
+  CreateInstanceFromMarketplaceRequest,
+  CreateInstanceRequest,
+  UpdateInstaceRequest,
+} from "./request-interfaces";
+import {
+  InstanceResponse,
+  MarketplaceInstanceResponse,
+} from "./response-interfaces";
 
 class SpheronApi {
   private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
@@ -580,11 +599,359 @@ class SpheronApi {
 
   //#endregion Deployment Environment
 
+  async getOrganizationClusters(
+    id: string,
+    options: {
+      skip: number;
+      limit: number;
+    }
+  ): Promise<Cluster[]> {
+    if (options.skip < 0 || options.limit < 0) {
+      throw new Error(`Skip and Limit cannot be negative numbers.`);
+    }
+    const result = await this.sendApiRequest<{ clusters: Cluster[] }>(
+      HttpMethods.GET,
+      `/v1/organization/${id}/clusters?skip=${options.skip}&limit=${options.limit}`
+    );
+    return result.clusters;
+  }
+
+  async getCluster(id: string): Promise<Cluster> {
+    return this.sendApiRequest<Cluster>(HttpMethods.GET, `/v1/cluster/${id}`);
+  }
+
+  async deleteCluster(id: string): Promise<void> {
+    await this.sendApiRequest<Cluster>(HttpMethods.DELETE, `/v1/cluster/${id}`);
+  }
+
+  async getClusterInstancesDetails(id: string): Promise<InstancesInfo> {
+    return this.sendApiRequest<InstancesInfo>(
+      HttpMethods.GET,
+      `/v1/cluster/${id}/instances/count`
+    );
+  }
+
+  async getClusterFundsUsage(id: string): Promise<ClusterFundsUsage> {
+    return this.sendApiRequest<ClusterFundsUsage>(
+      HttpMethods.GET,
+      `/v1/cluster/${id}/funds-usage`
+    );
+  }
+
+  async getClusterInstances(
+    id: string,
+    options: {
+      skip: number;
+      limit: number;
+      includeReport?: boolean;
+    }
+  ): Promise<ExtendedInstance[]> {
+    if (options.skip < 0 || options.limit < 0) {
+      throw new Error(`Skip and Limit cannot be negative numbers.`);
+    }
+
+    const result: { extendedInstances: ExtendedInstance[] } =
+      await this.sendApiRequest<{
+        extendedInstances: ExtendedInstance[];
+      }>(HttpMethods.GET, `/v1/cluster/${id}/instances`, null, {
+        skip: options.skip,
+        limit: options.limit,
+        topupReport: options.includeReport && "y",
+      });
+
+    return result.extendedInstances;
+  }
+
+  async getClusterTemplates(): Promise<MarketplaceApp[]> {
+    const response = await this.sendApiRequest<{
+      clusterTemplates: MarketplaceApp[];
+    }>(HttpMethods.GET, `/v1/cluster-templates`);
+
+    return response.clusterTemplates;
+  }
+
+  async getClusterTemplate(id: string): Promise<MarketplaceApp> {
+    const response = await this.sendApiRequest<{
+      clusterTemplate: MarketplaceApp;
+    }>(HttpMethods.GET, `/v1/cluster-templates/${id}`);
+
+    return response.clusterTemplate;
+  }
+
+  async getClusterCategories(): Promise<string[]> {
+    const result: { categories: string[] } = await this.sendApiRequest<{
+      categories: string[];
+    }>(HttpMethods.GET, `/v1/cluster-templates/categories`);
+
+    return result.categories;
+  }
+
+  async getClusterInstance(
+    id: string,
+    options?: {
+      includeReport?: boolean;
+    }
+  ): Promise<Instance> {
+    const response: { success: boolean; instance: Instance } =
+      await this.sendApiRequest<{
+        success: boolean;
+        instance: Instance;
+      }>(HttpMethods.GET, `/v1/cluster-instance/${id}`, null, {
+        topupReport: options && options.includeReport && "y",
+      });
+
+    return response.instance;
+  }
+
+  async deleteClusterInstance(id: string): Promise<void> {
+    await this.sendApiRequest<Instance>(
+      HttpMethods.DELETE,
+      `/v1/cluster-instance/${id}`
+    );
+  }
+
+  async updateClusterInstance(
+    id: string,
+    organizationId: string,
+    clusterInstance: UpdateInstaceRequest
+  ): Promise<InstanceResponse> {
+    return this.sendApiRequest<InstanceResponse>(
+      HttpMethods.PATCH,
+      `/v1/cluster-instance/${id}/update`,
+      { ...clusterInstance, organizationId }
+    );
+  }
+
+  async updateClusterInstanceHealthCheckInfo(
+    id: string,
+    healthCheck: { path: string; cointainerPort: number }
+  ): Promise<{ message: string; updated: boolean }> {
+    return this.sendApiRequest<{
+      message: string;
+      updated: boolean;
+    }>(HttpMethods.PATCH, `/v1/cluster-instance/${id}/update/health-check`, {
+      healthCheckUrl: healthCheck.path,
+      healthCheckPort: healthCheck.cointainerPort,
+    });
+  }
+
+  async closeClusterInstance(
+    id: string
+  ): Promise<{ message: string; success: boolean }> {
+    return this.sendApiRequest<{
+      message: string;
+      success: boolean;
+    }>(HttpMethods.POST, `/v1/cluster-instance/${id}/close`);
+  }
+
+  async getClusterInstanceOrder(
+    id: string
+  ): Promise<{ order: InstanceOrder; liveLogs: string[] }> {
+    return this.sendApiRequest<{
+      order: InstanceOrder;
+      liveLogs: string[];
+    }>(HttpMethods.GET, `/v1/cluster-instance/order/${id}`);
+  }
+
+  async getClusterInstanceOrderLogs(
+    id: string,
+    logsOptions: {
+      from: number;
+      to: number;
+      logType: InstanceLogType;
+      search?: string;
+    }
+  ): Promise<InstanceOrderLogs> {
+    if (logsOptions.from < 0 || logsOptions.to < 0) {
+      throw new Error(`From and To cannot be negative numbers.`);
+    }
+
+    const response = await this.sendApiRequest<{
+      success: boolean;
+      order: InstanceOrderLogs;
+    }>(
+      HttpMethods.GET,
+      `/v1/cluster-instance/order/${id}/logs`,
+      null,
+      logsOptions
+    );
+
+    return response.order;
+  }
+
+  async createClusterInstance(
+    clusterInstance: CreateInstanceRequest
+  ): Promise<InstanceResponse> {
+    return this.sendApiRequest<InstanceResponse>(
+      HttpMethods.POST,
+      `/v1/cluster-instance/create`,
+      clusterInstance
+    );
+  }
+
+  async createClusterInstanceFromTemplate(
+    clusterInstance: CreateInstanceFromMarketplaceRequest
+  ): Promise<MarketplaceInstanceResponse> {
+    return this.sendApiRequest<MarketplaceInstanceResponse>(
+      HttpMethods.POST,
+      `/v1/cluster-instance/template`,
+      clusterInstance
+    );
+  }
+
+  async getClusterInstanceDomains(id: string): Promise<Domain[]> {
+    const result: { domains: Domain[] } = await this.sendApiRequest<{
+      domains: Domain[];
+    }>(HttpMethods.GET, `/v1/cluster-instance/${id}/domains`);
+
+    return result.domains;
+  }
+
+  async addClusterInstanceDomain(
+    instanceId: string,
+    doamin: {
+      link?: string;
+      type: DomainTypeEnum | string;
+      name: string;
+    }
+  ): Promise<Domain> {
+    return this.sendApiRequest<Domain>(
+      HttpMethods.POST,
+      `/v1/cluster-instance/${instanceId}/domains`,
+      doamin
+    );
+  }
+
+  async updateClusterInstanceDomain(
+    instanceId: string,
+    domainId: string,
+    doamin: {
+      link: string;
+      type: DomainTypeEnum | string;
+      name: string;
+    }
+  ): Promise<Domain> {
+    return this.sendApiRequest<Domain>(
+      HttpMethods.PATCH,
+      `/v1/cluster-instance/${instanceId}/domains/${domainId}`,
+      doamin
+    );
+  }
+
+  async deleteClusterInstanceDomain(
+    instanceId: string,
+    domainId: string
+  ): Promise<void> {
+    await this.sendApiRequest<Domain>(
+      HttpMethods.DELETE,
+      `/v1/cluster-instance/${instanceId}/domains/${domainId}`
+    );
+  }
+
+  async verifyClusterInstanceDomain(
+    instanceId: string,
+    domainId: string
+  ): Promise<void> {
+    await this.sendApiRequest<Domain>(
+      HttpMethods.PATCH,
+      `/v1/cluster-instance/${instanceId}/domains/${domainId}/verify`
+    );
+  }
+
+  async getComputeMachines(options: {
+    skip: number;
+    limit: number;
+    searchString?: string;
+  }): Promise<ComputeMachine[]> {
+    if (options.limit < 0 || options.skip < 0) {
+      throw new Error(`Limit and Skip cannot be negative numbers.`);
+    }
+
+    const result: { akashMachineImages: ComputeMachine[]; totalCount: number } =
+      await this.sendApiRequest<{
+        akashMachineImages: ComputeMachine[];
+        totalCount: number;
+      }>(HttpMethods.GET, `/v1/compute-machine-image`, null, options);
+
+    return result.akashMachineImages;
+  }
+
+  async getComputeMachineRegions(): Promise<string[]> {
+    const result: {
+      regions: string[];
+      totalCount: number;
+    } = await this.sendApiRequest<{
+      regions: string[];
+      totalCount: number;
+    }>(HttpMethods.GET, `/v1/compute-machine-image/regions`);
+
+    return result.regions;
+  }
+
+  async triggerClusterInstanceHealthCheck(
+    instanceId: string,
+    topicId: string
+  ): Promise<{
+    topicId: string;
+    message: string;
+  }> {
+    return this.sendApiRequest<{
+      topicId: string;
+      message: string;
+    }>(
+      HttpMethods.POST,
+      `/v1/cluster-instance/${instanceId}/trigger/container-health-check?topicId=${topicId}`
+    );
+  }
+
+  async triggerClusterInstanceStatusCheck(
+    instanceId: string,
+    topicId: string
+  ): Promise<{
+    topicId: string;
+    message: string;
+  }> {
+    return this.sendApiRequest<{
+      topicId: string;
+      message: string;
+    }>(
+      HttpMethods.POST,
+      `/v1/cluster-instance/${instanceId}/trigger/container-health-check?topicId=${topicId}`
+    );
+  }
+
+  async triggerClusterInstanceLogFetch(
+    instanceId: string,
+    topicId: string
+  ): Promise<{
+    topicId: string;
+    message: string;
+  }> {
+    return this.sendApiRequest<{
+      topicId: string;
+      message: string;
+    }>(
+      HttpMethods.POST,
+      `/v1/cluster-instance/${instanceId}/trigger/fetch-logs?topicId=${topicId}`
+    );
+  }
+
+  async getPriceForToken(tokenId: number): Promise<number> {
+    const response = await this.sendApiRequest<{
+      message: string;
+      price: number;
+    }>(HttpMethods.GET, `/v1/price/liveTokenPrice/${tokenId}`);
+
+    return response.price;
+  }
+
   private async sendApiRequest<T>(
     method: HttpMethods,
     path: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    payload?: any
+    payload?: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    params?: any
   ): Promise<T> {
     try {
       const response = await axios<T>({
@@ -594,6 +961,7 @@ class SpheronApi {
         headers: {
           Authorization: `Bearer ${this.token}`,
         },
+        params: params,
       });
       return response.data;
     } catch (error) {
