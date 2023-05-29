@@ -132,6 +132,7 @@ export class SpheronClient {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return { uploadToken: singleDeploymentToken! };
   }
+  
   async pinCID(configuration: {
     name: string;
     cid: string;

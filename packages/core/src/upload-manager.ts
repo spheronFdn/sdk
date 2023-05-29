@@ -84,7 +84,7 @@ class UploadManager {
   }> {
     try {
       if (!configuration.name) {
-        throw new Error("Name is not provided.");
+        throw new Error("Bucket name is not provided.");
       }
       let url = `${this.spheronApiUrl}/v1/ipfs/pin/${configuration.cid}?project=${configuration.name}`;
 
@@ -216,7 +216,7 @@ class UploadManager {
     }
 
     if (!configuration.name) {
-      throw new Error("Name is not provided.");
+      throw new Error("Bucket name is not provided.");
     }
   }
 
