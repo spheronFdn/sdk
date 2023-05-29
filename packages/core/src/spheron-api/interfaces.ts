@@ -226,14 +226,14 @@ interface IPNSName {
 }
 
 interface PeerData {
-  peername: string;
-  ipfs_peer_id: string;
-  ipfs_peer_addresses: string[];
+  peerName: string;
+  ipfsPeerId: string;
+  ipfsPeerAddresses: string[];
   status: string;
-  timestamp: string;
+  timeStamp: string;
   error: string;
-  attempt_count: number;
-  priority_pin: boolean;
+  attemptCount: number;
+  priorityPin: boolean;
 }
 
 interface PinStatus {
@@ -242,8 +242,8 @@ interface PinStatus {
   allocations: string[];
   origins: string[];
   created: string;
-  metadata: null;
-  peer_map: { [key: string]: PeerData };
+  metadata: null | any;
+  peerMap: { [key: string]: PeerData };
 }
 
 interface RootObject {
