@@ -456,10 +456,14 @@ class SpheronApi {
   }): Promise<{ suggestedFramework: FrameworkEnum }> {
     const response = await this.sendApiRequest<{
       suggestedFramework: FrameworkEnum;
-    }>(
-      HttpMethods.GET,
-      `/v1/deployment/framework/suggestion?owner=${options.owner}&branch=${options.branch}&provider=${options.provider}&repo=${options.repositoryName}&root=${options.root}`
-    );
+    }>(HttpMethods.GET, `/v1/deployment/framework/suggestion`, null, {
+      owner: options.owner,
+      branch: options.branch,
+      provider: options.provider,
+      repo: options.repositoryName,
+      root: options.root,
+    });
+
     return response;
   }
 
