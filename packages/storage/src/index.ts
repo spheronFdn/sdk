@@ -13,7 +13,7 @@ import {
   TokenScope,
   UploadManager,
   UploadResult,
-  PinStatusObject,
+  PinStatus,
 } from "@spheron/core";
 import { createPayloads } from "./fs-payload-creator";
 import { ipfs } from "./ipfs.utils";
@@ -161,7 +161,7 @@ export class SpheronClient {
     return await this.bucketManager.getBucket(bucketId);
   }
 
-  async getCIDStatus(CID: string): Promise<{ pinStatus: PinStatusObject }> {
+  async getCIDStatus(CID: string): Promise<{ pinStatus: PinStatus }> {
     return await this.uploadManager.getCIDStatus(CID);
   }
 
