@@ -7,7 +7,10 @@ import {
   InstanceLogType,
   NodeVersionEnum,
   ProjectStateEnum,
+  ProtocolEnum,
+  ProviderEnum,
 } from "./enums";
+
 import {
   Configuration,
   Deployment,
@@ -21,6 +24,8 @@ import {
   UsageWithLimitsWithSkynet,
   IPNSPublishResponse,
   IPNSName,
+  StartDeploymentConfiguration,
+  EnvironmentVariable,
   Cluster,
   InstancesInfo,
   ClusterFundsUsage,
@@ -86,6 +91,8 @@ class SpheronApi {
     return { deployments };
   }
 
+  //#region Project Domains
+
   async getProjectDomains(projectId: string): Promise<{ domains: Domain[] }> {
     return this.sendApiRequest<{ domains: Domain[] }>(
       HttpMethods.GET,
@@ -106,9 +113,9 @@ class SpheronApi {
   async addProjectDomain(
     projectId: string,
     options: {
-      link: string;
+      link?: string;
       type: DomainTypeEnum | string;
-      deploymentEnvironments: string[];
+      deploymentEnvironments?: string[];
       name: string;
     }
   ): Promise<{ domain: Domain }> {
@@ -123,8 +130,8 @@ class SpheronApi {
     projectId: string,
     domainIdentifier: string,
     options: {
-      link: string;
-      deploymentEnvironments: string[];
+      link?: string;
+      deploymentEnvironments?: string[];
       name: string;
     }
   ): Promise<{ domain: Domain }> {
@@ -155,6 +162,8 @@ class SpheronApi {
       `/v1/project/${projectId}/domains/${domainIdentifier}`
     );
   }
+
+  //#endregion Project Domains
 
   async getProjectDeploymentCount(projectId: string): Promise<{
     total: number;
@@ -199,12 +208,7 @@ class SpheronApi {
     );
   }
 
-  async getDeployment(deploymentId: string): Promise<Deployment> {
-    const { deployment } = await this.sendApiRequest<{
-      deployment: Deployment;
-    }>(HttpMethods.GET, `/v1/deployment/${deploymentId}`);
-    return deployment;
-  }
+  //#region Organization Endpoints
 
   async createOrganization(
     username: string,
@@ -230,12 +234,28 @@ class SpheronApi {
     return organization;
   }
 
+  async updateOrganization(
+    organizationId: string,
+    options: {
+      name: string;
+      username: string;
+      image: string;
+    }
+  ): Promise<Organization> {
+    const organization = await this.sendApiRequest<Organization>(
+      HttpMethods.PUT,
+      `/v1/organization/${organizationId}`,
+      options
+    );
+    return organization;
+  }
+
   async getOrganizationProjects(
     id: string,
     options: {
       skip: number;
       limit: number;
-      state?: string;
+      state?: ProjectStateEnum;
     }
   ): Promise<Project[]> {
     if (options.skip < 0 || options.limit < 0) {
@@ -250,21 +270,29 @@ class SpheronApi {
     return result.projects;
   }
 
+  async getOrganizationProjectCount(
+    id: string,
+    options: {
+      state?: ProjectStateEnum;
+    }
+  ): Promise<number> {
+    const result = await this.sendApiRequest<{ count: number }>(
+      HttpMethods.GET,
+      `/v1/organization/${id}/projects/count${
+        options.state ? `?state=${options.state}` : ""
+      }`
+    );
+    return result.count;
+  }
+
+  //#endregion Organization Endpoints
+
   async getProfile(): Promise<User> {
     const result = await this.sendApiRequest<{ user: User }>(
       HttpMethods.GET,
       `/v1/profile/`
     );
     return result.user;
-  }
-
-  async getDeploymentEnvironments(
-    projectId: string
-  ): Promise<DeploymentEnvironment[]> {
-    const response = await this.sendApiRequest<{
-      result: DeploymentEnvironment[];
-    }>(HttpMethods.GET, `/v1/project/${projectId}/deployment-environments`);
-    return response.result;
   }
 
   async verfiyGitToken(
@@ -339,6 +367,241 @@ class SpheronApi {
     );
     return resp.map((ipnsName) => this.mapIPNSResponseToIPNSName(ipnsName));
   }
+
+  //#region Deployments
+
+  public async startDeployment(
+    configuration: StartDeploymentConfiguration
+  ): Promise<{
+    success: boolean;
+    message: string;
+    topic: string;
+    deploymentId: string;
+    projectId: string;
+    deployment: Deployment;
+  }> {
+    const response = await this.sendApiRequest<{
+      success: boolean;
+      message: string;
+      topic: string;
+      deploymentId: string;
+      projectId: string;
+      deployment: Deployment;
+    }>(HttpMethods.POST, `/v1/deployment`, configuration);
+    return response;
+  }
+
+  async authorizeDeployment(deploymentId: string): Promise<{
+    success: boolean;
+    message: string;
+    topic: string;
+    deploymentId: string;
+    projectId: string;
+    deployment: Deployment;
+  }> {
+    const response = await this.sendApiRequest<{
+      success: boolean;
+      message: string;
+      topic: string;
+      deploymentId: string;
+      projectId: string;
+      deployment: Deployment;
+    }>(HttpMethods.POST, `/v1/deployment/${deploymentId}/authorize`);
+    return response;
+  }
+
+  async cancelDeployment(
+    deploymentId: string
+  ): Promise<{ message: string; canceled: true; killing: true }> {
+    const response = await this.sendApiRequest<{
+      message: string;
+      canceled: true;
+      killing: true;
+    }>(HttpMethods.POST, `/v1/deployment/${deploymentId}/cancel`);
+    return response;
+  }
+
+  async redeployDeployment(deploymentId: string): Promise<{
+    success: boolean;
+    message: string;
+    topic: string;
+    deploymentId: string;
+    projectId: string;
+    deployment: Deployment;
+  }> {
+    const response = await this.sendApiRequest<{
+      success: boolean;
+      message: string;
+      topic: string;
+      deploymentId: string;
+      projectId: string;
+      deployment: Deployment;
+    }>(HttpMethods.POST, `/v1/deployment/${deploymentId}/redeploy`);
+    return response;
+  }
+
+  async getDeployment(deploymentId: string): Promise<Deployment> {
+    const { deployment } = await this.sendApiRequest<{
+      deployment: Deployment;
+    }>(HttpMethods.GET, `/v1/deployment/${deploymentId}`);
+    return deployment;
+  }
+
+  async suggestFramework(options: {
+    owner: string;
+    branch: string;
+    provider: ProviderEnum;
+    repositoryName: string;
+    root?: string;
+  }): Promise<{ suggestedFramework: FrameworkEnum }> {
+    const response = await this.sendApiRequest<{
+      suggestedFramework: FrameworkEnum;
+    }>(HttpMethods.GET, `/v1/deployment/framework/suggestion`, null, {
+      owner: options.owner,
+      branch: options.branch,
+      provider: options.provider,
+      repo: options.repositoryName,
+      root: options.root,
+    });
+
+    return response;
+  }
+
+  //#endregion Deployments
+
+  //#region Environment Variables
+
+  async addProjectEnvironmentVariables(
+    projectId: string,
+    environmentVariables: {
+      name: string;
+      value: string;
+      environments: string[];
+    }[]
+  ): Promise<{ environmentVariables: EnvironmentVariable[] }> {
+    const response = await this.sendApiRequest<{
+      environmentVariables: EnvironmentVariable[];
+    }>(HttpMethods.POST, `/v1/project/${projectId}/environment-variables`, {
+      environmentVariables,
+    });
+    return response;
+  }
+
+  async updateProjectEnvironmentVariable(
+    projectId: string,
+    environmentVariableId: string,
+    payload: { name: string; value: string; environments: string[] }
+  ): Promise<EnvironmentVariable> {
+    const response = await this.sendApiRequest<{
+      updated: EnvironmentVariable;
+    }>(
+      HttpMethods.PUT,
+      `/v1/project/${projectId}/environment-variables/${environmentVariableId}`,
+      payload
+    );
+    return response.updated;
+  }
+
+  async deleteProjectEnvironmentVariable(
+    projectId: string,
+    environmentVariableId: string
+  ): Promise<void> {
+    await this.sendApiRequest<{ success: boolean }>(
+      HttpMethods.DELETE,
+      `/v1/project/${projectId}/environment-variables/${environmentVariableId}`
+    );
+  }
+
+  //#endregion Environment Variables
+
+  //#region Deployment Environment
+
+  async getDeploymentEnvironments(
+    projectId: string
+  ): Promise<DeploymentEnvironment[]> {
+    const response = await this.sendApiRequest<{
+      result: DeploymentEnvironment[];
+    }>(HttpMethods.GET, `/v1/project/${projectId}/deployment-environments`);
+    return response.result;
+  }
+
+  async createDeploymentEnvironment(
+    projectId: string,
+    payload: {
+      name: string;
+      branches: string[];
+      protocol: ProtocolEnum;
+    }
+  ): Promise<DeploymentEnvironment> {
+    const response = await this.sendApiRequest<{
+      newEnvironment: DeploymentEnvironment;
+    }>(
+      HttpMethods.POST,
+      `/v1/project/${projectId}/deployment-environments`,
+      payload
+    );
+    return response.newEnvironment;
+  }
+
+  async updateDeploymentEnvironment(
+    projectId: string,
+    deploymentEnvironmentId: string,
+    payload: {
+      name: string;
+      branches: string[];
+      protocol: ProtocolEnum;
+    }
+  ): Promise<DeploymentEnvironment> {
+    const response = await this.sendApiRequest<{
+      deploymentEnvironment: DeploymentEnvironment;
+    }>(
+      HttpMethods.PUT,
+      `/v1/project/${projectId}/deployment-environments/${deploymentEnvironmentId}`,
+      payload
+    );
+    return response.deploymentEnvironment;
+  }
+
+  async deleteDeploymentEnvironment(
+    projectId: string,
+    deploymentEnvironmentId: string
+  ): Promise<{ message: string }> {
+    const response = await this.sendApiRequest<{
+      message: string;
+    }>(
+      HttpMethods.DELETE,
+      `/v1/project/${projectId}/deployment-environments/${deploymentEnvironmentId}`
+    );
+    return response;
+  }
+
+  async activateDeploymentEnvironment(
+    projectId: string,
+    deploymentEnvironmentId: string
+  ): Promise<DeploymentEnvironment> {
+    const response = await this.sendApiRequest<{
+      deploymentEnvironment: DeploymentEnvironment;
+    }>(
+      HttpMethods.PATCH,
+      `/v1/project/${projectId}/deployment-environments/${deploymentEnvironmentId}/activate`
+    );
+    return response.deploymentEnvironment;
+  }
+
+  async deactivateDeploymentEnvironment(
+    projectId: string,
+    deploymentEnvironmentId: string
+  ): Promise<DeploymentEnvironment> {
+    const response = await this.sendApiRequest<{
+      deploymentEnvironment: DeploymentEnvironment;
+    }>(
+      HttpMethods.PATCH,
+      `/v1/project/${projectId}/deployment-environments/${deploymentEnvironmentId}/deactivate`
+    );
+    return response.deploymentEnvironment;
+  }
+
+  //#endregion Deployment Environment
 
   async getOrganizationClusters(
     id: string,

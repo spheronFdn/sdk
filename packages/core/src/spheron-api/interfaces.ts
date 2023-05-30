@@ -75,7 +75,7 @@ interface Domain {
   type: DomainTypeEnum;
   verified: boolean;
   projectId: string;
-  deploymentEnvironmentIds: DeploymentEnvironment[];
+  deploymentEnvironmentIds: string[];
   version: string;
   credentials: Credentials[];
   appType: DomainApplicationTypeEnum;
@@ -93,9 +93,9 @@ interface Project {
   organization: string;
   state: ProjectStateEnum;
   hookId: string;
-  provider: string;
+  provider: ProviderEnum;
   prCommentIds: { prId: string; commentId: string }[];
-  configuration: Configuration[];
+  configuration: Configuration;
   passwordProtection: PasswordProtection;
   createdAt: Date;
   updatedAt: Date;
@@ -119,7 +119,7 @@ interface Deployment {
   project: Project;
   branch: string;
   externalRepositoryName: string;
-  protocol: string;
+  protocol: ProtocolEnum;
   deploymentEnvironmentName: string;
   failedMessage: string;
   isFromRequest: boolean;
@@ -132,7 +132,6 @@ interface Deployment {
 
 interface Organization {
   _id: string;
-  appType: AppTypeEnum;
   profile: {
     name: string;
     image: string;
@@ -141,6 +140,7 @@ interface Organization {
   users: [string];
   registries: string[];
   overdue: boolean;
+  appType: AppTypeEnum;
 }
 
 interface User {
@@ -223,6 +223,39 @@ interface IPNSName {
   updatedAt: string;
   ipnsHash: string;
   ipnsLink: string;
+}
+
+interface StartDeploymentConfiguration {
+  organizationId: string;
+  gitUrl: string;
+  repoName: string;
+  branch: string;
+  protocol: ProtocolEnum;
+  provider: ProviderEnum;
+  createDefaultWebhook: boolean;
+  configuration: {
+    buildCommand: string;
+    installCommand: string;
+    workspace: string;
+    publishDir: string;
+    framework: FrameworkEnum | string;
+    nodeVersion: NodeVersionEnum;
+  };
+  env?: Record<string, string>;
+  gitProviderPreferences?: {
+    prComments?: boolean;
+    commitComments?: boolean;
+    buildStatus?: boolean;
+    githubDeployment?: boolean;
+  };
+  uniqueTopicId?: string;
+}
+
+interface EnvironmentVariable {
+  _id: string;
+  name: string;
+  value: string;
+  deploymentEnvironments: DeploymentEnvironment[];
 }
 
 interface Cluster {
@@ -443,6 +476,8 @@ export {
   UsageWithLimitsWithSkynet,
   IPNSPublishResponse,
   IPNSName,
+  StartDeploymentConfiguration,
+  EnvironmentVariable,
   Cluster,
   InstancesInfo,
   ClusterFundsUsage,
