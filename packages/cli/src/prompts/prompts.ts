@@ -34,14 +34,14 @@ export async function promptForUploadFile(): Promise<any> {
     },
     {
       type: "input",
-      name: "project",
-      message: "Project name:",
+      name: "bucket",
+      message: "Bucket name:",
       default: defaultProject,
     },
     {
       type: "input",
       name: "organizationId",
-      message: "Organization where project will be created (optional):",
+      message: "Organization where bucket will be created (optional):",
     },
   ];
   return inquirer.prompt(questions);

@@ -40,15 +40,15 @@ import { DeploymentStatusEnum, ProjectStateEnum } from "@spheron/core";
           describe: "Upload protocol",
           choices: ["arweave", "filecoin", "ipfs"],
         })
-        .option("project", {
-          describe: "Project name",
+        .option("bucket", {
+          describe: "Bucket name",
         })
         .option("organization", {
           describe: "Organization where project will be created",
         })
         .version(false)
         .usage(
-          `Usage: $0 upload --path <file_path> --protocol [arweave| filecoin| ipfs] [--project <project_name>] [--organization <organizationId>]`
+          `Usage: $0 upload --path <file_path> --protocol [arweave| filecoin| ipfs] [--bucket <bucket_name>] [--organization <organizationId>]`
         )
         .wrap(100)
         .help();
