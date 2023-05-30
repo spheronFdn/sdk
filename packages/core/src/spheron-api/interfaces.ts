@@ -246,7 +246,7 @@ interface PinStatus {
   peerMap: { [key: string]: PeerData };
 }
 
-interface RootObject {
+interface PinStatusObject {
   pinStatus: PinStatus;
 }
 
@@ -468,7 +468,8 @@ export {
   UsageWithLimitsWithSkynet,
   IPNSPublishResponse,
   IPNSName,
-  RootObject,
+  PinStatusObject,
+  PinStatus,
   Cluster,
   InstancesInfo,
   ClusterFundsUsage,
