@@ -22,7 +22,7 @@
 
 <a  href="https://www.npmjs.com/package/@spheron/storage"  target="_blank"  rel="noreferrer">
 
-<img  src="https://img.shields.io/static/v1?label=npm&message=v1.0.10&color=green"  />
+<img  src="https://img.shields.io/static/v1?label=npm&message=v1.0.11&color=green"  />
 
 </a>
 
@@ -111,7 +111,7 @@ This command will look up at your spheron.json file and  use its configuration t
 <pre><code>spheron upload</code></pre> 
 This will open up a prompter that will prompt you to describe how you want to upload your directory/file. If you want to directly call it without prompter you can use:
 
-<code>spheron upload --path {file_path} --protocol {protocol} [--project {project_name}] [--organization {organizationId}] </code>
+<code>spheron upload --path {file_path} --protocol {protocol} [--bucket {bucket_name}] [--organization {organizationId}] </code>
 
 **_Params options_**
 
@@ -119,7 +119,7 @@ This will open up a prompter that will prompt you to describe how you want to up
 
 **protocol\*** - [arweave/filecoin/ipfs]
 
-**project** - name (if not provided, path last segment will be taken by default)
+**bucket** - name (if not provided, path last segment will be taken by default)
 
 **organization** - you can override organizationId that will be used. By default it will take one that you have received after executing <code>spheron login</code>
 

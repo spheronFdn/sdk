@@ -17,7 +17,7 @@ export async function upload(
   rootPath: string,
   protocol: string,
   organizationId: string,
-  projectName: string
+  bucketName: string
 ) {
   const spinner = new Spinner();
   try {
@@ -44,10 +44,10 @@ export async function upload(
     const { uploadId, bucketId, protocolLink, dynamicLinks } =
       await client.upload(rootPath, {
         protocol: mapProtocolToStorageSDK(protocol),
-        name: projectName,
+        name: bucketName,
         organizationId,
-        onUploadInitiated: (deploymentId: any) => {
-          console.log("Upload started, ID of upload: " + deploymentId);
+        onUploadInitiated: (uploadId: any) => {
+          console.log("Upload started, ID of upload: " + uploadId);
         },
         onChunkUploaded(uploadedSize: any, totalSize: any) {
           if (!uploadStarted) {
