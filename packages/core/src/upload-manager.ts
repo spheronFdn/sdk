@@ -20,6 +20,7 @@ export interface UploadResult {
   bucketId: string;
   protocolLink: string;
   dynamicLinks: string[];
+  cid?: string;
 }
 
 class UploadManager {
@@ -119,6 +120,7 @@ class UploadManager {
     projectId: string;
     sitePreview: string;
     affectedDomains: string[];
+    cid: string;
   }> {
     try {
       const response = await axios.post<{
@@ -128,6 +130,7 @@ class UploadManager {
         projectId: string;
         sitePreview: string;
         affectedDomains: string[];
+        cid: string;
       }>(
         `${
           this.spheronApiUrl

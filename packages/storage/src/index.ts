@@ -113,6 +113,7 @@ export class SpheronClient {
       bucketId: result.projectId,
       protocolLink: result.sitePreview,
       dynamicLinks: result.affectedDomains,
+      cid: result.cid,
     };
   }
 
