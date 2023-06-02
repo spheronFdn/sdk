@@ -54,7 +54,7 @@ export async function commandHandler(options: any) {
   }
 
   if (options._[0] === "upload") {
-    const validOptions = ["path", "protocol", "project", "organization"];
+    const validOptions = ["path", "protocol", "bucket", "organization"];
     const unknownOptions = Object.keys(options).filter(
       (option) =>
         option !== "_" && option !== "$0" && !validOptions.includes(option)
@@ -64,23 +64,23 @@ export async function commandHandler(options: any) {
       process.exit(1);
     }
     (async () => {
-      let path, protocol, organizationId, projectName;
+      let path, protocol, organizationId, bucketName;
       if (options.path && options.protocol) {
         path = options.path;
         protocol = options.protocol.toLowerCase();
         organizationId = options.organization;
-        projectName = options.project;
+        bucketName = options.project;
       } else {
         const prompt = await promptForUploadFile();
         path = prompt.path;
         protocol = prompt.protocol.toLowerCase();
         organizationId = prompt.organizationId;
-        projectName = prompt.project;
+        bucketName = prompt.project;
       }
-      if (!projectName) {
+      if (!bucketName) {
         const pathSegments = process.cwd().split("/");
-        projectName = pathSegments[pathSegments.length - 1];
-        console.log(`Generated default project name: ${projectName}`);
+        bucketName = pathSegments[pathSegments.length - 1];
+        console.log(`Generated default bucket name: ${bucketName}`);
       }
       if (!organizationId) {
         organizationId = await readFromJsonFile(
@@ -92,7 +92,7 @@ export async function commandHandler(options: any) {
         path = "./";
       }
       try {
-        await upload(path, protocol, organizationId, projectName);
+        await upload(path, protocol, organizationId, bucketName);
       } catch (error) {
         process.exit(1);
       }

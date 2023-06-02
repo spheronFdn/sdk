@@ -79,6 +79,9 @@ enum AppTypeEnum {
 }
 
 enum ProviderEnum {
+  GITHUB = "GITHUB",
+  GITLAB = "GITLAB",
+  BITBUCKET = "BITBUCKET",
   DOCKERHUB = "DOCKERHUB",
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "@spheron/cli",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "CLI for working on projects and deploying them via Spheron ",
   "keywords": [
     "CLI",
