@@ -81,6 +81,7 @@ async function upload(
     bucketId: result.projectId,
     protocolLink: result.sitePreview,
     dynamicLinks: result.affectedDomains,
+    cid: result.cid,
   };
 }
 

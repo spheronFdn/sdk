@@ -36,9 +36,8 @@ import { SpheronClient, ProtocolEnum } from "@spheron/storage";
 
 const client = new SpheronClient({ token });
 let currentlyUploaded = 0;
-const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
-  filePath,
-  {
+const { uploadId, bucketId, protocolLink, dynamicLinks, cid } =
+  await client.upload(filePath, {
     protocol: ProtocolEnum.IPFS,
     name,
     onUploadInitiated: (uploadId) => {
@@ -48,8 +47,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
       currentlyUploaded += uploadedSize;
       console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
     },
-  }
-);
+  });
 ```
 
 - Function `upload` has two parameters `client.upload(filePath, configuration);`
@@ -64,6 +62,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
     - `bucketId` - the id of the bucket
     - `protocolLink` - is the protocol link of the upload
     - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
+    - `cid` - the CID of the uploaded data. Only exists for IPFS and Filecoin protocols.
 
 ### IPNS Example
 
@@ -74,9 +73,8 @@ import { SpheronClient, ProtocolEnum } from "@spheron/storage";
 
 const client = new SpheronClient({ token });
 let currentlyUploaded = 0;
-const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
-  filePath,
-  {
+const { uploadId, bucketId, protocolLink, dynamicLinks, cid } =
+  await client.upload(filePath, {
     protocol: ProtocolEnum.IPFS, // Only works with IPFS and Filecoin uploads
     name,
     onUploadInitiated: (uploadId) => {
@@ -86,8 +84,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
       currentlyUploaded += uploadedSize;
       console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
     },
-  }
-);
+  });
 
 // Publish Upload to IPNS
 const ipnsData: IPNSName = await client.publishIPNS(uploadId);
