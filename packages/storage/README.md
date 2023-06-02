@@ -36,9 +36,8 @@ import { SpheronClient, ProtocolEnum } from "@spheron/storage";
 
 const client = new SpheronClient({ token });
 let currentlyUploaded = 0;
-const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
-  filePath,
-  {
+const { uploadId, bucketId, protocolLink, dynamicLinks, cid } =
+  await client.upload(filePath, {
     protocol: ProtocolEnum.IPFS,
     name,
     onUploadInitiated: (uploadId) => {
@@ -48,8 +47,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
       currentlyUploaded += uploadedSize;
       console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
     },
-  }
-);
+  });
 ```
 
 - Function `upload` has two parameters `client.upload(filePath, configuration);`
@@ -75,9 +73,8 @@ import { SpheronClient, ProtocolEnum } from "@spheron/storage";
 
 const client = new SpheronClient({ token });
 let currentlyUploaded = 0;
-const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
-  filePath,
-  {
+const { uploadId, bucketId, protocolLink, dynamicLinks, cid } =
+  await client.upload(filePath, {
     protocol: ProtocolEnum.IPFS, // Only works with IPFS and Filecoin uploads
     name,
     onUploadInitiated: (uploadId) => {
@@ -87,8 +84,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
       currentlyUploaded += uploadedSize;
       console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
     },
-  }
-);
+  });
 
 // Publish Upload to IPNS
 const ipnsData: IPNSName = await client.publishIPNS(uploadId);
