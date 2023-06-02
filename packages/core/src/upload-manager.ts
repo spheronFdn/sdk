@@ -2,6 +2,7 @@ import axios, { AxiosRequestConfig } from "axios";
 import FormData from "form-data";
 import pLimit from "p-limit";
 import { ProtocolEnum } from "./spheron-api/enums";
+import { PinStatus } from "./spheron-api/interfaces";
 
 export interface UploadMangerConfiguration {
   token: string;
@@ -65,6 +66,62 @@ class UploadManager {
         }
       );
       return response.data;
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message || error?.message;
+      throw new Error(errorMessage);
+    }
+  }
+  public async pinCID(configuration: {
+    name: string;
+    organizationId?: string;
+    token: string;
+    cid: string;
+  }): Promise<{
+    deploymentId: string;
+    projectId: string;
+    sitePreview: string;
+    affectedDomains: string[];
+  }> {
+    try {
+      if (!configuration.name) {
+        throw new Error("Bucket name is not provided.");
+      }
+      let url = `${this.spheronApiUrl}/v1/ipfs/pin/${configuration.cid}?project=${configuration.name}`;
+
+      if (configuration.organizationId) {
+        url += `&organization=${configuration.organizationId}`;
+      }
+
+      const response = await axios.post<{
+        deploymentId: string;
+        projectId: string;
+        sitePreview: string;
+        affectedDomains: string[];
+      }>(
+        url,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${configuration.token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message || error?.message;
+      throw new Error(errorMessage);
+    }
+  }
+
+  public async getCIDStatus(CID: string): Promise<{ pinStatus: PinStatus }> {
+    try {
+      if (!CID) {
+        throw new Error("CID is not provided.");
+      }
+      const url = `${this.spheronApiUrl}/v1/ipfs/pins/${CID}/status`;
+      const response = await axios.get<{ pinStatus: PinStatus }>(url);
+      return response.data;
+
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
       throw new Error(errorMessage);
@@ -159,7 +216,7 @@ class UploadManager {
     }
 
     if (!configuration.name) {
-      throw new Error("Name is not provided.");
+      throw new Error("Bucket name is not provided.");
     }
   }
 

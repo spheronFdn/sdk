@@ -13,6 +13,7 @@ import {
   TokenScope,
   UploadManager,
   UploadResult,
+  PinStatus,
 } from "@spheron/core";
 import { createPayloads } from "./fs-payload-creator";
 import { ipfs } from "./ipfs.utils";
@@ -131,9 +132,37 @@ export class SpheronClient {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return { uploadToken: singleDeploymentToken! };
   }
+  
+  async pinCID(configuration: {
+    name: string;
+    cid: string;
+  }): Promise<{
+    uploadId: string;
+    bucketId: string;
+    protocolLink: string;
+    dynamicLinks: string[];
+  }> {
+    const { deploymentId, projectId, sitePreview, affectedDomains } =
+      await this.uploadManager.pinCID({
+        name: configuration.name,
+        token: this.configuration.token,
+        cid: configuration.cid,
+      });
+
+    return {
+      uploadId: deploymentId,
+      bucketId: projectId,
+      protocolLink: sitePreview,
+      dynamicLinks: affectedDomains,
+    };
+  }
 
   async getBucket(bucketId: string): Promise<Bucket> {
     return await this.bucketManager.getBucket(bucketId);
+  }
+
+  async getCIDStatus(CID: string): Promise<{ pinStatus: PinStatus }> {
+    return await this.uploadManager.getCIDStatus(CID);
   }
 
   async getBucketDomains(bucketId: string): Promise<Domain[]> {

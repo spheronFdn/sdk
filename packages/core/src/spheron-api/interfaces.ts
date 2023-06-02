@@ -225,6 +225,27 @@ interface IPNSName {
   ipnsLink: string;
 }
 
+interface PeerData {
+  peerName: string;
+  ipfsPeerId: string;
+  ipfsPeerAddresses: string[];
+  status: string;
+  timeStamp: string;
+  error: string;
+  attemptCount: number;
+  priorityPin: boolean;
+}
+
+interface PinStatus {
+  cid: string;
+  name: string;
+  allocations: string[];
+  origins: string[];
+  created: string;
+  metadata: null | any;
+  peerMap: { [key: string]: PeerData };
+}
+
 interface StartDeploymentConfiguration {
   organizationId: string;
   gitUrl: string;
@@ -476,6 +497,7 @@ export {
   UsageWithLimitsWithSkynet,
   IPNSPublishResponse,
   IPNSName,
+  PinStatus,
   StartDeploymentConfiguration,
   EnvironmentVariable,
   Cluster,
