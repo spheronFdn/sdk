@@ -64,6 +64,7 @@ const { uploadId, bucketId, protocolLink, dynamicLinks } = await client.upload(
     - `bucketId` - the id of the bucket
     - `protocolLink` - is the protocol link of the upload
     - `dynamicLinks` - are domains that you have setup for your bucket. When you upload new data to the same bucket, the domains will point to the new uploaded data.
+    - `cid` - the CID of the uploaded data. Only exists for IPFS and Filecoin protocols.
 
 ### IPNS Example
 
