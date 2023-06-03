@@ -12,3 +12,12 @@ dist
 
 # types 
 types
+
+# lib
+lib
+
+# vscode
+.vscode
+
+# test
+test

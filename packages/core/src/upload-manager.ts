@@ -22,6 +22,14 @@ export interface UploadResult {
   dynamicLinks: string[];
 }
 
+export interface DealDataResult {
+  pieceSize: number;
+  size: number;
+  pieceCid: string;
+  dataCid: string;
+  carLink: string;
+}
+
 class UploadManager {
   private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
 
