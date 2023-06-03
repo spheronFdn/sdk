@@ -78,6 +78,18 @@ import { DeploymentStatusEnum, ProjectStateEnum } from "@spheron/core";
         .wrap(100)
         .help();
     })
+    .command("create-instance", "Create compute cluster", (yargs: any) => {
+      yargs
+        .option("name", {
+          describe: "Name of the cluster",
+        })
+        .option("username", {
+          describe: "Username of the organization",
+        })
+        .version(false)
+        .usage(`Usage: $0 create-cluster`)
+        .help();
+    })
     .command("get <resource>", "Get resource/s <<resource>>", (yargs: any) => {
       yargs.positional("resource", {
         describe: "The resource to get information about",
@@ -95,6 +107,9 @@ import { DeploymentStatusEnum, ProjectStateEnum } from "@spheron/core";
         - get projects                : options: --organizationId (optional), --skip (optional), --limit (optional), --state (optional)
         - get domains                 : options: --projectId
         - get deployment-environments : options: --projectId
+        - get cluster                 : options: --clusterId
+        - get instance                : options: --instanceId
+        - get instances               : options: --clusterId
         Note* : 
         deployment status field can be ${Object.values(DeploymentStatusEnum)}
         project state field can be ${Object.values(ProjectStateEnum)} 
