@@ -18,6 +18,15 @@ import {
 import { createPayloads } from "./fs-payload-creator";
 import { ipfs } from "./ipfs.utils";
 import { UsageWithLimits } from "./bucket-manager/interfaces";
+// import { DecryptFromIpfsProps, EncryptToIpfsProps } from "./interface";
+// import {
+//   decryptFile,
+//   decryptString,
+//   encryptFile,
+//   encryptString,
+//   uint8arrayToString,
+// } from "@spheron/encryption";
+// import { promises as fs } from "fs";
 
 export {
   ipfs,
@@ -118,6 +127,133 @@ export class SpheronClient {
     };
   }
 
+  // async encryptUpload({
+  //   authSig,
+  //   sessionSigs,
+  //   accessControlConditions,
+  //   evmContractConditions,
+  //   solRpcConditions,
+  //   unifiedAccessControlConditions,
+  //   chain,
+  //   string,
+  //   file,
+  //   litNodeClient,
+  //   configuration,
+  // }: EncryptToIpfsProps): Promise<UploadResult> {
+  //   if (string === undefined && file === undefined)
+  //     throw new Error(`Either string or file must be provided`);
+
+  //   let encryptedData;
+  //   let symmetricKey;
+  //   if (string !== undefined && file !== undefined) {
+  //     throw new Error(`Provide only either a string or file to encrypt`);
+  //   } else if (string !== undefined) {
+  //     const encryptedString = await encryptString(string);
+  //     encryptedData = encryptedString.encryptedString;
+  //     symmetricKey = encryptedString.symmetricKey;
+  //   } else {
+  //     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  //     const encryptedFile = await encryptFile({ file: file! });
+  //     encryptedData = encryptedFile.encryptedFile;
+  //     symmetricKey = encryptedFile.symmetricKey;
+  //   }
+
+  //   const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
+  //     accessControlConditions,
+  //     evmContractConditions,
+  //     solRpcConditions,
+  //     unifiedAccessControlConditions,
+  //     symmetricKey,
+  //     authSig,
+  //     sessionSigs,
+  //     chain,
+  //   });
+
+  //   console.log("encrypted key saved to Lit", encryptedSymmetricKey);
+
+  //   const encryptedSymmetricKeyString = uint8arrayToString(
+  //     encryptedSymmetricKey,
+  //     "base16"
+  //   );
+
+  //   const encryptedDataJson = Buffer.from(
+  //     await encryptedData.arrayBuffer()
+  //   ).toJSON();
+  //   try {
+  //     const uploadJson = JSON.stringify({
+  //       [string !== undefined ? "encryptedString" : "encryptedFile"]:
+  //         encryptedDataJson,
+  //       encryptedSymmetricKeyString,
+  //       accessControlConditions,
+  //       evmContractConditions,
+  //       solRpcConditions,
+  //       unifiedAccessControlConditions,
+  //       chain,
+  //     });
+  //     const filePath = "./data.json";
+  //     // Write the JSON data to the file
+  //     await fs.writeFile(filePath, uploadJson);
+  //     //Upload it to spheron
+  //     const res = await this.upload(filePath, configuration);
+  //     // Delete the JSON file
+  //     await fs.unlink(filePath);
+  //     return res;
+  //   } catch (e) {
+  //     throw new Error(`Upload failed: ${e.message}`);
+  //   }
+  // }
+
+  // async decryptUpload({
+  //   authSig,
+  //   sessionSigs,
+  //   ipfsCid,
+  //   litNodeClient,
+  // }: DecryptFromIpfsProps): Promise<string | Uint8Array> {
+  //   try {
+  //     const metadataRes = await (
+  //       await fetch(
+  //         `https://gateway.spheron.link/ipfs/${ipfsCid}/data.json`
+  //       ).catch(() => {
+  //         throw new Error("Error finding metadata from IPFS CID");
+  //       })
+  //     ).json();
+  //     const metadata = JSON.parse(metadataRes);
+
+  //     console.log("metadata", metadata.accessControlConditions);
+
+  //     const symmetricKey = await litNodeClient.getEncryptionKey({
+  //       accessControlConditions: metadata.accessControlConditions,
+  //       evmContractConditions: metadata.evmContractConditions,
+  //       solRpcConditions: metadata.solRpcConditions,
+  //       unifiedAccessControlConditions: metadata.unifiedAccessControlConditions,
+  //       toDecrypt: metadata.encryptedSymmetricKeyString,
+  //       chain: metadata.chain,
+  //       authSig,
+  //       sessionSigs,
+  //     });
+  //     console.log("symmetricKey", symmetricKey);
+
+  //     if (metadata.encryptedString !== undefined) {
+  //       const encryptedStringBlob = new Blob(
+  //         [Buffer.from(metadata.encryptedString)],
+  //         { type: "application/octet-stream" }
+  //       );
+  //       return await decryptString(encryptedStringBlob, symmetricKey);
+  //     }
+
+  //     const encryptedFileBlob = new Blob(
+  //       [Buffer.from(metadata.encryptedFile)],
+  //       {
+  //         type: "application/octet-stream",
+  //       }
+  //     );
+  //     return await decryptFile({ file: encryptedFileBlob, symmetricKey });
+  //   } catch (e) {
+  //     console.log("Error on decrypt", e);
+  //     throw new Error(e.message);
+  //   }
+  // }
+
   async createSingleUploadToken(configuration: {
     name: string;
     protocol: ProtocolEnum;
@@ -133,11 +269,8 @@ export class SpheronClient {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return { uploadToken: singleDeploymentToken! };
   }
-  
-  async pinCID(configuration: {
-    name: string;
-    cid: string;
-  }): Promise<{
+
+  async pinCID(configuration: { name: string; cid: string }): Promise<{
     uploadId: string;
     bucketId: string;
     protocolLink: string;
