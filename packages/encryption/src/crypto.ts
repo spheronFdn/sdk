@@ -18,7 +18,7 @@ export const SYMM_KEY_ALGO_PARAMS = {
  * @returns { Promise<CryptoKey> } A promise that resolves to the imported key
  */
 export const importSymmetricKey = async (
-  symmKey: SymmetricKey
+  symmKey: Uint8Array
 ): Promise<CryptoKey> => {
   const importedSymmKey = await crypto.subtle.importKey(
     "raw",
@@ -35,17 +35,17 @@ export const importSymmetricKey = async (
  *
  * Decrypt an encrypted blob with a symmetric key.  Uses AES-CBC via SubtleCrypto
  *
- * @param { Blob } encryptedBlob The encrypted blob that should be decrypted
+ * @param { Uint8Array } encryptedData The encrypted blob that should be decrypted
  * @param { CryptoKey } symmKey The symmetric key
  *
  * @returns { Uint8Array } The decrypted blob
  */
 export const decryptWithSymmetricKey = async (
-  encryptedBlob: Blob,
+  encryptedData: Uint8Array,
   symmKey: CryptoKey
 ): Promise<Uint8Array> => {
-  const recoveredIv = await encryptedBlob.slice(0, 16).arrayBuffer();
-  const encryptedZipArrayBuffer = await encryptedBlob.slice(16).arrayBuffer();
+  const recoveredIv = encryptedData.slice(0, 16);
+  const encryptedZipArrayBuffer = encryptedData.slice(16);
   const decryptedZip = await crypto.subtle.decrypt(
     {
       name: "AES-CBC",
@@ -87,7 +87,7 @@ export const generateSymmetricKey = async (): Promise<CryptoKey> => {
 export const encryptWithSymmetricKey = async (
   symmKey: CryptoKey,
   data: BufferSource | Uint8Array
-): Promise<Blob> => {
+): Promise<Uint8Array> => {
   // encrypt the zip with symmetric key
   const iv = crypto.getRandomValues(new Uint8Array(16));
 
@@ -100,9 +100,5 @@ export const encryptWithSymmetricKey = async (
     data
   );
 
-  const encryptedZipBlob = new Blob([iv, new Uint8Array(encryptedZipData)], {
-    type: "application/octet-stream",
-  });
-
-  return encryptedZipBlob;
+  return new Uint8Array([...iv, ...new Uint8Array(encryptedZipData)]);
 };
