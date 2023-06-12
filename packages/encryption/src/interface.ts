@@ -7,7 +7,7 @@ export interface DecryptFileProps {
 }
 
 export interface EncryptedFile {
-  encryptedFile: Blob;
+  encryptedFile: Uint8Array;
   symmetricKey: SymmetricKey;
 }
 
@@ -89,6 +89,5 @@ export interface AccsOperatorParams {
 
 export interface EncryptedString {
   symmetricKey: SymmetricKey;
-  encryptedString: Blob;
-  encryptedData?: Blob;
+  encryptedString: Uint8Array;
 }
