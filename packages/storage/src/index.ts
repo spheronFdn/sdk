@@ -133,11 +133,8 @@ export class SpheronClient {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return { uploadToken: singleDeploymentToken! };
   }
-  
-  async pinCID(configuration: {
-    name: string;
-    cid: string;
-  }): Promise<{
+
+  async pinCID(configuration: { name: string; cid: string }): Promise<{
     uploadId: string;
     bucketId: string;
     protocolLink: string;
@@ -217,6 +214,18 @@ export class SpheronClient {
       bucketId,
       domainIdentifier
     );
+  }
+
+  async getCdnValues(): Promise<{
+    cdnDomainValue: string;
+    cdnSubdomainValue: string;
+  }> {
+    const { recordIpv4V2, recordCnameV2 } =
+      await this.spheronApi.getCdnRecords();
+    return {
+      cdnDomainValue: recordIpv4V2,
+      cdnSubdomainValue: recordCnameV2,
+    };
   }
 
   async deleteBucketDomain(
