@@ -6,7 +6,6 @@ import {
   SolRpcConditions,
   UnifiedAccessControlConditions,
   Chain,
-  AcceptedFileType,
 } from "@spheron/encryption";
 
 export interface EncryptToIpfsProps {
@@ -35,7 +34,7 @@ export interface EncryptToIpfsProps {
   string?: string;
 
   // The file you wish to encrypt
-  file?: AcceptedFileType;
+  file?: File;
 
   // An instance of LitNodeClient that is already connected
   litNodeClient: any;

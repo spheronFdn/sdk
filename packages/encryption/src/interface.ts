@@ -1,15 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AcceptedFileType, Chain, ConditionType, SymmetricKey } from "./types";
-
-export interface DecryptFileProps {
-  file: AcceptedFileType;
-  symmetricKey: SymmetricKey;
-}
-
-export interface EncryptedFile {
-  encryptedFile: Blob;
-  symmetricKey: SymmetricKey;
-}
+import { Chain, ConditionType, SymmetricKey } from "./types";
 
 export interface MetadataForFile {
   name: string | any;
@@ -87,8 +77,7 @@ export interface AccsOperatorParams {
   operator: string;
 }
 
-export interface EncryptedString {
+export interface EncryptedData {
   symmetricKey: SymmetricKey;
-  encryptedString: Blob;
-  encryptedData?: Blob;
+  encryptedData: Uint8Array;
 }
