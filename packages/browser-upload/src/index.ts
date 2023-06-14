@@ -3,11 +3,10 @@ import { createPayloads } from "./file-payload-creator";
 import jwt_decode from "jwt-decode";
 import {
   convertJsonToFile,
-  decryptFile,
-  decryptString,
-  encryptFile,
-  encryptString,
   uint8arrayToString,
+  encryptData,
+  uint8arrayFromString,
+  decryptData,
 } from "@spheron/encryption";
 import { DecryptFromIpfsProps, EncryptToIpfsProps } from "./interface";
 
@@ -110,20 +109,20 @@ async function encryptUpload({
   if (string === undefined && file === undefined)
     throw new Error(`Either string or file must be provided`);
 
-  let encryptedData;
-  let symmetricKey;
+  let dataToEncrypt: Uint8Array | null = null;
   if (string !== undefined && file !== undefined) {
     throw new Error(`Provide only either a string or file to encrypt`);
   } else if (string !== undefined) {
-    const encryptedString = await encryptString(string);
-    encryptedData = encryptedString.encryptedString;
-    symmetricKey = encryptedString.symmetricKey;
+    dataToEncrypt = uint8arrayFromString(string, "utf8");
+  } else if (file !== undefined) {
+    dataToEncrypt = new Uint8Array(await file.arrayBuffer());
   } else {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const encryptedFile = await encryptFile({ file: file! });
-    encryptedData = encryptedFile.encryptedFile;
-    symmetricKey = encryptedFile.symmetricKey;
+    throw new Error(`Either string or file must be provided`);
   }
+
+  if (dataToEncrypt === null) throw new Error(`Failed to encrypt data`);
+
+  const { symmetricKey, encryptedData } = await encryptData(dataToEncrypt);
 
   const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
     accessControlConditions,
@@ -143,13 +142,10 @@ async function encryptUpload({
     "base16"
   );
 
-  const encryptedDataJson = Buffer.from(
-    await encryptedData.arrayBuffer()
-  ).toJSON();
+  const encryptedDataJson = Buffer.from(await encryptedData).toJSON();
   try {
     const uploadJson = JSON.stringify({
-      [string !== undefined ? "encryptedString" : "encryptedFile"]:
-        encryptedDataJson,
+      encryptedData: encryptedDataJson,
       encryptedSymmetricKeyString,
       accessControlConditions,
       evmContractConditions,
@@ -196,19 +192,10 @@ async function decryptUpload({
     });
     console.log("symmetricKey", symmetricKey);
 
-    if (metadata.encryptedString !== undefined) {
-      const encryptedStringBlob = new Blob(
-        [Buffer.from(metadata.encryptedString)],
-        { type: "application/octet-stream" }
-      );
-      return await decryptString(encryptedStringBlob, symmetricKey);
-    }
+    const encrypted = new Uint8Array(Buffer.from(metadata.encryptedData));
 
-    const encryptedFileBlob = new Blob([Buffer.from(metadata.encryptedFile)], {
-      type: "application/octet-stream",
-    });
-    return await decryptFile({ file: encryptedFileBlob, symmetricKey });
-  } catch (e: any) {
+    return decryptData(encrypted, symmetricKey);
+  } catch (e) {
     console.log("Error on decrypt", e);
     throw new Error(e.message);
   }
