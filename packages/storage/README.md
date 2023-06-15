@@ -114,7 +114,7 @@ const orgIPNSNames: IPNSName[] = await client.getIPNSNamesForOrganization(
 
 ---
 
-For more information about the Storage SDK, check out the [DOCS](https://docs.spheron.network/sdk/storage/)
+### For more information about the Storage SDK, check out the [DOCS](https://docs.spheron.network/sdk/storage/)
 
 ## Access Token
 
