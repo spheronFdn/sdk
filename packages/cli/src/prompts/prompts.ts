@@ -1,4 +1,5 @@
 import { createDapp, templateTypesMap } from "../commands/create-dapp";
+import { FixBugEnum } from "../commands/gpt";
 import { FrameworkOptions } from "../commands/init";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -161,6 +162,52 @@ export async function promptForCreateDapp(appName?: string): Promise<any> {
           );
         });
     });
+}
+
+export async function promptForGPT(): Promise<any> {
+  const questions = [
+    {
+      type: "input",
+      name: "gpt",
+      message: "Details about the code you wish to generate:",
+    },
+  ];
+  return inquirer.prompt(questions);
+}
+
+export async function filePathForGPT(): Promise<any> {
+  const questions = [
+    {
+      type: "input",
+      name: "inputpath",
+      message: "File path for the code you want to update:",
+    },
+  ];
+  return inquirer.prompt(questions);
+}
+
+export async function fixBugForGPT(): Promise<any> {
+  const questions = [
+    {
+      type: "list",
+      name: "fix",
+      message: "Do you want to fix this code:",
+      choices: [FixBugEnum.YES, FixBugEnum.NO],
+      default: FixBugEnum.YES,
+    },
+  ];
+  return inquirer.prompt(questions);
+}
+
+export async function languageForGPT(): Promise<any> {
+  const questions = [
+    {
+      type: "input",
+      name: "lang",
+      message: "Programming Language you want to transpile to:",
+    },
+  ];
+  return inquirer.prompt(questions);
 }
 
 const templateTypes = Array.from(templateTypesMap.values()).map((t) => ({

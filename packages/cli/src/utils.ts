@@ -1,4 +1,6 @@
 import fs from "fs";
+import * as path from "path";
+import configuration from "./configuration";
 
 export async function fileExists(path: string): Promise<boolean> {
   try {
@@ -91,3 +93,41 @@ export enum FileTypeEnum {
   DIRECTORY = "directory",
   FILE = "file",
 }
+
+export const generateFilePath = (filePath: string) => {
+  const rootDirectory = ".";
+  const { dir } = path.parse(filePath);
+
+  // Check if the directory exists or create it
+  const directoryPath = path.join(rootDirectory, dir);
+  if (!fs.existsSync(directoryPath)) {
+    fs.mkdirSync(directoryPath, { recursive: true });
+  }
+
+  const fileFullPath = path.join(rootDirectory, filePath);
+  return fileFullPath;
+};
+
+// export const gptConfiguration = async (prompt: string) => {
+//   const { apiKey } = configuration;
+//   const gptConfiguration = new Configuration({
+//     apiKey,
+//   });
+//   const openai: any = new OpenAIApi(gptConfiguration);
+
+//   const messages = [
+//     { role: "system", content: "You are a coding expert." },
+//     { role: "user", content: prompt },
+//   ];
+
+//   if (prompt == null) {
+//     throw new Error("Uh oh, no prompt was provided");
+//   }
+
+//   const response = await openai.createChatCompletion({
+//     model: "gpt-3.5-turbo",
+//     messages,
+//   });
+
+//   return response;
+// };

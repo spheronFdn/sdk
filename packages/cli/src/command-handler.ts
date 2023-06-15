@@ -2,6 +2,14 @@ import { changeDefaultOrganization } from "./commands/configure";
 import { createConfiguration } from "./commands/create-configuration";
 import { createOrganization } from "./commands/create-organization";
 import { ResourceEnum, ResourceFetcher } from "./commands/get-resources";
+import {
+  CommandEnum,
+  findBugInCode,
+  generateCode,
+  improveCode,
+  transpileCode,
+  updateCode,
+} from "./commands/gpt";
 import { init } from "./commands/init";
 import { login } from "./commands/login";
 import { logout } from "./commands/logout";
@@ -9,9 +17,12 @@ import { publish } from "./commands/publish";
 import { upload } from "./commands/upload";
 import configuration from "./configuration";
 import {
+  filePathForGPT,
+  languageForGPT,
   promptForConfigure,
   promptForCreateDapp,
   promptForCreateOrganization,
+  promptForGPT,
   promptForInit,
   promptForLogin,
   promptForUploadFile,
@@ -281,6 +292,74 @@ export async function commandHandler(options: any) {
           organizationId = prompt.organization;
         }
         await changeDefaultOrganization(organizationId);
+      } catch (error) {
+        console.log(error.message);
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (options._[0] === "gpt") {
+    const validOptions = ["prompt", "command", "path", "language"];
+    const unknownOptions = Object.keys(options).filter(
+      (option) =>
+        option !== "_" && option !== "$0" && !validOptions.includes(option)
+    );
+    if (unknownOptions.length > 0) {
+      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
+    (async () => {
+      try {
+        if (!options.command) {
+          let gptPrompt;
+          if (options.prompt) {
+            gptPrompt = options.prompt;
+          } else {
+            const prompt = await promptForGPT();
+            gptPrompt = prompt.gpt;
+          }
+          options.path
+            ? await updateCode(gptPrompt, options.path)
+            : await generateCode(gptPrompt);
+        }
+        if (options.command) {
+          if (options.command == CommandEnum.FINDBUG) {
+            let filePath;
+            if (options.path) {
+              filePath = options.path;
+            } else {
+              const path = await filePathForGPT();
+              filePath = path.inputpath;
+            }
+            await findBugInCode(filePath);
+          } else if (options.command == CommandEnum.IMPROVE) {
+            let filePath;
+            if (options.path) {
+              filePath = options.path;
+            } else {
+              const path = await filePathForGPT();
+              filePath = path.inputpath;
+            }
+            await improveCode(filePath);
+          } else if (options.command == CommandEnum.TRANSPILE) {
+            let progLanguage;
+            if (options.language) {
+              progLanguage = options.language;
+            } else {
+              const lang = await languageForGPT();
+              progLanguage = lang.lang;
+            }
+            let filePath;
+            if (options.path) {
+              filePath = options.path;
+            } else {
+              const path = await filePathForGPT();
+              filePath = path.inputpath;
+            }
+            await transpileCode(progLanguage, filePath);
+          }
+        }
       } catch (error) {
         console.log(error.message);
         process.exit(1);
