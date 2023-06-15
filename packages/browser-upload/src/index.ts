@@ -133,8 +133,6 @@ async function encryptUpload({
     chain,
   });
 
-  console.log("Encrypted key saved to Lit", encryptedSymmetricKey);
-
   const encryptedSymmetricKeyString = uint8arrayToString(
     encryptedSymmetricKey,
     "base16"
