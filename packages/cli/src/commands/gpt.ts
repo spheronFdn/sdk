@@ -19,28 +19,17 @@ export interface IGPTResponse {
   response: string;
 }
 
-const GENERATE =
-  "Follow these Instructions: Generate Full Code, Use Double Quotes, Don't use single quotes, Don't use backticks, Don't give description, Give answer in JSON, Create an array of objects for multiple JSONs \nUse this Format: { filename: 'generated-file-name', code: 'generated-code'} \nQuestion:";
-const UPDATE =
-  "Follow these Instructions: Generate Full Code, Use Double Quotes, Don't give description \nUpdate the following file/s and give results in the same format:";
-const FIX =
-  "Follow these Instructions: Generate Full Code, Use Double Quotes, Don't give description, Give answer in JSON \nUse this Format: { code: 'fixed-code' } \nFix bugs in this code:";
-const IMPROVE =
-  "Follow these Instructions: Generate Full Code, Use Double Quotes, Don't give description, Give answer in JSON \nUse this Format: { code: 'imporved-code' } \nImprove the performance of this code:";
-const TRANSPILE =
-  "Follow these Instructions: Generate Full Code, Use Double Quotes, Don't use single quotes, Don't use backticks, Don't give description, Give answer in JSON \nUse this Format: { filename: 'generated-file-name', code: 'transpiled-code' } \nTranspile this code to";
-
 export async function generateCode(prompt: string) {
   const spinner = new Spinner();
   const spinnerMessage = "Generating code...";
 
   try {
     const formattedPrompt = prompt[0].toUpperCase() + prompt.slice(1);
-    const gptPrompt = `${GENERATE} ${formattedPrompt}`;
     const gptResponse: IGPTResponse = await SpheronApiService.generateCode(
       spinner,
       spinnerMessage,
-      gptPrompt
+      "Generate",
+      formattedPrompt
     );
     if (!gptResponse.response) {
       throw { message: "You need to login first using 'spheron login'." };
@@ -73,13 +62,12 @@ export async function updateCode(prompt: string, path: any) {
       filesArray.push({ filename: filename.trim(), code: fileText });
     });
     const formattedPrompt = prompt[0].toUpperCase() + prompt.slice(1);
-    const gptPrompt = `${UPDATE} ${JSON.stringify(
-      filesArray
-    )} \nQuestion: ${formattedPrompt}`;
     const gptResponse: IGPTResponse = await SpheronApiService.generateCode(
       spinner,
       spinnerMessage,
-      gptPrompt
+      "Update",
+      formattedPrompt,
+      filesArray
     );
     if (!gptResponse.response) {
       throw { message: "You need to login first using 'spheron login'." };
@@ -106,11 +94,11 @@ export async function findBugInCode(path: any) {
 
   try {
     const fileText = fs.readFileSync(path, "utf8");
-    const findBugPrompt = `Find bugs in this code: ${fileText}`;
     const gptResponse: IGPTResponse = await SpheronApiService.generateCode(
       spinner,
       spinnerMessage,
-      findBugPrompt
+      "Find",
+      fileText
     );
     if (!gptResponse.response) {
       throw { message: "You need to login first using 'spheron login'." };
@@ -124,12 +112,11 @@ export async function findBugInCode(path: any) {
 
     if (fixBug.fix === FixBugEnum.YES) {
       const spinnerFixMessage = "Fixing bugs in your code ⚔️  ...";
-
-      const fixBugPrompt = `${FIX} ${fileText}`;
       const gptResponse: IGPTResponse = await SpheronApiService.generateCode(
         spinner,
         spinnerFixMessage,
-        fixBugPrompt
+        "Fix",
+        fileText
       );
 
       try {
@@ -153,11 +140,11 @@ export async function improveCode(path: any) {
 
   try {
     const fileText = fs.readFileSync(path, "utf8");
-    const improveCodePrompt = `${IMPROVE} ${fileText}`;
     const gptResponse: IGPTResponse = await SpheronApiService.generateCode(
       spinner,
       spinnerMessage,
-      improveCodePrompt
+      "Improve",
+      fileText
     );
     if (!gptResponse.response) {
       throw { message: "You need to login first using 'spheron login'." };
@@ -185,11 +172,13 @@ export async function transpileCode(lang: string, path: any) {
 
   try {
     const fileText = fs.readFileSync(path, "utf8");
-    const transpileCodePrompt = `${TRANSPILE} ${lang} : ${fileText}`;
     const gptResponse: IGPTResponse = await SpheronApiService.generateCode(
       spinner,
       spinnerMessage,
-      transpileCodePrompt
+      "Transpile",
+      fileText,
+      [],
+      lang
     );
     if (!gptResponse.response) {
       throw { message: "You need to login first using 'spheron login'." };
