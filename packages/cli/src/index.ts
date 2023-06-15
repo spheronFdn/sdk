@@ -1,11 +1,12 @@
 #! /usr/bin/env node
 /* eslint-disable @typescript-eslint/no-var-requires */
 const yargs = require("yargs");
+import { DeploymentStatusEnum, ProjectStateEnum } from "@spheron/core";
 import configuration from "./configuration";
 import { commandHandler } from "./command-handler";
 import { FrameworkOptions } from "./commands/init";
 import { ResourceEnum } from "./commands/get-resources";
-import { DeploymentStatusEnum, ProjectStateEnum } from "@spheron/core";
+import { CommandEnum } from "./commands/gpt";
 
 (async () => {
   console.log(`Spheron CLI ${configuration.version}\n`);
@@ -147,6 +148,25 @@ import { DeploymentStatusEnum, ProjectStateEnum } from "@spheron/core";
           .usage(`Usage: $0 create-dapp <name>`)
           .wrap(100)
           .help();
+      }
+    )
+    .command(
+      "gpt [command]",
+      "Generate code using Spheron GPT",
+      (yargs: any) => {
+        yargs.positional("command", {
+          describe: "The command to generate code",
+          choices: Object.values(CommandEnum),
+        });
+        yargs.version(false).wrap(150).help();
+        yargs.epilogue(`Custom help text for 'gpt <command>' command.
+
+        Examples:
+          - gpt                         : options: --prompt, --path (optional)
+          - gpt findbug                 : options: --path
+          - gpt improve                 : options: --path
+          - gpt transpile               : options: --language, --path
+        `);
       }
     ).argv;
 
