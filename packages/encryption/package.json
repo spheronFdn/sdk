@@ -1,7 +1,7 @@
 {
   "name": "@spheron/encryption",
   "version": "1.0.0",
-  "description": "Typescript library for encrypting files and upload to IPFS, Filecoin or Arweave via Spheron",
+  "description": "Typescript library for encrypting files",
   "keywords": [
     "Storage",
     "Typescript",
