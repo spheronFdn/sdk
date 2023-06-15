@@ -1,18 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Chain, ConditionType, SymmetricKey } from "./types";
 
-export interface MetadataForFile {
-  name: string | any;
-  type: string | any;
-  size: string | number | any;
-  accessControlConditions: any[] | any;
-  evmContractConditions: any[] | any;
-  solRpcConditions: any[] | any;
-  unifiedAccessControlConditions: any[] | any;
-  chain: string;
-  encryptedSymmetricKey: Uint8Array | any;
-}
-
 export interface AuthSig {
   sig: any;
   derivedVia: string;
