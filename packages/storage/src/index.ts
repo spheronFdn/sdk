@@ -216,15 +216,15 @@ export class SpheronClient {
     );
   }
 
-  async getCdnValues(): Promise<{
-    cdnDomainValue: string;
-    cdnSubdomainValue: string;
+  async getCdnDnsRecords(): Promise<{
+    cdnARecords: string;
+    cdnCnameRecords: string;
   }> {
     const { recordIpv4V2, recordCnameV2 } =
       await this.spheronApi.getCdnRecords();
     return {
-      cdnDomainValue: recordIpv4V2,
-      cdnSubdomainValue: recordCnameV2,
+      cdnARecords: recordIpv4V2,
+      cdnCnameRecords: recordCnameV2,
     };
   }
 
