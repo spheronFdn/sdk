@@ -15,7 +15,6 @@ function UploadEncrypt() {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files ? event.target.files[0] : null;
     setFile(selectedFile);
-    console.log(selectedFile);
     setFileType(selectedFile!.name);
     setUploadLink("");
     setDynamicLink("");
@@ -154,9 +153,7 @@ function UploadEncrypt() {
           </>
         )}
 
-        {isLoading ? (
-          <>Uploading...</>
-        ) : (
+        {!isLoading && (
           <>
             <p>Decrypt Content from IPFS</p>
             <div className="flex gap-32">

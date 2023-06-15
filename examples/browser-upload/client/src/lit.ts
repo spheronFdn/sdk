@@ -13,7 +13,7 @@ const accessControlConditions = [
     method: "eth_getBalance",
     parameters: [":userAddress", "latest"],
     returnValueTest: {
-      comparator: ">",
+      comparator: ">=",
       value: "0",
     },
   },
@@ -40,7 +40,6 @@ class Lit {
       litNodeClient: this.litNodeClient,
       configuration,
     });
-    console.log(uploadRes);
     return uploadRes;
   }
 
@@ -55,8 +54,6 @@ class Lit {
       ipfsCid,
       litNodeClient: this.litNodeClient,
     });
-
-    console.log(decryptedFile);
 
     return decryptedFile;
   }
