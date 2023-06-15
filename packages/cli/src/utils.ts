@@ -107,27 +107,3 @@ export const generateFilePath = (filePath: string) => {
   const fileFullPath = path.join(rootDirectory, filePath);
   return fileFullPath;
 };
-
-// export const gptConfiguration = async (prompt: string) => {
-//   const { apiKey } = configuration;
-//   const gptConfiguration = new Configuration({
-//     apiKey,
-//   });
-//   const openai: any = new OpenAIApi(gptConfiguration);
-
-//   const messages = [
-//     { role: "system", content: "You are a coding expert." },
-//     { role: "user", content: prompt },
-//   ];
-
-//   if (prompt == null) {
-//     throw new Error("Uh oh, no prompt was provided");
-//   }
-
-//   const response = await openai.createChatCompletion({
-//     model: "gpt-3.5-turbo",
-//     messages,
-//   });
-
-//   return response;
-// };
