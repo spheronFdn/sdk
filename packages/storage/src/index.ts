@@ -253,9 +253,7 @@ export class SpheronClient {
     litNodeClient,
   }: DecryptFromIpfsProps): Promise<string | Uint8Array> {
     const metadata = await (
-      await fetch(
-        `https://gateway.spheron.link/ipfs/${ipfsCid}/data.json`
-      ).catch(() => {
+      await fetch(`https://${ipfsCid}.ipfs.sphn.link/data.json`).catch(() => {
         throw new Error("Error finding metadata from IPFS CID");
       })
     ).json();

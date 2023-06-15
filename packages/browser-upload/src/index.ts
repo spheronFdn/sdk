@@ -161,11 +161,9 @@ async function decryptUpload({
   litNodeClient,
 }: DecryptFromIpfsProps): Promise<string | Uint8Array> {
   const metadataRes = await (
-    await fetch(`https://gateway.spheron.link/ipfs/${ipfsCid}/data.json`).catch(
-      () => {
-        throw new Error("Error finding metadata from IPFS CID");
-      }
-    )
+    await fetch(`https://${ipfsCid}.ipfs.sphn.link/data.json`).catch(() => {
+      throw new Error("Error finding metadata from IPFS CID");
+    })
   ).json();
 
   const metadata = JSON.parse(metadataRes);
