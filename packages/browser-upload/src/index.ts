@@ -3,11 +3,10 @@ import { createPayloads } from "./file-payload-creator";
 import jwt_decode from "jwt-decode";
 import {
   convertJsonToFile,
-  decryptFile,
-  decryptString,
-  encryptFile,
-  encryptString,
   uint8arrayToString,
+  encryptData,
+  uint8arrayFromString,
+  decryptData,
 } from "@spheron/encryption";
 import { DecryptFromIpfsProps, EncryptToIpfsProps } from "./interface";
 
@@ -107,23 +106,21 @@ async function encryptUpload({
   litNodeClient,
   configuration,
 }: EncryptToIpfsProps): Promise<UploadResult> {
-  if (string === undefined && file === undefined)
+  if (!string && !file)
     throw new Error(`Either string or file must be provided`);
 
-  let encryptedData;
-  let symmetricKey;
-  if (string !== undefined && file !== undefined) {
+  let dataToEncrypt: Uint8Array | null = null;
+  if (string && file) {
     throw new Error(`Provide only either a string or file to encrypt`);
-  } else if (string !== undefined) {
-    const encryptedString = await encryptString(string);
-    encryptedData = encryptedString.encryptedString;
-    symmetricKey = encryptedString.symmetricKey;
-  } else {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const encryptedFile = await encryptFile({ file: file! });
-    encryptedData = encryptedFile.encryptedFile;
-    symmetricKey = encryptedFile.symmetricKey;
+  } else if (string) {
+    dataToEncrypt = uint8arrayFromString(string, "utf8");
+  } else if (file) {
+    dataToEncrypt = new Uint8Array(await file.arrayBuffer());
   }
+
+  if (dataToEncrypt === null) throw new Error(`Failed to encrypt data`);
+
+  const { symmetricKey, encryptedData } = await encryptData(dataToEncrypt);
 
   const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
     accessControlConditions,
@@ -143,26 +140,18 @@ async function encryptUpload({
     "base16"
   );
 
-  const encryptedDataJson = Buffer.from(
-    await encryptedData.arrayBuffer()
-  ).toJSON();
-  try {
-    const uploadJson = JSON.stringify({
-      [string !== undefined ? "encryptedString" : "encryptedFile"]:
-        encryptedDataJson,
-      encryptedSymmetricKeyString,
-      accessControlConditions,
-      evmContractConditions,
-      solRpcConditions,
-      unifiedAccessControlConditions,
-      chain,
-    });
-    const uploadFile = convertJsonToFile(uploadJson, "data.json");
-    const res = await upload([uploadFile], configuration);
-    return res;
-  } catch (e) {
-    throw new Error(`Upload failed: ${e.message}`);
-  }
+  const encryptedDataJson = Buffer.from(await encryptedData).toJSON();
+  const uploadJson = JSON.stringify({
+    encryptedData: encryptedDataJson,
+    encryptedSymmetricKeyString,
+    accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
+    unifiedAccessControlConditions,
+    chain,
+  });
+  const uploadFile = convertJsonToFile(uploadJson, "data.json");
+  return await upload([uploadFile], configuration);
 }
 
 async function decryptUpload({
@@ -171,47 +160,28 @@ async function decryptUpload({
   ipfsCid,
   litNodeClient,
 }: DecryptFromIpfsProps): Promise<string | Uint8Array> {
-  try {
-    const metadataRes = await (
-      await fetch(
-        `https://gateway.spheron.link/ipfs/${ipfsCid}/data.json`
-      ).catch(() => {
-        throw new Error("Error finding metadata from IPFS CID");
-      })
-    ).json();
+  const metadataRes = await (
+    await fetch(`https://${ipfsCid}.ipfs.sphn.link/data.json`).catch(() => {
+      throw new Error("Error finding metadata from IPFS CID");
+    })
+  ).json();
 
-    const metadata = JSON.parse(metadataRes);
+  const metadata = JSON.parse(metadataRes);
 
-    console.log("metadata", metadata.accessControlConditions);
+  const symmetricKey = await litNodeClient.getEncryptionKey({
+    accessControlConditions: metadata.accessControlConditions,
+    evmContractConditions: metadata.evmContractConditions,
+    solRpcConditions: metadata.solRpcConditions,
+    unifiedAccessControlConditions: metadata.unifiedAccessControlConditions,
+    toDecrypt: metadata.encryptedSymmetricKeyString,
+    chain: metadata.chain,
+    authSig,
+    sessionSigs,
+  });
 
-    const symmetricKey = await litNodeClient.getEncryptionKey({
-      accessControlConditions: metadata.accessControlConditions,
-      evmContractConditions: metadata.evmContractConditions,
-      solRpcConditions: metadata.solRpcConditions,
-      unifiedAccessControlConditions: metadata.unifiedAccessControlConditions,
-      toDecrypt: metadata.encryptedSymmetricKeyString,
-      chain: metadata.chain,
-      authSig,
-      sessionSigs,
-    });
-    console.log("symmetricKey", symmetricKey);
+  const encrypted = new Uint8Array(Buffer.from(metadata.encryptedData));
 
-    if (metadata.encryptedString !== undefined) {
-      const encryptedStringBlob = new Blob(
-        [Buffer.from(metadata.encryptedString)],
-        { type: "application/octet-stream" }
-      );
-      return await decryptString(encryptedStringBlob, symmetricKey);
-    }
-
-    const encryptedFileBlob = new Blob([Buffer.from(metadata.encryptedFile)], {
-      type: "application/octet-stream",
-    });
-    return await decryptFile({ file: encryptedFileBlob, symmetricKey });
-  } catch (e: any) {
-    console.log("Error on decrypt", e);
-    throw new Error(e.message);
-  }
+  return decryptData(encrypted, symmetricKey);
 }
 
 export { upload, encryptUpload, decryptUpload };

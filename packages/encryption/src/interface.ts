@@ -1,27 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AcceptedFileType, Chain, ConditionType, SymmetricKey } from "./types";
-
-export interface DecryptFileProps {
-  file: AcceptedFileType;
-  symmetricKey: SymmetricKey;
-}
-
-export interface EncryptedFile {
-  encryptedFile: Blob;
-  symmetricKey: SymmetricKey;
-}
-
-export interface MetadataForFile {
-  name: string | any;
-  type: string | any;
-  size: string | number | any;
-  accessControlConditions: any[] | any;
-  evmContractConditions: any[] | any;
-  solRpcConditions: any[] | any;
-  unifiedAccessControlConditions: any[] | any;
-  chain: string;
-  encryptedSymmetricKey: Uint8Array | any;
-}
+import { Chain, ConditionType, SymmetricKey } from "./types";
 
 export interface AuthSig {
   sig: any;
@@ -87,8 +65,7 @@ export interface AccsOperatorParams {
   operator: string;
 }
 
-export interface EncryptedString {
+export interface EncryptedData {
   symmetricKey: SymmetricKey;
-  encryptedString: Blob;
-  encryptedData?: Blob;
+  encryptedData: Uint8Array;
 }

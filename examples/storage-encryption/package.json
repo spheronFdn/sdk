@@ -1,0 +1,21 @@
+{
+  "name": "storage-encryption",
+  "version": "1.0.0",
+  "description": "Example on how to upload encrypted data via Storage SDK",
+  "scripts": {
+    "encrypt": "node ./src/encrypt.js",
+    "decrypt": "node ./src/decrypt.js"
+  },
+  "keywords": [],
+  "author": "Spheron Team",
+  "dependencies": {
+    "@lit-protocol/lit-node-client": "^2.2.23",
+    "ethers": "^6.5.1",
+    "siwe": "^2.1.4"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/spheronFdn/sdk.git"
+  }
+}

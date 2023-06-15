@@ -7,8 +7,6 @@ import {
   AccsSOLV2Params,
 } from "./interface";
 
-export type AcceptedFileType = File | Blob;
-
 export type SymmetricKey = Uint8Array | string | CryptoKey | BufferSource;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type EncryptedSymmetricKey = string | Uint8Array | any;

@@ -1,5 +1,3 @@
-import { MetadataForFile } from "./interface";
-
 function utf8Encode(str: string): Uint8Array {
   // Initialize an empty array to store the UTF-8 encoded dat
   const utf8Array: number[] = [];
@@ -152,52 +150,6 @@ export function uint8arrayToString(uint8array: Uint8Array, encoding = "utf8") {
       throw new Error(`Unsupported encoding "${encoding}"`);
   }
 }
-
-export const metadataForFile = ({
-  name,
-  type,
-  size,
-  accessControlConditions,
-  evmContractConditions,
-  solRpcConditions,
-  unifiedAccessControlConditions,
-  chain,
-  encryptedSymmetricKey,
-}: MetadataForFile): MetadataForFile => {
-  return {
-    name,
-    type,
-    size,
-    accessControlConditions,
-    evmContractConditions,
-    solRpcConditions,
-    unifiedAccessControlConditions,
-    chain,
-    encryptedSymmetricKey: uint8arrayToString(encryptedSymmetricKey, "base16"),
-  };
-};
-
-export const isNode = () => {
-  let isNode = false;
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  if (typeof process === "object") {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    if (typeof process.versions === "object") {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      if (typeof process.versions.node !== "undefined") {
-        isNode = true;
-      }
-    }
-  }
-  return isNode;
-};
-
-export const isBrowser = () => {
-  return isNode() === false;
-};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const convertJsonToFile = (jsonData: any, fileName: string): File => {
