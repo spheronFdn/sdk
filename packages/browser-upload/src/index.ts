@@ -1,6 +1,14 @@
 import { ProtocolEnum, UploadManager, UploadResult } from "@spheron/core";
 import { createPayloads } from "./file-payload-creator";
 import jwt_decode from "jwt-decode";
+import {
+  convertJsonToFile,
+  uint8arrayToString,
+  encryptData,
+  uint8arrayFromString,
+  decryptData,
+} from "@spheron/encryption";
+import { DecryptFromIpfsProps, EncryptToIpfsProps } from "./interface";
 
 export { ProtocolEnum, UploadResult };
 
@@ -85,4 +93,93 @@ async function upload(
   };
 }
 
-export { upload };
+async function encryptUpload({
+  authSig,
+  sessionSigs,
+  accessControlConditions,
+  evmContractConditions,
+  solRpcConditions,
+  unifiedAccessControlConditions,
+  chain,
+  string,
+  file,
+  litNodeClient,
+  configuration,
+}: EncryptToIpfsProps): Promise<UploadResult> {
+  if (!string && !file)
+    throw new Error(`Either string or file must be provided`);
+
+  let dataToEncrypt: Uint8Array | null = null;
+  if (string && file) {
+    throw new Error(`Provide only either a string or file to encrypt`);
+  } else if (string) {
+    dataToEncrypt = uint8arrayFromString(string, "utf8");
+  } else if (file) {
+    dataToEncrypt = new Uint8Array(await file.arrayBuffer());
+  }
+
+  if (dataToEncrypt === null) throw new Error(`Failed to encrypt data`);
+
+  const { symmetricKey, encryptedData } = await encryptData(dataToEncrypt);
+
+  const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
+    accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
+    unifiedAccessControlConditions,
+    symmetricKey,
+    authSig,
+    sessionSigs,
+    chain,
+  });
+
+  const encryptedSymmetricKeyString = uint8arrayToString(
+    encryptedSymmetricKey,
+    "base16"
+  );
+
+  const encryptedDataJson = Buffer.from(await encryptedData).toJSON();
+  const uploadJson = JSON.stringify({
+    encryptedData: encryptedDataJson,
+    encryptedSymmetricKeyString,
+    accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
+    unifiedAccessControlConditions,
+    chain,
+  });
+  const uploadFile = convertJsonToFile(uploadJson, "data.json");
+  return await upload([uploadFile], configuration);
+}
+
+async function decryptUpload({
+  authSig,
+  sessionSigs,
+  ipfsCid,
+  litNodeClient,
+}: DecryptFromIpfsProps): Promise<string | Uint8Array> {
+  const metadataRes = await (
+    await fetch(`https://${ipfsCid}.ipfs.sphn.link/data.json`).catch(() => {
+      throw new Error("Error finding metadata from IPFS CID");
+    })
+  ).json();
+
+  const metadata = JSON.parse(metadataRes);
+
+  const symmetricKey = await litNodeClient.getEncryptionKey({
+    accessControlConditions: metadata.accessControlConditions,
+    evmContractConditions: metadata.evmContractConditions,
+    solRpcConditions: metadata.solRpcConditions,
+    unifiedAccessControlConditions: metadata.unifiedAccessControlConditions,
+    toDecrypt: metadata.encryptedSymmetricKeyString,
+    chain: metadata.chain,
+    authSig,
+    sessionSigs,
+  });
+
+  const encrypted = new Uint8Array(Buffer.from(metadata.encryptedData));
+
+  return decryptData(encrypted, symmetricKey);
+}
+
+export { upload, encryptUpload, decryptUpload };
