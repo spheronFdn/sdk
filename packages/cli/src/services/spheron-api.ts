@@ -153,7 +153,7 @@ const SpheronApiService = {
     spinnerMessage: string,
     type: string,
     query: string,
-    filesArray?: Array<any>,
+    file?: string,
     lang?: string
   ): Promise<IGPTResponse> {
     const client: any = await this.initialize();
@@ -161,11 +161,16 @@ const SpheronApiService = {
       return { response: "" };
     }
     spinner.spin(spinnerMessage);
-    const params: { type: string, query: string, filesArray?: Array<any>, lang?: string } = {
+    const params: {
+      type: string;
+      query: string;
+      file?: string;
+      lang?: string;
+    } = {
       type,
       query,
-      ...(filesArray && { filesArray }),
-      ...(lang && { lang })
+      ...(file && { file }),
+      ...(lang && { lang }),
     };
     const gptResponse: IGPTResponse = await client.getGPTResponse(params);
 
