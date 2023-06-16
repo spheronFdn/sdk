@@ -109,6 +109,10 @@ async function encryptUpload({
   if (!string && !file)
     throw new Error(`Either string or file must be provided`);
 
+  if (!configuration?.token) {
+    throw new Error(`Token must be provided`);
+  }
+
   let dataToEncrypt: Uint8Array | null = null;
   if (string && file) {
     throw new Error(`Provide only either a string or file to encrypt`);
@@ -157,7 +161,7 @@ async function decryptUpload({
   sessionSigs,
   ipfsCid,
   litNodeClient,
-}: DecryptFromIpfsProps): Promise<string | Uint8Array> {
+}: DecryptFromIpfsProps): Promise<Uint8Array> {
   const metadataRes = await (
     await fetch(`https://${ipfsCid}.ipfs.sphn.link/data.json`).catch(() => {
       throw new Error("Error finding metadata from IPFS CID");

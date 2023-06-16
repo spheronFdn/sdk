@@ -27,11 +27,14 @@ const main = async () => {
   const authSig = await signAuthMessage(walletPrivateKey);
 
   const client = new LitJsSdk.LitNodeClient({});
+
   await client.connect();
 
   const spheron = new SpheronClient({
     token: spheronToken,
   });
+
+  let currentlyUploaded = 0;
 
   const uploadResponse = await spheron.encryptUpload({
     authSig,
@@ -41,6 +44,13 @@ const main = async () => {
     litNodeClient: client,
     configuration: {
       name: bucketName,
+      onUploadInitiated: (uploadId) => {
+        console.log(`Upload with id ${uploadId} started...`);
+      },
+      onChunkUploaded: (uploadedSize, totalSize) => {
+        currentlyUploaded += uploadedSize;
+        console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
+      },
     },
   });
 

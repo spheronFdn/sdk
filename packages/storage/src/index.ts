@@ -145,6 +145,10 @@ export class SpheronClient {
       throw new Error(`Either string or filePath must be provided`);
     }
 
+    if (!configuration.name) {
+      throw new Error(`Name must be provided`);
+    }
+
     let dataToEncrypt: Uint8Array | null = null;
     if (string && filePath) {
       throw new Error(`Provide only either a string or filePath to encrypt`);
@@ -199,8 +203,12 @@ export class SpheronClient {
           token: this.configuration.token,
         });
 
+      configuration.onUploadInitiated &&
+        configuration.onUploadInitiated(deploymentId);
+
       let success = true;
       let caughtError: Error | undefined = undefined;
+      const totalSize = Buffer.byteLength(uploadJson, "utf8");
       try {
         const form = new FormData();
         form.append("files", uploadJson, "data.json");
@@ -210,6 +218,9 @@ export class SpheronClient {
             deploymentId,
             token: this.configuration.token,
             parallelUploadCount,
+            onChunkUploaded: (uploadedSize: number) =>
+              configuration.onChunkUploaded &&
+              configuration.onChunkUploaded(uploadedSize, totalSize),
           }
         );
         if (!uploadPayloadsResult.success) {
@@ -251,7 +262,7 @@ export class SpheronClient {
     sessionSigs,
     ipfsCid,
     litNodeClient,
-  }: DecryptFromIpfsProps): Promise<string | Uint8Array> {
+  }: DecryptFromIpfsProps): Promise<Uint8Array> {
     const metadata = await (
       await fetch(`https://${ipfsCid}.ipfs.sphn.link/data.json`).catch(() => {
         throw new Error("Error finding metadata from IPFS CID");
