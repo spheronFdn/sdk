@@ -965,6 +965,17 @@ class SpheronApi {
     return response.price;
   }
 
+  //#gpt api
+  async getGPTResponse(body: { query: string }): Promise<{ response: string }> {
+    const response: any = await this.sendApiRequest(
+      HttpMethods.POST,
+      "/v1/gpt/query",
+      body
+    );
+
+    return response;
+  }
+
   private async sendApiRequest<T>(
     method: HttpMethods,
     path: string,

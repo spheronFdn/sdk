@@ -1,4 +1,6 @@
 import fs from "fs";
+import * as path from "path";
+import configuration from "./configuration";
 
 export async function fileExists(path: string): Promise<boolean> {
   try {
@@ -91,3 +93,17 @@ export enum FileTypeEnum {
   DIRECTORY = "directory",
   FILE = "file",
 }
+
+export const generateFilePath = (filePath: string) => {
+  const rootDirectory = ".";
+  const { dir } = path.parse(filePath);
+
+  // Check if the directory exists or create it
+  const directoryPath = path.join(rootDirectory, dir);
+  if (!fs.existsSync(directoryPath)) {
+    fs.mkdirSync(directoryPath, { recursive: true });
+  }
+
+  const fileFullPath = path.join(rootDirectory, filePath);
+  return fileFullPath;
+};

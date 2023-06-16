@@ -18,6 +18,15 @@ import {
 import { createPayloads } from "./fs-payload-creator";
 import { ipfs } from "./ipfs.utils";
 import { UsageWithLimits } from "./bucket-manager/interfaces";
+import { DecryptFromIpfsProps, EncryptToIpfsProps } from "./interface";
+import {
+  uint8arrayFromString,
+  encryptData,
+  uint8arrayToString,
+  decryptData,
+} from "@spheron/encryption";
+import { readFileContent } from "./utils";
+import FormData from "form-data";
 
 export {
   ipfs,
@@ -31,6 +40,7 @@ export {
   UsageWithLimits,
   TokenScope,
   IPNSName,
+  uint8arrayToString,
 };
 
 export interface SpheronClientConfiguration {
@@ -116,6 +126,163 @@ export class SpheronClient {
       dynamicLinks: result.affectedDomains,
       cid: result.cid,
     };
+  }
+
+  async encryptUpload({
+    authSig,
+    sessionSigs,
+    accessControlConditions,
+    evmContractConditions,
+    solRpcConditions,
+    unifiedAccessControlConditions,
+    chain,
+    string,
+    filePath,
+    litNodeClient,
+    configuration,
+  }: EncryptToIpfsProps): Promise<UploadResult> {
+    if (!string && !filePath) {
+      throw new Error(`Either string or filePath must be provided`);
+    }
+
+    if (!configuration.name) {
+      throw new Error(`Name must be provided`);
+    }
+
+    let dataToEncrypt: Uint8Array | null = null;
+    if (string && filePath) {
+      throw new Error(`Provide only either a string or filePath to encrypt`);
+    } else if (string !== undefined) {
+      dataToEncrypt = uint8arrayFromString(string, "utf8");
+    } else if (filePath !== undefined) {
+      const { content } = await readFileContent(filePath);
+      dataToEncrypt = content;
+    } else {
+      throw new Error(`Either string or file must be provided`);
+    }
+
+    if (!dataToEncrypt) {
+      throw new Error(`No data to encrypt`);
+    }
+
+    const { encryptedData, symmetricKey } = await encryptData(dataToEncrypt);
+
+    const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
+      accessControlConditions,
+      evmContractConditions,
+      solRpcConditions,
+      unifiedAccessControlConditions,
+      symmetricKey,
+      authSig,
+      sessionSigs,
+      chain,
+    });
+
+    const encryptedSymmetricKeyString = uint8arrayToString(
+      encryptedSymmetricKey,
+      "base16"
+    );
+
+    const encryptedDataJson = Buffer.from(encryptedData.buffer).toJSON();
+
+    try {
+      const uploadJson = JSON.stringify({
+        encryptedData: encryptedDataJson,
+        encryptedSymmetricKeyString,
+        accessControlConditions,
+        evmContractConditions,
+        solRpcConditions,
+        unifiedAccessControlConditions,
+        chain,
+      });
+
+      const { deploymentId, parallelUploadCount } =
+        await this.uploadManager.initiateDeployment({
+          protocol: ProtocolEnum.IPFS,
+          name: configuration.name,
+          token: this.configuration.token,
+        });
+
+      configuration.onUploadInitiated &&
+        configuration.onUploadInitiated(deploymentId);
+
+      let success = true;
+      let caughtError: Error | undefined = undefined;
+      const totalSize = Buffer.byteLength(uploadJson, "utf8");
+      try {
+        const form = new FormData();
+        form.append("files", uploadJson, "data.json");
+        const uploadPayloadsResult = await this.uploadManager.uploadPayloads(
+          [form],
+          {
+            deploymentId,
+            token: this.configuration.token,
+            parallelUploadCount,
+            onChunkUploaded: (uploadedSize: number) =>
+              configuration.onChunkUploaded &&
+              configuration.onChunkUploaded(uploadedSize, totalSize),
+          }
+        );
+        if (!uploadPayloadsResult.success) {
+          throw new Error(uploadPayloadsResult.errorMessage);
+        }
+      } catch (error) {
+        success = false;
+        caughtError = error;
+      }
+
+      const result = await this.uploadManager.finalizeUploadDeployment(
+        deploymentId,
+        success,
+        this.configuration.token
+      );
+
+      if (caughtError) {
+        throw caughtError;
+      }
+
+      if (!result.success) {
+        throw new Error(`Upload failed. ${result.message}`);
+      }
+
+      return {
+        uploadId: result.deploymentId,
+        bucketId: result.projectId,
+        protocolLink: result.sitePreview,
+        dynamicLinks: result.affectedDomains,
+        cid: result.cid,
+      };
+    } catch (e) {
+      throw new Error(`Upload failed: ${e.message}`);
+    }
+  }
+
+  async decryptUpload({
+    authSig,
+    sessionSigs,
+    ipfsCid,
+    litNodeClient,
+  }: DecryptFromIpfsProps): Promise<Uint8Array> {
+    const metadata = await (
+      await fetch(`https://${ipfsCid}.ipfs.sphn.link/data.json`).catch(() => {
+        throw new Error("Error finding metadata from IPFS CID");
+      })
+    ).json();
+
+    const symmetricKey = await litNodeClient.getEncryptionKey({
+      accessControlConditions: metadata.accessControlConditions,
+      evmContractConditions: metadata.evmContractConditions,
+      solRpcConditions: metadata.solRpcConditions,
+      unifiedAccessControlConditions: metadata.unifiedAccessControlConditions,
+      toDecrypt: metadata.encryptedSymmetricKeyString,
+      chain: metadata.chain,
+      authSig,
+      sessionSigs,
+    });
+
+    const encrypted = new Uint8Array(Buffer.from(metadata.encryptedData));
+
+    return decryptData(encrypted, symmetricKey);
   }
 
   async createSingleUploadToken(configuration: {
