@@ -33,7 +33,7 @@
     "dist/"
   ],
   "dependencies": {
-    "@spheron/core": "^1.0.7"
+    "@spheron/core": "^1.0.8"
   },
   "license": "Apache-2.0",
   "repository": {
