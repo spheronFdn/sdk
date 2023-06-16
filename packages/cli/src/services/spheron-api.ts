@@ -148,6 +148,15 @@ const SpheronApiService = {
     return deploymentEnvironments;
   },
 
+  async isWhitelisted(): Promise<any> {
+    const client: any = await this.initialize();
+    if (!client.token) {
+      return { response: "" };
+    }
+    const response = await client.isWhitelisted();
+    return response;
+  },
+
   async generateCode(
     spinner: Spinner,
     spinnerMessage: string,

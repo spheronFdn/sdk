@@ -30,6 +30,7 @@ import {
   promptForLogin,
   promptForUploadFile,
 } from "./prompts/prompts";
+import SpheronApiService from "./services/spheron-api";
 import { fileExists, readFromJsonFile } from "./utils";
 
 export async function commandHandler(options: any) {
@@ -310,6 +311,12 @@ export async function commandHandler(options: any) {
     );
     if (unknownOptions.length > 0) {
       console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
+    const isWhitelisted = await SpheronApiService.isWhitelisted();
+    // check if the user is whitelisted
+    if (isWhitelisted.error) {
+      console.log(`✖️  Error: ${isWhitelisted.message}`);
       process.exit(1);
     }
     (async () => {
