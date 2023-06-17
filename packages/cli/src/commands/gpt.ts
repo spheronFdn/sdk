@@ -337,7 +337,7 @@ export async function createTestCases(lang: string, filepath: any) {
       throw { message: "You need to login first using 'spheron login'." };
     }
 
-    let testFilepath = filepath.replace(/(.*\/)(.*)(\..*)/, `$1$2.test$3`);
+    const testFilepath = filepath.replace(/(.*\/)(.*)(\..*)/, `$1$2.test$3`);
 
     try {
       const parsedGPTRes = JSON.parse(gptResponse.response);
