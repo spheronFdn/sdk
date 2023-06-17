@@ -1,4 +1,8 @@
 import fs from "fs";
+import * as path from "path";
+import { IParsedResponse } from "./commands/gpt";
+import axios from "axios";
+import Spinner from "./outputs/spinner";
 
 export async function fileExists(path: string): Promise<boolean> {
   try {
@@ -91,3 +95,35 @@ export enum FileTypeEnum {
   DIRECTORY = "directory",
   FILE = "file",
 }
+
+export const generateFilePath = (filePath: string) => {
+  const rootDirectory = ".";
+  const { dir } = path.parse(filePath);
+
+  // Check if the directory exists or create it
+  const directoryPath = path.join(rootDirectory, dir);
+  if (!fs.existsSync(directoryPath)) {
+    fs.mkdirSync(directoryPath, { recursive: true });
+  }
+
+  const fileFullPath = path.join(rootDirectory, filePath);
+  return fileFullPath;
+};
+
+export const generateFilesString = (response: IParsedResponse[]) => {
+  return response.map((file: IParsedResponse) => file.filename).join(", ");
+};
+
+export const createLog = (filepath: string, message: string) => {
+  const fileContent = `${new Date().toISOString()} - ${message}\n`;
+
+  fs.access(filepath, fs.constants.F_OK, (err) => {
+    if (err) {
+      // file doesn't exist, create it and append the data
+      fs.writeFileSync(filepath, fileContent);
+    } else {
+      // file exists, append the data
+      fs.appendFileSync(filepath, fileContent);
+    }
+  });
+};

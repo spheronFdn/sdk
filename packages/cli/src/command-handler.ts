@@ -2,6 +2,16 @@ import { changeDefaultOrganization } from "./commands/configure";
 import { createConfiguration } from "./commands/create-configuration";
 import { createOrganization } from "./commands/create-organization";
 import { ResourceEnum, ResourceFetcher } from "./commands/get-resources";
+import {
+  CommandEnum,
+  createTestCases,
+  findBugInCode,
+  generateCode,
+  generateCodeBasedOnFile,
+  improveCode,
+  transpileCode,
+  updateCode,
+} from "./commands/gpt";
 import { init } from "./commands/init";
 import { login } from "./commands/login";
 import { logout } from "./commands/logout";
@@ -9,13 +19,18 @@ import { publish } from "./commands/publish";
 import { upload } from "./commands/upload";
 import configuration from "./configuration";
 import {
+  filePathForGPT,
+  languageForGPT,
+  languageForGPTTest,
   promptForConfigure,
   promptForCreateDapp,
   promptForCreateOrganization,
+  promptForGPT,
   promptForInit,
   promptForLogin,
   promptForUploadFile,
 } from "./prompts/prompts";
+import SpheronApiService from "./services/spheron-api";
 import { fileExists, readFromJsonFile } from "./utils";
 
 export async function commandHandler(options: any) {
@@ -281,6 +296,112 @@ export async function commandHandler(options: any) {
           organizationId = prompt.organization;
         }
         await changeDefaultOrganization(organizationId);
+      } catch (error) {
+        console.log(error.message);
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (options._[0] === "gpt") {
+    const validOptions = ["prompt", "command", "filepath", "language"];
+    const unknownOptions = Object.keys(options).filter(
+      (option) =>
+        option !== "_" && option !== "$0" && !validOptions.includes(option)
+    );
+    if (unknownOptions.length > 0) {
+      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
+    const isWhitelisted = await SpheronApiService.isWhitelisted();
+    // check if the user is whitelisted
+    if (isWhitelisted.error) {
+      console.log(`✖️  Error: ${isWhitelisted.message}`);
+      process.exit(1);
+    }
+    (async () => {
+      try {
+        if (!options.command) {
+          let gptPrompt;
+          if (options.prompt) {
+            gptPrompt = options.prompt;
+          } else {
+            const prompt = await promptForGPT();
+            gptPrompt = prompt.gpt;
+          }
+          options.filepath
+            ? await generateCodeBasedOnFile(gptPrompt, options.filepath)
+            : await generateCode(gptPrompt);
+        }
+        if (options.command) {
+          if (options.command == CommandEnum.UPDATE) {
+            let gptPrompt;
+            if (options.prompt) {
+              gptPrompt = options.prompt;
+            } else {
+              const prompt = await promptForGPT();
+              gptPrompt = prompt.gpt;
+            }
+            let filePath;
+            if (options.filepath) {
+              filePath = options.filepath;
+            } else {
+              const path = await filePathForGPT();
+              filePath = path.inputpath;
+            }
+            await updateCode(gptPrompt, filePath);
+          } else if (options.command == CommandEnum.FINDBUG) {
+            let filePath;
+            if (options.filepath) {
+              filePath = options.filepath;
+            } else {
+              const path = await filePathForGPT();
+              filePath = path.inputpath;
+            }
+            await findBugInCode(filePath);
+          } else if (options.command == CommandEnum.IMPROVE) {
+            let filePath;
+            if (options.filepath) {
+              filePath = options.filepath;
+            } else {
+              const path = await filePathForGPT();
+              filePath = path.inputpath;
+            }
+            await improveCode(filePath);
+          } else if (options.command == CommandEnum.TRANSPILE) {
+            let progLanguage;
+            if (options.language) {
+              progLanguage = options.language;
+            } else {
+              const lang = await languageForGPT();
+              progLanguage = lang.lang;
+            }
+            let filePath;
+            if (options.filepath) {
+              filePath = options.filepath;
+            } else {
+              const path = await filePathForGPT();
+              filePath = path.inputpath;
+            }
+            await transpileCode(progLanguage, filePath);
+          } else if (options.command == CommandEnum.TEST) {
+            let progLanguage;
+            if (options.language) {
+              progLanguage = options.language;
+            } else {
+              const lang = await languageForGPTTest();
+              progLanguage = lang.testlang;
+            }
+            let filePath;
+            if (options.filepath) {
+              filePath = options.filepath;
+            } else {
+              const path = await filePathForGPT();
+              filePath = path.inputpath;
+            }
+            await createTestCases(progLanguage, filePath);
+          }
+        }
       } catch (error) {
         console.log(error.message);
         process.exit(1);

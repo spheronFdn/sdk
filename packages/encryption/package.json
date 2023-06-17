@@ -1,7 +1,7 @@
 {
-  "name": "@spheron/storage",
-  "version": "1.0.18",
-  "description": "Typescript library for uploading files or directory to  IPFS, Filecoin or Arweave via Spheron",
+  "name": "@spheron/encryption",
+  "version": "1.0.0",
+  "description": "Typescript library for encrypting files",
   "keywords": [
     "Storage",
     "Typescript",
@@ -14,15 +14,13 @@
   ],
   "author": "Spheron Team",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",  
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsup",
-    "preinstall": "ts-node --esm ./src/preinstall.ts",
+    "build": "tsc --declaration --declarationDir dist",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "prettier:write": "prettier --write '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
     "prettier:check": "prettier --check '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
-    "lint": "eslint . --ext .ts",
-    "test": "ts-node test.ts"
+    "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
     "@types/node": "^18.13.0",
@@ -30,29 +28,15 @@
     "@typescript-eslint/parser": "^5.51.0",
     "eslint": "^8.33.0",
     "prettier": "^2.8.3",
-    "tsup": "^6.5.0",
     "typescript": "^4.9.5"
   },
   "files": [
-    "dist/",
-    "lib/generate-car/generate-car",
-    "src/preinstall.ts"
+    "dist/"
   ],
-  "dependencies": {
-    "@spheron/core": "1.0.6",    
-    "cids": "^1.1.9",
-    "download-git-repo": "^3.0.2",    
-    "@spheron/encryption": "1.0.0",
-    "form-data": "^4.0.0",
-    "multiformats": "^9.9.0"
-  },  
+  "dependencies": {},
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/spheronFdn/sdk.git"
-  },
-  "bugs": {
-    "url": "https://github.com/spheronFdn/sdk/issues"
-  },
-  "homepage": "https://github.com/spheronFdn/sdk#readme"
+  }
 }

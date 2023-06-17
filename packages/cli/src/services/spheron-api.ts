@@ -12,6 +12,8 @@ import {
 } from "@spheron/core";
 import configuration from "../configuration";
 import { readFromJsonFile } from "../utils";
+import { IGPTResponse } from "../commands/gpt";
+import Spinner from "../outputs/spinner";
 
 const SpheronApiService = {
   async initialize(): Promise<SpheronApi> {
@@ -144,6 +146,44 @@ const SpheronApiService = {
     const deploymentEnvironments: DeploymentEnvironment[] =
       await client.getDeploymentEnvironments(projectId);
     return deploymentEnvironments;
+  },
+
+  async isWhitelisted(): Promise<any> {
+    const client: any = await this.initialize();
+    if (!client.token) {
+      return { response: "" };
+    }
+    const response = await client.isWhitelisted();
+    return response;
+  },
+
+  async generateCode(
+    spinner: Spinner,
+    spinnerMessage: string,
+    type: string,
+    query: string,
+    file?: string,
+    lang?: string
+  ): Promise<IGPTResponse> {
+    const client: any = await this.initialize();
+    if (!client.token) {
+      return { response: "" };
+    }
+    spinner.spin(spinnerMessage);
+    const params: {
+      type: string;
+      query: string;
+      file?: string;
+      lang?: string;
+    } = {
+      type,
+      query,
+      ...(file && { file }),
+      ...(lang && { lang }),
+    };
+    const gptResponse: IGPTResponse = await client.getGPTResponse(params);
+
+    return gptResponse;
   },
 };
 
