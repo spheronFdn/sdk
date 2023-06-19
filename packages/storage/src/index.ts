@@ -383,6 +383,18 @@ export class SpheronClient {
     );
   }
 
+  async getCdnDnsRecords(): Promise<{
+    cdnARecords: string;
+    cdnCnameRecords: string;
+  }> {
+    const { recordIpv4V2, recordCnameV2 } =
+      await this.spheronApi.getCdnRecords();
+    return {
+      cdnARecords: recordIpv4V2,
+      cdnCnameRecords: recordCnameV2,
+    };
+  }
+
   async deleteBucketDomain(
     bucketId: string,
     domainIdentifier: string
