@@ -164,9 +164,9 @@ import { CommandEnum } from "./commands/gpt";
         Examples:
           - gpt                         : options: --prompt, --filepath (optional)
           - gpt update                  : options: --prompt, --filepath
-          - gpt findbug                 : options: --filepath
+          - gpt findbugs                : options: --filepath
           - gpt improve                 : options: --filepath
-          - gpt transpile               : options: --language, --filepath
+          - gpt transpile               : options: --filepath, --language
           - gpt ctc                     : options: --filepath 
         `);
       }

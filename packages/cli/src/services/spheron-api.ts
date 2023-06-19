@@ -151,10 +151,20 @@ const SpheronApiService = {
   async isWhitelisted(): Promise<any> {
     const client: any = await this.initialize();
     if (!client.token) {
-      return { response: "" };
+      return {
+        error: true,
+        message: "Unauthorized. You need to login first using 'spheron login'.",
+      };
     }
-    const response = await client.isWhitelisted();
-    return response;
+    try {
+      const response = await client.isWhitelisted();
+      return response;
+    } catch (error) {
+      return {
+        error: true,
+        message: "Unauthorized. You need to login first using 'spheron login'.",
+      };
+    }
   },
 
   async generateCode(

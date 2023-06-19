@@ -5,7 +5,7 @@ import { ResourceEnum, ResourceFetcher } from "./commands/get-resources";
 import {
   CommandEnum,
   createTestCases,
-  findBugInCode,
+  findBugsInCode,
   generateCode,
   generateCodeBasedOnFile,
   improveCode,
@@ -315,7 +315,7 @@ export async function commandHandler(options: any) {
     }
     const isWhitelisted = await SpheronApiService.isWhitelisted();
     // check if the user is whitelisted
-    if (isWhitelisted.error) {
+    if (!isWhitelisted.whitelisted) {
       console.log(`✖️  Error: ${isWhitelisted.message}`);
       process.exit(1);
     }
@@ -350,7 +350,7 @@ export async function commandHandler(options: any) {
               filePath = path.inputpath;
             }
             await updateCode(gptPrompt, filePath);
-          } else if (options.command == CommandEnum.FINDBUG) {
+          } else if (options.command == CommandEnum.FINDBUGS) {
             let filePath;
             if (options.filepath) {
               filePath = options.filepath;
@@ -358,7 +358,7 @@ export async function commandHandler(options: any) {
               const path = await filePathForGPT();
               filePath = path.inputpath;
             }
-            await findBugInCode(filePath);
+            await findBugsInCode(filePath);
           } else if (options.command == CommandEnum.IMPROVE) {
             let filePath;
             if (options.filepath) {

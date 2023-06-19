@@ -6,7 +6,7 @@ import { fixBugForGPT } from "../prompts/prompts";
 
 export enum CommandEnum {
   UPDATE = "update",
-  FINDBUG = "findbug",
+  FINDBUGS = "findbugs",
   IMPROVE = "improve",
   TRANSPILE = "transpile",
   TEST = "ctc",
@@ -169,7 +169,7 @@ export async function updateCode(prompt: string, filepath: any) {
   }
 }
 
-export async function findBugInCode(filepath: any) {
+export async function findBugsInCode(filepath: any) {
   const spinner = new Spinner();
   const spinnerMessage = "Searching for bugs in your code \uD83D\uDC1B ...";
 
