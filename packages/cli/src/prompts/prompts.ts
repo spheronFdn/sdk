@@ -210,6 +210,17 @@ export async function languageForGPT(): Promise<any> {
   return inquirer.prompt(questions);
 }
 
+export async function languageForGPTTest(): Promise<any> {
+  const questions = [
+    {
+      type: "input",
+      name: "testlang",
+      message: "Programming Language for creating test cases:",
+    },
+  ];
+  return inquirer.prompt(questions);
+}
+
 const templateTypes = Array.from(templateTypesMap.values()).map((t) => ({
   name: t.alias,
   value: t.dapps,
