@@ -161,13 +161,13 @@ import { CommandEnum } from "./commands/gpt";
         yargs.version(false).wrap(150).help();
         yargs.epilogue(`Custom help text for 'gpt <command>' command.
 
-        Examples:
-          - gpt                         : options: --prompt, --filepath (optional)
-          - gpt update                  : options: --prompt, --filepath
-          - gpt findbugs                : options: --filepath
-          - gpt improve                 : options: --filepath
-          - gpt transpile               : options: --filepath, --language
-          - gpt ctc                     : options: --filepath 
+Examples:
+  - gpt            : Generate code          : options: --prompt, --filepath (optional)
+  - gpt update     : Update code            : options: --prompt, --filepath
+  - gpt findbugs   : Debug code             : options: --filepath
+  - gpt improve    : Optimise code          : options: --filepath
+  - gpt transpile  : Transpile code         : options: --filepath, --language
+  - gpt ctc        : Generate test cases    : options: --filepath                      
         `);
       }
     ).argv;
