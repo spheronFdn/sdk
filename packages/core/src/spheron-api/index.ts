@@ -163,6 +163,22 @@ class SpheronApi {
     );
   }
 
+  async getCdnRecords(): Promise<{
+    recordIpv4V2: string;
+    recordCnameV2: string;
+  }> {
+    // the project id is always 1 because it is required, but it is not used in the api
+    const response = await this.sendApiRequest<{
+      records: {
+        recordIpv4V2: string;
+        recordCnameV2: string;
+      };
+    }>(HttpMethods.GET, `/v1/project/1/domains/cdn-records`);
+    return {
+      ...response.records,
+    };
+  }
+
   //#endregion Project Domains
 
   async getProjectDeploymentCount(projectId: string): Promise<{

@@ -1,6 +1,6 @@
 {
   "name": "@spheron/storage",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "Typescript library for uploading files or directory to  IPFS, Filecoin or Arweave via Spheron",
   "keywords": [
     "Storage",
@@ -39,9 +39,9 @@
     "src/preinstall.ts"
   ],
   "dependencies": {
-    "@spheron/core": "1.0.6",    
+    "@spheron/core": "1.0.9",    
     "cids": "^1.1.9",
-    "download-git-repo": "^3.0.2",    
+    "download-git-repo": "^3.0.2",        
     "@spheron/encryption": "1.0.0",
     "form-data": "^4.0.0",
     "multiformats": "^9.9.0"
