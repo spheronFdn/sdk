@@ -13,7 +13,6 @@ download('github:tech-greedy/generate-car', goCodePath, (err: Error | null) => {
 
   // Compile the Go code into a binary
   const goBuild = spawnSync('make', ['build'], { cwd: goCodePath });
-  //const goBuild = spawnSync('go', ['build', '-ldflags',"-s -w",'-o', 'generate-car', goCodePath+'cmd/generate-car/generate-car.go'], { cwd: goCodePath });
 
   if (goBuild.error) {
     console.error('Failed to compile Go code:', goBuild.error.message);
