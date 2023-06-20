@@ -3,7 +3,6 @@ import { spawnSync } from 'child_process';
 const download = require('download-git-repo');
 
 const goCodePath = './lib/generate-car/';
-const goBinaryPath = './lib/generate-car/';
 
 // Download the Go code from GitHub
 download('github:tech-greedy/generate-car', goCodePath, (err: Error | null) => {
