@@ -126,7 +126,7 @@ const execute = (cmd : any) => {
 
 const processCarFile = async (
   filepath: string
-) => {
+): Promise<any> => {
   const fileDir = path.dirname(filepath)
   const binaryPath = path.relative(".", "node_modules/@spheron/storage/lib/generate-car/generate-car")  
   //console.log(binaryPath)
