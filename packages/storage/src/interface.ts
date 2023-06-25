@@ -59,3 +59,11 @@ export interface DecryptFromIpfsProps {
   // An instance of LitNodeClient that is already connected
   litNodeClient: any;
 }
+
+export interface DealDataResult {
+  pieceSize: number;
+  size: number;
+  pieceCid: string;
+  dataCid: string;
+  carLink: string;
+}
