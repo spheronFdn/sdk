@@ -483,6 +483,19 @@ interface ComputeMachine {
   topupThreashold: number;
 }
 
+enum BucketStateEnum {
+  MAINTAINED = "MAINTAINED",
+  ARCHIVED = "ARCHIVED",
+}
+
+interface Bucket extends Document {
+  _id: string;
+  name: string;
+  organization: string;
+  createdBy: string;
+  state: BucketStateEnum;
+}
+
 export {
   TokenScope,
   Project,
@@ -519,4 +532,6 @@ export {
   HealthCheck,
   MachineImageType,
   InstanceOrderLogs,
+  Bucket,
+  BucketStateEnum,
 };

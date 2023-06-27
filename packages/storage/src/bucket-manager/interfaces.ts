@@ -1,4 +1,4 @@
-import { DomainTypeEnum, ProjectStateEnum } from "@spheron/core";
+import { BucketStateEnum, DomainTypeEnum } from "@spheron/core";
 
 interface Domain {
   id: string;
@@ -9,14 +9,11 @@ interface Domain {
   type: DomainTypeEnum;
 }
 
-type BucketStateEnum = ProjectStateEnum;
-
 interface Bucket {
   id: string;
   name: string;
   organizationId: string;
   state: BucketStateEnum;
-  domains: Domain[];
 }
 
 enum UploadStatusEnum {

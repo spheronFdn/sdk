@@ -1,8 +1,8 @@
 import {
   DomainTypeEnum,
   ProjectStateEnum,
-  ProjectTypeEnum,
   SpheronApi,
+  Bucket as CoreBucket,
 } from "@spheron/core";
 import {
   Bucket,
@@ -11,7 +11,7 @@ import {
   BucketStateEnum,
   UploadStatusEnum,
 } from "./interfaces";
-import { Deployment, Domain as ProjectDomain, Project } from "@spheron/core";
+import { Deployment, Domain as ProjectDomain } from "@spheron/core";
 
 class BucketManager {
   private readonly spheronApi: SpheronApi;
@@ -21,11 +21,8 @@ class BucketManager {
   }
 
   async getBucket(bucketId: string): Promise<Bucket> {
-    const project = await this.spheronApi.getProject(bucketId);
-    if (project.type !== ProjectTypeEnum.UPLOAD) {
-      throw new Error(`Project with id '${bucketId}' is not a bucket.`);
-    }
-    return this.mapProjectToBucket(project);
+    const bucket = await this.spheronApi.getBucket(bucketId);
+    return this.mapCoreBucket(bucket);
   }
 
   async getBucketDomains(bucketId: string): Promise<Domain[]> {
@@ -142,15 +139,12 @@ class BucketManager {
     return this.mapDeploymentToUpload(deployment);
   }
 
-  private mapProjectToBucket(project: Project): Bucket {
+  private mapCoreBucket(bucket: CoreBucket): Bucket {
     return {
-      id: project._id,
-      name: project.name,
-      organizationId: project.organization,
-      state: project.state,
-      domains: project.domains?.map((x) =>
-        this.mapProjectDomainToBucketDomain(x)
-      ),
+      id: bucket._id,
+      name: bucket.name,
+      organizationId: bucket.organization,
+      state: bucket.state,
     };
   }
 

@@ -35,6 +35,7 @@ import {
   MarketplaceApp,
   ComputeMachine,
   InstanceOrderLogs,
+  Bucket,
 } from "./interfaces";
 import {
   CreateInstanceFromMarketplaceRequest,
@@ -47,7 +48,9 @@ import {
 } from "./response-interfaces";
 
 class SpheronApi {
-  private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
+  // private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
+  private readonly spheronApiUrl: string = "http://localhost:8080";
+
   private readonly token: string;
 
   constructor(token: string, url?: string) {
@@ -984,6 +987,17 @@ class SpheronApi {
 
     return response;
   }
+
+  //#region Bucket API
+
+  async getBucket(bucketId: string): Promise<Bucket> {
+    return this.sendApiRequest<Bucket>(
+      HttpMethods.GET,
+      `/v1/bucket/${bucketId}`
+    );
+  }
+
+  //#endregion
 
   private async sendApiRequest<T>(
     method: HttpMethods,
