@@ -1,6 +1,5 @@
 import {
   DomainTypeEnum,
-  ProjectStateEnum,
   SpheronApi,
   Bucket as CoreBucket,
 } from "@spheron/core";
@@ -121,16 +120,13 @@ class BucketManager {
   }
 
   async archiveBucket(bucketId: string): Promise<void> {
-    await this.spheronApi.updateProjectState(
-      bucketId,
-      ProjectStateEnum.ARCHIVED
-    );
+    await this.spheronApi.updateBucketState(bucketId, BucketStateEnum.ARCHIVED);
   }
 
   async unarchiveBucket(bucketId: string): Promise<void> {
-    await this.spheronApi.updateProjectState(
+    await this.spheronApi.updateBucketState(
       bucketId,
-      ProjectStateEnum.MAINTAINED
+      BucketStateEnum.MAINTAINED
     );
   }
 

@@ -36,6 +36,7 @@ import {
   ComputeMachine,
   InstanceOrderLogs,
   Bucket,
+  BucketStateEnum,
 } from "./interfaces";
 import {
   CreateInstanceFromMarketplaceRequest,
@@ -994,6 +995,17 @@ class SpheronApi {
     return this.sendApiRequest<Bucket>(
       HttpMethods.GET,
       `/v1/bucket/${bucketId}`
+    );
+  }
+
+  async updateBucketState(
+    bucketId: string,
+    state: BucketStateEnum
+  ): Promise<Bucket> {
+    return this.sendApiRequest<Bucket>(
+      HttpMethods.PATCH,
+      `/v1/bucket/${bucketId}/state`,
+      { state }
     );
   }
 
