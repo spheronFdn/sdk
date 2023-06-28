@@ -39,28 +39,62 @@ class InstanceManager {
   async create(
     creationConfig: InstanceCreationConfig
   ): Promise<InstanceResponse> {
-    const organizationId = await this.utils.getOrganizationId();
-
-    const computeMachines = await this.spheronApi.getComputeMachines({
-      skip: 0,
-      limit: 10,
-    });
-    const computeMachine = computeMachines.find(
-      (m) => m._id === creationConfig.configuration.machineImageId
-    );
-
-    if (!computeMachine) {
+    if (
+      creationConfig.configuration.machineImageId &&
+      creationConfig.configuration.customSpecs
+    ) {
       throw new Error(
-        `Compute machine with id ${creationConfig.configuration.machineImageId} not found!`
+        `Custom specification cannot be applied when machine image is specified!`
       );
     }
 
+    if (creationConfig.configuration.customSpecs) {
+      const validValues = [0.5, 1, 2, 4, 8, 16, 32];
+      if (!validValues.includes(creationConfig.configuration.customSpecs.cpu)) {
+        throw new Error(
+          `Cpu must have one of following values: ${JSON.stringify(
+            validValues
+          )}!`
+        );
+      }
+      if (
+        !validValues.includes(creationConfig.configuration.customSpecs.memory)
+      ) {
+        throw new Error(
+          `Memory must have one of following values: ${JSON.stringify(
+            validValues
+          )}!`
+        );
+      }
+    }
+
+    const organizationId = await this.utils.getOrganizationId();
+    let machineName;
+
+    console.log(JSON.stringify(creationConfig));
+
+    if (creationConfig.configuration.machineImageId) {
+      console.log("asdasdasdas", creationConfig.configuration.machineImageId);
+
+      const computeMachines = await this.spheronApi.getComputeMachines({
+        skip: 0,
+        limit: 10,
+      });
+      const computeMachine = computeMachines.find(
+        (m) => m._id === creationConfig.configuration.machineImageId
+      );
+
+      if (!computeMachine) {
+        throw new Error(
+          `Compute machine with id ${creationConfig.configuration.machineImageId} not found!`
+        );
+      }
+
+      machineName = computeMachine.name;
+    }
+
     const response = await this.spheronApi.createClusterInstance(
-      mapCreateInstanceRequest(
-        creationConfig,
-        organizationId,
-        computeMachine.name
-      )
+      mapCreateInstanceRequest(creationConfig, organizationId, machineName)
     );
     return mapInstanceResponse(response);
   }
@@ -144,6 +178,30 @@ class InstanceManager {
   async createFromMarketplace(
     createConfig: MarketplaceInstanceCreationConfig
   ): Promise<MarketplaceInstanceResponse> {
+    if (createConfig.machineImageId && createConfig.customSpecs) {
+      throw new Error(
+        `Custom specification cannot be applied when machine image is specified!`
+      );
+    }
+
+    if (createConfig.customSpecs) {
+      const validValues = [0.5, 1, 2, 4, 8, 16, 32];
+      if (!validValues.includes(createConfig.customSpecs.cpu)) {
+        throw new Error(
+          `Cpu must have one of following values: ${JSON.stringify(
+            validValues
+          )}!`
+        );
+      }
+      if (!validValues.includes(createConfig.customSpecs.memory)) {
+        throw new Error(
+          `Memory must have one of following values: ${JSON.stringify(
+            validValues
+          )}!`
+        );
+      }
+    }
+
     const organizationId = await this.utils.getOrganizationId();
 
     const response = await this.spheronApi.createClusterInstanceFromTemplate(

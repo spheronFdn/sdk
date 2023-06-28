@@ -213,7 +213,7 @@ const mapInstanceDeployment = (
 const mapCreateInstanceRequest = (
   input: InstanceCreationConfig,
   organizationId: string,
-  machineImageName: string
+  machineImageName?: string
 ): CreateInstanceRequest => {
   return {
     organizationId,
@@ -223,7 +223,7 @@ const mapCreateInstanceRequest = (
       protocol: ClusterProtocolEnum.AKASH,
       image: input.configuration.image,
       tag: input.configuration.tag,
-      instanceCount: 1,
+      instanceCount: input.configuration.replicas,
       buildImage: false,
       ports: input.configuration.ports,
       env: [
@@ -233,7 +233,19 @@ const mapCreateInstanceRequest = (
       command: input.configuration.commands,
       args: input.configuration.args,
       region: input.configuration.region,
-      akashMachineImageName: machineImageName,
+      akashMachineImageName: machineImageName ?? "",
+      customInstanceSpecs: {
+        storage: `${input.configuration.storage}Gi`,
+        persistentStorage: input.configuration.persistentStorage && {
+          size: `${input.configuration.persistentStorage.size}Gi`,
+          class: input.configuration.persistentStorage.class,
+          mountPoint: input.configuration.persistentStorage.mountPoint,
+        },
+        cpu: input.configuration.customSpecs?.cpu,
+        memory: input.configuration.customSpecs?.memory
+          ? `${input.configuration.customSpecs.memory}Gi`
+          : undefined,
+      },
     },
     clusterUrl: input.configuration.image,
     clusterProvider: ProviderEnum.DOCKERHUB,
@@ -258,9 +270,22 @@ const mapMarketplaceInstanceCreationConfig = (
       }
     ),
     organizationId: organizationId,
-    akashImageId: input.machineImageId,
+    akashImageId: input.machineImageId ?? "",
     uniqueTopicId: uuidv4(),
     region: input.region,
+    instanceCount: input.replicas,
+    customInstanceSpecs: {
+      storage: `${input.storage}Gi`,
+      persistentStorage: input.persistentStorage && {
+        size: `${input.persistentStorage.size}Gi`,
+        class: input.persistentStorage.class,
+        mountPoint: input.persistentStorage.mountPoint,
+      },
+      cpu: input.customSpecs?.cpu,
+      memory: input.customSpecs?.memory
+        ? `${input.customSpecs.memory}Gi`
+        : undefined,
+    },
   };
 };
 

@@ -11,6 +11,7 @@ import {
   Port,
   HealthStatusEnum,
   PersistentStorage,
+  PersistentStorageClassEnum,
 } from "@spheron/core";
 
 interface Organization {
@@ -145,7 +146,18 @@ interface InstanceCreationConfig {
     commands: Array<string>;
     args: Array<string>;
     region: string;
-    machineImageId: string;
+    machineImageId?: string;
+    storage: number;
+    persistentStorage?: {
+      size: number;
+      class: PersistentStorageClassEnum;
+      mountPoint: string;
+    };
+    customSpecs?: {
+      cpu: number;
+      memory: number;
+    };
+    replicas: number;
   };
   clusterName: string;
   healthCheckConfig?: {
@@ -162,8 +174,19 @@ interface EnvironmentVariable {
 interface MarketplaceInstanceCreationConfig {
   marketplaceAppId: string;
   environmentVariables: EnvironmentVariable[];
-  machineImageId: string;
+  machineImageId?: string;
   region: string;
+  storage: number;
+  customSpecs?: {
+    cpu: number;
+    memory: number;
+  };
+  persistentStorage?: {
+    size: number;
+    class: PersistentStorageClassEnum;
+    mountPoint: string;
+  };
+  replicas: number;
 }
 
 interface InstanceResponse {
@@ -237,6 +260,7 @@ export {
   ClusterProtocolEnum,
   ProviderEnum,
   InstanceStateEnum,
+  PersistentStorageClassEnum,
   InstanceCreationConfig,
   InstanceUpdateConfig,
   EnvironmentVariable as EnvironmentVar,
