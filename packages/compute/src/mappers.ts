@@ -107,12 +107,14 @@ const mapClusterInstance = (input: InstanceCore): Instance => {
       machineName: input.agreedMachineImageType.machineType,
       agreementDate: input.agreedMachineImageType.agreementDate,
     },
-    healthCheck: {
-      path: input.healthCheck.url,
-      port: input.healthCheck.port,
-      status: input.healthCheck.status,
-      timestamp: input.healthCheck.timestamp,
-    },
+    healthCheck: input.healthCheck
+      ? {
+          path: input.healthCheck?.url,
+          port: input.healthCheck?.port,
+          status: input.healthCheck?.status,
+          timestamp: input.healthCheck?.timestamp,
+        }
+      : undefined,
     createdAt: input.createdAt,
     updatedAt: input.updatedAt,
   };
@@ -198,11 +200,36 @@ const mapInstanceDeployment = (
         agreementDate:
           input.clusterInstanceConfiguration.agreedMachineImage.agreementDate,
         cpu: input.clusterInstanceConfiguration.agreedMachineImage.cpu,
-        memory: input.clusterInstanceConfiguration.agreedMachineImage.memory,
-        storage: input.clusterInstanceConfiguration.agreedMachineImage.storage,
-        persistentStorage:
-          input.clusterInstanceConfiguration.agreedMachineImage
-            .persistentStorage,
+        memory: input.clusterInstanceConfiguration.agreedMachineImage.memory
+          ? Number(
+              input.clusterInstanceConfiguration.agreedMachineImage.memory.split(
+                "Gi"
+              )[0]
+            )
+          : undefined,
+        storage: input.clusterInstanceConfiguration.agreedMachineImage.storage
+          ? Number(
+              input.clusterInstanceConfiguration.agreedMachineImage.storage.split(
+                "Gi"
+              )[0]
+            )
+          : undefined,
+        persistentStorage: input.clusterInstanceConfiguration.agreedMachineImage
+          .persistentStorage
+          ? {
+              size: Number(
+                input.clusterInstanceConfiguration.agreedMachineImage.persistentStorage.size.split(
+                  "Gi"
+                )[0]
+              ),
+              class:
+                input.clusterInstanceConfiguration.agreedMachineImage
+                  .persistentStorage.class,
+              mountPoint:
+                input.clusterInstanceConfiguration.agreedMachineImage
+                  .persistentStorage.mountPoint,
+            }
+          : undefined,
       },
     },
     connectionUrls: urlList,

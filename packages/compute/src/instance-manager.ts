@@ -71,11 +71,7 @@ class InstanceManager {
     const organizationId = await this.utils.getOrganizationId();
     let machineName;
 
-    console.log(JSON.stringify(creationConfig));
-
     if (creationConfig.configuration.machineImageId) {
-      console.log("asdasdasdas", creationConfig.configuration.machineImageId);
-
       const computeMachines = await this.spheronApi.getComputeMachines({
         skip: 0,
         limit: 10,

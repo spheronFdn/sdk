@@ -830,7 +830,7 @@ class SpheronApi {
   async addClusterInstanceDomain(
     instanceId: string,
     doamin: {
-      link?: string;
+      link: string;
       type: DomainTypeEnum | string;
       name: string;
     }

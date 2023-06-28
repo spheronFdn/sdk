@@ -63,7 +63,7 @@ interface Instance {
   cluster: string;
   activeDeployment: string;
   agreedMachine: MachineImageType;
-  healthCheck: HealthCheck;
+  healthCheck?: HealthCheck;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -131,9 +131,13 @@ interface MachineImageType {
   machineName: string;
   agreementDate: number;
   cpu?: number;
-  memory?: string;
-  storage?: string;
-  persistentStorage?: PersistentStorage;
+  memory?: number;
+  storage?: number;
+  persistentStorage?: {
+    size: number;
+    class: PersistentStorageClassEnum;
+    mountPoint: string;
+  };
 }
 
 interface InstanceCreationConfig {
@@ -233,8 +237,8 @@ interface InstancesInfo {
 }
 
 enum DomainTypeEnum {
-  DOMAIN,
-  SUBDOMAIN,
+  DOMAIN = "domain",
+  SUBDOMAIN = "subdomain",
 }
 
 export {
