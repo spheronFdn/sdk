@@ -1035,7 +1035,18 @@ class SpheronApi {
     }>(HttpMethods.GET, `/v1/bucket/${bucketId}/uploads/count`);
   }
 
-  //#endregion
+  //#endregion Bucket API
+
+  //#region Upload API
+
+  async getUpload(uploadId: string): Promise<Upload> {
+    const { upload } = await this.sendApiRequest<{
+      upload: Upload;
+    }>(HttpMethods.GET, `/v1/upload/${uploadId}`);
+    return upload;
+  }
+
+  //#region Upload API
 
   private async sendApiRequest<T>(
     method: HttpMethods,

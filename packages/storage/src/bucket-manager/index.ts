@@ -126,8 +126,8 @@ class BucketManager {
   }
 
   async getUpload(uploadId: string): Promise<Upload> {
-    const deployment = await this.spheronApi.getDeployment(uploadId);
-    return this.mapDeploymentToUpload(deployment);
+    const upload = await this.spheronApi.getUpload(uploadId);
+    return this.mapCoreUpload(upload);
   }
 
   private mapCoreBucket(bucket: CoreBucket): Bucket {
@@ -159,18 +159,6 @@ class BucketManager {
       memoryUsed: upload.memoryUsed,
       bucketId: upload.bucket,
       protocol: upload.protocol,
-    };
-  }
-
-  private mapDeploymentToUpload(deployment: Deployment): Upload {
-    return {
-      id: deployment._id,
-      protocolLink: deployment.sitePreview,
-      uploadDirectory: deployment.buildDirectory,
-      status: deployment.status as unknown as UploadStatusEnum,
-      memoryUsed: deployment.memoryUsed,
-      bucketId: deployment.project?._id ?? deployment.project,
-      protocol: deployment.protocol,
     };
   }
 }
