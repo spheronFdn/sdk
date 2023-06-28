@@ -37,6 +37,7 @@ import {
   InstanceOrderLogs,
   Bucket,
   BucketStateEnum,
+  Upload,
 } from "./interfaces";
 import {
   CreateInstanceFromMarketplaceRequest,
@@ -1007,6 +1008,31 @@ class SpheronApi {
       `/v1/bucket/${bucketId}/state`,
       { state }
     );
+  }
+
+  async getBucketUploads(
+    bucketId: string,
+    options: {
+      skip: number;
+      limit: number;
+    }
+  ): Promise<{ uploads: Upload[] }> {
+    if (options.skip < 0 || options.limit < 0) {
+      throw new Error(`Skip and Limit cannot be negative numbers.`);
+    }
+    const uploads = await this.sendApiRequest<Upload[]>(
+      HttpMethods.GET,
+      `/v1/bucket/${bucketId}/uploads?skip=${options.skip}&limit=${options.limit}`
+    );
+    return { uploads };
+  }
+
+  async getBucketUploadCount(bucketId: string): Promise<{
+    count: number;
+  }> {
+    return await this.sendApiRequest<{
+      count: number;
+    }>(HttpMethods.GET, `/v1/bucket/${bucketId}/uploads/count`);
   }
 
   //#endregion

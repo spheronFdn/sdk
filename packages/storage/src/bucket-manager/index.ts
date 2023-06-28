@@ -1,6 +1,7 @@
 import {
   DomainTypeEnum,
   SpheronApi,
+  Upload as CoreUpload,
   Bucket as CoreBucket,
 } from "@spheron/core";
 import {
@@ -99,24 +100,18 @@ class BucketManager {
     if (options.skip < 0 || options.limit < 0) {
       throw new Error(`Skip and Limit cannot be negative numbers.`);
     }
-    const { deployments } = await this.spheronApi.getProjectDeployments(
-      bucketId,
-      {
-        skip: options.skip && options.skip >= 0 ? options.skip : 0,
-        limit: options.limit && options.limit >= 0 ? options.limit : 6,
-      }
-    );
+    const { uploads } = await this.spheronApi.getBucketUploads(bucketId, {
+      skip: options.skip && options.skip >= 0 ? options.skip : 0,
+      limit: options.limit && options.limit >= 0 ? options.limit : 6,
+    });
 
-    return deployments.map((x) => this.mapDeploymentToUpload(x));
+    return uploads.map((x) => this.mapCoreUpload(x));
   }
 
   async getBucketUploadCount(bucketId: string): Promise<{
-    total: number;
-    successful: number;
-    failed: number;
-    pending: number;
+    count: number;
   }> {
-    return await this.spheronApi.getProjectDeploymentCount(bucketId);
+    return await this.spheronApi.getBucketUploadCount(bucketId);
   }
 
   async archiveBucket(bucketId: string): Promise<void> {
@@ -155,11 +150,23 @@ class BucketManager {
     };
   }
 
+  private mapCoreUpload(upload: CoreUpload): Upload {
+    return {
+      id: upload._id,
+      protocolLink: upload.protocolLink,
+      uploadDirectory: upload.uploadDirectory,
+      status: upload.status,
+      memoryUsed: upload.memoryUsed,
+      bucketId: upload.bucket,
+      protocol: upload.protocol,
+    };
+  }
+
   private mapDeploymentToUpload(deployment: Deployment): Upload {
     return {
       id: deployment._id,
       protocolLink: deployment.sitePreview,
-      buildDirectory: deployment.buildDirectory,
+      uploadDirectory: deployment.buildDirectory,
       status: deployment.status as unknown as UploadStatusEnum,
       memoryUsed: deployment.memoryUsed,
       bucketId: deployment.project?._id ?? deployment.project,

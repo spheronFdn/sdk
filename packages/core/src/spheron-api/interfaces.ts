@@ -496,6 +496,25 @@ interface Bucket extends Document {
   state: BucketStateEnum;
 }
 
+enum UploadStatusEnum {
+  IN_PROGRESS = "InProgress",
+  CANCELED = "Canceled",
+  UPLOADED = "Uploaded",
+  FAILED = "Failed",
+  TIMED_OUT = "TimedOut",
+}
+
+interface Upload {
+  _id: string;
+  protocolLink: string;
+  uploadDirectory: string[];
+  status: UploadStatusEnum;
+  memoryUsed: number;
+  bucket: string;
+  uploadInitiator: string;
+  protocol: ProtocolEnum;
+}
+
 export {
   TokenScope,
   Project,
@@ -534,4 +553,6 @@ export {
   InstanceOrderLogs,
   Bucket,
   BucketStateEnum,
+  UploadStatusEnum,
+  Upload,
 };

@@ -1,4 +1,8 @@
-import { BucketStateEnum, DomainTypeEnum } from "@spheron/core";
+import {
+  BucketStateEnum,
+  DomainTypeEnum,
+  UploadStatusEnum,
+} from "@spheron/core";
 
 interface Domain {
   id: string;
@@ -16,18 +20,10 @@ interface Bucket {
   state: BucketStateEnum;
 }
 
-enum UploadStatusEnum {
-  PENDING = "Pending",
-  CANCELED = "Canceled",
-  DEPLOYED = "Deployed",
-  FAILED = "Failed",
-  TIMED_OUT = "TimedOut",
-}
-
 interface Upload {
   id: string;
   protocolLink: string;
-  buildDirectory: string[];
+  uploadDirectory: string[];
   status: UploadStatusEnum;
   memoryUsed: number;
   bucketId: string;

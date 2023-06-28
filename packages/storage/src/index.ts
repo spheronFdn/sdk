@@ -439,10 +439,7 @@ export class SpheronClient {
   }
 
   async getBucketUploadCount(bucketId: string): Promise<{
-    total: number;
-    successful: number;
-    failed: number;
-    pending: number;
+    count: number;
   }> {
     return await this.bucketManager.getBucketUploadCount(bucketId);
   }
