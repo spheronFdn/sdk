@@ -68,6 +68,21 @@ class InstanceManager {
       }
     }
 
+    if (
+      creationConfig.configuration.persistentStorage &&
+      (creationConfig.configuration.persistentStorage.size > 1024 ||
+        creationConfig.configuration.persistentStorage.size < 1)
+    ) {
+      throw new Error(`Persistent storage must be number between 1 and 1024!`);
+    }
+
+    if (
+      creationConfig.configuration.storage > 1024 ||
+      creationConfig.configuration.storage < 1
+    ) {
+      throw new Error(`Instance storage must be number between 1 and 1024!`);
+    }
+
     const organizationId = await this.utils.getOrganizationId();
     let machineName;
 
@@ -196,6 +211,18 @@ class InstanceManager {
           )}!`
         );
       }
+    }
+
+    if (
+      createConfig.persistentStorage &&
+      (createConfig.persistentStorage.size > 1024 ||
+        createConfig.persistentStorage.size < 1)
+    ) {
+      throw new Error(`Persistent storage must be number between 1 and 1024!`);
+    }
+
+    if (createConfig.storage > 1024 || createConfig.storage < 1) {
+      throw new Error(`Instance storage must be number between 1 and 1024!`);
     }
 
     const organizationId = await this.utils.getOrganizationId();

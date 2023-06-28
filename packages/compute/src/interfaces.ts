@@ -130,9 +130,9 @@ interface InstanceDeployment {
 interface MachineImageType {
   machineName: string;
   agreementDate: number;
-  cpu?: number;
-  memory?: number;
-  storage?: number;
+  cpu: number;
+  memory: number;
+  storage: number;
   persistentStorage?: {
     size: number;
     class: PersistentStorageClassEnum;
