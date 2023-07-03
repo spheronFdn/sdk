@@ -1,6 +1,7 @@
 import {
   SpheronApi,
   DomainTypeEnum as DomainTypeEnumCore,
+  PersistentStorageClassEnum,
 } from "@spheron/core";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -39,28 +40,31 @@ class InstanceManager {
   async create(
     creationConfig: InstanceCreationConfig
   ): Promise<InstanceResponse> {
+    this.checkCreationConfig(creationConfig.configuration);
+
     const organizationId = await this.utils.getOrganizationId();
+    let machineName;
 
-    const computeMachines = await this.spheronApi.getComputeMachines({
-      skip: 0,
-      limit: 10,
-    });
-    const computeMachine = computeMachines.find(
-      (m) => m._id === creationConfig.configuration.machineImageId
-    );
-
-    if (!computeMachine) {
-      throw new Error(
-        `Compute machine with id ${creationConfig.configuration.machineImageId} not found!`
+    if (creationConfig.configuration.machineImageId) {
+      const computeMachines = await this.spheronApi.getComputeMachines({
+        skip: 0,
+        limit: 10,
+      });
+      const computeMachine = computeMachines.find(
+        (m) => m._id === creationConfig.configuration.machineImageId
       );
+
+      if (!computeMachine) {
+        throw new Error(
+          `Compute machine with id ${creationConfig.configuration.machineImageId} not found!`
+        );
+      }
+
+      machineName = computeMachine.name;
     }
 
     const response = await this.spheronApi.createClusterInstance(
-      mapCreateInstanceRequest(
-        creationConfig,
-        organizationId,
-        computeMachine.name
-      )
+      mapCreateInstanceRequest(creationConfig, organizationId, machineName)
     );
     return mapInstanceResponse(response);
   }
@@ -144,6 +148,8 @@ class InstanceManager {
   async createFromMarketplace(
     createConfig: MarketplaceInstanceCreationConfig
   ): Promise<MarketplaceInstanceResponse> {
+    this.checkCreationConfig(createConfig);
+
     const organizationId = await this.utils.getOrganizationId();
 
     const response = await this.spheronApi.createClusterInstanceFromTemplate(
@@ -231,6 +237,70 @@ class InstanceManager {
       instanceId,
       uuidv4()
     );
+  }
+
+  private checkCreationConfig(configuration: {
+    machineImageId?: string;
+    storage: number;
+    customSpecs?: { cpu: number; memory: number };
+    replicas: number;
+    persistentStorage?: {
+      size: number;
+      class: PersistentStorageClassEnum;
+      mountPoint: string;
+    };
+  }) {
+    if (configuration.machineImageId && configuration.customSpecs) {
+      throw new Error(
+        `Custom specification cannot be applied when machine image is specified!`
+      );
+    }
+
+    if (configuration.replicas < 1) {
+      throw new Error(`Replication factor cannot be less than 1!`);
+    }
+
+    this.checkCustomSpecValues(configuration.customSpecs);
+    this.checkPersistentStorageValue(configuration.persistentStorage);
+
+    if (configuration.storage > 1024 || configuration.storage < 1) {
+      throw new Error(`Instance storage must be number between 1 and 1024!`);
+    }
+  }
+
+  private checkCustomSpecValues(
+    customSpecs: { cpu: number; memory: number } | undefined
+  ) {
+    if (!customSpecs) {
+      return;
+    }
+
+    const validValues = [0.5, 1, 2, 4, 8, 16, 32];
+    if (!validValues.includes(customSpecs.cpu)) {
+      throw new Error(
+        `Cpu must have one of following values: ${JSON.stringify(validValues)}!`
+      );
+    }
+    if (!validValues.includes(customSpecs.memory)) {
+      throw new Error(
+        `Memory must have one of following values: ${JSON.stringify(
+          validValues
+        )}!`
+      );
+    }
+  }
+
+  private checkPersistentStorageValue(
+    persistentStorage:
+      | { size: number; class: PersistentStorageClassEnum; mountPoint: string }
+      | undefined
+  ) {
+    if (
+      persistentStorage &&
+      (persistentStorage.size > 1024 || persistentStorage.size < 1)
+    ) {
+      throw new Error(`Persistent storage must be number between 1 and 1024!`);
+    }
   }
 }
 
