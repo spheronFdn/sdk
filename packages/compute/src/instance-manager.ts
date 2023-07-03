@@ -1,6 +1,7 @@
 import {
   SpheronApi,
   DomainTypeEnum as DomainTypeEnumCore,
+  PersistentStorageClassEnum,
 } from "@spheron/core";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -39,49 +40,9 @@ class InstanceManager {
   async create(
     creationConfig: InstanceCreationConfig
   ): Promise<InstanceResponse> {
-    if (
-      creationConfig.configuration.machineImageId &&
-      creationConfig.configuration.customSpecs
-    ) {
-      throw new Error(
-        `Custom specification cannot be applied when machine image is specified!`
-      );
-    }
+    console.log(JSON.stringify(creationConfig.configuration));
 
-    if (creationConfig.configuration.customSpecs) {
-      const validValues = [0.5, 1, 2, 4, 8, 16, 32];
-      if (!validValues.includes(creationConfig.configuration.customSpecs.cpu)) {
-        throw new Error(
-          `Cpu must have one of following values: ${JSON.stringify(
-            validValues
-          )}!`
-        );
-      }
-      if (
-        !validValues.includes(creationConfig.configuration.customSpecs.memory)
-      ) {
-        throw new Error(
-          `Memory must have one of following values: ${JSON.stringify(
-            validValues
-          )}!`
-        );
-      }
-    }
-
-    if (
-      creationConfig.configuration.persistentStorage &&
-      (creationConfig.configuration.persistentStorage.size > 1024 ||
-        creationConfig.configuration.persistentStorage.size < 1)
-    ) {
-      throw new Error(`Persistent storage must be number between 1 and 1024!`);
-    }
-
-    if (
-      creationConfig.configuration.storage > 1024 ||
-      creationConfig.configuration.storage < 1
-    ) {
-      throw new Error(`Instance storage must be number between 1 and 1024!`);
-    }
+    this.checkCreationConfig(creationConfig.configuration);
 
     const organizationId = await this.utils.getOrganizationId();
     let machineName;
@@ -189,41 +150,7 @@ class InstanceManager {
   async createFromMarketplace(
     createConfig: MarketplaceInstanceCreationConfig
   ): Promise<MarketplaceInstanceResponse> {
-    if (createConfig.machineImageId && createConfig.customSpecs) {
-      throw new Error(
-        `Custom specification cannot be applied when machine image is specified!`
-      );
-    }
-
-    if (createConfig.customSpecs) {
-      const validValues = [0.5, 1, 2, 4, 8, 16, 32];
-      if (!validValues.includes(createConfig.customSpecs.cpu)) {
-        throw new Error(
-          `Cpu must have one of following values: ${JSON.stringify(
-            validValues
-          )}!`
-        );
-      }
-      if (!validValues.includes(createConfig.customSpecs.memory)) {
-        throw new Error(
-          `Memory must have one of following values: ${JSON.stringify(
-            validValues
-          )}!`
-        );
-      }
-    }
-
-    if (
-      createConfig.persistentStorage &&
-      (createConfig.persistentStorage.size > 1024 ||
-        createConfig.persistentStorage.size < 1)
-    ) {
-      throw new Error(`Persistent storage must be number between 1 and 1024!`);
-    }
-
-    if (createConfig.storage > 1024 || createConfig.storage < 1) {
-      throw new Error(`Instance storage must be number between 1 and 1024!`);
-    }
+    this.checkCreationConfig(createConfig);
 
     const organizationId = await this.utils.getOrganizationId();
 
@@ -312,6 +239,70 @@ class InstanceManager {
       instanceId,
       uuidv4()
     );
+  }
+
+  private checkCreationConfig(configuration: {
+    machineImageId?: string;
+    storage: number;
+    customSpecs?: { cpu: number; memory: number };
+    replicas: number;
+    persistentStorage?: {
+      size: number;
+      class: PersistentStorageClassEnum;
+      mountPoint: string;
+    };
+  }) {
+    if (configuration.machineImageId && configuration.customSpecs) {
+      throw new Error(
+        `Custom specification cannot be applied when machine image is specified!`
+      );
+    }
+
+    if (configuration.replicas < 1) {
+      throw new Error(`Replication factor cannot be less than 1!`);
+    }
+
+    this.checkCustomSpecValues(configuration.customSpecs);
+    this.checkPersistentStorageValue(configuration.persistentStorage);
+
+    if (configuration.storage > 1024 || configuration.storage < 1) {
+      throw new Error(`Instance storage must be number between 1 and 1024!`);
+    }
+  }
+
+  private checkCustomSpecValues(
+    customSpecs: { cpu: number; memory: number } | undefined
+  ) {
+    if (!customSpecs) {
+      return;
+    }
+
+    const validValues = [0.5, 1, 2, 4, 8, 16, 32];
+    if (!validValues.includes(customSpecs.cpu)) {
+      throw new Error(
+        `Cpu must have one of following values: ${JSON.stringify(validValues)}!`
+      );
+    }
+    if (!validValues.includes(customSpecs.memory)) {
+      throw new Error(
+        `Memory must have one of following values: ${JSON.stringify(
+          validValues
+        )}!`
+      );
+    }
+  }
+
+  private checkPersistentStorageValue(
+    persistentStorage:
+      | { size: number; class: PersistentStorageClassEnum; mountPoint: string }
+      | undefined
+  ) {
+    if (
+      persistentStorage &&
+      (persistentStorage.size > 1024 || persistentStorage.size < 1)
+    ) {
+      throw new Error(`Persistent storage must be number between 1 and 1024!`);
+    }
   }
 }
 
