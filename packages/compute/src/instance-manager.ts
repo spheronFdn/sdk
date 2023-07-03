@@ -40,8 +40,6 @@ class InstanceManager {
   async create(
     creationConfig: InstanceCreationConfig
   ): Promise<InstanceResponse> {
-    console.log(JSON.stringify(creationConfig.configuration));
-
     this.checkCreationConfig(creationConfig.configuration);
 
     const organizationId = await this.utils.getOrganizationId();

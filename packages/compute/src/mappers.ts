@@ -200,20 +200,16 @@ const mapInstanceDeployment = (
         agreementDate:
           input.clusterInstanceConfiguration.agreedMachineImage.agreementDate,
         cpu: input.clusterInstanceConfiguration.agreedMachineImage.cpu,
-        memory: input.clusterInstanceConfiguration.agreedMachineImage.memory
-          ? Number(
-              input.clusterInstanceConfiguration.agreedMachineImage.memory.split(
-                "Gi"
-              )[0]
-            )
-          : undefined,
-        storage: input.clusterInstanceConfiguration.agreedMachineImage.storage
-          ? Number(
-              input.clusterInstanceConfiguration.agreedMachineImage.storage.split(
-                "Gi"
-              )[0]
-            )
-          : undefined,
+        memory: Number(
+          input.clusterInstanceConfiguration.agreedMachineImage.memory.split(
+            "Gi"
+          )[0]
+        ),
+        storage: Number(
+          input.clusterInstanceConfiguration.agreedMachineImage.storage.split(
+            "Gi"
+          )[0]
+        ),
         persistentStorage: input.clusterInstanceConfiguration.agreedMachineImage
           .persistentStorage
           ? {
@@ -254,11 +250,15 @@ const mapCreateInstanceRequest = (
       buildImage: false,
       ports: input.configuration.ports,
       env: [
-        ...mapVariables(input.configuration.environmentVariables, false),
-        ...mapVariables(input.configuration.secretEnvironmentVariables, true),
+        ...(input.configuration.environmentVariables
+          ? mapVariables(input.configuration.environmentVariables, false)
+          : []),
+        ...(input.configuration.secretEnvironmentVariables
+          ? mapVariables(input.configuration.secretEnvironmentVariables, true)
+          : []),
       ],
-      command: input.configuration.commands,
-      args: input.configuration.args,
+      command: input.configuration.commands ?? [],
+      args: input.configuration.args ?? [],
       region: input.configuration.region,
       akashMachineImageName: machineImageName ?? "",
       customInstanceSpecs: {

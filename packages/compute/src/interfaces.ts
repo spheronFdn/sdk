@@ -130,9 +130,9 @@ interface InstanceDeployment {
 interface MachineImageType {
   machineName: string;
   agreementDate: number;
-  cpu: number;
-  memory: number;
-  storage: number;
+  cpu?: number;
+  memory?: number;
+  storage?: number;
   persistentStorage?: {
     size: number;
     class: PersistentStorageClassEnum;
@@ -145,10 +145,10 @@ interface InstanceCreationConfig {
     image: string;
     tag: string;
     ports: Array<Port>;
-    environmentVariables: Array<EnvironmentVariable>;
-    secretEnvironmentVariables: Array<EnvironmentVariable>;
-    commands: Array<string>;
-    args: Array<string>;
+    environmentVariables?: Array<EnvironmentVariable>;
+    secretEnvironmentVariables?: Array<EnvironmentVariable>;
+    commands?: Array<string>;
+    args?: Array<string>;
     region: string;
     machineImageId?: string;
     storage: number;
