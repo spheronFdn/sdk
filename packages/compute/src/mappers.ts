@@ -19,12 +19,13 @@ import {
   UpdateInstaceRequest,
   MarketplaceDeploymentVariable,
   InstancesInfo as InstancesInfoCore,
+  Port,
 } from "@spheron/core";
 import {
   InstanceDetailed,
   InstanceDeployment,
   DeploymentTypeEnum,
-  EnvironmentVar,
+  EnvironmentVariable,
   InstanceCreationConfig,
   MarketplaceInstanceCreationConfig,
   InstanceUpdateConfig,
@@ -162,8 +163,8 @@ const mapInstanceDeployment = (
     });
   }
 
-  const env: EnvironmentVar[] = [];
-  const secretEnv: EnvironmentVar[] = [];
+  const env: EnvironmentVariable[] = [];
+  const secretEnv: EnvironmentVariable[] = [];
 
   input.clusterInstanceConfiguration.env.forEach((ev: Env) => {
     if (ev.isSecret) {
@@ -337,17 +338,29 @@ const mapMarketplaceInstanceResponse = (
 };
 
 const mapInstanceUpdateRequest = (
-  input: InstanceUpdateConfig
+  input: InstanceUpdateConfig,
+  existingConfig: {
+    tag: string;
+    ports: Array<Port>;
+    environmentVariables: Array<EnvironmentVariable>;
+    secretEnvironmentVariables: Array<EnvironmentVariable>;
+    commands: Array<string>;
+    args: Array<string>;
+  }
 ): UpdateInstaceRequest => {
   return {
     env: [
-      ...mapVariables(input.environmentVariables, false),
-      ...mapVariables(input.secretEnvironmentVariables, true),
+      ...(input.environmentVariables
+        ? mapVariables(input.environmentVariables, false)
+        : mapVariables(existingConfig.environmentVariables, false)),
+      ...(input.secretEnvironmentVariables
+        ? mapVariables(input.secretEnvironmentVariables, true)
+        : mapVariables(existingConfig.secretEnvironmentVariables, true)),
     ],
-    command: input.commands,
-    args: input.args,
+    command: input.commands ?? existingConfig.commands,
+    args: input.args ?? existingConfig.args,
     uniqueTopicId: uuidv4(),
-    tag: input.tag,
+    tag: input.tag ?? existingConfig.tag,
   };
 };
 
@@ -383,20 +396,20 @@ const mapInstancesInfo = (input: InstancesInfoCore): InstancesInfo => {
 };
 
 const mapVariables = (
-  variables: EnvironmentVar[],
+  variables: EnvironmentVariable[],
   isSecret: boolean
 ): Env[] => {
-  return variables.map((ev: EnvironmentVar) => ({
+  return variables.map((ev: EnvironmentVariable) => ({
     value: `${ev.key}=${ev.value}`,
     isSecret,
   }));
 };
 
 const mapMarketplaceVariables = (
-  variables: EnvironmentVar[],
+  variables: EnvironmentVariable[],
   isSecret: boolean
 ): MarketplaceDeploymentVariable[] => {
-  return variables.map((ev: EnvironmentVar) => ({
+  return variables.map((ev: EnvironmentVariable) => ({
     label: ev.key,
     value: ev.value,
     isSecret,

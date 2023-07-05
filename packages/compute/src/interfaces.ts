@@ -205,11 +205,11 @@ interface MarketplaceInstanceResponse extends InstanceResponse {
 }
 
 interface InstanceUpdateConfig {
-  environmentVariables: Array<EnvironmentVariable>;
-  secretEnvironmentVariables: Array<EnvironmentVariable>;
-  commands: Array<string>;
-  args: Array<string>;
-  tag: string;
+  environmentVariables?: Array<EnvironmentVariable>;
+  secretEnvironmentVariables?: Array<EnvironmentVariable>;
+  commands?: Array<string>;
+  args?: Array<string>;
+  tag?: string;
 }
 
 interface UsageWithLimits {
@@ -267,8 +267,9 @@ export {
   PersistentStorageClassEnum,
   InstanceCreationConfig,
   InstanceUpdateConfig,
-  EnvironmentVariable as EnvironmentVar,
+  EnvironmentVariable,
   MarketplaceInstanceCreationConfig,
   DeploymentStatusEnum,
   DeploymentTypeEnum,
+  PersistentStorage,
 };
