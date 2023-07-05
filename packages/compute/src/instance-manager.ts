@@ -85,10 +85,30 @@ class InstanceManager {
   ): Promise<InstanceResponse> {
     const organizationId = await this.utils.getOrganizationId();
 
+    if (
+      !updateConfig.args &&
+      !updateConfig.commands &&
+      !updateConfig.environmentVariables &&
+      !updateConfig.secretEnvironmentVariables &&
+      !updateConfig.tag
+    ) {
+      throw new Error(`Nothing to update.`);
+    }
+
+    const instance = await this.get(id);
+
+    if (!instance.activeDeployment) {
+      throw new Error(`Instance ${id} doesnt have active deployments.`);
+    }
+
+    const deployment = await this.getInstanceDeployment(
+      instance.activeDeployment
+    );
+
     const response = await this.spheronApi.updateClusterInstance(
       id,
       organizationId,
-      mapInstanceUpdateRequest(updateConfig)
+      mapInstanceUpdateRequest(updateConfig, deployment.instanceConfiguration)
     );
 
     return mapInstanceResponse(response);
