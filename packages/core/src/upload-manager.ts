@@ -25,7 +25,8 @@ export interface UploadResult {
 }
 
 class UploadManager {
-  private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
+  // private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
+  private readonly spheronApiUrl: string = "http://localhost:8002";
 
   public async initiateDeployment(configuration: {
     protocol: ProtocolEnum;
@@ -87,11 +88,13 @@ class UploadManager {
       if (!configuration.name) {
         throw new Error("Bucket name is not provided.");
       }
-      let url = `${this.spheronApiUrl}/v1/ipfs/pin/${configuration.cid}?project=${configuration.name}`;
+      let url = `${this.spheronApiUrl}/v2/ipfs/pin/${configuration.cid}?bucket=${configuration.name}`;
 
       if (configuration.organizationId) {
         url += `&organization=${configuration.organizationId}`;
       }
+
+      console.log(url);
 
       const response = await axios.post<{
         deploymentId: string;
@@ -122,7 +125,6 @@ class UploadManager {
       const url = `${this.spheronApiUrl}/v1/ipfs/pins/${CID}/status`;
       const response = await axios.get<{ pinStatus: PinStatus }>(url);
       return response.data;
-
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
       throw new Error(errorMessage);
