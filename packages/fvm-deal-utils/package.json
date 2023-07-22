@@ -1,7 +1,7 @@
 {
-  "name": "@spheron/storage",
+  "name": "@spheron/fvm-deal-utils",
   "version": "1.0.19",
-  "description": "Typescript library for uploading files or directory to  IPFS, Filecoin or Arweave via Spheron",
+  "description": "Typescript library for creating deal parameters for creating a FVM storage deal.",
   "keywords": [
     "Storage",
     "Typescript",
@@ -10,13 +10,16 @@
     "Filecoin",
     "Arweave",
     "SDK",
-    "Upload"
+    "Upload",
+    "FVM",
+    "Storage Deal"
   ],
   "author": "Spheron Team",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",  
   "scripts": {
-    "build": "tsup",    
+    "build": "tsup",
+    "preinstall": "ts-node --esm ./src/preinstall.ts",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "prettier:write": "prettier --write '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
     "prettier:check": "prettier --check '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
@@ -34,11 +37,15 @@
     "ts-node": "^10.9.1"
   },
   "files": [
-    "dist/"    
+    "dist/",
+    "lib/generate-car/generate-car",
+    "src/preinstall.ts"
   ],
   "dependencies": {
     "@spheron/core": "1.0.9",    
-    "cids": "^1.1.9",    
+    "@spheron/storage": "^1.0.15",
+    "cids": "^1.1.9",
+    "download-git-repo": "^3.0.2",        
     "@spheron/encryption": "1.0.0",
     "form-data": "^4.0.0",
     "multiformats": "^9.9.0"
