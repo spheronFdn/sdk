@@ -60,10 +60,3 @@ export interface DecryptFromIpfsProps {
   litNodeClient: any;
 }
 
-export interface DealDataResult {
-  pieceSize: number;
-  size: number;
-  pieceCid: string;
-  dataCid: string;
-  carLink: string;
-}

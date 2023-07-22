@@ -15,12 +15,12 @@ import {
   UploadResult,
   PinStatus,  
 } from "@spheron/core";
-import { createPayloads, processCarFile } from "./fs-payload-creator";
+import { createPayloads } from "./fs-payload-creator";
 import { ipfs } from "./ipfs.utils";
 import { UsageWithLimits } from "./bucket-manager/interfaces";
 import fs from 'fs';
 
-import { DecryptFromIpfsProps, EncryptToIpfsProps, DealDataResult } from "./interface";
+import { DecryptFromIpfsProps, EncryptToIpfsProps } from "./interface";
 import {
   uint8arrayFromString,
   encryptData,
@@ -492,40 +492,6 @@ export class SpheronClient {
     return await this.spheronApi.getTokenScope();
   }
 
-  async getPrepData (filename: string): Promise<DealDataResult> {    
-    const carFileResults: any = await processCarFile(filename)    
-    let currentlyUploaded = 0;
-    const UploadResult = await this.upload(
-      carFileResults.filePath,
-      {
-        protocol: ProtocolEnum.IPFS,
-        name: 'fvm_car_store',
-        onUploadInitiated: (uploadId) => {
-          console.log(`Upload with id ${uploadId} started...`);
-        },
-        onChunkUploaded: (uploadedSize, totalSize) => {
-          currentlyUploaded += uploadedSize;
-          console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
-        },
-      })
-      if (UploadResult.protocolLink) {
-        var carlink = UploadResult.protocolLink;
-        //console.log('CarLink :', carlink)        
-      } else {
-        throw new Error('Error: Something went wrong');
-      }
-      fs.unlinkSync(carFileResults.filePath);
-      fs.rmdirSync('out');      
-      return {
-        pieceSize: carFileResults.pieceSize,        
-        size: carFileResults.size,
-        pieceCid: carFileResults.pieceCid,
-        dataCid: carFileResults.dataCid,
-        carLink: carlink
-      }
-              
-       
-  };
   
 };
 
