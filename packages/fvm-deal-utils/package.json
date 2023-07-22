@@ -1,6 +1,6 @@
 {
   "name": "@spheron/fvm-deal-utils",
-  "version": "1.0.19",
+  "version": "1.0.0",
   "description": "Typescript library for creating deal parameters for creating a FVM storage deal.",
   "keywords": [
     "Storage",
