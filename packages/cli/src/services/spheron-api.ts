@@ -162,7 +162,7 @@ const SpheronApiService = {
     } catch (error) {
       return {
         error: true,
-        message: "Unauthorized. You need to login first using 'spheron login'.",
+        message: "✖️  Error: User is not whitelisted for this service",
       };
     }
   },

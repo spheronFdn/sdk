@@ -830,16 +830,18 @@ class SpheronApi {
   async addClusterInstanceDomain(
     instanceId: string,
     doamin: {
-      link?: string;
+      link: string;
       type: DomainTypeEnum | string;
       name: string;
     }
   ): Promise<Domain> {
-    return this.sendApiRequest<Domain>(
+    const response = await this.sendApiRequest<{ domain: Domain }>(
       HttpMethods.POST,
       `/v1/cluster-instance/${instanceId}/domains`,
       doamin
     );
+
+    return response.domain;
   }
 
   async updateClusterInstanceDomain(
@@ -851,11 +853,13 @@ class SpheronApi {
       name: string;
     }
   ): Promise<Domain> {
-    return this.sendApiRequest<Domain>(
+    const response = await this.sendApiRequest<{ domain: Domain }>(
       HttpMethods.PATCH,
       `/v1/cluster-instance/${instanceId}/domains/${domainId}`,
       doamin
     );
+
+    return response.domain;
   }
 
   async deleteClusterInstanceDomain(

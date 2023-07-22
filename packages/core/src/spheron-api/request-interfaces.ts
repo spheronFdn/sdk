@@ -1,5 +1,5 @@
 import { ClusterProtocolEnum } from "./enums";
-import { Env, Port } from "./interfaces";
+import { Env, PersistentStorage, Port } from "./interfaces";
 
 interface CreateInstanceRequest {
   organizationId: string;
@@ -18,6 +18,7 @@ interface CreateInstanceRequest {
     args: Array<string>;
     region: string;
     akashMachineImageName: string;
+    customInstanceSpecs: CustomInstanceSpecs;
   };
   instanceName?: string;
   clusterUrl: string;
@@ -34,6 +35,8 @@ interface CreateInstanceFromMarketplaceRequest {
   akashImageId: string;
   uniqueTopicId?: string;
   region: string;
+  customInstanceSpecs: CustomInstanceSpecs;
+  instanceCount: number;
 }
 
 interface MarketplaceDeploymentVariable {
@@ -49,6 +52,13 @@ interface UpdateInstaceRequest {
   tag: string;
   healthCheckUrl?: string;
   healthCheckPort?: string;
+}
+
+interface CustomInstanceSpecs {
+  cpu?: number;
+  memory?: string;
+  persistentStorage?: PersistentStorage;
+  storage: string;
 }
 
 export {

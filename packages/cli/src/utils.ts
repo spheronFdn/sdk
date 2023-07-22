@@ -1,8 +1,6 @@
 import fs from "fs";
 import * as path from "path";
-import { IParsedResponse } from "./commands/gpt";
-import axios from "axios";
-import Spinner from "./outputs/spinner";
+import { IFiles } from "./commands/gpt";
 
 export async function fileExists(path: string): Promise<boolean> {
   try {
@@ -110,20 +108,35 @@ export const generateFilePath = (filePath: string) => {
   return fileFullPath;
 };
 
-export const generateFilesString = (response: IParsedResponse[]) => {
-  return response.map((file: IParsedResponse) => file.filename).join(", ");
+export const generateFilesString = (response: IFiles[]) => {
+  return response.map((file: IFiles) => file.filename).join(", ");
+};
+
+export const generateTestCasesFilesString = (
+  filepath: string,
+  response: IFiles[]
+) => {
+  return response
+    .map((file: IFiles) => generateTestCaseFileName(filepath, file.filename))
+    .join(", ");
 };
 
 export const createLog = (filepath: string, message: string) => {
   const fileContent = `${new Date().toISOString()} - ${message}\n`;
-
   fs.access(filepath, fs.constants.F_OK, (err) => {
     if (err) {
-      // file doesn't exist, create it and append the data
       fs.writeFileSync(filepath, fileContent);
     } else {
-      // file exists, append the data
       fs.appendFileSync(filepath, fileContent);
     }
   });
+};
+
+export const generateTestCaseFileName = (
+  filename: string,
+  generatedFilename: string
+) => {
+  const nameOfFile = path.basename(filename, path.extname(filename));
+  const fileExtension = path.extname(generatedFilename);
+  return nameOfFile + ".test" + fileExtension;
 };
