@@ -79,10 +79,10 @@ class UploadManager {
     token: string;
     cid: string;
   }): Promise<{
-    deploymentId: string;
-    projectId: string;
-    sitePreview: string;
-    affectedDomains: string[];
+    uploadId: string;
+    bucketId: string;
+    protocolLink: string;
+    dynamicLinks: string[];
   }> {
     try {
       if (!configuration.name) {
@@ -97,10 +97,10 @@ class UploadManager {
       console.log(url);
 
       const response = await axios.post<{
-        deploymentId: string;
-        projectId: string;
-        sitePreview: string;
-        affectedDomains: string[];
+        uploadId: string;
+        bucketId: string;
+        protocolLink: string;
+        dynamicLinks: string[];
       }>(
         url,
         {},

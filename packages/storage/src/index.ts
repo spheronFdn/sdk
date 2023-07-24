@@ -307,19 +307,11 @@ export class SpheronClient {
     protocolLink: string;
     dynamicLinks: string[];
   }> {
-    const { deploymentId, projectId, sitePreview, affectedDomains } =
-      await this.uploadManager.pinCID({
-        name: configuration.name,
-        token: this.configuration.token,
-        cid: configuration.cid,
-      });
-
-    return {
-      uploadId: deploymentId,
-      bucketId: projectId,
-      protocolLink: sitePreview,
-      dynamicLinks: affectedDomains,
-    };
+    return await this.uploadManager.pinCID({
+      name: configuration.name,
+      token: this.configuration.token,
+      cid: configuration.cid,
+    });
   }
 
   async getBucket(bucketId: string): Promise<Bucket> {
