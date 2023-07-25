@@ -59,4 +59,3 @@ export interface DecryptFromIpfsProps {
   // An instance of LitNodeClient that is already connected
   litNodeClient: any;
 }
-
