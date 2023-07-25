@@ -46,9 +46,7 @@
     "@spheron/storage": "^1.0.15",
     "cids": "^1.1.9",
     "download-git-repo": "^3.0.2",        
-    "@spheron/encryption": "1.0.0",
-    "form-data": "^4.0.0",
-    "multiformats": "^9.9.0"
+    "form-data": "^4.0.0"    
   },  
   "license": "Apache-2.0",
   "repository": {
