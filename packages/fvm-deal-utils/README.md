@@ -44,7 +44,7 @@ console.log(dealData)
 - Function `getprepData` has two parameters `client.getPrepData(fileName, bucketName);`
   - `fileName` - the path to the file/directory that we are trying to create a deal for
   - `bucketName` - a name of the storage bucket
-  </br></br>
+  <br/><br/>
 
   Below is a sample response
   ```
