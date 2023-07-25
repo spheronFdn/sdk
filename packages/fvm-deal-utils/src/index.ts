@@ -33,8 +33,7 @@ export class SpheronDealClient {
         },
       })
       if (uploadResult.protocolLink) {
-        var carlink = uploadResult.protocolLink;
-        //console.log('CarLink :', carlink)        
+        var carlink = uploadResult.protocolLink;             
       } else {
         throw new Error('Error: Something went wrong');
       }
