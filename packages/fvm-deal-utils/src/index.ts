@@ -15,7 +15,7 @@ export class SpheronDealClient {
     this.configuration = configuration;    
   }
 
-  async getPrepData (filename: string): Promise<DealDataResult> {   
+  async getPrepData (filename: string, bucket: string): Promise<DealDataResult> {   
     const spheronStorage = new SpheronClient(this.configuration)
     const carFileResults: any = await processCarFile(filename)    
     let currentlyUploaded = 0;
@@ -23,7 +23,7 @@ export class SpheronDealClient {
       carFileResults.filePath,
       {
         protocol: ProtocolEnum.IPFS,
-        name: 'fvm_car_store',
+        name: bucket,
         onUploadInitiated: (uploadId) => {
           console.log(`Upload with id ${uploadId} started...`);
         },
