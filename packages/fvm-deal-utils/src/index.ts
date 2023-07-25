@@ -19,7 +19,7 @@ export class SpheronDealClient {
     const spheronStorage = new SpheronClient(this.configuration)
     const carFileResults: any = await processCarFile(filename)    
     let currentlyUploaded = 0;
-    const UploadResult = await spheronStorage.upload(
+    const uploadResult = await spheronStorage.upload(
       carFileResults.filePath,
       {
         protocol: ProtocolEnum.IPFS,
@@ -32,8 +32,8 @@ export class SpheronDealClient {
           console.log(`Uploaded ${currentlyUploaded} of ${totalSize} Bytes.`);
         },
       })
-      if (UploadResult.protocolLink) {
-        var carlink = UploadResult.protocolLink;
+      if (uploadResult.protocolLink) {
+        var carlink = uploadResult.protocolLink;
         //console.log('CarLink :', carlink)        
       } else {
         throw new Error('Error: Something went wrong');
