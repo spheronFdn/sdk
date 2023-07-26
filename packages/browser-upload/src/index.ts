@@ -38,9 +38,9 @@ async function upload(
   const jwtPayload: {
     payloadSize: number;
     parallelUploadCount: number;
-    deploymentId: string;
+    uploadId: string;
   } = jwt_decode(configuration.token);
-  const uploadId = jwtPayload?.deploymentId ?? "";
+  const uploadId = jwtPayload?.uploadId ?? "";
   if (!uploadId) {
     throw new Error("The provided token is invalid.");
   }
@@ -55,7 +55,7 @@ async function upload(
   const uploadManager = new UploadManager();
   try {
     const uploadPayloadsResult = await uploadManager.uploadPayloads(payloads, {
-      deploymentId: uploadId,
+      uploadId,
       token: configuration.token,
       parallelUploadCount,
       onChunkUploaded: (uploadedSize: number) =>
@@ -70,7 +70,7 @@ async function upload(
     caughtError = error;
   }
 
-  const result = await uploadManager.finalizeUploadDeployment(
+  const result = await uploadManager.finalizeUpload(
     uploadId,
     success,
     configuration.token
@@ -85,10 +85,10 @@ async function upload(
   }
 
   return {
-    uploadId: result.deploymentId,
-    bucketId: result.projectId,
-    protocolLink: result.sitePreview,
-    dynamicLinks: result.affectedDomains,
+    uploadId: result.uploadId,
+    bucketId: result.bucketId,
+    protocolLink: result.protocolLink,
+    dynamicLinks: result.dynamicLinks,
     cid: result.cid,
   };
 }

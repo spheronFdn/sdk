@@ -70,8 +70,8 @@ export class SpheronClient {
       onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
     }
   ): Promise<UploadResult> {
-    const { deploymentId, payloadSize, parallelUploadCount } =
-      await this.uploadManager.initiateDeployment({
+    const { uploadId, payloadSize, parallelUploadCount } =
+      await this.uploadManager.initiateUpload({
         protocol: configuration.protocol,
         name: configuration.name,
         organizationId: configuration.organizationId,
@@ -84,12 +84,12 @@ export class SpheronClient {
       const { payloads, totalSize } = await createPayloads(path, payloadSize);
 
       configuration.onUploadInitiated &&
-        configuration.onUploadInitiated(deploymentId);
+        configuration.onUploadInitiated(uploadId);
 
       const uploadPayloadsResult = await this.uploadManager.uploadPayloads(
         payloads,
         {
-          deploymentId,
+          uploadId,
           token: this.configuration.token,
           parallelUploadCount,
           onChunkUploaded: (uploadedSize: number) =>
@@ -105,8 +105,8 @@ export class SpheronClient {
       caughtError = error;
     }
 
-    const result = await this.uploadManager.finalizeUploadDeployment(
-      deploymentId,
+    const result = await this.uploadManager.finalizeUpload(
+      uploadId,
       success,
       this.configuration.token
     );
@@ -120,10 +120,10 @@ export class SpheronClient {
     }
 
     return {
-      uploadId: result.deploymentId,
-      bucketId: result.projectId,
-      protocolLink: result.sitePreview,
-      dynamicLinks: result.affectedDomains,
+      uploadId: result.uploadId,
+      bucketId: result.bucketId,
+      protocolLink: result.protocolLink,
+      dynamicLinks: result.dynamicLinks,
       cid: result.cid,
     };
   }
@@ -196,15 +196,15 @@ export class SpheronClient {
         chain,
       });
 
-      const { deploymentId, parallelUploadCount } =
-        await this.uploadManager.initiateDeployment({
+      const { uploadId, parallelUploadCount } =
+        await this.uploadManager.initiateUpload({
           protocol: ProtocolEnum.IPFS,
           name: configuration.name,
           token: this.configuration.token,
         });
 
       configuration.onUploadInitiated &&
-        configuration.onUploadInitiated(deploymentId);
+        configuration.onUploadInitiated(uploadId);
 
       let success = true;
       let caughtError: Error | undefined = undefined;
@@ -215,7 +215,7 @@ export class SpheronClient {
         const uploadPayloadsResult = await this.uploadManager.uploadPayloads(
           [form],
           {
-            deploymentId,
+            uploadId,
             token: this.configuration.token,
             parallelUploadCount,
             onChunkUploaded: (uploadedSize: number) =>
@@ -231,8 +231,8 @@ export class SpheronClient {
         caughtError = error;
       }
 
-      const result = await this.uploadManager.finalizeUploadDeployment(
-        deploymentId,
+      const result = await this.uploadManager.finalizeUpload(
+        uploadId,
         success,
         this.configuration.token
       );
@@ -246,10 +246,10 @@ export class SpheronClient {
       }
 
       return {
-        uploadId: result.deploymentId,
-        bucketId: result.projectId,
-        protocolLink: result.sitePreview,
-        dynamicLinks: result.affectedDomains,
+        uploadId: result.uploadId,
+        bucketId: result.bucketId,
+        protocolLink: result.protocolLink,
+        dynamicLinks: result.dynamicLinks,
         cid: result.cid,
       };
     } catch (e) {
@@ -289,16 +289,15 @@ export class SpheronClient {
     name: string;
     protocol: ProtocolEnum;
   }): Promise<{ uploadToken: string }> {
-    const { singleDeploymentToken } =
-      await this.uploadManager.initiateDeployment({
-        protocol: configuration.protocol,
-        name: configuration.name,
-        token: this.configuration.token,
-        createSingleDeploymentToken: true,
-      });
+    const { singleUseToken } = await this.uploadManager.initiateUpload({
+      protocol: configuration.protocol,
+      name: configuration.name,
+      token: this.configuration.token,
+      createSingleUseToken: true,
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return { uploadToken: singleDeploymentToken! };
+    return { uploadToken: singleUseToken! };
   }
 
   async pinCID(configuration: { name: string; cid: string }): Promise<{
