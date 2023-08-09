@@ -13,11 +13,13 @@ import {
   TokenScope,
   UploadManager,
   UploadResult,
-  PinStatus,
+  PinStatus,  
 } from "@spheron/core";
 import { createPayloads } from "./fs-payload-creator";
 import { ipfs } from "./ipfs.utils";
 import { UsageWithLimits } from "./bucket-manager/interfaces";
+import fs from 'fs';
+
 import { DecryptFromIpfsProps, EncryptToIpfsProps } from "./interface";
 import {
   uint8arrayFromString,
@@ -489,6 +491,9 @@ export class SpheronClient {
   async getTokenScope(): Promise<TokenScope> {
     return await this.spheronApi.getTokenScope();
   }
-}
+
+  
+};
+
 
 export default SpheronClient;
