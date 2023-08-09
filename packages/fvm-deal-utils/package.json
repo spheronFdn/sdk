@@ -8,7 +8,6 @@
     "Badass",
     "IPFS",
     "Filecoin",
-    "Arweave",
     "SDK",
     "Upload",
     "FVM",
@@ -16,15 +15,14 @@
   ],
   "author": "Spheron Team",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",  
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsup",
     "preinstall": "ts-node --esm ./src/preinstall.ts",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "prettier:write": "prettier --write '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
     "prettier:check": "prettier --check '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
-    "lint": "eslint . --ext .ts",
-    "test": "ts-node test.ts"
+    "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
     "@types/node": "^18.13.0",
@@ -33,8 +31,7 @@
     "eslint": "^8.33.0",
     "prettier": "^2.8.3",
     "tsup": "^6.5.0",
-    "typescript": "^4.9.5",
-    "ts-node": "^10.9.1"
+    "typescript": "^4.9.5"
   },
   "files": [
     "dist/",
@@ -42,12 +39,12 @@
     "src/preinstall.ts"
   ],
   "dependencies": {
-    "@spheron/core": "1.0.9",    
+    "@spheron/core": "1.0.9",
     "@spheron/storage": "^1.0.15",
     "cids": "^1.1.9",
-    "download-git-repo": "^3.0.2",        
-    "form-data": "^4.0.0"    
-  },  
+    "download-git-repo": "^3.0.2",
+    "form-data": "^4.0.0"
+  },
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
