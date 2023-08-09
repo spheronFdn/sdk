@@ -1,28 +1,45 @@
-// preinstall.ts
-import { spawnSync } from 'child_process';
-const download = require('download-git-repo');
+import { spawnSync } from "child_process";
+import * as fs from "fs";
 
-const goCodePath = './lib/generate-car/';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const download = require("download-git-repo");
 
-// Download the Go code from GitHub
-download('github:tech-greedy/generate-car', goCodePath, (err: Error | null) => {
-  if (err) {
-    console.error('Error downloading from github:', err);
-    process.exit(1);
+const goCodePath = "./lib/generate-car/";
+
+function checkDirectoryExists(directoryPath: string): boolean {
+  try {
+    fs.accessSync(directoryPath, fs.constants.R_OK);
+    return true;
+  } catch (error) {
+    return false;
   }
+}
 
-  // Compile the Go code into a binary
-  const goBuild = spawnSync('make', ['build'], { cwd: goCodePath });
+if (!checkDirectoryExists(goCodePath)) {
+  // Download the Go code from GitHub
+  download(
+    "github:tech-greedy/generate-car",
+    goCodePath,
+    (err: Error | null) => {
+      if (err) {
+        console.error("Error downloading from github:", err);
+        process.exit(1);
+      }
 
-  if (goBuild.error) {
-    console.error('Failed to compile Go code:', goBuild.error.message);
-    process.exit(1);
-  }
+      // Compile the Go code into a binary
+      const goBuild = spawnSync("make", ["build"], { cwd: goCodePath });
 
-  if (goBuild.status !== 0) {
-    console.error('Failed to compile Go code. Exit code:', goBuild.status);
-    process.exit(1);
-  }
+      if (goBuild.error) {
+        console.error("Failed to compile Go code:", goBuild.error.message);
+        process.exit(1);
+      }
 
-  console.log('Go code downloaded and compiled successfully!');
-});
+      if (goBuild.status !== 0) {
+        console.error("Failed to compile Go code. Exit code:", goBuild.status);
+        process.exit(1);
+      }
+
+      console.log("Go code downloaded and compiled successfully!");
+    }
+  );
+}
