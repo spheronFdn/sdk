@@ -11,4 +11,5 @@ export interface DealDataResult {
   dataCid: string;
   carLink: string;
   carName: string;
+  uploadId: string;
 }

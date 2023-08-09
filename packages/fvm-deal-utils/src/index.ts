@@ -59,6 +59,7 @@ export class SpheronDealClient {
           carFileResults.filePath
         )}`,
         carName: carFileResults.carName,
+        uploadId: uploadResult.uploadId,
       };
     } finally {
       await fs.promises.rm(outputDir, { recursive: true });
