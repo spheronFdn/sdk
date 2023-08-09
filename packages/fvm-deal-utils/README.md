@@ -32,21 +32,23 @@
 In the example below you can see how to create an instance of `SpheronDealClient` and how to generate the metadata required for creating a storage deal on FVM.
 
 ```js
-const { SpheronDealClient } = require("@spheron/fvm-deal-utils")
-const path = require('path')
+const { SpheronDealClient } = require("@spheron/fvm-deal-utils");
+const path = require("path");
 
-const client = new SpheronDealClient ({ token });
+const client = new SpheronDealClient({ token });
 
-const dealData = await client.getPrepData(fileName, bucketName)
-console.log(dealData)
+const dealData = await client.getPrepData(fileName, bucketName);
+console.log(dealData);
 ```
 
 - Function `getprepData` has two parameters `client.getPrepData(fileName, bucketName);`
+
   - `fileName` - the path to the file/directory that we are trying to create a deal for
   - `bucketName` - a name of the storage bucket
-  <br/><br/>
+    <br/><br/>
 
   Below is a sample response
+
   ```
   Upload with id 64bb907ca22cea001258f651 started...
   Uploaded 3031 of 3031 Bytes.
@@ -58,6 +60,7 @@ console.log(dealData)
     carLink: 'https://bafybeidk3zuybfr4vulrkjubilgaynixxj4cui6fkpdc6xvsalgaegenr4.ipfs.sphn.link'
   }
   ```
+
   - The response of the `getPrepData` function is an object with the following properties:
     - `pieceSize` - the size of the file in bytes
     - `size` - the size of the CAR file in bytes
