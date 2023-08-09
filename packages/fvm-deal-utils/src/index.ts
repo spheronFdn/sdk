@@ -14,7 +14,10 @@ export interface SpheronClientConfiguration {
 
 export class SpheronDealClient {
   private readonly configuration: SpheronClientConfiguration;
-  private readonly generateCarCommandPath = "./lib/generate-car/generate-car";
+  private readonly generateCarCommandPath = path.relative(
+    ".",
+    "node_modules/@spheron/fvm-deal-utils/lib/generate-car/generate-car"
+  );
 
   constructor(configuration: SpheronClientConfiguration) {
     if (!configuration.token) {
