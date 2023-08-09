@@ -56,6 +56,17 @@ const result: DealDataResult = await client.getFvmMetadata(filePath, {
   - `carName` - the name of the car
   - `uploadId` - the id of the upload on which the car was uploaded
 
-```
+## Access Token
 
-```
+To create the `token` that is used with the `SpheronClient`, follow the instructions in the [DOCS](https://docs.spheron.network/rest-api/#creating-an-access-token). When you are creating the tokens, please choose **web app** type in the dashboard.
+
+## Notes
+
+The package is only meant for Node.js environments and will not work in a browser or frontend apps.
+
+## Learn More
+
+You can learn more about Spheron and Storage SDK here:
+
+- [Spheron Discord](https://discord.com/invite/ahxuCtm)
+- [Spheron Twitter](https://twitter.com/SpheronFdn)
