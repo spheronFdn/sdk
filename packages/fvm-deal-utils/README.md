@@ -32,6 +32,11 @@
 In the example below you can see how to create an instance of `SpheronDealClient` and how to generate the metadata required for creating a storage deal on FVM.
 
 ```ts
+const {
+  SpheronDealClient,
+  DealDataResult,
+} = require("@spheron/fvm-deal-utils");
+
 const client = new SpheronDealClient({ token });
 
 let currentlyUploaded = 0;
