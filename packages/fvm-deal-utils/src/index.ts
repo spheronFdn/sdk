@@ -23,7 +23,7 @@ export class SpheronDealClient {
     this.configuration = configuration;
   }
 
-  async getPrepData(
+  async getFvmMetadata(
     filePath: string,
     configuration: PrepDataConfiguration
   ): Promise<DealDataResult> {
@@ -52,7 +52,10 @@ export class SpheronDealClient {
         size: carFileResults.size,
         pieceCid: carFileResults.pieceCid,
         dataCid: carFileResults.dataCid,
-        carLink: uploadResult.protocolLink,
+        carLink: `${uploadResult.protocolLink}/${path.basename(
+          carFileResults.filePath
+        )}`,
+        carName: carFileResults.carName,
       };
     } finally {
       await fs.promises.rm(outputDir, { recursive: true });
@@ -68,6 +71,7 @@ export class SpheronDealClient {
     pieceCid: string;
     dataCid: string;
     filePath: string;
+    carName: string;
   }> => {
     const cmd = `${
       this.generateCarCommandPath
@@ -90,6 +94,7 @@ export class SpheronDealClient {
       pieceCid: cidHex,
       dataCid: data.DataCid,
       filePath: path.resolve(outDir + "/" + carFiles[0]),
+      carName: data.PieceCid,
     };
   };
 

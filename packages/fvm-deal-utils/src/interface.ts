@@ -10,4 +10,5 @@ export interface DealDataResult {
   pieceCid: string;
   dataCid: string;
   carLink: string;
+  carName: string;
 }
