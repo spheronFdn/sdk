@@ -14,9 +14,9 @@
   ],
   "author": "Spheron Team",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",  
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsup",    
+    "build": "tsup",
     "prettier": "prettier \"**/*.{css,scss,json,md,html,yml}\" --ignore-path=.eslintignore",
     "prettier:write": "prettier --write '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
     "prettier:check": "prettier --check '**/*.{ts,tsx,json,md,hbs}' --ignore-path .gitignore",
@@ -34,15 +34,15 @@
     "ts-node": "^10.9.1"
   },
   "files": [
-    "dist/"    
+    "dist/"
   ],
   "dependencies": {
-    "@spheron/core": "1.0.9",    
-    "cids": "^1.1.9",    
+    "@spheron/core": "1.0.9",
+    "cids": "^1.1.9",
     "@spheron/encryption": "1.0.0",
     "form-data": "^4.0.0",
     "multiformats": "^9.9.0"
-  },  
+  },
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
