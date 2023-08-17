@@ -315,8 +315,8 @@ export async function commandHandler(options: any) {
     }
     const isWhitelisted = await SpheronApiService.isWhitelisted();
     // check if the user is whitelisted
-    if (!isWhitelisted.whitelisted) {
-      console.log("✖️  Error: User is not whitelisted for this service");
+    if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
+      console.log(isWhitelisted?.message);
       process.exit(1);
     }
     (async () => {

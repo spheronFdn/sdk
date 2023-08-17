@@ -162,7 +162,7 @@ const SpheronApiService = {
     } catch (error) {
       return {
         error: true,
-        message: "Unauthorized. You need to login first using 'spheron login'.",
+        message: "✖️  Error: User is not whitelisted for this service",
       };
     }
   },
@@ -180,7 +180,7 @@ const SpheronApiService = {
       return { response: "" };
     }
     spinner.spin(spinnerMessage);
-    const params: {
+    const data: {
       type: string;
       query: string;
       file?: string;
@@ -191,7 +191,7 @@ const SpheronApiService = {
       ...(file && { file }),
       ...(lang && { lang }),
     };
-    const gptResponse: IGPTResponse = await client.getGPTResponse(params);
+    const gptResponse: IGPTResponse = await client.getGPTResponse(data);
 
     return gptResponse;
   },
