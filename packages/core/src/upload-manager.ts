@@ -94,8 +94,6 @@ class UploadManager {
         url += `&organization=${configuration.organizationId}`;
       }
 
-      console.log(url);
-
       const response = await axios.post<{
         uploadId: string;
         bucketId: string;
