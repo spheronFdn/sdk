@@ -120,7 +120,7 @@ class UploadManager {
       if (!CID) {
         throw new Error("CID is not provided.");
       }
-      const url = `${this.spheronApiUrl}/v1/ipfs/pins/${CID}/status`;
+      const url = `${this.spheronApiUrl}/v2/ipfs/pins/${CID}/status`;
       const response = await axios.get<{ pinStatus: PinStatus }>(url);
       return response.data;
     } catch (error) {
