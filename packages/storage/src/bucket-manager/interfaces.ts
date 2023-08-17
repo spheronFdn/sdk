@@ -2,6 +2,7 @@ import {
   BucketStateEnum,
   DomainTypeEnum,
   UploadStatusEnum,
+  UploadedFile,
 } from "@spheron/core";
 
 interface Domain {
@@ -23,28 +24,41 @@ interface Bucket {
 interface Upload {
   id: string;
   protocolLink: string;
-  uploadDirectory: string[];
+  uploadDirectory: UploadedFile[];
   status: UploadStatusEnum;
   memoryUsed: number;
   bucketId: string;
   protocol: string;
 }
 
+/*
+        "usedImageOptimizations": 0,
+        "imageOptimizationsLimit": 1000
+    */
+
 interface UsageWithLimits {
   used: {
     bandwidth: number; // Bytes
     storageArweave: number; // Bytes
     storageIPFS: number; // Bytes
+    storageFilecoin: number; // Bytes
     domains: number;
+    hnsDomains: number;
+    ensDomains: number;
     numberOfRequests: number;
     parallelUploads: number;
+    imageOptimization: number;
   };
   limit: {
     bandwidth: number; // Bytes
     storageArweave: number; // Bytes
     storageIPFS: number; // Bytes
+    storageFilecoin: number; // Bytes
     domains: number;
+    hnsDomains: number;
+    ensDomains: number;
     parallelUploads: number;
+    imageOptimization: number;
   };
 }
 

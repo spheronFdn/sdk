@@ -330,7 +330,7 @@ class SpheronApi {
 
   async getOrganizationUsage(
     organizationId: string,
-    specialization: "wa-global" | "c-akash"
+    specialization: "wa-global" | "c-akash" | "storage"
   ): Promise<UsageWithLimitsWithSkynet> {
     const { usage } = await this.sendApiRequest<{
       usage: UsageWithLimitsWithSkynet;
@@ -1011,6 +1011,13 @@ class SpheronApi {
       HttpMethods.PATCH,
       `/v1/bucket/${bucketId}/state`,
       { state }
+    );
+  }
+
+  async getBucketDomains(bucketId: string): Promise<{ domains: Domain[] }> {
+    return this.sendApiRequest<{ domains: Domain[] }>(
+      HttpMethods.GET,
+      `/v1/bucket/${bucketId}/domains`
     );
   }
 

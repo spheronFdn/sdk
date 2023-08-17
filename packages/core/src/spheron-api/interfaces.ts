@@ -197,6 +197,10 @@ interface UsageWithLimits {
   passwordProtectionLimit?: number;
   usedParallelUploads?: number;
   parallelUploadsLimit?: number;
+  usedStorageFilecoin?: number;
+  storageFilecoinLimit?: number;
+  usedImageOptimizations?: number;
+  imageOptimizationsLimit?: number;
 }
 
 interface UsageWithLimitsWithSkynet extends UsageWithLimits {
@@ -502,12 +506,19 @@ enum UploadStatusEnum {
   UPLOADED = "Uploaded",
   FAILED = "Failed",
   TIMED_OUT = "TimedOut",
+  PINNED = "Pinned",
+  UNPINNED = "Unpinned",
+}
+
+interface UploadedFile {
+  fileName: string;
+  fileSize: number;
 }
 
 interface Upload {
   _id: string;
   protocolLink: string;
-  uploadDirectory: string[];
+  uploadDirectory: UploadedFile[];
   status: UploadStatusEnum;
   memoryUsed: number;
   bucket: string;
@@ -555,4 +566,5 @@ export {
   BucketStateEnum,
   UploadStatusEnum,
   Upload,
+  UploadedFile,
 };
