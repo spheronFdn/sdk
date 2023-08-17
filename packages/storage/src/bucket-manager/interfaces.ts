@@ -14,6 +14,16 @@ interface Domain {
   type: DomainTypeEnum;
 }
 
+interface IpnsRecord {
+  id: string;
+  ipnsHash: string;
+  ipnsLink: string;
+  publishedUploadId: string;
+  bucketId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface Bucket {
   id: string;
   name: string;
@@ -69,4 +79,5 @@ export {
   BucketStateEnum,
   UploadStatusEnum,
   UsageWithLimits,
+  IpnsRecord,
 };

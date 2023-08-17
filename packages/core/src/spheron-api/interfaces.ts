@@ -509,6 +509,18 @@ interface BucketDomain {
   type: DomainTypeEnum;
 }
 
+interface BucketIpnsRecord {
+  _id: string;
+  keyName: string;
+  keyId: string;
+  ipnsLink: string;
+  upload: Upload;
+  bucket: string;
+  targetCid: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 enum UploadStatusEnum {
   IN_PROGRESS = "InProgress",
   CANCELED = "Canceled",
@@ -577,4 +589,5 @@ export {
   Upload,
   UploadedFile,
   BucketDomain,
+  BucketIpnsRecord,
 };

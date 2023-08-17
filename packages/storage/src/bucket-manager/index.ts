@@ -10,8 +10,12 @@ import {
   Upload,
   BucketStateEnum,
   UploadStatusEnum,
+  IpnsRecord,
 } from "./interfaces";
-import { BucketDomain as CoreBucketDomain } from "@spheron/core";
+import {
+  BucketDomain as CoreBucketDomain,
+  BucketIpnsRecord as CoreBucketIpnsRecord,
+} from "@spheron/core";
 
 class BucketManager {
   private readonly spheronApi: SpheronApi;
@@ -129,6 +133,55 @@ class BucketManager {
     return this.mapCoreUpload(upload);
   }
 
+  async getBucketIpnsRecords(bucketId: string): Promise<IpnsRecord[]> {
+    const { ipnsRecords } = await this.spheronApi.getBucketIpnsRecords(
+      bucketId
+    );
+    return ipnsRecords.map((x) => this.mapCoreIpnsRecord(x));
+  }
+
+  async getBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string
+  ): Promise<IpnsRecord> {
+    const { ipnsRecord } = await this.spheronApi.getBucketIpnsRecord(
+      bucketId,
+      ipnsRecordId
+    );
+    return this.mapCoreIpnsRecord(ipnsRecord);
+  }
+
+  async addBucketIpnsRecord(
+    bucketId: string,
+    uploadId: string
+  ): Promise<IpnsRecord> {
+    const { ipnsRecord } = await this.spheronApi.addBucketIpnsRecord(
+      bucketId,
+      uploadId
+    );
+    return this.mapCoreIpnsRecord(ipnsRecord);
+  }
+
+  async updateBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string,
+    uploadId: string
+  ): Promise<IpnsRecord> {
+    const { ipnsRecord } = await this.spheronApi.patchBucketIpnsRecord(
+      bucketId,
+      ipnsRecordId,
+      uploadId
+    );
+    return this.mapCoreIpnsRecord(ipnsRecord);
+  }
+
+  async deleteBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string
+  ): Promise<void> {
+    await this.spheronApi.deleteBucketIpnsRecord(bucketId, ipnsRecordId);
+  }
+
   private mapCoreBucket(bucket: CoreBucket): Bucket {
     return {
       id: bucket._id,
@@ -158,6 +211,18 @@ class BucketManager {
       memoryUsed: upload.memoryUsed,
       bucketId: upload.bucket,
       protocol: upload.protocol,
+    };
+  }
+
+  private mapCoreIpnsRecord(ipnsRecord: CoreBucketIpnsRecord): IpnsRecord {
+    return {
+      id: ipnsRecord._id,
+      ipnsHash: ipnsRecord.keyId,
+      ipnsLink: ipnsRecord.ipnsLink,
+      publishedUploadId: ipnsRecord.upload._id ?? ipnsRecord.upload,
+      bucketId: ipnsRecord.bucket,
+      createdAt: ipnsRecord.createdAt,
+      updatedAt: ipnsRecord.updatedAt,
     };
   }
 }

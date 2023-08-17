@@ -7,7 +7,6 @@ import BucketManager, {
   UploadStatusEnum,
 } from "./bucket-manager";
 import {
-  IPNSName,
   ProtocolEnum,
   SpheronApi,
   TokenScope,
@@ -17,7 +16,7 @@ import {
 } from "@spheron/core";
 import { createPayloads } from "./fs-payload-creator";
 import { ipfs } from "./ipfs.utils";
-import { UsageWithLimits } from "./bucket-manager/interfaces";
+import { IpnsRecord, UsageWithLimits } from "./bucket-manager/interfaces";
 import { DecryptFromIpfsProps, EncryptToIpfsProps } from "./interface";
 import {
   uint8arrayFromString,
@@ -39,8 +38,8 @@ export {
   UploadStatusEnum,
   UsageWithLimits,
   TokenScope,
-  IPNSName,
   uint8arrayToString,
+  IpnsRecord,
 };
 
 export interface SpheronClientConfiguration {
@@ -404,31 +403,6 @@ export class SpheronClient {
     await this.bucketManager.unarchiveBucket(bucketId);
   }
 
-  async publishIPNS(uploadId: string): Promise<IPNSName> {
-    return await this.spheronApi.publishIPNS(uploadId);
-  }
-
-  async updateIPNSName(
-    ipnsNameId: string,
-    uploadId: string
-  ): Promise<IPNSName> {
-    return await this.spheronApi.updateIPNSName(ipnsNameId, uploadId);
-  }
-
-  async getIPNSName(ipnsNameId: string): Promise<IPNSName> {
-    return await this.spheronApi.getIPNSName(ipnsNameId);
-  }
-
-  async getIPNSNamesForUpload(uploadId: string): Promise<IPNSName[]> {
-    return await this.spheronApi.getIPNSNamesForUpload(uploadId);
-  }
-
-  async getIPNSNamesForOrganization(
-    organizationId: string
-  ): Promise<IPNSName[]> {
-    return await this.spheronApi.getIPNSNamesForOrganization(organizationId);
-  }
-
   async getBucketUploadCount(bucketId: string): Promise<{
     count: number;
   }> {
@@ -484,6 +458,43 @@ export class SpheronClient {
 
   async getTokenScope(): Promise<TokenScope> {
     return await this.spheronApi.getTokenScope();
+  }
+
+  async getBucketIpnsRecords(bucketId: string): Promise<IpnsRecord[]> {
+    return await this.bucketManager.getBucketIpnsRecords(bucketId);
+  }
+
+  async getBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string
+  ): Promise<IpnsRecord> {
+    return await this.bucketManager.getBucketIpnsRecord(bucketId, ipnsRecordId);
+  }
+
+  async addBucketIpnsRecord(
+    bucketId: string,
+    uploadId: string
+  ): Promise<IpnsRecord> {
+    return await this.bucketManager.addBucketIpnsRecord(bucketId, uploadId);
+  }
+
+  async updateBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string,
+    uploadId: string
+  ): Promise<IpnsRecord> {
+    return await this.bucketManager.updateBucketIpnsRecord(
+      bucketId,
+      ipnsRecordId,
+      uploadId
+    );
+  }
+
+  async deleteBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string
+  ): Promise<void> {
+    await this.spheronApi.deleteBucketIpnsRecord(bucketId, ipnsRecordId);
   }
 }
 

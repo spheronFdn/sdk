@@ -39,6 +39,7 @@ import {
   BucketStateEnum,
   Upload,
   BucketDomain,
+  BucketIpnsRecord,
 } from "./interfaces";
 import {
   CreateInstanceFromMarketplaceRequest,
@@ -998,7 +999,7 @@ class SpheronApi {
   //#region Bucket API
 
   async getBucket(bucketId: string): Promise<Bucket> {
-    return this.sendApiRequest<Bucket>(
+    return await this.sendApiRequest<Bucket>(
       HttpMethods.GET,
       `/v1/bucket/${bucketId}`
     );
@@ -1008,7 +1009,7 @@ class SpheronApi {
     bucketId: string,
     state: BucketStateEnum
   ): Promise<Bucket> {
-    return this.sendApiRequest<Bucket>(
+    return await this.sendApiRequest<Bucket>(
       HttpMethods.PATCH,
       `/v1/bucket/${bucketId}/state`,
       { state }
@@ -1018,7 +1019,7 @@ class SpheronApi {
   async getBucketDomains(
     bucketId: string
   ): Promise<{ domains: BucketDomain[] }> {
-    return this.sendApiRequest<{ domains: BucketDomain[] }>(
+    return await this.sendApiRequest<{ domains: BucketDomain[] }>(
       HttpMethods.GET,
       `/v1/bucket/${bucketId}/domains`
     );
@@ -1028,7 +1029,7 @@ class SpheronApi {
     bucketId: string,
     domainIdentifier: string
   ): Promise<{ domain: BucketDomain }> {
-    return this.sendApiRequest<{ domain: BucketDomain }>(
+    return await this.sendApiRequest<{ domain: BucketDomain }>(
       HttpMethods.GET,
       `/v1/bucket/${bucketId}/domains/${domainIdentifier}`
     );
@@ -1085,6 +1086,62 @@ class SpheronApi {
     await this.sendApiRequest(
       HttpMethods.DELETE,
       `/v1/bucket/${bucketId}/domains/${domainIdentifier}`
+    );
+  }
+
+  async getBucketIpnsRecords(
+    bucketId: string
+  ): Promise<{ ipnsRecords: BucketIpnsRecord[] }> {
+    return await this.sendApiRequest<{ ipnsRecords: BucketIpnsRecord[] }>(
+      HttpMethods.GET,
+      `/v1/bucket/${bucketId}/ipns-records`
+    );
+  }
+
+  async getBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string
+  ): Promise<{ ipnsRecord: BucketIpnsRecord }> {
+    return await this.sendApiRequest<{ ipnsRecord: BucketIpnsRecord }>(
+      HttpMethods.GET,
+      `/v1/bucket/${bucketId}/ipns-records/${ipnsRecordId}`
+    );
+  }
+
+  async addBucketIpnsRecord(
+    bucketId: string,
+    uploadId: string
+  ): Promise<{ ipnsRecord: BucketIpnsRecord }> {
+    return await this.sendApiRequest<{ ipnsRecord: BucketIpnsRecord }>(
+      HttpMethods.POST,
+      `/v1/bucket/${bucketId}/ipns-records`,
+      {
+        uploadId,
+      }
+    );
+  }
+
+  async patchBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string,
+    uploadId: string
+  ): Promise<{ ipnsRecord: BucketIpnsRecord }> {
+    return await this.sendApiRequest<{ ipnsRecord: BucketIpnsRecord }>(
+      HttpMethods.PATCH,
+      `/v1/bucket/${bucketId}/ipns-records/${ipnsRecordId}`,
+      {
+        uploadId,
+      }
+    );
+  }
+
+  async deleteBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string
+  ): Promise<void> {
+    await this.sendApiRequest(
+      HttpMethods.DELETE,
+      `/v1/bucket/${bucketId}/ipns-records/${ipnsRecordId}`
     );
   }
 
