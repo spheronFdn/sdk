@@ -35,7 +35,7 @@
     "dist/"
   ],
   "dependencies": {
-    "@spheron/core": "1.1.0",
+    "@spheron/core": "2.0.0",
     "@spheron/encryption": "1.0.0",
     "form-data": "^4.0.0",
     "multiformats": "^9.9.0"
