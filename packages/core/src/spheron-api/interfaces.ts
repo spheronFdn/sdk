@@ -492,12 +492,21 @@ enum BucketStateEnum {
   ARCHIVED = "ARCHIVED",
 }
 
-interface Bucket extends Document {
+interface Bucket {
   _id: string;
   name: string;
   organization: string;
   createdBy: string;
   state: BucketStateEnum;
+}
+
+interface BucketDomain {
+  _id: string;
+  name: string;
+  link: string;
+  verified: boolean;
+  bucketId: string;
+  type: DomainTypeEnum;
 }
 
 enum UploadStatusEnum {
@@ -567,4 +576,5 @@ export {
   UploadStatusEnum,
   Upload,
   UploadedFile,
+  BucketDomain,
 };

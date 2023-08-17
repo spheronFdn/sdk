@@ -38,6 +38,7 @@ import {
   Bucket,
   BucketStateEnum,
   Upload,
+  BucketDomain,
 } from "./interfaces";
 import {
   CreateInstanceFromMarketplaceRequest,
@@ -1014,10 +1015,76 @@ class SpheronApi {
     );
   }
 
-  async getBucketDomains(bucketId: string): Promise<{ domains: Domain[] }> {
-    return this.sendApiRequest<{ domains: Domain[] }>(
+  async getBucketDomains(
+    bucketId: string
+  ): Promise<{ domains: BucketDomain[] }> {
+    return this.sendApiRequest<{ domains: BucketDomain[] }>(
       HttpMethods.GET,
       `/v1/bucket/${bucketId}/domains`
+    );
+  }
+
+  async getBucketDomain(
+    bucketId: string,
+    domainIdentifier: string
+  ): Promise<{ domain: BucketDomain }> {
+    return this.sendApiRequest<{ domain: BucketDomain }>(
+      HttpMethods.GET,
+      `/v1/bucket/${bucketId}/domains/${domainIdentifier}`
+    );
+  }
+
+  async addBucketDomain(
+    bucketId: string,
+    options: {
+      link?: string;
+      type: DomainTypeEnum | string;
+      name: string;
+    }
+  ): Promise<{ domain: BucketDomain }> {
+    return await this.sendApiRequest<{ domain: BucketDomain }>(
+      HttpMethods.POST,
+      `/v1/bucket/${bucketId}/domains`,
+      options
+    );
+  }
+
+  async patchBucketDomain(
+    bucketId: string,
+    domainIdentifier: string,
+    options: {
+      link?: string;
+      name: string;
+    }
+  ): Promise<{ domain: BucketDomain }> {
+    return await this.sendApiRequest<{ domain: BucketDomain }>(
+      HttpMethods.PATCH,
+      `/v1/bucket/${bucketId}/domains/${domainIdentifier}`,
+      options
+    );
+  }
+
+  async verifyBucketDomain(
+    bucketId: string,
+    domainIdentifier: string
+  ): Promise<{ success: boolean; domain: BucketDomain }> {
+    return await this.sendApiRequest<{
+      success: boolean;
+      domain: BucketDomain;
+    }>(
+      HttpMethods.PATCH,
+      `/v1/bucket/${bucketId}/domains/${domainIdentifier}/verify`,
+      {}
+    );
+  }
+
+  async deleteBucketDomain(
+    bucketId: string,
+    domainIdentifier: string
+  ): Promise<void> {
+    await this.sendApiRequest(
+      HttpMethods.DELETE,
+      `/v1/bucket/${bucketId}/domains/${domainIdentifier}`
     );
   }
 
