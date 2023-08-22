@@ -1,14 +1,15 @@
 # dependencies
 node_modules
 
-# turbo
 .turbo
 
 # misc
 .DS_Store
+.vscode
 
 # build
 dist
+lib
 
 # types 
 types
