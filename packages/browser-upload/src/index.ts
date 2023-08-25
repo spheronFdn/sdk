@@ -53,7 +53,7 @@ async function upload(
 
   let success = true;
   let caughtError: Error | undefined = undefined;
-  const uploadManager = new UploadManager();
+  const uploadManager = new UploadManager(configuration.apiUrl);
   try {
     const uploadPayloadsResult = await uploadManager.uploadPayloads(payloads, {
       uploadId,
