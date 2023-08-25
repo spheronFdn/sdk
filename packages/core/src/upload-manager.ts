@@ -25,8 +25,11 @@ export interface UploadResult {
 }
 
 class UploadManager {
-  // private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
-  private readonly spheronApiUrl: string = "http://localhost:8002";
+  private readonly spheronApiUrl: string;
+
+  constructor(apiUrl?: string) {
+    this.spheronApiUrl = apiUrl ?? "https://api-v2.spheron.network";
+  }
 
   public async initiateUpload(configuration: {
     protocol: ProtocolEnum;

@@ -52,16 +52,13 @@ import {
 } from "./response-interfaces";
 
 class SpheronApi {
-  // private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
-  private readonly spheronApiUrl: string = "http://localhost:8080";
+  private readonly spheronApiUrl: string;
 
   private readonly token: string;
 
   constructor(token: string, url?: string) {
     this.token = token;
-    if (url) {
-      this.spheronApiUrl = url;
-    }
+    this.spheronApiUrl = url ?? "https://api-v2.spheron.network";
   }
 
   async getTokenScope(): Promise<TokenScope> {

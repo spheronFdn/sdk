@@ -17,6 +17,7 @@ async function upload(
   configuration: {
     token: string;
     onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
+    apiUrl?: string;
   }
 ): Promise<UploadResult> {
   let fileList: File[] = [];
