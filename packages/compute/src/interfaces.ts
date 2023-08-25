@@ -12,6 +12,7 @@ import {
   HealthStatusEnum,
   PersistentStorage,
   PersistentStorageClassEnum,
+  IAutoscalingRules,
 } from "@spheron/core";
 
 interface Organization {
@@ -152,6 +153,7 @@ interface InstanceCreationConfig {
     region: string;
     machineImageId?: string;
     storage: number;
+    akashMachineImageName: string;
     persistentStorage?: {
       size: number;
       class: PersistentStorageClassEnum;
@@ -168,6 +170,7 @@ interface InstanceCreationConfig {
     path: string;
     port: number;
   };
+  scalable: boolean;
 }
 
 interface EnvironmentVariable {
@@ -181,6 +184,7 @@ interface MarketplaceInstanceCreationConfig {
   machineImageId?: string;
   region: string;
   storage: number;
+  scalable: boolean;
   customSpecs?: {
     cpu: number;
     memory: number;
@@ -191,6 +195,7 @@ interface MarketplaceInstanceCreationConfig {
     mountPoint: string;
   };
   replicas: number;
+  autoscalingRules?: IAutoscalingRules
 }
 
 interface InstanceResponse {
