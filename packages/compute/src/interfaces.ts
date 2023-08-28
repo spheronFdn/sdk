@@ -153,7 +153,7 @@ interface InstanceCreationConfig {
     region: string;
     machineImageId?: string;
     storage: number;
-    akashMachineImageName: string;
+    akashMachineImageName?: string;
     persistentStorage?: {
       size: number;
       class: PersistentStorageClassEnum;
