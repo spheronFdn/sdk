@@ -58,17 +58,19 @@ interface UsageWithLimits {
     numberOfRequests: number;
     parallelUploads: number;
     imageOptimization: number;
+    ipfsBandwidth: number; // Bytes
+    ipfsNumberOfRequests: number;
   };
   limit: {
     bandwidth: number; // Bytes
     storageArweave: number; // Bytes
     storageIPFS: number; // Bytes
-    storageFilecoin: number; // Bytes
     domains: number;
     hnsDomains: number;
     ensDomains: number;
     parallelUploads: number;
     imageOptimization: number;
+    ipfsBandwidth: number; // Bytes
   };
 }
 

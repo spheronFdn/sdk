@@ -201,6 +201,9 @@ interface UsageWithLimits {
   storageFilecoinLimit?: number;
   usedImageOptimizations?: number;
   imageOptimizationsLimit?: number;
+  usedIpfsBandwidth: number;
+  ipfsBandwidthLimit?: number;
+  usedIpfsNumberOfRequests?: number;
 }
 
 interface UsageWithLimitsWithSkynet extends UsageWithLimits {
