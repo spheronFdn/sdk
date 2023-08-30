@@ -995,6 +995,62 @@ class SpheronApi {
 
   //#region Bucket API
 
+  async getOrganizationBuckets({
+    organizationId,
+    name,
+    state,
+    skip,
+    limit,
+  }: {
+    organizationId: string;
+    name?: string;
+    state?: BucketStateEnum;
+    skip: number;
+    limit: number;
+  }): Promise<{ buckets: Bucket[] }> {
+    if (!organizationId) {
+      throw new Error("Organization Id is not provided.");
+    }
+    if (skip < 0 || limit < 0) {
+      throw new Error(`Skip and Limit cannot be negative numbers.`);
+    }
+    return await this.sendApiRequest<{ buckets: Bucket[] }>(
+      HttpMethods.GET,
+      `/v1/organization/${organizationId}/buckets`,
+      null,
+      {
+        name: name ?? "",
+        state: state ?? "",
+        skip,
+        limit,
+      }
+    );
+  }
+
+  async getOrganizationBucketCount({
+    organizationId,
+    name,
+    state,
+  }: {
+    organizationId: string;
+    name?: string;
+    state?: BucketStateEnum;
+  }): Promise<{ count: number }> {
+    if (!organizationId) {
+      throw new Error("Organization Id is not provided.");
+    }
+
+    return await this.sendApiRequest<{ count: number }>(
+      HttpMethods.GET,
+      `/v1/organization/${organizationId}/buckets/count`,
+      null,
+      {
+        name: name ?? "",
+        state: state ?? "",
+      }
+    );
+  }
+
   async getBucket(bucketId: string): Promise<Bucket> {
     return await this.sendApiRequest<Bucket>(
       HttpMethods.GET,

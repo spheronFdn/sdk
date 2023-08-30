@@ -44,6 +44,8 @@ export {
 
 export interface SpheronClientConfiguration {
   token: string;
+  apiUrl?: string;
+  uploadApiUrl?: string;
 }
 
 export class SpheronClient {
@@ -54,9 +56,12 @@ export class SpheronClient {
 
   constructor(configuration: SpheronClientConfiguration) {
     this.configuration = configuration;
-    this.spheronApi = new SpheronApi(this.configuration.token);
+    this.spheronApi = new SpheronApi(
+      this.configuration.token,
+      configuration?.apiUrl
+    );
     this.bucketManager = new BucketManager(this.spheronApi);
-    this.uploadManager = new UploadManager();
+    this.uploadManager = new UploadManager(configuration?.uploadApiUrl);
   }
 
   async upload(
@@ -310,6 +315,34 @@ export class SpheronClient {
       token: this.configuration.token,
       cid: configuration.cid,
     });
+  }
+
+  async getOrganizationBuckets(
+    organizationId: string,
+    options: {
+      name?: string;
+      state?: BucketStateEnum;
+      skip: number;
+      limit: number;
+    }
+  ): Promise<Bucket[]> {
+    return await this.bucketManager.getOrganizationBuckets(
+      organizationId,
+      options
+    );
+  }
+
+  async getOrganizationBucketCount(
+    organizationId: string,
+    options?: {
+      name?: string;
+      state?: BucketStateEnum;
+    }
+  ): Promise<number> {
+    return await this.bucketManager.getOrganizationBucketCount(
+      organizationId,
+      options
+    );
   }
 
   async getBucket(bucketId: string): Promise<Bucket> {

@@ -24,6 +24,36 @@ class BucketManager {
     this.spheronApi = spheronApi;
   }
 
+  async getOrganizationBuckets(
+    organizationId: string,
+    options: {
+      name?: string;
+      state?: BucketStateEnum;
+      skip: number;
+      limit: number;
+    }
+  ): Promise<Bucket[]> {
+    const { buckets } = await this.spheronApi.getOrganizationBuckets({
+      organizationId,
+      ...options,
+    });
+    return buckets.map((x) => this.mapCoreBucket(x));
+  }
+
+  async getOrganizationBucketCount(
+    organizationId: string,
+    options?: {
+      name?: string;
+      state?: BucketStateEnum;
+    }
+  ): Promise<number> {
+    const { count } = await this.spheronApi.getOrganizationBucketCount({
+      organizationId,
+      ...options,
+    });
+    return count;
+  }
+
   async getBucket(bucketId: string): Promise<Bucket> {
     const bucket = await this.spheronApi.getBucket(bucketId);
     return this.mapCoreBucket(bucket);
