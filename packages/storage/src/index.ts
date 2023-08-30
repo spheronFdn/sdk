@@ -436,9 +436,7 @@ export class SpheronClient {
     await this.bucketManager.unarchiveBucket(bucketId);
   }
 
-  async getBucketUploadCount(bucketId: string): Promise<{
-    count: number;
-  }> {
+  async getBucketUploadCount(bucketId: string): Promise<number> {
     return await this.bucketManager.getBucketUploadCount(bucketId);
   }
 

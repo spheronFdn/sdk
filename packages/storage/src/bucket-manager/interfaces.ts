@@ -18,10 +18,10 @@ interface IpnsRecord {
   id: string;
   ipnsHash: string;
   ipnsLink: string;
-  publishedUploadId: string;
   bucketId: string;
   createdAt: Date;
   updatedAt: Date;
+  memoryUsed: number;
 }
 
 interface Bucket {

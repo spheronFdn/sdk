@@ -141,10 +141,9 @@ class BucketManager {
     return uploads.map((x) => this.mapCoreUpload(x));
   }
 
-  async getBucketUploadCount(bucketId: string): Promise<{
-    count: number;
-  }> {
-    return await this.spheronApi.getBucketUploadCount(bucketId);
+  async getBucketUploadCount(bucketId: string): Promise<number> {
+    const { count } = await this.spheronApi.getBucketUploadCount(bucketId);
+    return count;
   }
 
   async archiveBucket(bucketId: string): Promise<void> {
@@ -249,10 +248,10 @@ class BucketManager {
       id: ipnsRecord._id,
       ipnsHash: ipnsRecord.keyId,
       ipnsLink: ipnsRecord.ipnsLink,
-      publishedUploadId: ipnsRecord.upload._id ?? ipnsRecord.upload,
       bucketId: ipnsRecord.bucket,
       createdAt: ipnsRecord.createdAt,
       updatedAt: ipnsRecord.updatedAt,
+      memoryUsed: ipnsRecord.memoryUsed,
     };
   }
 }

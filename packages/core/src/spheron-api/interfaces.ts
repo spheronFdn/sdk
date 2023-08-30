@@ -517,11 +517,11 @@ interface BucketIpnsRecord {
   keyName: string;
   keyId: string;
   ipnsLink: string;
-  upload: Upload;
   bucket: string;
   targetCid: string;
   createdAt: Date;
   updatedAt: Date;
+  memoryUsed: number;
 }
 
 enum UploadStatusEnum {
