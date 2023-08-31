@@ -1223,6 +1223,25 @@ class SpheronApi {
     }>(HttpMethods.GET, `/v1/bucket/${bucketId}/uploads/count`);
   }
 
+  async migrateWebAppOrgToStorage(
+    webappOrganizationId: string,
+    storageOrganizationId: string
+  ): Promise<{
+    numberOfBuckets: number;
+    numberOfUploads: number;
+  }> {
+    return await this.sendApiRequest<{
+      numberOfBuckets: number;
+      numberOfUploads: number;
+    }>(
+      HttpMethods.POST,
+      `/v1/organization/${storageOrganizationId}/migrate-to-storage`,
+      {
+        webappOrganizationId,
+      }
+    );
+  }
+
   //#endregion Bucket API
 
   //#region Upload API

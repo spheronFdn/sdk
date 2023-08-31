@@ -45,7 +45,6 @@ export {
 export interface SpheronClientConfiguration {
   token: string;
   apiUrl?: string;
-  uploadApiUrl?: string;
 }
 
 export class SpheronClient {
@@ -61,7 +60,7 @@ export class SpheronClient {
       configuration?.apiUrl
     );
     this.bucketManager = new BucketManager(this.spheronApi);
-    this.uploadManager = new UploadManager(configuration?.uploadApiUrl);
+    this.uploadManager = new UploadManager(configuration?.apiUrl);
   }
 
   async upload(
@@ -528,6 +527,19 @@ export class SpheronClient {
     ipnsRecordId: string
   ): Promise<void> {
     await this.spheronApi.deleteBucketIpnsRecord(bucketId, ipnsRecordId);
+  }
+
+  async migrateWebAppOrgToStorage(
+    webappOrganizationId: string,
+    storageOrganizationId: string
+  ): Promise<{
+    numberOfBuckets: number;
+    numberOfUploads: number;
+  }> {
+    return await this.spheronApi.migrateWebAppOrgToStorage(
+      webappOrganizationId,
+      storageOrganizationId
+    );
   }
 }
 
