@@ -1235,7 +1235,7 @@ class SpheronApi {
       numberOfUploads: number;
     }>(
       HttpMethods.POST,
-      `/v1/organization/${storageOrganizationId}/migrate-to-storage`,
+      `/v1/organization/${storageOrganizationId}/migrate-projects`,
       {
         webappOrganizationId,
       }
