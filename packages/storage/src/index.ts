@@ -529,14 +529,14 @@ export class SpheronClient {
     await this.spheronApi.deleteBucketIpnsRecord(bucketId, ipnsRecordId);
   }
 
-  async migrateWebAppOrgToStorage(
+  async migrateStaticSiteOrgToStorage(
     webappOrganizationId: string,
     storageOrganizationId: string
   ): Promise<{
     numberOfBuckets: number;
     numberOfUploads: number;
   }> {
-    return await this.spheronApi.migrateWebAppOrgToStorage(
+    return await this.spheronApi.migrateStaticSiteOrgToStorage(
       webappOrganizationId,
       storageOrganizationId
     );

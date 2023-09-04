@@ -1223,7 +1223,7 @@ class SpheronApi {
     }>(HttpMethods.GET, `/v1/bucket/${bucketId}/uploads/count`);
   }
 
-  async migrateWebAppOrgToStorage(
+  async migrateStaticSiteOrgToStorage(
     webappOrganizationId: string,
     storageOrganizationId: string
   ): Promise<{
