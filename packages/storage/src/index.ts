@@ -7,7 +7,6 @@ import BucketManager, {
   UploadStatusEnum,
 } from "./bucket-manager";
 import {
-  IPNSName,
   ProtocolEnum,
   SpheronApi,
   TokenScope,
@@ -17,7 +16,7 @@ import {
 } from "@spheron/core";
 import { createPayloads } from "./fs-payload-creator";
 import { ipfs } from "./ipfs.utils";
-import { UsageWithLimits } from "./bucket-manager/interfaces";
+import { IpnsRecord, UsageWithLimits } from "./bucket-manager/interfaces";
 import { DecryptFromIpfsProps, EncryptToIpfsProps } from "./interface";
 import {
   uint8arrayFromString,
@@ -39,12 +38,13 @@ export {
   UploadStatusEnum,
   UsageWithLimits,
   TokenScope,
-  IPNSName,
   uint8arrayToString,
+  IpnsRecord,
 };
 
 export interface SpheronClientConfiguration {
   token: string;
+  apiUrl?: string;
 }
 
 export class SpheronClient {
@@ -55,9 +55,12 @@ export class SpheronClient {
 
   constructor(configuration: SpheronClientConfiguration) {
     this.configuration = configuration;
-    this.spheronApi = new SpheronApi(this.configuration.token);
+    this.spheronApi = new SpheronApi(
+      this.configuration.token,
+      configuration?.apiUrl
+    );
     this.bucketManager = new BucketManager(this.spheronApi);
-    this.uploadManager = new UploadManager();
+    this.uploadManager = new UploadManager(configuration?.apiUrl);
   }
 
   async upload(
@@ -70,8 +73,8 @@ export class SpheronClient {
       onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
     }
   ): Promise<UploadResult> {
-    const { deploymentId, payloadSize, parallelUploadCount } =
-      await this.uploadManager.initiateDeployment({
+    const { uploadId, payloadSize, parallelUploadCount } =
+      await this.uploadManager.initiateUpload({
         protocol: configuration.protocol,
         name: configuration.name,
         organizationId: configuration.organizationId,
@@ -84,12 +87,12 @@ export class SpheronClient {
       const { payloads, totalSize } = await createPayloads(path, payloadSize);
 
       configuration.onUploadInitiated &&
-        configuration.onUploadInitiated(deploymentId);
+        configuration.onUploadInitiated(uploadId);
 
       const uploadPayloadsResult = await this.uploadManager.uploadPayloads(
         payloads,
         {
-          deploymentId,
+          uploadId,
           token: this.configuration.token,
           parallelUploadCount,
           onChunkUploaded: (uploadedSize: number) =>
@@ -105,8 +108,8 @@ export class SpheronClient {
       caughtError = error;
     }
 
-    const result = await this.uploadManager.finalizeUploadDeployment(
-      deploymentId,
+    const result = await this.uploadManager.finalizeUpload(
+      uploadId,
       success,
       this.configuration.token
     );
@@ -120,10 +123,10 @@ export class SpheronClient {
     }
 
     return {
-      uploadId: result.deploymentId,
-      bucketId: result.projectId,
-      protocolLink: result.sitePreview,
-      dynamicLinks: result.affectedDomains,
+      uploadId: result.uploadId,
+      bucketId: result.bucketId,
+      protocolLink: result.protocolLink,
+      dynamicLinks: result.dynamicLinks,
       cid: result.cid,
     };
   }
@@ -196,15 +199,15 @@ export class SpheronClient {
         chain,
       });
 
-      const { deploymentId, parallelUploadCount } =
-        await this.uploadManager.initiateDeployment({
+      const { uploadId, parallelUploadCount } =
+        await this.uploadManager.initiateUpload({
           protocol: ProtocolEnum.IPFS,
           name: configuration.name,
           token: this.configuration.token,
         });
 
       configuration.onUploadInitiated &&
-        configuration.onUploadInitiated(deploymentId);
+        configuration.onUploadInitiated(uploadId);
 
       let success = true;
       let caughtError: Error | undefined = undefined;
@@ -215,7 +218,7 @@ export class SpheronClient {
         const uploadPayloadsResult = await this.uploadManager.uploadPayloads(
           [form],
           {
-            deploymentId,
+            uploadId,
             token: this.configuration.token,
             parallelUploadCount,
             onChunkUploaded: (uploadedSize: number) =>
@@ -231,8 +234,8 @@ export class SpheronClient {
         caughtError = error;
       }
 
-      const result = await this.uploadManager.finalizeUploadDeployment(
-        deploymentId,
+      const result = await this.uploadManager.finalizeUpload(
+        uploadId,
         success,
         this.configuration.token
       );
@@ -246,10 +249,10 @@ export class SpheronClient {
       }
 
       return {
-        uploadId: result.deploymentId,
-        bucketId: result.projectId,
-        protocolLink: result.sitePreview,
-        dynamicLinks: result.affectedDomains,
+        uploadId: result.uploadId,
+        bucketId: result.bucketId,
+        protocolLink: result.protocolLink,
+        dynamicLinks: result.dynamicLinks,
         cid: result.cid,
       };
     } catch (e) {
@@ -289,16 +292,15 @@ export class SpheronClient {
     name: string;
     protocol: ProtocolEnum;
   }): Promise<{ uploadToken: string }> {
-    const { singleDeploymentToken } =
-      await this.uploadManager.initiateDeployment({
-        protocol: configuration.protocol,
-        name: configuration.name,
-        token: this.configuration.token,
-        createSingleDeploymentToken: true,
-      });
+    const { singleUseToken } = await this.uploadManager.initiateUpload({
+      protocol: configuration.protocol,
+      name: configuration.name,
+      token: this.configuration.token,
+      createSingleUseToken: true,
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return { uploadToken: singleDeploymentToken! };
+    return { uploadToken: singleUseToken! };
   }
 
   async pinCID(configuration: { name: string; cid: string }): Promise<{
@@ -307,19 +309,39 @@ export class SpheronClient {
     protocolLink: string;
     dynamicLinks: string[];
   }> {
-    const { deploymentId, projectId, sitePreview, affectedDomains } =
-      await this.uploadManager.pinCID({
-        name: configuration.name,
-        token: this.configuration.token,
-        cid: configuration.cid,
-      });
+    return await this.uploadManager.pinCID({
+      name: configuration.name,
+      token: this.configuration.token,
+      cid: configuration.cid,
+    });
+  }
 
-    return {
-      uploadId: deploymentId,
-      bucketId: projectId,
-      protocolLink: sitePreview,
-      dynamicLinks: affectedDomains,
-    };
+  async getOrganizationBuckets(
+    organizationId: string,
+    options: {
+      name?: string;
+      state?: BucketStateEnum;
+      skip: number;
+      limit: number;
+    }
+  ): Promise<Bucket[]> {
+    return await this.bucketManager.getOrganizationBuckets(
+      organizationId,
+      options
+    );
+  }
+
+  async getOrganizationBucketCount(
+    organizationId: string,
+    options?: {
+      name?: string;
+      state?: BucketStateEnum;
+    }
+  ): Promise<number> {
+    return await this.bucketManager.getOrganizationBucketCount(
+      organizationId,
+      options
+    );
   }
 
   async getBucket(bucketId: string): Promise<Bucket> {
@@ -413,37 +435,7 @@ export class SpheronClient {
     await this.bucketManager.unarchiveBucket(bucketId);
   }
 
-  async publishIPNS(uploadId: string): Promise<IPNSName> {
-    return await this.spheronApi.publishIPNS(uploadId);
-  }
-
-  async updateIPNSName(
-    ipnsNameId: string,
-    uploadId: string
-  ): Promise<IPNSName> {
-    return await this.spheronApi.updateIPNSName(ipnsNameId, uploadId);
-  }
-
-  async getIPNSName(ipnsNameId: string): Promise<IPNSName> {
-    return await this.spheronApi.getIPNSName(ipnsNameId);
-  }
-
-  async getIPNSNamesForUpload(uploadId: string): Promise<IPNSName[]> {
-    return await this.spheronApi.getIPNSNamesForUpload(uploadId);
-  }
-
-  async getIPNSNamesForOrganization(
-    organizationId: string
-  ): Promise<IPNSName[]> {
-    return await this.spheronApi.getIPNSNamesForOrganization(organizationId);
-  }
-
-  async getBucketUploadCount(bucketId: string): Promise<{
-    total: number;
-    successful: number;
-    failed: number;
-    pending: number;
-  }> {
+  async getBucketUploadCount(bucketId: string): Promise<number> {
     return await this.bucketManager.getBucketUploadCount(bucketId);
   }
 
@@ -464,7 +456,7 @@ export class SpheronClient {
   async getOrganizationUsage(organizationId: string): Promise<UsageWithLimits> {
     const usage = await this.spheronApi.getOrganizationUsage(
       organizationId,
-      "wa-global"
+      "storage"
     );
 
     return {
@@ -472,22 +464,82 @@ export class SpheronClient {
         bandwidth: usage.usedBandwidth ?? 0,
         storageArweave: usage.usedStorageArweave ?? 0,
         storageIPFS: usage.usedStorageIPFS ?? 0,
+        storageFilecoin: usage.usedStorageFilecoin ?? 0,
         domains: usage.usedDomains ?? 0,
+        hnsDomains: usage.usedHnsDomains ?? 0,
+        ensDomains: usage.usedEnsDomains ?? 0,
         numberOfRequests: usage.usedNumberOfRequests ?? 0,
         parallelUploads: usage.usedParallelUploads ?? 0,
+        imageOptimization: usage.usedImageOptimizations ?? 0,
+        ipfsBandwidth: usage.usedIpfsBandwidth ?? 0,
+        ipfsNumberOfRequests: usage.usedIpfsNumberOfRequests ?? 0,
       },
       limit: {
         bandwidth: usage.bandwidthLimit ?? 0,
         storageArweave: usage.storageArweaveLimit ?? 0,
         storageIPFS: usage.storageIPFSLimit ?? 0,
         domains: usage.domainsLimit ?? 0,
+        hnsDomains: usage.usedHnsDomains ?? 0,
+        ensDomains: usage.usedEnsDomains ?? 0,
         parallelUploads: usage.parallelUploadsLimit ?? 0,
+        imageOptimization: usage.imageOptimizationsLimit ?? 0,
+        ipfsBandwidth: usage.ipfsBandwidthLimit ?? 0,
       },
     };
   }
 
   async getTokenScope(): Promise<TokenScope> {
     return await this.spheronApi.getTokenScope();
+  }
+
+  async getBucketIpnsRecords(bucketId: string): Promise<IpnsRecord[]> {
+    return await this.bucketManager.getBucketIpnsRecords(bucketId);
+  }
+
+  async getBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string
+  ): Promise<IpnsRecord> {
+    return await this.bucketManager.getBucketIpnsRecord(bucketId, ipnsRecordId);
+  }
+
+  async addBucketIpnsRecord(
+    bucketId: string,
+    uploadId: string
+  ): Promise<IpnsRecord> {
+    return await this.bucketManager.addBucketIpnsRecord(bucketId, uploadId);
+  }
+
+  async updateBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string,
+    uploadId: string
+  ): Promise<IpnsRecord> {
+    return await this.bucketManager.updateBucketIpnsRecord(
+      bucketId,
+      ipnsRecordId,
+      uploadId
+    );
+  }
+
+  async deleteBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string
+  ): Promise<void> {
+    await this.spheronApi.deleteBucketIpnsRecord(bucketId, ipnsRecordId);
+  }
+
+  async migrateStaticSiteOrgToStorage(
+    webappOrganizationId: string,
+    storageOrganizationId: string
+  ): Promise<{
+    numberOfBuckets: number;
+    numberOfUploads: number;
+  }> {
+    return await this.spheronApi.migrateStaticSiteOrgToStorage(
+      webappOrganizationId,
+      storageOrganizationId
+    );
   }
 }
 

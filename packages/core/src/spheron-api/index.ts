@@ -35,6 +35,11 @@ import {
   MarketplaceApp,
   ComputeMachine,
   InstanceOrderLogs,
+  Bucket,
+  BucketStateEnum,
+  Upload,
+  BucketDomain,
+  BucketIpnsRecord,
 } from "./interfaces";
 import {
   CreateInstanceFromMarketplaceRequest,
@@ -47,14 +52,13 @@ import {
 } from "./response-interfaces";
 
 class SpheronApi {
-  private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
+  private readonly spheronApiUrl: string;
+
   private readonly token: string;
 
   constructor(token: string, url?: string) {
     this.token = token;
-    if (url) {
-      this.spheronApiUrl = url;
-    }
+    this.spheronApiUrl = url ?? "https://api-v2.spheron.network";
   }
 
   async getTokenScope(): Promise<TokenScope> {
@@ -325,7 +329,7 @@ class SpheronApi {
 
   async getOrganizationUsage(
     organizationId: string,
-    specialization: "wa-global" | "c-akash"
+    specialization: "wa-global" | "c-akash" | "storage"
   ): Promise<UsageWithLimitsWithSkynet> {
     const { usage } = await this.sendApiRequest<{
       usage: UsageWithLimitsWithSkynet;
@@ -988,6 +992,268 @@ class SpheronApi {
 
     return response;
   }
+
+  //#region Bucket API
+
+  async getOrganizationBuckets({
+    organizationId,
+    name,
+    state,
+    skip,
+    limit,
+  }: {
+    organizationId: string;
+    name?: string;
+    state?: BucketStateEnum;
+    skip: number;
+    limit: number;
+  }): Promise<{ buckets: Bucket[] }> {
+    if (!organizationId) {
+      throw new Error("Organization Id is not provided.");
+    }
+    if (skip < 0 || limit < 0) {
+      throw new Error(`Skip and Limit cannot be negative numbers.`);
+    }
+    return await this.sendApiRequest<{ buckets: Bucket[] }>(
+      HttpMethods.GET,
+      `/v1/organization/${organizationId}/buckets`,
+      null,
+      {
+        name: name ?? "",
+        state: state ?? "",
+        skip,
+        limit,
+      }
+    );
+  }
+
+  async getOrganizationBucketCount({
+    organizationId,
+    name,
+    state,
+  }: {
+    organizationId: string;
+    name?: string;
+    state?: BucketStateEnum;
+  }): Promise<{ count: number }> {
+    if (!organizationId) {
+      throw new Error("Organization Id is not provided.");
+    }
+
+    return await this.sendApiRequest<{ count: number }>(
+      HttpMethods.GET,
+      `/v1/organization/${organizationId}/buckets/count`,
+      null,
+      {
+        name: name ?? "",
+        state: state ?? "",
+      }
+    );
+  }
+
+  async getBucket(bucketId: string): Promise<Bucket> {
+    return await this.sendApiRequest<Bucket>(
+      HttpMethods.GET,
+      `/v1/bucket/${bucketId}`
+    );
+  }
+
+  async updateBucketState(
+    bucketId: string,
+    state: BucketStateEnum
+  ): Promise<Bucket> {
+    return await this.sendApiRequest<Bucket>(
+      HttpMethods.PATCH,
+      `/v1/bucket/${bucketId}/state`,
+      { state }
+    );
+  }
+
+  async getBucketDomains(
+    bucketId: string
+  ): Promise<{ domains: BucketDomain[] }> {
+    return await this.sendApiRequest<{ domains: BucketDomain[] }>(
+      HttpMethods.GET,
+      `/v1/bucket/${bucketId}/domains`
+    );
+  }
+
+  async getBucketDomain(
+    bucketId: string,
+    domainIdentifier: string
+  ): Promise<{ domain: BucketDomain }> {
+    return await this.sendApiRequest<{ domain: BucketDomain }>(
+      HttpMethods.GET,
+      `/v1/bucket/${bucketId}/domains/${domainIdentifier}`
+    );
+  }
+
+  async addBucketDomain(
+    bucketId: string,
+    options: {
+      link?: string;
+      type: DomainTypeEnum | string;
+      name: string;
+    }
+  ): Promise<{ domain: BucketDomain }> {
+    return await this.sendApiRequest<{ domain: BucketDomain }>(
+      HttpMethods.POST,
+      `/v1/bucket/${bucketId}/domains`,
+      options
+    );
+  }
+
+  async patchBucketDomain(
+    bucketId: string,
+    domainIdentifier: string,
+    options: {
+      link?: string;
+      name: string;
+    }
+  ): Promise<{ domain: BucketDomain }> {
+    return await this.sendApiRequest<{ domain: BucketDomain }>(
+      HttpMethods.PATCH,
+      `/v1/bucket/${bucketId}/domains/${domainIdentifier}`,
+      options
+    );
+  }
+
+  async verifyBucketDomain(
+    bucketId: string,
+    domainIdentifier: string
+  ): Promise<{ success: boolean; domain: BucketDomain }> {
+    return await this.sendApiRequest<{
+      success: boolean;
+      domain: BucketDomain;
+    }>(
+      HttpMethods.PATCH,
+      `/v1/bucket/${bucketId}/domains/${domainIdentifier}/verify`,
+      {}
+    );
+  }
+
+  async deleteBucketDomain(
+    bucketId: string,
+    domainIdentifier: string
+  ): Promise<void> {
+    await this.sendApiRequest(
+      HttpMethods.DELETE,
+      `/v1/bucket/${bucketId}/domains/${domainIdentifier}`
+    );
+  }
+
+  async getBucketIpnsRecords(
+    bucketId: string
+  ): Promise<{ ipnsRecords: BucketIpnsRecord[] }> {
+    return await this.sendApiRequest<{ ipnsRecords: BucketIpnsRecord[] }>(
+      HttpMethods.GET,
+      `/v1/bucket/${bucketId}/ipns-records`
+    );
+  }
+
+  async getBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string
+  ): Promise<{ ipnsRecord: BucketIpnsRecord }> {
+    return await this.sendApiRequest<{ ipnsRecord: BucketIpnsRecord }>(
+      HttpMethods.GET,
+      `/v1/bucket/${bucketId}/ipns-records/${ipnsRecordId}`
+    );
+  }
+
+  async addBucketIpnsRecord(
+    bucketId: string,
+    uploadId: string
+  ): Promise<{ ipnsRecord: BucketIpnsRecord }> {
+    return await this.sendApiRequest<{ ipnsRecord: BucketIpnsRecord }>(
+      HttpMethods.POST,
+      `/v1/bucket/${bucketId}/ipns-records`,
+      {
+        uploadId,
+      }
+    );
+  }
+
+  async patchBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string,
+    uploadId: string
+  ): Promise<{ ipnsRecord: BucketIpnsRecord }> {
+    return await this.sendApiRequest<{ ipnsRecord: BucketIpnsRecord }>(
+      HttpMethods.PATCH,
+      `/v1/bucket/${bucketId}/ipns-records/${ipnsRecordId}`,
+      {
+        uploadId,
+      }
+    );
+  }
+
+  async deleteBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string
+  ): Promise<void> {
+    await this.sendApiRequest(
+      HttpMethods.DELETE,
+      `/v1/bucket/${bucketId}/ipns-records/${ipnsRecordId}`
+    );
+  }
+
+  async getBucketUploads(
+    bucketId: string,
+    options: {
+      skip: number;
+      limit: number;
+    }
+  ): Promise<{ uploads: Upload[] }> {
+    if (options.skip < 0 || options.limit < 0) {
+      throw new Error(`Skip and Limit cannot be negative numbers.`);
+    }
+    const uploads = await this.sendApiRequest<Upload[]>(
+      HttpMethods.GET,
+      `/v1/bucket/${bucketId}/uploads?skip=${options.skip}&limit=${options.limit}`
+    );
+    return { uploads };
+  }
+
+  async getBucketUploadCount(bucketId: string): Promise<{
+    count: number;
+  }> {
+    return await this.sendApiRequest<{
+      count: number;
+    }>(HttpMethods.GET, `/v1/bucket/${bucketId}/uploads/count`);
+  }
+
+  async migrateStaticSiteOrgToStorage(
+    webappOrganizationId: string,
+    storageOrganizationId: string
+  ): Promise<{
+    numberOfBuckets: number;
+    numberOfUploads: number;
+  }> {
+    return await this.sendApiRequest<{
+      numberOfBuckets: number;
+      numberOfUploads: number;
+    }>(
+      HttpMethods.POST,
+      `/v1/organization/${storageOrganizationId}/migrate-projects`,
+      {
+        webappOrganizationId,
+      }
+    );
+  }
+
+  //#endregion Bucket API
+
+  //#region Upload API
+
+  async getUpload(uploadId: string): Promise<Upload> {
+    const { upload } = await this.sendApiRequest<{
+      upload: Upload;
+    }>(HttpMethods.GET, `/v1/upload/${uploadId}`);
+    return upload;
+  }
+
+  //#region Upload API
 
   private async sendApiRequest<T>(
     method: HttpMethods,
