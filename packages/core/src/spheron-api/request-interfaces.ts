@@ -1,4 +1,4 @@
-import { ClusterProtocolEnum, AutoscalingNumberOfChecksEnum, AutoscalingTimeWindowEnum } from "./enums";
+import { ClusterProtocolEnum } from "./enums";
 import { Env, PersistentStorage, Port } from "./interfaces";
 
 interface CreateInstanceRequest {
@@ -29,40 +29,6 @@ interface CreateInstanceRequest {
   scalable?: boolean;
 }
 
-interface IAutoscalingRulesThreshold {
-  cpuThreshold: {
-    step: number;
-    utilizationPercentage: number;
-    checksInAlarm: number;
-  };
-  memoryThreshold: {
-    step: number;
-    utilizationPercentage: number;
-    checksInAlarm: number;
-  };
-}
-
-interface IAutoscalingRules {
-  numberOfChecks: AutoscalingNumberOfChecksEnum;
-  timeWindow: AutoscalingTimeWindowEnum;
-  minimumInstances: number;
-  maxInstances: number;
-  scaleUp: IAutoscalingRulesThreshold;
-  scaleDown: IAutoscalingRulesThreshold;
-  cooldown: number;
-  lastScaleAction: Date;
-  lastScaleCheck: Date;
-  windowCounter: {
-    numberOfChecksPreformed: number;
-    numberOfRequestsAboveCPULimit: number;
-    numberOfRequestsBelowCPULimit: number;
-    numberOfRequestsAboveMemoryLimit: number;
-    numberOfRequestsBelowMemoryLimit: number;
-  };
-  averageCpuUtilization: number;
-  averageMemoryUtilization: number;
-}
-
 interface CreateInstanceFromMarketplaceRequest {
   templateId: string;
   environmentVariables: MarketplaceDeploymentVariable[];
@@ -73,7 +39,6 @@ interface CreateInstanceFromMarketplaceRequest {
   customInstanceSpecs?: CustomInstanceSpecs;
   scalable: boolean;
   instanceCount?: number;
-  autoscalingRules?: IAutoscalingRules;
 }
 
 interface MarketplaceDeploymentVariable {
@@ -103,5 +68,4 @@ export {
   CreateInstanceFromMarketplaceRequest,
   MarketplaceDeploymentVariable,
   UpdateInstaceRequest,
-  IAutoscalingRules,
 };

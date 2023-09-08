@@ -125,21 +125,6 @@ enum ClusterProtocolEnum {
   AKASH = "akash",
 }
 
-enum AutoscalingNumberOfChecksEnum {
-  CHECKS_1 = 1,
-  CHECKS_2 = 2,
-  CHECKS_4 = 4,
-  CHECKS_8 = 8,
-  CHECKS_16 = 16,
-}
-
-enum AutoscalingTimeWindowEnum {
-  WINDOW_60 = 60, // 1min
-  WINDOW_120 = 120, // 2min
-  WINDOW_300 = 300, // 5min
-  WINDOW_6000 = 600, // 10min
-}
-
 export {
   ProjectTypeEnum,
   DeploymentEnvironmentStatusEnum,
@@ -157,7 +142,5 @@ export {
   MarketplaceCategoryEnum,
   InstanceLogType,
   PersistentStorageClassEnum,
-  ClusterProtocolEnum,
-  AutoscalingNumberOfChecksEnum,
-  AutoscalingTimeWindowEnum
+  ClusterProtocolEnum
 };

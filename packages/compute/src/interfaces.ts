@@ -12,7 +12,6 @@ import {
   HealthStatusEnum,
   PersistentStorage,
   PersistentStorageClassEnum,
-  IAutoscalingRules,
 } from "@spheron/core";
 
 interface Organization {
@@ -194,7 +193,6 @@ interface MarketplaceInstanceCreationConfig {
     mountPoint: string;
   };
   replicas: number;
-  autoscalingRules?: IAutoscalingRules
 }
 
 interface InstanceResponse {
