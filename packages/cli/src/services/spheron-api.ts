@@ -180,7 +180,7 @@ const SpheronApiService = {
       return { response: "" };
     }
     spinner.spin(spinnerMessage);
-    const params: {
+    const data: {
       type: string;
       query: string;
       file?: string;
@@ -191,7 +191,7 @@ const SpheronApiService = {
       ...(file && { file }),
       ...(lang && { lang }),
     };
-    const gptResponse: IGPTResponse = await client.getGPTResponse(params);
+    const gptResponse: IGPTResponse = await client.getGPTResponse(data);
 
     return gptResponse;
   },

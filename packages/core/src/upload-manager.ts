@@ -25,37 +25,41 @@ export interface UploadResult {
 }
 
 class UploadManager {
-  private readonly spheronApiUrl: string = "https://api-v2.spheron.network";
+  private readonly spheronApiUrl: string;
 
-  public async initiateDeployment(configuration: {
+  constructor(apiUrl?: string) {
+    this.spheronApiUrl = apiUrl ?? "https://api-v2.spheron.network";
+  }
+
+  public async initiateUpload(configuration: {
     protocol: ProtocolEnum;
     name: string;
     organizationId?: string;
     token: string;
-    createSingleDeploymentToken?: boolean;
+    createSingleUseToken?: boolean;
   }): Promise<{
-    deploymentId: string;
+    uploadId: string;
     parallelUploadCount: number;
     payloadSize: number;
-    singleDeploymentToken?: string;
+    singleUseToken?: string;
   }> {
     try {
       this.validateUploadConfiguration(configuration);
 
-      let url = `${this.spheronApiUrl}/v1/upload-deployment?protocol=${configuration.protocol}&project=${configuration.name}`;
+      let url = `${this.spheronApiUrl}/v1/upload/initiate?protocol=${configuration.protocol}&bucket=${configuration.name}`;
 
       if (configuration.organizationId) {
         url += `&organization=${configuration.organizationId}`;
       }
 
-      if (configuration.createSingleDeploymentToken) {
-        url += `&create_single_deployment_token=${configuration.createSingleDeploymentToken}`;
+      if (configuration.createSingleUseToken) {
+        url += `&create_single_use_token=${configuration.createSingleUseToken}`;
       }
 
       const response = await axios.post<{
-        deploymentId: string;
+        uploadId: string;
         parallelUploadCount: number;
-        singleDeploymentToken?: string;
+        singleUseToken?: string;
         payloadSize: number;
       }>(
         url,
@@ -78,26 +82,26 @@ class UploadManager {
     token: string;
     cid: string;
   }): Promise<{
-    deploymentId: string;
-    projectId: string;
-    sitePreview: string;
-    affectedDomains: string[];
+    uploadId: string;
+    bucketId: string;
+    protocolLink: string;
+    dynamicLinks: string[];
   }> {
     try {
       if (!configuration.name) {
         throw new Error("Bucket name is not provided.");
       }
-      let url = `${this.spheronApiUrl}/v1/ipfs/pin/${configuration.cid}?project=${configuration.name}`;
+      let url = `${this.spheronApiUrl}/v2/ipfs/pin/${configuration.cid}?bucket=${configuration.name}`;
 
       if (configuration.organizationId) {
         url += `&organization=${configuration.organizationId}`;
       }
 
       const response = await axios.post<{
-        deploymentId: string;
-        projectId: string;
-        sitePreview: string;
-        affectedDomains: string[];
+        uploadId: string;
+        bucketId: string;
+        protocolLink: string;
+        dynamicLinks: string[];
       }>(
         url,
         {},
@@ -119,10 +123,9 @@ class UploadManager {
       if (!CID) {
         throw new Error("CID is not provided.");
       }
-      const url = `${this.spheronApiUrl}/v1/ipfs/pins/${CID}/status`;
+      const url = `${this.spheronApiUrl}/v2/ipfs/pins/${CID}/status`;
       const response = await axios.get<{ pinStatus: PinStatus }>(url);
       return response.data;
-
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
       throw new Error(errorMessage);
@@ -132,7 +135,7 @@ class UploadManager {
   public async uploadPayloads(
     payloads: FormData[],
     configuration: {
-      deploymentId: string;
+      uploadId: string;
       token: string;
       parallelUploadCount: number;
       onChunkUploaded?: (uploadedSize: number) => void;
@@ -141,13 +144,13 @@ class UploadManager {
     let errorMessage = "";
     const limit = pLimit(configuration.parallelUploadCount);
 
-    const uploadPayload = async (payload: FormData, deploymentId: string) => {
+    const uploadPayload = async (payload: FormData, uploadId: string) => {
       try {
         if (errorMessage) {
           return;
         }
         const { data } = await axios.post<{ uploadSize: number }>(
-          `${this.spheronApiUrl}/v1/upload-deployment/${deploymentId}/data`,
+          `${this.spheronApiUrl}/v1/upload/${uploadId}/data`,
           payload,
           this.getAxiosRequestConfig(configuration.token)
         );
@@ -160,38 +163,36 @@ class UploadManager {
 
     await Promise.all(
       payloads.map((payload) =>
-        limit(() => uploadPayload(payload, configuration.deploymentId))
+        limit(() => uploadPayload(payload, configuration.uploadId))
       )
     );
     return { success: !errorMessage, errorMessage: errorMessage };
   }
 
-  public async finalizeUploadDeployment(
-    deploymentId: string,
+  public async finalizeUpload(
+    uploadId: string,
     upload: boolean,
     token: string
   ): Promise<{
     success: boolean;
     message: string;
-    deploymentId: string;
-    projectId: string;
-    sitePreview: string;
-    affectedDomains: string[];
+    uploadId: string;
+    bucketId: string;
+    protocolLink: string;
+    dynamicLinks: string[];
     cid: string;
   }> {
     try {
       const response = await axios.post<{
         success: boolean;
         message: string;
-        deploymentId: string;
-        projectId: string;
-        sitePreview: string;
-        affectedDomains: string[];
+        uploadId: string;
+        bucketId: string;
+        protocolLink: string;
+        dynamicLinks: string[];
         cid: string;
       }>(
-        `${
-          this.spheronApiUrl
-        }/v1/upload-deployment/${deploymentId}/finish?action=${
+        `${this.spheronApiUrl}/v1/upload/${uploadId}/finish?action=${
           upload ? "UPLOAD" : "CANCEL"
         }`,
         {},

@@ -116,9 +116,9 @@ enum InstanceLogType {
 }
 
 enum PersistentStorageClassEnum {
-  BETA1 = "beta1",
-  BETA2 = "beta2",
-  BETA3 = "beta3",
+  HDD = "beta1",
+  SSD = "beta2",
+  NVMe = "beta3",
 }
 enum ClusterProtocolEnum {
   AKASH = "akash",

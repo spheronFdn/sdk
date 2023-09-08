@@ -19,12 +19,13 @@ import {
   UpdateInstaceRequest,
   MarketplaceDeploymentVariable,
   InstancesInfo as InstancesInfoCore,
+  Port,
 } from "@spheron/core";
 import {
   InstanceDetailed,
   InstanceDeployment,
   DeploymentTypeEnum,
-  EnvironmentVar,
+  EnvironmentVariable,
   InstanceCreationConfig,
   MarketplaceInstanceCreationConfig,
   InstanceUpdateConfig,
@@ -107,12 +108,14 @@ const mapClusterInstance = (input: InstanceCore): Instance => {
       machineName: input.agreedMachineImageType.machineType,
       agreementDate: input.agreedMachineImageType.agreementDate,
     },
-    healthCheck: {
-      path: input.healthCheck.url,
-      port: input.healthCheck.port,
-      status: input.healthCheck.status,
-      timestamp: input.healthCheck.timestamp,
-    },
+    healthCheck: input.healthCheck
+      ? {
+          path: input.healthCheck?.url,
+          port: input.healthCheck?.port,
+          status: input.healthCheck?.status,
+          timestamp: input.healthCheck?.timestamp,
+        }
+      : undefined,
     createdAt: input.createdAt,
     updatedAt: input.updatedAt,
   };
@@ -160,8 +163,8 @@ const mapInstanceDeployment = (
     });
   }
 
-  const env: EnvironmentVar[] = [];
-  const secretEnv: EnvironmentVar[] = [];
+  const env: EnvironmentVariable[] = [];
+  const secretEnv: EnvironmentVariable[] = [];
 
   input.clusterInstanceConfiguration.env.forEach((ev: Env) => {
     if (ev.isSecret) {
@@ -198,11 +201,32 @@ const mapInstanceDeployment = (
         agreementDate:
           input.clusterInstanceConfiguration.agreedMachineImage.agreementDate,
         cpu: input.clusterInstanceConfiguration.agreedMachineImage.cpu,
-        memory: input.clusterInstanceConfiguration.agreedMachineImage.memory,
-        storage: input.clusterInstanceConfiguration.agreedMachineImage.storage,
-        persistentStorage:
-          input.clusterInstanceConfiguration.agreedMachineImage
-            .persistentStorage,
+        memory: Number(
+          input.clusterInstanceConfiguration.agreedMachineImage.memory.split(
+            "Gi"
+          )[0]
+        ),
+        storage: Number(
+          input.clusterInstanceConfiguration.agreedMachineImage.storage.split(
+            "Gi"
+          )[0]
+        ),
+        persistentStorage: input.clusterInstanceConfiguration.agreedMachineImage
+          .persistentStorage
+          ? {
+              size: Number(
+                input.clusterInstanceConfiguration.agreedMachineImage.persistentStorage.size.split(
+                  "Gi"
+                )[0]
+              ),
+              class:
+                input.clusterInstanceConfiguration.agreedMachineImage
+                  .persistentStorage.class,
+              mountPoint:
+                input.clusterInstanceConfiguration.agreedMachineImage
+                  .persistentStorage.mountPoint,
+            }
+          : undefined,
       },
     },
     connectionUrls: urlList,
@@ -213,7 +237,7 @@ const mapInstanceDeployment = (
 const mapCreateInstanceRequest = (
   input: InstanceCreationConfig,
   organizationId: string,
-  machineImageName: string
+  machineImageName?: string
 ): CreateInstanceRequest => {
   return {
     organizationId,
@@ -223,17 +247,33 @@ const mapCreateInstanceRequest = (
       protocol: ClusterProtocolEnum.AKASH,
       image: input.configuration.image,
       tag: input.configuration.tag,
-      instanceCount: 1,
+      instanceCount: input.configuration.replicas,
       buildImage: false,
       ports: input.configuration.ports,
       env: [
-        ...mapVariables(input.configuration.environmentVariables, false),
-        ...mapVariables(input.configuration.secretEnvironmentVariables, true),
+        ...(input.configuration.environmentVariables
+          ? mapVariables(input.configuration.environmentVariables, false)
+          : []),
+        ...(input.configuration.secretEnvironmentVariables
+          ? mapVariables(input.configuration.secretEnvironmentVariables, true)
+          : []),
       ],
-      command: input.configuration.commands,
-      args: input.configuration.args,
+      command: input.configuration.commands ?? [],
+      args: input.configuration.args ?? [],
       region: input.configuration.region,
-      akashMachineImageName: machineImageName,
+      akashMachineImageName: machineImageName ?? "",
+      customInstanceSpecs: {
+        storage: `${input.configuration.storage}Gi`,
+        persistentStorage: input.configuration.persistentStorage && {
+          size: `${input.configuration.persistentStorage.size}Gi`,
+          class: input.configuration.persistentStorage.class,
+          mountPoint: input.configuration.persistentStorage.mountPoint,
+        },
+        cpu: input.configuration.customSpecs?.cpu,
+        memory: input.configuration.customSpecs?.memory
+          ? `${input.configuration.customSpecs.memory}Gi`
+          : undefined,
+      },
     },
     clusterUrl: input.configuration.image,
     clusterProvider: ProviderEnum.DOCKERHUB,
@@ -258,9 +298,22 @@ const mapMarketplaceInstanceCreationConfig = (
       }
     ),
     organizationId: organizationId,
-    akashImageId: input.machineImageId,
+    akashImageId: input.machineImageId ?? "",
     uniqueTopicId: uuidv4(),
     region: input.region,
+    instanceCount: input.replicas,
+    customInstanceSpecs: {
+      storage: `${input.storage}Gi`,
+      persistentStorage: input.persistentStorage && {
+        size: `${input.persistentStorage.size}Gi`,
+        class: input.persistentStorage.class,
+        mountPoint: input.persistentStorage.mountPoint,
+      },
+      cpu: input.customSpecs?.cpu,
+      memory: input.customSpecs?.memory
+        ? `${input.customSpecs.memory}Gi`
+        : undefined,
+    },
   };
 };
 
@@ -285,17 +338,29 @@ const mapMarketplaceInstanceResponse = (
 };
 
 const mapInstanceUpdateRequest = (
-  input: InstanceUpdateConfig
+  input: InstanceUpdateConfig,
+  existingConfig: {
+    tag: string;
+    ports: Array<Port>;
+    environmentVariables: Array<EnvironmentVariable>;
+    secretEnvironmentVariables: Array<EnvironmentVariable>;
+    commands: Array<string>;
+    args: Array<string>;
+  }
 ): UpdateInstaceRequest => {
   return {
     env: [
-      ...mapVariables(input.environmentVariables, false),
-      ...mapVariables(input.secretEnvironmentVariables, true),
+      ...(input.environmentVariables
+        ? mapVariables(input.environmentVariables, false)
+        : mapVariables(existingConfig.environmentVariables, false)),
+      ...(input.secretEnvironmentVariables
+        ? mapVariables(input.secretEnvironmentVariables, true)
+        : mapVariables(existingConfig.secretEnvironmentVariables, true)),
     ],
-    command: input.commands,
-    args: input.args,
+    command: input.commands ?? existingConfig.commands,
+    args: input.args ?? existingConfig.args,
     uniqueTopicId: uuidv4(),
-    tag: input.tag,
+    tag: input.tag ?? existingConfig.tag,
   };
 };
 
@@ -331,20 +396,20 @@ const mapInstancesInfo = (input: InstancesInfoCore): InstancesInfo => {
 };
 
 const mapVariables = (
-  variables: EnvironmentVar[],
+  variables: EnvironmentVariable[],
   isSecret: boolean
 ): Env[] => {
-  return variables.map((ev: EnvironmentVar) => ({
+  return variables.map((ev: EnvironmentVariable) => ({
     value: `${ev.key}=${ev.value}`,
     isSecret,
   }));
 };
 
 const mapMarketplaceVariables = (
-  variables: EnvironmentVar[],
+  variables: EnvironmentVariable[],
   isSecret: boolean
 ): MarketplaceDeploymentVariable[] => {
-  return variables.map((ev: EnvironmentVar) => ({
+  return variables.map((ev: EnvironmentVariable) => ({
     label: ev.key,
     value: ev.value,
     isSecret,

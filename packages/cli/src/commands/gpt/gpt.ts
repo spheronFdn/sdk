@@ -10,9 +10,6 @@ import {
 } from "../../utils";
 import { fixBugForGPT } from "../../prompts/prompts";
 
-const REGEX =
-  /@fname\s*\n{1,2}(.*?)\s*\n{1,2}@code-start\s*\n([\s\S]*?)@code-end/g;
-
 export enum GptCommandEnum {
   GENERATE = "generate",
   UPDATE = "update",
@@ -28,7 +25,7 @@ export enum FixBugEnum {
 }
 
 export interface IGPTResponse {
-  response: string;
+  response: any;
 }
 
 export interface IParsedResponse {
@@ -55,44 +52,23 @@ export async function generateCode(prompt: string) {
       formattedPrompt
     );
 
-    if (!gptResponse?.response) {
-      throw { message: "You need to login first using 'spheron login'." };
-    }
-
-    const matches = [...gptResponse.response.matchAll(REGEX)];
-    const generatedFiles: IFiles[] = [];
-
-    if (!matches[0]) {
-      createLog("./error.log", "Unexpected Response. Please try again!");
-      throw new Error("Unexpected Response. Please try again!");
-    }
-
-    matches.forEach((match) => {
-      const filename = match[1].trim();
-      const code = match[2].replace(/```/g, " ").trim();
-      generatedFiles.push({ filename, code });
-    });
     // create files
-    generatedFiles.forEach((file: IFiles) => {
+    gptResponse?.response.forEach((file: IFiles) => {
       fs.writeFileSync(generateFilePath(file.filename), file.code);
     });
-
-    if (!generatedFiles[0]) {
-      createLog("./error.log", "Unexpected Response. Please try again!");
-      throw new Error("Unexpected Response. Please try again!");
-    }
 
     const endTime = Date.now();
     // calculate response time
     const elapsedTime = Math.round((endTime - startTime) / 1000);
     spinner.success(
       `Successfully generated the following files: ${generateFilesString(
-        generatedFiles
+        gptResponse?.response
       )} in ${elapsedTime}s! 🎉`
     );
   } catch (error) {
-    console.log(`✖️  Error: ${error.message}`);
-    createLog("./error.log", error.message);
+    const errorMessage = error.response.data.error || error.message || error;
+    console.log(`✖️  Error: ${errorMessage}`);
+    createLog("./error.log", errorMessage);
   } finally {
     spinner.stop();
   }
@@ -114,44 +90,23 @@ export async function generateCodeBasedOnFile(prompt: string, filepath: any) {
       fileText
     );
 
-    if (!gptResponse.response) {
-      throw { message: "You need to login first using 'spheron login'." };
-    }
-
-    const matches = [...gptResponse.response.matchAll(REGEX)];
-    const generatedFiles: IFiles[] = [];
-
-    if (!matches[0]) {
-      createLog("./error.log", "Unexpected Response. Please try again!");
-      throw new Error("Unexpected Response. Please try again!");
-    }
-
-    matches.forEach((match) => {
-      const filename = match[1].trim();
-      const code = match[2].replace(/```/g, " ").trim();
-      generatedFiles.push({ filename, code });
-    });
     // create files
-    generatedFiles.forEach((file: IFiles) => {
+    gptResponse?.response.forEach((file: IFiles) => {
       fs.writeFileSync(generateFilePath(file.filename), file.code);
     });
-
-    if (!generatedFiles[0]) {
-      createLog("./error.log", "Unexpected Response. Please try again!");
-      throw new Error("Unexpected Response. Please try again!");
-    }
 
     const endTime = Date.now();
     // calculate response time
     const elapsedTime = Math.round((endTime - startTime) / 1000);
     spinner.success(
       `Successfully generated the following files: ${generateFilesString(
-        generatedFiles
+        gptResponse?.response
       )} in ${elapsedTime}s! 🎉`
     );
   } catch (error) {
-    console.log(`✖️  Error: ${error.message}`);
-    createLog("./error.log", error.message);
+    const errorMessage = error.response.data.error || error.message || error;
+    console.log(`✖️  Error: ${errorMessage}`);
+    createLog("./error.log", errorMessage);
   } finally {
     spinner.stop();
   }
@@ -173,32 +128,10 @@ export async function updateCode(prompt: string, filepath: any) {
       fileText
     );
 
-    if (!gptResponse.response) {
-      throw { message: "You need to login first using 'spheron login'." };
-    }
-
-    const matches = [...gptResponse.response.matchAll(REGEX)];
-    const generatedFiles: IFiles[] = [];
-
-    if (!matches[0]) {
-      createLog("./error.log", "Unexpected Response. Please try again!");
-      throw new Error("Unexpected Response. Please try again!");
-    }
-
-    matches.forEach((match) => {
-      const filename = match[1].trim();
-      const code = match[2].replace(/```/g, " ").trim();
-      generatedFiles.push({ filename, code });
-    });
     // create files
-    generatedFiles.forEach((file: IFiles) => {
+    gptResponse?.response.forEach((file: IFiles) => {
       fs.writeFileSync(filepath, file.code);
     });
-
-    if (!generatedFiles[0]) {
-      createLog("./error.log", "Unexpected Response. Please try again!");
-      throw new Error("Unexpected Response. Please try again!");
-    }
 
     const endTime = Date.now();
     // calculate response time
@@ -207,8 +140,9 @@ export async function updateCode(prompt: string, filepath: any) {
       `File: ${filepath} updated successfully in ${elapsedTime}s!`
     );
   } catch (error) {
-    console.log(`✖️  Error: ${error.message}`);
-    createLog("./error.log", error.message);
+    const errorMessage = error.response.data.error || error.message || error;
+    console.log(`✖️  Error: ${errorMessage}`);
+    createLog("./error.log", errorMessage);
   } finally {
     spinner.stop();
   }
@@ -227,10 +161,6 @@ export async function findBugsInCode(filepath: any) {
       fileText
     );
 
-    if (!gptResponse.response) {
-      throw { message: "You need to login first using 'spheron login'." };
-    }
-
     createLog("./bugs.log", gptResponse.response);
     spinner.success("Bugs search completed! Check bugs.log for more info.");
     spinner.stop();
@@ -240,39 +170,17 @@ export async function findBugsInCode(filepath: any) {
     if (fixBug.fix === FixBugEnum.YES) {
       const spinnerFixMessage = "Fixing bugs in your code ⚔️  ...";
       const startTime = Date.now();
-      const gptResponse: IGPTResponse = await SpheronApiService.generateCode(
+      const gptResponse: any = await SpheronApiService.generateCode(
         spinner,
         spinnerFixMessage,
         "Fix",
         fileText
       );
 
-      if (!gptResponse?.response) {
-        throw { message: "You need to login first using 'spheron login'." };
-      }
-
-      const matches = [...gptResponse.response.matchAll(REGEX)];
-      const generatedFiles: IFiles[] = [];
-
-      if (!matches[0]) {
-        createLog("./error.log", "Unexpected Response. Please try again!");
-        throw new Error("Unexpected Response. Please try again!");
-      }
-
-      matches.forEach((match) => {
-        const filename = match[1].trim();
-        const code = match[2].replace(/```/g, " ").trim();
-        generatedFiles.push({ filename, code });
-      });
       // create files
-      generatedFiles.forEach((file: IFiles) => {
+      gptResponse?.response.forEach((file: IFiles) => {
         fs.writeFileSync(filepath, file.code);
       });
-
-      if (!generatedFiles[0]) {
-        createLog("./error.log", "Unexpected Response. Please try again!");
-        throw new Error("Unexpected Response. Please try again!");
-      }
 
       const endTime = Date.now();
       // calculate response time
@@ -280,8 +188,9 @@ export async function findBugsInCode(filepath: any) {
       spinner.success(`Fixed all the bugs in ${filepath} in ${elapsedTime}s!`);
     }
   } catch (error) {
-    console.log(`✖️  Error: ${error.message}`);
-    createLog("./error.log", error.message);
+    const errorMessage = error.response.data.error || error.message || error;
+    console.log(`✖️  Error: ${errorMessage}`);
+    createLog("./error.log", errorMessage);
   } finally {
     spinner.stop();
   }
@@ -301,43 +210,21 @@ export async function improveCode(filepath: any) {
       fileText
     );
 
-    if (!gptResponse.response) {
-      throw { message: "You need to login first using 'spheron login'." };
-    }
-
-    const matches = [...gptResponse.response.matchAll(REGEX)];
-    const generatedFiles: IFiles[] = [];
-
-    if (!matches[0]) {
-      createLog("./error.log", "Unexpected Response. Please try again!");
-      throw new Error("Unexpected Response. Please try again!");
-    }
-
-    matches.forEach((match) => {
-      const filename = match[1].trim();
-      const code = match[2].replace(/```/g, " ").trim();
-      generatedFiles.push({ filename, code });
-    });
     // create files
-    generatedFiles.forEach((file: IFiles) => {
+    gptResponse?.response.forEach((file: IFiles) => {
       fs.writeFileSync(filepath, file.code);
     });
-
-    if (!generatedFiles[0]) {
-      createLog("./error.log", "Unexpected Response. Please try again!");
-      throw new Error("Unexpected Response. Please try again!");
-    }
 
     const endTime = Date.now();
     // calculate response time
     const elapsedTime = Math.round((endTime - startTime) / 1000);
-
     spinner.success(
       `Successfully optimized ${filepath} for improved performance in ${elapsedTime}s! 🚀`
     );
   } catch (error) {
-    console.log(`✖️  Error: ${error.message}`);
-    createLog("./error.log", error.message);
+    const errorMessage = error.response.data.error || error.message || error;
+    console.log(`✖️  Error: ${errorMessage}`);
+    createLog("./error.log", errorMessage);
   } finally {
     spinner.stop();
   }
@@ -359,44 +246,23 @@ export async function transpileCode(lang: string, filepath: any) {
       lang
     );
 
-    if (!gptResponse.response) {
-      throw { message: "You need to login first using 'spheron login'." };
-    }
-
-    const matches = [...gptResponse.response.matchAll(REGEX)];
-    const generatedFiles: IFiles[] = [];
-
-    if (!matches[0]) {
-      createLog("./error.log", "Unexpected Response. Please try again!");
-      throw new Error("Unexpected Response. Please try again!");
-    }
-
-    matches.forEach((match) => {
-      const filename = match[1].trim();
-      const code = match[2].replace(/```/g, " ").trim();
-      generatedFiles.push({ filename, code });
-    });
     // create files
-    generatedFiles.forEach((file: IFiles) => {
+    gptResponse?.response.forEach((file: IFiles) => {
       fs.writeFileSync(generateFilePath(file.filename), file.code);
     });
-
-    if (!generatedFiles[0]) {
-      createLog("./error.log", "Unexpected Response. Please try again!");
-      throw new Error("Unexpected Response. Please try again!");
-    }
 
     const endTime = Date.now();
     // calculate response time
     const elapsedTime = Math.round((endTime - startTime) / 1000);
     spinner.success(
       `Successfully transpiled to ${lang}: ${generateFilesString(
-        generatedFiles
+        gptResponse?.response
       )} in ${elapsedTime}s! 🔥`
     );
   } catch (error) {
-    console.log(`✖️  Error: ${error.message}`);
-    createLog("./error.log", error.message);
+    const errorMessage = error.response.data.error || error.message || error;
+    console.log(`✖️  Error: ${errorMessage}`);
+    createLog("./error.log", errorMessage);
   } finally {
     spinner.stop();
   }
@@ -418,36 +284,13 @@ export async function createTestCases(lang: string, filepath: any) {
       lang
     );
 
-    if (!gptResponse?.response) {
-      throw { message: "You need to login first using 'spheron login'." };
-    }
-
-    const matches = [...gptResponse.response.matchAll(REGEX)];
-    const generatedFiles: IFiles[] = [];
-
-    if (!matches[0]) {
-      createLog("./error.log", "Unexpected Response. Please try again!");
-      throw new Error("Unexpected Response. Please try again!");
-    }
-
-    matches.forEach((match) => {
-      const filename = match[1].trim();
-      const code = match[2].replace(/```/g, " ").trim();
-      generatedFiles.push({ filename, code });
-    });
-
     // create files
-    generatedFiles.forEach((file: IFiles) => {
+    gptResponse?.response.forEach((file: IFiles) => {
       fs.writeFileSync(
         generateTestCaseFileName(filepath, file.filename),
         file.code
       );
     });
-
-    if (!generatedFiles[0]) {
-      createLog("./error.log", "Unexpected Response. Please try again!");
-      throw new Error("Unexpected Response. Please try again!");
-    }
 
     const endTime = Date.now();
     // calculate response time
@@ -455,12 +298,13 @@ export async function createTestCases(lang: string, filepath: any) {
     spinner.success(
       `Successfully created test cases: ${generateTestCasesFilesString(
         filepath,
-        generatedFiles
+        gptResponse?.response
       )} in ${elapsedTime}s! ✅`
     );
   } catch (error) {
-    console.log(`✖️  Error: ${error.message}`);
-    createLog("./error.log", error.message);
+    const errorMessage = error.response.data.error || error.message || error;
+    console.log(`✖️  Error: ${errorMessage}`);
+    createLog("./error.log", errorMessage);
   } finally {
     spinner.stop();
   }

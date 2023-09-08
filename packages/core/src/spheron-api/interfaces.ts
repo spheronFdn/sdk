@@ -197,6 +197,13 @@ interface UsageWithLimits {
   passwordProtectionLimit?: number;
   usedParallelUploads?: number;
   parallelUploadsLimit?: number;
+  usedStorageFilecoin?: number;
+  storageFilecoinLimit?: number;
+  usedImageOptimizations?: number;
+  imageOptimizationsLimit?: number;
+  usedIpfsBandwidth: number;
+  ipfsBandwidthLimit?: number;
+  usedIpfsNumberOfRequests?: number;
 }
 
 interface UsageWithLimitsWithSkynet extends UsageWithLimits {
@@ -483,6 +490,66 @@ interface ComputeMachine {
   topupThreashold: number;
 }
 
+enum BucketStateEnum {
+  MAINTAINED = "MAINTAINED",
+  ARCHIVED = "ARCHIVED",
+}
+
+interface Bucket {
+  _id: string;
+  name: string;
+  organization: string;
+  createdBy: string;
+  state: BucketStateEnum;
+}
+
+interface BucketDomain {
+  _id: string;
+  name: string;
+  link: string;
+  verified: boolean;
+  bucketId: string;
+  type: DomainTypeEnum;
+}
+
+interface BucketIpnsRecord {
+  _id: string;
+  keyName: string;
+  keyId: string;
+  ipnsLink: string;
+  bucket: string;
+  targetCid: string;
+  createdAt: Date;
+  updatedAt: Date;
+  memoryUsed: number;
+}
+
+enum UploadStatusEnum {
+  IN_PROGRESS = "InProgress",
+  CANCELED = "Canceled",
+  UPLOADED = "Uploaded",
+  FAILED = "Failed",
+  TIMED_OUT = "TimedOut",
+  PINNED = "Pinned",
+  UNPINNED = "Unpinned",
+}
+
+interface UploadedFile {
+  fileName: string;
+  fileSize: number;
+}
+
+interface Upload {
+  _id: string;
+  protocolLink: string;
+  uploadDirectory: UploadedFile[];
+  status: UploadStatusEnum;
+  memoryUsed: number;
+  bucket: string;
+  uploadInitiator: string;
+  protocol: ProtocolEnum;
+}
+
 export {
   TokenScope,
   Project,
@@ -519,4 +586,11 @@ export {
   HealthCheck,
   MachineImageType,
   InstanceOrderLogs,
+  Bucket,
+  BucketStateEnum,
+  UploadStatusEnum,
+  Upload,
+  UploadedFile,
+  BucketDomain,
+  BucketIpnsRecord,
 };

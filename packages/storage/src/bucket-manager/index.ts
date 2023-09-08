@@ -1,8 +1,8 @@
 import {
   DomainTypeEnum,
-  ProjectStateEnum,
-  ProjectTypeEnum,
   SpheronApi,
+  Upload as CoreUpload,
+  Bucket as CoreBucket,
 } from "@spheron/core";
 import {
   Bucket,
@@ -10,8 +10,12 @@ import {
   Upload,
   BucketStateEnum,
   UploadStatusEnum,
+  IpnsRecord,
 } from "./interfaces";
-import { Deployment, Domain as ProjectDomain, Project } from "@spheron/core";
+import {
+  BucketDomain as CoreBucketDomain,
+  BucketIpnsRecord as CoreBucketIpnsRecord,
+} from "@spheron/core";
 
 class BucketManager {
   private readonly spheronApi: SpheronApi;
@@ -20,28 +24,55 @@ class BucketManager {
     this.spheronApi = spheronApi;
   }
 
-  async getBucket(bucketId: string): Promise<Bucket> {
-    const project = await this.spheronApi.getProject(bucketId);
-    if (project.type !== ProjectTypeEnum.UPLOAD) {
-      throw new Error(`Project with id '${bucketId}' is not a bucket.`);
+  async getOrganizationBuckets(
+    organizationId: string,
+    options: {
+      name?: string;
+      state?: BucketStateEnum;
+      skip: number;
+      limit: number;
     }
-    return this.mapProjectToBucket(project);
+  ): Promise<Bucket[]> {
+    const { buckets } = await this.spheronApi.getOrganizationBuckets({
+      organizationId,
+      ...options,
+    });
+    return buckets.map((x) => this.mapCoreBucket(x));
+  }
+
+  async getOrganizationBucketCount(
+    organizationId: string,
+    options?: {
+      name?: string;
+      state?: BucketStateEnum;
+    }
+  ): Promise<number> {
+    const { count } = await this.spheronApi.getOrganizationBucketCount({
+      organizationId,
+      ...options,
+    });
+    return count;
+  }
+
+  async getBucket(bucketId: string): Promise<Bucket> {
+    const bucket = await this.spheronApi.getBucket(bucketId);
+    return this.mapCoreBucket(bucket);
   }
 
   async getBucketDomains(bucketId: string): Promise<Domain[]> {
-    const { domains } = await this.spheronApi.getProjectDomains(bucketId);
-    return domains.map((x) => this.mapProjectDomainToBucketDomain(x));
+    const { domains } = await this.spheronApi.getBucketDomains(bucketId);
+    return domains.map((x) => this.mapCoreBucketDomains(x));
   }
 
   async getBucketDomain(
     bucketId: string,
     domainIdentifier: string
   ): Promise<Domain> {
-    const { domain } = await this.spheronApi.getProjectDomain(
+    const { domain } = await this.spheronApi.getBucketDomain(
       bucketId,
       domainIdentifier
     );
-    return this.mapProjectDomainToBucketDomain(domain);
+    return this.mapCoreBucketDomains(domain);
   }
 
   async updateBucketDomain(
@@ -52,30 +83,30 @@ class BucketManager {
       name: string;
     }
   ): Promise<Domain> {
-    const { domain } = await this.spheronApi.patchProjectDomain(
+    const { domain } = await this.spheronApi.patchBucketDomain(
       bucketId,
       domainIdentifier,
-      { ...options, deploymentEnvironments: [] }
+      { ...options }
     );
-    return this.mapProjectDomainToBucketDomain(domain);
+    return this.mapCoreBucketDomains(domain);
   }
 
   async verifyBucketDomain(
     bucketId: string,
     domainIdentifier: string
   ): Promise<Domain> {
-    const { domain } = await this.spheronApi.verifyProjectDomain(
+    const { domain } = await this.spheronApi.verifyBucketDomain(
       bucketId,
       domainIdentifier
     );
-    return this.mapProjectDomainToBucketDomain(domain);
+    return this.mapCoreBucketDomains(domain);
   }
 
   async deleteBucketDomain(
     bucketId: string,
     domainIdentifier: string
   ): Promise<void> {
-    await this.spheronApi.deleteProjectDomain(bucketId, domainIdentifier);
+    await this.spheronApi.deleteBucketDomain(bucketId, domainIdentifier);
   }
 
   async addBucketDomain(
@@ -86,11 +117,10 @@ class BucketManager {
       name: string;
     }
   ): Promise<Domain> {
-    const { domain } = await this.spheronApi.addProjectDomain(bucketId, {
+    const { domain } = await this.spheronApi.addBucketDomain(bucketId, {
       ...options,
-      deploymentEnvironments: [],
     });
-    return this.mapProjectDomainToBucketDomain(domain);
+    return this.mapCoreBucketDomains(domain);
   }
 
   async getBucketUploads(
@@ -103,77 +133,125 @@ class BucketManager {
     if (options.skip < 0 || options.limit < 0) {
       throw new Error(`Skip and Limit cannot be negative numbers.`);
     }
-    const { deployments } = await this.spheronApi.getProjectDeployments(
-      bucketId,
-      {
-        skip: options.skip && options.skip >= 0 ? options.skip : 0,
-        limit: options.limit && options.limit >= 0 ? options.limit : 6,
-      }
-    );
+    const { uploads } = await this.spheronApi.getBucketUploads(bucketId, {
+      skip: options.skip && options.skip >= 0 ? options.skip : 0,
+      limit: options.limit && options.limit >= 0 ? options.limit : 6,
+    });
 
-    return deployments.map((x) => this.mapDeploymentToUpload(x));
+    return uploads.map((x) => this.mapCoreUpload(x));
   }
 
-  async getBucketUploadCount(bucketId: string): Promise<{
-    total: number;
-    successful: number;
-    failed: number;
-    pending: number;
-  }> {
-    return await this.spheronApi.getProjectDeploymentCount(bucketId);
+  async getBucketUploadCount(bucketId: string): Promise<number> {
+    const { count } = await this.spheronApi.getBucketUploadCount(bucketId);
+    return count;
   }
 
   async archiveBucket(bucketId: string): Promise<void> {
-    await this.spheronApi.updateProjectState(
-      bucketId,
-      ProjectStateEnum.ARCHIVED
-    );
+    await this.spheronApi.updateBucketState(bucketId, BucketStateEnum.ARCHIVED);
   }
 
   async unarchiveBucket(bucketId: string): Promise<void> {
-    await this.spheronApi.updateProjectState(
+    await this.spheronApi.updateBucketState(
       bucketId,
-      ProjectStateEnum.MAINTAINED
+      BucketStateEnum.MAINTAINED
     );
   }
 
   async getUpload(uploadId: string): Promise<Upload> {
-    const deployment = await this.spheronApi.getDeployment(uploadId);
-    return this.mapDeploymentToUpload(deployment);
+    const upload = await this.spheronApi.getUpload(uploadId);
+    return this.mapCoreUpload(upload);
   }
 
-  private mapProjectToBucket(project: Project): Bucket {
+  async getBucketIpnsRecords(bucketId: string): Promise<IpnsRecord[]> {
+    const { ipnsRecords } = await this.spheronApi.getBucketIpnsRecords(
+      bucketId
+    );
+    return ipnsRecords.map((x) => this.mapCoreIpnsRecord(x));
+  }
+
+  async getBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string
+  ): Promise<IpnsRecord> {
+    const { ipnsRecord } = await this.spheronApi.getBucketIpnsRecord(
+      bucketId,
+      ipnsRecordId
+    );
+    return this.mapCoreIpnsRecord(ipnsRecord);
+  }
+
+  async addBucketIpnsRecord(
+    bucketId: string,
+    uploadId: string
+  ): Promise<IpnsRecord> {
+    const { ipnsRecord } = await this.spheronApi.addBucketIpnsRecord(
+      bucketId,
+      uploadId
+    );
+    return this.mapCoreIpnsRecord(ipnsRecord);
+  }
+
+  async updateBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string,
+    uploadId: string
+  ): Promise<IpnsRecord> {
+    const { ipnsRecord } = await this.spheronApi.patchBucketIpnsRecord(
+      bucketId,
+      ipnsRecordId,
+      uploadId
+    );
+    return this.mapCoreIpnsRecord(ipnsRecord);
+  }
+
+  async deleteBucketIpnsRecord(
+    bucketId: string,
+    ipnsRecordId: string
+  ): Promise<void> {
+    await this.spheronApi.deleteBucketIpnsRecord(bucketId, ipnsRecordId);
+  }
+
+  private mapCoreBucket(bucket: CoreBucket): Bucket {
     return {
-      id: project._id,
-      name: project.name,
-      organizationId: project.organization,
-      state: project.state,
-      domains: project.domains?.map((x) =>
-        this.mapProjectDomainToBucketDomain(x)
-      ),
+      id: bucket._id,
+      name: bucket.name,
+      organizationId: bucket.organization,
+      state: bucket.state,
     };
   }
 
-  private mapProjectDomainToBucketDomain(domain: ProjectDomain): Domain {
+  private mapCoreBucketDomains(domain: CoreBucketDomain): Domain {
     return {
       id: domain._id,
       name: domain.name,
       link: domain.link,
       verified: domain.verified,
-      bucketId: domain.projectId,
+      bucketId: domain.bucketId,
       type: domain.type,
     };
   }
 
-  private mapDeploymentToUpload(deployment: Deployment): Upload {
+  private mapCoreUpload(upload: CoreUpload): Upload {
     return {
-      id: deployment._id,
-      protocolLink: deployment.sitePreview,
-      buildDirectory: deployment.buildDirectory,
-      status: deployment.status as unknown as UploadStatusEnum,
-      memoryUsed: deployment.memoryUsed,
-      bucketId: deployment.project?._id ?? deployment.project,
-      protocol: deployment.protocol,
+      id: upload._id,
+      protocolLink: upload.protocolLink,
+      uploadDirectory: upload.uploadDirectory,
+      status: upload.status,
+      memoryUsed: upload.memoryUsed,
+      bucketId: upload.bucket,
+      protocol: upload.protocol,
+    };
+  }
+
+  private mapCoreIpnsRecord(ipnsRecord: CoreBucketIpnsRecord): IpnsRecord {
+    return {
+      id: ipnsRecord._id,
+      ipnsHash: ipnsRecord.keyId,
+      ipnsLink: ipnsRecord.ipnsLink,
+      bucketId: ipnsRecord.bucket,
+      createdAt: ipnsRecord.createdAt,
+      updatedAt: ipnsRecord.updatedAt,
+      memoryUsed: ipnsRecord.memoryUsed,
     };
   }
 }
