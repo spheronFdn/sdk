@@ -6,7 +6,7 @@ const rimraf = require("rimraf");
 import path from "path";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const chalk = require("chalk");
-import { FrameworkOptions, init } from "./init";
+import { FrameworkOptions, init } from "../site/init";
 
 export async function createDapp(
   template: ITemplateApp,

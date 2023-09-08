@@ -1,19 +1,20 @@
 import * as fs from "fs";
-import Spinner from "../outputs/spinner";
-import SpheronApiService from "../services/spheron-api";
+import Spinner from "../../outputs/spinner";
+import SpheronApiService from "../../services/spheron-api";
 import {
   createLog,
   generateFilePath,
   generateFilesString,
   generateTestCaseFileName,
   generateTestCasesFilesString,
-} from "../utils";
-import { fixBugForGPT } from "../prompts/prompts";
+} from "../../utils";
+import { fixBugForGPT } from "../../prompts/prompts";
 
 const REGEX =
   /@fname\s*\n{1,2}(.*?)\s*\n{1,2}@code-start\s*\n([\s\S]*?)@code-end/g;
 
-export enum CommandEnum {
+export enum GptCommandEnum {
+  GENERATE = "generate",
   UPDATE = "update",
   FINDBUGS = "findbugs",
   IMPROVE = "improve",

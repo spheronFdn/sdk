@@ -1,9 +1,9 @@
 import path from "path";
 
-import { writeToJsonFile, fileExists, readFromJsonFile } from "../utils";
-import configuration from "../configuration";
-import { createConfiguration } from "./create-configuration";
-import Spinner from "../outputs/spinner";
+import { writeToJsonFile, fileExists, readFromJsonFile } from "../../utils";
+import configuration from "../../configuration";
+import { createConfiguration } from "../create-configuration";
+import Spinner from "../../outputs/spinner";
 
 export async function init(
   name: string,

@@ -12,7 +12,7 @@ import {
 } from "@spheron/core";
 import configuration from "../configuration";
 import { readFromJsonFile } from "../utils";
-import { IGPTResponse } from "../commands/gpt";
+import { IGPTResponse } from "../commands/gpt/gpt";
 import Spinner from "../outputs/spinner";
 
 const SpheronApiService = {

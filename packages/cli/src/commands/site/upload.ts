@@ -1,4 +1,4 @@
-import configuration from "../configuration";
+import configuration from "../../configuration";
 import SpheronClient, { ProtocolEnum } from "@spheron/storage";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const chalk = require("chalk");
@@ -9,9 +9,9 @@ import {
   getFileType,
   mapProtocolToUserReadable,
   readFromJsonFile,
-} from "../utils";
-import Spinner from "../outputs/spinner";
-import { progressBar } from "../outputs/progress-bar";
+} from "../../utils";
+import Spinner from "../../outputs/spinner";
+import { progressBar } from "../../outputs/progress-bar";
 
 export async function upload(
   rootPath: string,

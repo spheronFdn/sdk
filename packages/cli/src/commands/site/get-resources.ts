@@ -8,10 +8,10 @@ import {
   Project,
   User,
 } from "@spheron/core";
-import Spinner from "../outputs/spinner";
-import SpheronApiService from "../services/spheron-api";
-import { readFromJsonFile } from "../utils";
-import configuration from "../configuration";
+import Spinner from "../../outputs/spinner";
+import SpheronApiService from "../../services/spheron-api";
+import { readFromJsonFile } from "../../utils";
+import configuration from "../../configuration";
 
 export const ResourceFetcher = {
   async getOrganization(id: string) {

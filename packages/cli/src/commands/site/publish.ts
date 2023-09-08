@@ -1,11 +1,11 @@
 import path from "path";
-import configuration from "../configuration";
+import configuration from "../../configuration";
 
 import {
   fileExists,
   mapProtocolToUserReadable,
   readFromJsonFile,
-} from "../utils";
+} from "../../utils";
 import { upload } from "./upload";
 
 export async function publish(organization?: string): Promise<any> {

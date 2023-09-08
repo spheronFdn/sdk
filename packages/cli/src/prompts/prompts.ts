@@ -1,6 +1,6 @@
-import { createDapp, templateTypesMap } from "../commands/create-dapp";
-import { FixBugEnum } from "../commands/gpt";
-import { FrameworkOptions } from "../commands/init";
+import { createDapp, templateTypesMap } from "../commands/site/create-dapp";
+import { FixBugEnum } from "../commands/gpt/gpt";
+import { FrameworkOptions } from "../commands/site/init";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const inquirer = require("inquirer");
