@@ -1,14 +1,14 @@
-import configuration from "../../configuration";
-import { fileExists, readFromJsonFile, writeToJsonFile } from "../../utils";
-import { createConfiguration } from "../create-configuration";
-import Spinner from "../../outputs/spinner";
+import configuration from "../configuration";
+import { fileExists, readFromJsonFile, writeToJsonFile } from "../utils";
+import { createConfiguration } from "./create-configuration";
+import Spinner from "../outputs/spinner";
 import { AppTypeEnum, Organization } from "@spheron/core";
-import SpheronApiService from "../../services/spheron-api";
+import SpheronApiService from "../services/spheron-api";
 
 export async function createOrganization(
   name: string,
   username: string,
-  type: string
+  type: AppTypeEnum
 ) {
   const spinner = new Spinner();
   try {
@@ -26,15 +26,20 @@ export async function createOrganization(
       );
       return;
     }
-    const appType =
-      type == AppTypeEnum.WEB_APP ? AppTypeEnum.WEB_APP : AppTypeEnum.COMPUTE;
+
     const organization: Organization =
-      await SpheronApiService.createOrganization(username, name, appType);
-    await writeToJsonFile(
-      "organization",
-      organization._id,
-      configuration.configFilePath
-    );
+      await SpheronApiService.createOrganization(username, name, type);
+
+    let orgJson = await readFromJsonFile(type, configuration.configFilePath);
+    if (!orgJson) {
+      orgJson = {
+        organizationId: organization._id,
+      };
+    } else {
+      orgJson.organizationId = organization._id;
+    }
+
+    await writeToJsonFile(type, orgJson, configuration.configFilePath);
     spinner.success(`Organization ${name} is created`);
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);

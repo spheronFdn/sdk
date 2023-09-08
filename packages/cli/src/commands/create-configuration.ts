@@ -27,7 +27,18 @@ export async function createConfiguration() {
       [],
       configuration.projectTrackingFilePath
     );
+
+    await writeToJsonFile(
+      "compute-clusters",
+      [],
+      configuration.computeClusterTrackingFilePath
+    );
+
     await fs.promises.chmod(configuration.projectTrackingFilePath, 0o777);
+    await fs.promises.chmod(
+      configuration.computeClusterTrackingFilePath,
+      0o777
+    );
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);
   }

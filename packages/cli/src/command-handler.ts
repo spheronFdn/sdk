@@ -1,6 +1,6 @@
 import { changeDefaultOrganization } from "./commands/configure";
 import { createConfiguration } from "./commands/create-configuration";
-import { createOrganization } from "./commands/site/create-organization";
+import { createOrganization } from "./commands/create-organization";
 import { ResourceEnum, ResourceFetcher } from "./commands/site/get-resources";
 import {
   GptCommandEnum,
@@ -22,7 +22,7 @@ import {
   filePathForGPT,
   languageForGPT,
   languageForGPTTest,
-  promptForConfigure,
+  promptForSwitchOrganization,
   promptForCreateDapp,
   promptForCreateOrganization,
   promptForGPT,
@@ -34,6 +34,7 @@ import SpheronApiService from "./services/spheron-api";
 import { fileExists, readFromJsonFile } from "./utils";
 import { SiteCommandEnum } from "./commands/site/interfaces";
 import { ComputeCommandEnum } from "./commands/compute/interfaces";
+import { AppTypeEnum } from "@spheron/core";
 
 export async function commandHandler(options: any) {
   console.log("PASSED PARAM:", options, options._[0]);
@@ -162,7 +163,7 @@ export async function commandHandler(options: any) {
           throw new Error("Please insert username for organization.");
         }
         try {
-          await createOrganization(name, username, "app");
+          await createOrganization(name, username, AppTypeEnum.WEB_APP);
         } catch (error) {
           process.exit(1);
         }
@@ -301,7 +302,7 @@ export async function commandHandler(options: any) {
         if (options.organization) {
           organizationId = options.organization;
         } else {
-          const prompt = await promptForConfigure();
+          const prompt = await promptForSwitchOrganization();
           organizationId = prompt.organization;
         }
         await changeDefaultOrganization(organizationId);
@@ -537,7 +538,7 @@ export async function commandHandler(options: any) {
     options._[0] === "compute" &&
     options._[1] === ComputeCommandEnum.CREATE_ORGANIZATION
   ) {
-    const validOptions = ["filepath"];
+    const validOptions = ["name", "username"];
     const unknownOptions = Object.keys(options).filter(
       (option) =>
         option !== "_" && option !== "$0" && !validOptions.includes(option)
@@ -546,29 +547,28 @@ export async function commandHandler(options: any) {
       console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
       process.exit(1);
     }
-    const isWhitelisted = await SpheronApiService.isWhitelisted();
-    // check if the user is whitelisted
-    if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
-      console.log(isWhitelisted?.message);
-      process.exit(1);
-    }
     (async () => {
       try {
-        let progLanguage;
-        if (options.language) {
-          progLanguage = options.language;
+        let name, username;
+        if (options.name && options.username) {
+          name = options.name;
+          username = options.username;
         } else {
-          const lang = await languageForGPTTest();
-          progLanguage = lang.testlang;
+          const prompt = await promptForCreateOrganization();
+          name = prompt.name;
+          username = prompt.username;
         }
-        let filePath;
-        if (options.filepath) {
-          filePath = options.filepath;
-        } else {
-          const path = await filePathForGPT();
-          filePath = path.inputpath;
+        if (!name) {
+          throw new Error("Please insert a name for organization.");
         }
-        await createTestCases(progLanguage, filePath);
+        if (!username) {
+          throw new Error("Please insert username for organization.");
+        }
+        try {
+          await createOrganization(name, username, AppTypeEnum.COMPUTE);
+        } catch (error) {
+          process.exit(1);
+        }
       } catch (error) {
         console.log(error.message);
         process.exit(1);
@@ -580,7 +580,7 @@ export async function commandHandler(options: any) {
     options._[0] === "compute" &&
     options._[1] === ComputeCommandEnum.SWITCH_ORGANIZATION
   ) {
-    const validOptions = ["filepath"];
+    const validOptions = ["organization"];
     const unknownOptions = Object.keys(options).filter(
       (option) =>
         option !== "_" && option !== "$0" && !validOptions.includes(option)
@@ -589,29 +589,16 @@ export async function commandHandler(options: any) {
       console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
       process.exit(1);
     }
-    const isWhitelisted = await SpheronApiService.isWhitelisted();
-    // check if the user is whitelisted
-    if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
-      console.log(isWhitelisted?.message);
-      process.exit(1);
-    }
     (async () => {
       try {
-        let progLanguage;
-        if (options.language) {
-          progLanguage = options.language;
+        let organizationId;
+        if (options.organization) {
+          organizationId = options.organization;
         } else {
-          const lang = await languageForGPTTest();
-          progLanguage = lang.testlang;
+          const prompt = await promptForSwitchOrganization();
+          organizationId = prompt.organization;
         }
-        let filePath;
-        if (options.filepath) {
-          filePath = options.filepath;
-        } else {
-          const path = await filePathForGPT();
-          filePath = path.inputpath;
-        }
-        await createTestCases(progLanguage, filePath);
+        await changeDefaultOrganization(organizationId);
       } catch (error) {
         console.log(error.message);
         process.exit(1);

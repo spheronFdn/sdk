@@ -3,7 +3,7 @@ import open from "open";
 import { writeToJsonFile } from "../utils";
 import configuration from "../configuration";
 import Spinner from "../outputs/spinner";
-import { VerifiedTokenResponse } from "@spheron/core";
+import { AppTypeEnum, VerifiedTokenResponse } from "@spheron/core";
 import SpheronApiService from "../services/spheron-api";
 
 let server: http.Server;
@@ -47,11 +47,23 @@ export async function login(provider: string): Promise<void> {
                 verify.jwtToken,
                 configuration.configFilePath
               );
+
               await writeToJsonFile(
-                "organization",
-                verify.organizationId,
+                AppTypeEnum.WEB_APP,
+                {
+                  organizationId: verify.siteOrganizationId,
+                },
                 configuration.configFilePath
               );
+
+              await writeToJsonFile(
+                AppTypeEnum.COMPUTE,
+                {
+                  organizationId: verify.computeOrganizationId,
+                },
+                configuration.configFilePath
+              );
+
               resolve();
             } catch (e) {
               if (e.response?.data?.message) {

@@ -102,7 +102,7 @@ export async function promptForInit(): Promise<any> {
   return inquirer.prompt(questions);
 }
 
-export async function promptForConfigure(): Promise<any> {
+export async function promptForSwitchOrganization(): Promise<any> {
   const questions = [
     {
       type: "input",
