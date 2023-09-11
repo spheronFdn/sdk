@@ -76,6 +76,7 @@ enum DeploymentStatusEnum {
 enum AppTypeEnum {
   WEB_APP = "app",
   COMPUTE = "compute",
+  STORAGE = "storage",
 }
 
 enum ProviderEnum {
