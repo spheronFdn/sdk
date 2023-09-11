@@ -30,6 +30,7 @@ interface TokenScope {
     id: string;
     name: string;
     username: string;
+    appType: AppTypeEnum;
   }[];
 }
 
