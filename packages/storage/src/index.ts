@@ -13,6 +13,8 @@ import {
   UploadManager,
   UploadResult,
   PinStatus,
+  ScopeExtractor,
+  AppTypeEnum,
 } from "@spheron/core";
 import { createPayloads } from "./fs-payload-creator";
 import { ipfs } from "./ipfs.utils";
@@ -47,18 +49,20 @@ export interface SpheronClientConfiguration {
   apiUrl?: string;
 }
 
-export class SpheronClient {
+export class SpheronClient extends ScopeExtractor {
   private readonly configuration: SpheronClientConfiguration;
   private readonly spheronApi: SpheronApi;
   private readonly bucketManager: BucketManager;
   private readonly uploadManager: UploadManager;
 
   constructor(configuration: SpheronClientConfiguration) {
-    this.configuration = configuration;
-    this.spheronApi = new SpheronApi(
-      this.configuration.token,
+    const spheronApi = new SpheronApi(
+      configuration.token,
       configuration?.apiUrl
     );
+    super(spheronApi);
+    this.spheronApi = spheronApi;
+    this.configuration = configuration;
     this.bucketManager = new BucketManager(this.spheronApi);
     this.uploadManager = new UploadManager(configuration?.apiUrl);
   }
@@ -73,6 +77,8 @@ export class SpheronClient {
       onChunkUploaded?: (uploadedSize: number, totalSize: number) => void;
     }
   ): Promise<UploadResult> {
+    await this.validateStorageOrganizationType();
+
     const { uploadId, payloadSize, parallelUploadCount } =
       await this.uploadManager.initiateUpload({
         protocol: configuration.protocol,
@@ -144,6 +150,8 @@ export class SpheronClient {
     litNodeClient,
     configuration,
   }: EncryptToIpfsProps): Promise<UploadResult> {
+    await this.validateStorageOrganizationType();
+
     if (!string && !filePath) {
       throw new Error(`Either string or filePath must be provided`);
     }
@@ -266,6 +274,8 @@ export class SpheronClient {
     ipfsCid,
     litNodeClient,
   }: DecryptFromIpfsProps): Promise<Uint8Array> {
+    await this.validateStorageOrganizationType();
+
     const metadata = await (
       await fetch(`https://${ipfsCid}.ipfs.sphn.link/data.json`).catch(() => {
         throw new Error("Error finding metadata from IPFS CID");
@@ -292,6 +302,8 @@ export class SpheronClient {
     name: string;
     protocol: ProtocolEnum;
   }): Promise<{ uploadToken: string }> {
+    await this.validateStorageOrganizationType();
+
     const { singleUseToken } = await this.uploadManager.initiateUpload({
       protocol: configuration.protocol,
       name: configuration.name,
@@ -309,6 +321,8 @@ export class SpheronClient {
     protocolLink: string;
     dynamicLinks: string[];
   }> {
+    await this.validateStorageOrganizationType();
+
     return await this.uploadManager.pinCID({
       name: configuration.name,
       token: this.configuration.token,
@@ -325,6 +339,8 @@ export class SpheronClient {
       limit: number;
     }
   ): Promise<Bucket[]> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.getOrganizationBuckets(
       organizationId,
       options
@@ -338,6 +354,8 @@ export class SpheronClient {
       state?: BucketStateEnum;
     }
   ): Promise<number> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.getOrganizationBucketCount(
       organizationId,
       options
@@ -345,14 +363,20 @@ export class SpheronClient {
   }
 
   async getBucket(bucketId: string): Promise<Bucket> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.getBucket(bucketId);
   }
 
   async getCIDStatus(CID: string): Promise<{ pinStatus: PinStatus }> {
+    await this.validateStorageOrganizationType();
+
     return await this.uploadManager.getCIDStatus(CID);
   }
 
   async getBucketDomains(bucketId: string): Promise<Domain[]> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.getBucketDomains(bucketId);
   }
 
@@ -360,6 +384,8 @@ export class SpheronClient {
     bucketId: string,
     domainIdentifier: string
   ): Promise<Domain> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.getBucketDomain(bucketId, domainIdentifier);
   }
 
@@ -377,6 +403,8 @@ export class SpheronClient {
       name: string;
     }
   ): Promise<Domain> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.addBucketDomain(bucketId, options);
   }
 
@@ -388,6 +416,8 @@ export class SpheronClient {
       name: string;
     }
   ): Promise<Domain> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.updateBucketDomain(
       bucketId,
       domainIdentifier,
@@ -399,6 +429,8 @@ export class SpheronClient {
     bucketId: string,
     domainIdentifier: string
   ): Promise<Domain> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.verifyBucketDomain(
       bucketId,
       domainIdentifier
@@ -409,6 +441,8 @@ export class SpheronClient {
     cdnARecords: string;
     cdnCnameRecords: string;
   }> {
+    await this.validateStorageOrganizationType();
+
     const { recordIpv4V2, recordCnameV2 } =
       await this.spheronApi.getCdnRecords();
     return {
@@ -421,6 +455,8 @@ export class SpheronClient {
     bucketId: string,
     domainIdentifier: string
   ): Promise<void> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.deleteBucketDomain(
       bucketId,
       domainIdentifier
@@ -428,14 +464,20 @@ export class SpheronClient {
   }
 
   async archiveBucket(bucketId: string): Promise<void> {
+    await this.validateStorageOrganizationType();
+
     await this.bucketManager.archiveBucket(bucketId);
   }
 
   async unarchiveBucket(bucketId: string): Promise<void> {
+    await this.validateStorageOrganizationType();
+
     await this.bucketManager.unarchiveBucket(bucketId);
   }
 
   async getBucketUploadCount(bucketId: string): Promise<number> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.getBucketUploadCount(bucketId);
   }
 
@@ -446,14 +488,20 @@ export class SpheronClient {
       limit: number;
     }
   ): Promise<Upload[]> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.getBucketUploads(bucketId, options);
   }
 
   async getUpload(uploadId: string): Promise<Upload> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.getUpload(uploadId);
   }
 
   async getOrganizationUsage(organizationId: string): Promise<UsageWithLimits> {
+    await this.validateStorageOrganizationType();
+
     const usage = await this.spheronApi.getOrganizationUsage(
       organizationId,
       "storage"
@@ -489,10 +537,14 @@ export class SpheronClient {
   }
 
   async getTokenScope(): Promise<TokenScope> {
-    return await this.spheronApi.getTokenScope();
+    await this.validateStorageOrganizationType();
+
+    return await this.getScopeFromToken();
   }
 
   async getBucketIpnsRecords(bucketId: string): Promise<IpnsRecord[]> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.getBucketIpnsRecords(bucketId);
   }
 
@@ -500,6 +552,8 @@ export class SpheronClient {
     bucketId: string,
     ipnsRecordId: string
   ): Promise<IpnsRecord> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.getBucketIpnsRecord(bucketId, ipnsRecordId);
   }
 
@@ -507,6 +561,8 @@ export class SpheronClient {
     bucketId: string,
     uploadId: string
   ): Promise<IpnsRecord> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.addBucketIpnsRecord(bucketId, uploadId);
   }
 
@@ -515,6 +571,8 @@ export class SpheronClient {
     ipnsRecordId: string,
     uploadId: string
   ): Promise<IpnsRecord> {
+    await this.validateStorageOrganizationType();
+
     return await this.bucketManager.updateBucketIpnsRecord(
       bucketId,
       ipnsRecordId,
@@ -526,6 +584,8 @@ export class SpheronClient {
     bucketId: string,
     ipnsRecordId: string
   ): Promise<void> {
+    await this.validateStorageOrganizationType();
+
     await this.spheronApi.deleteBucketIpnsRecord(bucketId, ipnsRecordId);
   }
 
@@ -536,10 +596,21 @@ export class SpheronClient {
     numberOfBuckets: number;
     numberOfUploads: number;
   }> {
+    await this.validateStorageOrganizationType();
+
     return await this.spheronApi.migrateStaticSiteOrgToStorage(
       webappOrganizationId,
       storageOrganizationId
     );
+  }
+
+  private async validateStorageOrganizationType(): Promise<void> {
+    const type = await this.getOrganizationTypeFromToken();
+    if (type != AppTypeEnum.STORAGE) {
+      throw new Error(
+        "The token used won't work with version >2.0.0 of SDK, please create a new token from your storage organisation."
+      );
+    }
   }
 }
 
