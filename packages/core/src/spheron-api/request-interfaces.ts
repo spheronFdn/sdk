@@ -54,6 +54,7 @@ interface UpdateInstaceRequest {
   tag: string;
   akashMachineImageName?: string;
   customInstanceSpecs?: CustomInstanceSpecs;
+  instanceCount?: number;
 }
 
 interface CustomInstanceSpecs {

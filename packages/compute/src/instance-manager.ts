@@ -90,7 +90,11 @@ class InstanceManager {
       !updateConfig.commands &&
       !updateConfig.environmentVariables &&
       !updateConfig.secretEnvironmentVariables &&
-      !updateConfig.tag
+      !updateConfig.tag &&
+      !updateConfig.storage &&
+      !updateConfig.persistentStorage &&
+      !updateConfig.customSpecs &&
+      !updateConfig.instanceCount
     ) {
       throw new Error(`Nothing to update.`);
     }

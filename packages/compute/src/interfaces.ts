@@ -12,6 +12,7 @@ import {
   HealthStatusEnum,
   PersistentStorage,
   PersistentStorageClassEnum,
+  ComputeTypeEnum,
 } from "@spheron/core";
 
 interface Organization {
@@ -168,7 +169,7 @@ interface InstanceCreationConfig {
     path: string;
     port: number;
   };
-  scalable: boolean;
+  type: ComputeTypeEnum;
 }
 
 interface EnvironmentVariable {
@@ -182,7 +183,7 @@ interface MarketplaceInstanceCreationConfig {
   machineImageId?: string;
   region: string;
   storage: number;
-  scalable: boolean;
+  type: ClusterProtocolEnum;
   customSpecs?: {
     cpu: number;
     memory: number;
@@ -212,6 +213,17 @@ interface InstanceUpdateConfig {
   commands?: Array<string>;
   args?: Array<string>;
   tag?: string;
+  storage?: number;
+  persistentStorage?: {
+    size: number;
+    class: PersistentStorageClassEnum;
+    mountPoint: string;
+  };
+  customSpecs?: {
+    cpu: number;
+    memory: number;
+  };
+  instanceCount?: number;
 }
 
 interface UsageWithLimits {

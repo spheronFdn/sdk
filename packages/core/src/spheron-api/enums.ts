@@ -125,6 +125,11 @@ enum ClusterProtocolEnum {
   AKASH = "akash",
 }
 
+enum ComputeTypeEnum {
+  SPOT = "spot",
+  DEMAND = "demand",
+}
+
 export {
   ProjectTypeEnum,
   DeploymentEnvironmentStatusEnum,
@@ -142,5 +147,6 @@ export {
   MarketplaceCategoryEnum,
   InstanceLogType,
   PersistentStorageClassEnum,
-  ClusterProtocolEnum
+  ClusterProtocolEnum,
+  ComputeTypeEnum,
 };
