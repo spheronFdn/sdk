@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import UploadEncrypt from "./UploadEncrypt";
+import Upload from "./Upload";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -9,6 +10,6 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <UploadEncrypt />
+    <Upload />
   </React.StrictMode>
 );
