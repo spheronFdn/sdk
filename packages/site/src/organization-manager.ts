@@ -1,13 +1,12 @@
-import { ProjectStateEnum, SpheronApi } from "@spheron/core";
+import { ProjectStateEnum, ScopeExtractor, SpheronApi } from "@spheron/core";
 import { Organization, Project, UsageWithLimits } from "./interfaces";
-import OrganizationIdExtractor from "./organizationId-extractor";
 import {
   mapCoreProject,
   mapCoreOrganization,
   mapCoreUsageWithLimits,
 } from "./interface-mappers";
 
-class OrganizationManager extends OrganizationIdExtractor {
+class OrganizationManager extends ScopeExtractor {
   private readonly spheronApi: SpheronApi;
 
   constructor(spheronApi: SpheronApi) {
