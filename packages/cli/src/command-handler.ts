@@ -1,4 +1,4 @@
-import { changeDefaultOrganization } from "./commands/configure";
+import { changeDefaultOrganization } from "./commands/switch-organization";
 import { createConfiguration } from "./commands/create-configuration";
 import { createOrganization } from "./commands/create-organization";
 import { ResourceEnum, ResourceFetcher } from "./commands/site/get-resources";
@@ -303,7 +303,7 @@ export async function commandHandler(options: any) {
           const prompt = await promptForSwitchOrganization();
           organizationId = prompt.organization;
         }
-        await changeDefaultOrganization(organizationId);
+        await changeDefaultOrganization(AppTypeEnum.WEB_APP, organizationId);
       } catch (error) {
         console.log(error.message);
         process.exit(1);
@@ -596,7 +596,7 @@ export async function commandHandler(options: any) {
           const prompt = await promptForSwitchOrganization();
           organizationId = prompt.organization;
         }
-        await changeDefaultOrganization(organizationId);
+        await changeDefaultOrganization(AppTypeEnum.COMPUTE, organizationId);
       } catch (error) {
         console.log(error.message);
         process.exit(1);
