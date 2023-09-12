@@ -31,13 +31,13 @@ import {
   promptForUploadFile,
 } from "./prompts/prompts";
 import SpheronApiService from "./services/spheron-api";
-import { fileExists, readFromJsonFile } from "./utils";
+import { fileExists } from "./utils";
 import { SiteCommandEnum } from "./commands/site/interfaces";
 import { ComputeCommandEnum } from "./commands/compute/interfaces";
 import { AppTypeEnum } from "@spheron/core";
+import MetadataService, { SiteMetadata } from "./services/metadata-service";
 
 export async function commandHandler(options: any) {
-  console.log("PASSED PARAM:", options, options._[0]);
   if (!(await fileExists(configuration.configFilePath))) {
     //check if ${HOME}/.spheron dir exists
     await createConfiguration();
@@ -102,10 +102,8 @@ export async function commandHandler(options: any) {
         console.log(`Generated default bucket name: ${bucketName}`);
       }
       if (!organizationId) {
-        organizationId = await readFromJsonFile(
-          "organization",
-          configuration.configFilePath
-        );
+        const siteData: SiteMetadata = await MetadataService.getSiteData();
+        organizationId = siteData.organizationId;
       }
       if (!path) {
         path = "./";

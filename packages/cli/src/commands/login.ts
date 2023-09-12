@@ -47,7 +47,6 @@ export async function login(provider: string): Promise<void> {
                 verify.jwtToken,
                 configuration.configFilePath
               );
-
               await writeToJsonFile(
                 AppTypeEnum.WEB_APP,
                 {

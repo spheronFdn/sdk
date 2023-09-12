@@ -11,16 +11,13 @@ import {
   VerifiedTokenResponse,
 } from "@spheron/core";
 import configuration from "../configuration";
-import { readFromJsonFile } from "../utils";
 import { IGPTResponse } from "../commands/gpt/gpt";
 import Spinner from "../outputs/spinner";
+import MetadataService from "./metadata-service";
 
 const SpheronApiService = {
   async initialize(): Promise<SpheronApi> {
-    const jwtToken = await readFromJsonFile(
-      "jwtToken",
-      configuration.configFilePath
-    );
+    const jwtToken = await MetadataService.getJwtToken();
     const client = jwtToken
       ? new SpheronApi(jwtToken, configuration.spheronServerAddress)
       : new SpheronApi("", configuration.spheronServerAddress);
@@ -74,6 +71,7 @@ const SpheronApiService = {
     state?: string
   ): Promise<Project[]> {
     const client: SpheronApi = await this.initialize();
+    console.log("FOR ID:", id);
     const options: any = {
       skip: 0,
       limit: 100,

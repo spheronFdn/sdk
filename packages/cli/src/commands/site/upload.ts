@@ -1,4 +1,3 @@
-import configuration from "../../configuration";
 import SpheronClient, { ProtocolEnum } from "@spheron/storage";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const chalk = require("chalk");
@@ -8,10 +7,10 @@ import {
   FileTypeEnum,
   getFileType,
   mapProtocolToUserReadable,
-  readFromJsonFile,
 } from "../../utils";
 import Spinner from "../../outputs/spinner";
 import { progressBar } from "../../outputs/progress-bar";
+import MetadataService from "../../services/metadata-service";
 
 export async function upload(
   rootPath: string,
@@ -22,10 +21,7 @@ export async function upload(
   const spinner = new Spinner();
   try {
     spinner.spin(`Uploading to ${mapProtocolToUserReadable(protocol)} `, 4000);
-    const jwtToken = await readFromJsonFile(
-      "jwtToken",
-      configuration.configFilePath
-    );
+    const jwtToken = await MetadataService.getJwtToken();
     if (!jwtToken) {
       throw new Error(
         "Authorization failed. Please execute login command first"

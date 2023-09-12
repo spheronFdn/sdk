@@ -163,6 +163,8 @@ interface PlatformUser {
 interface VerifiedTokenResponse {
   jwtToken: string;
   organizationId: string;
+  computeOrganizationId: string;
+  siteOrganizationId: string;
   email: string;
 }
 

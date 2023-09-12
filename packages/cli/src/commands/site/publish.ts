@@ -7,7 +7,7 @@ import {
   readFromJsonFile,
 } from "../../utils";
 import { upload } from "./upload";
-import { AppTypeEnum } from "@spheron/core";
+import MetadataService from "../../services/metadata-service";
 
 export async function publish(organization?: string): Promise<any> {
   try {
@@ -30,12 +30,7 @@ export async function publish(organization?: string): Promise<any> {
     );
     const organizationId: string = organization
       ? organization
-      : (
-          await readFromJsonFile(
-            AppTypeEnum.WEB_APP,
-            configuration.configFilePath
-          )
-        ).organizationId;
+      : (await MetadataService.getSiteData())?.organizationId;
     if (!organizationId) {
       throw new Error(
         "Please specify organization that you would wish to use while uploading"
