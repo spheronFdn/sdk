@@ -1,8 +1,8 @@
 import path from "path";
 
 const configuration = {
-  spheronServerAddress: "http://localhost:8085",
-  spheronFrontendAddress: "https://dev.spheron.network",
+  spheronServerAddress: "https://api-v2.spheron.network",
+  spheronFrontendAddress: "https://app.spheron.network",
   version: "1.0.16",
   configFilePath: path.join(
     process.env.HOME ? process.env.HOME : "/home/ubuntu",

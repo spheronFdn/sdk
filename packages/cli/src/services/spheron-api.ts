@@ -71,7 +71,6 @@ const SpheronApiService = {
     state?: string
   ): Promise<Project[]> {
     const client: SpheronApi = await this.initialize();
-    console.log("FOR ID:", id);
     const options: any = {
       skip: 0,
       limit: 100,
