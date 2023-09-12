@@ -10,8 +10,7 @@ import {
 } from "@spheron/core";
 import Spinner from "../../outputs/spinner";
 import SpheronApiService from "../../services/spheron-api";
-import { readFromJsonFile } from "../../utils";
-import configuration from "../../configuration";
+import MetadataService from "../../services/metadata-service";
 
 export const ResourceFetcher = {
   async getOrganization(id: string) {
@@ -19,10 +18,8 @@ export const ResourceFetcher = {
     try {
       spinner.spin("Fetching ");
       if (!id) {
-        id = await readFromJsonFile(
-          "organization",
-          configuration.configFilePath
-        );
+        const siteData = await MetadataService.getSiteData();
+        id = siteData?.organizationId;
         if (!id) {
           throw new Error("OrganizationId not provided");
         }
@@ -70,10 +67,8 @@ export const ResourceFetcher = {
     try {
       spinner.spin("Fetching ");
       if (!organizationId) {
-        organizationId = await readFromJsonFile(
-          "organization",
-          configuration.configFilePath
-        );
+        const siteData = await MetadataService.getSiteData();
+        organizationId = siteData?.organizationId;
         if (!organizationId) {
           throw new Error("OrganizationId not provided");
         }

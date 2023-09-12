@@ -1,9 +1,12 @@
 import path from "path";
 
-import { writeToJsonFile, fileExists, readFromJsonFile } from "../../utils";
+import { writeToJsonFile, fileExists } from "../../utils";
 import configuration from "../../configuration";
 import { createConfiguration } from "../create-configuration";
 import Spinner from "../../outputs/spinner";
+import MetadataService, {
+  ProjectTrackingElement,
+} from "../../services/metadata-service";
 
 export async function init(
   name: string,
@@ -41,11 +44,9 @@ export async function init(
       path.join(process.cwd(), "./spheron.json")
     );
     //link to project tracking file
-    const projects = await readFromJsonFile(
-      "projects",
-      configuration.projectTrackingFilePath
-    );
-    projects.push({
+    const projects: Array<ProjectTrackingElement> =
+      await MetadataService.getProjectTrackingData();
+    const newProjectTrackingElement: ProjectTrackingElement = {
       name: name ? name : pathSegments[pathSegments.length - 1],
       path: projectPath
         ? path.join(process.cwd(), projectPath)
@@ -55,12 +56,9 @@ export async function init(
         name: framework,
         configuration: frameworkConfig,
       },
-    });
-    await writeToJsonFile(
-      "projects",
-      projects,
-      configuration.projectTrackingFilePath
-    );
+    };
+    projects.push(newProjectTrackingElement);
+    await MetadataService.setProjectTrackingData(projects);
     if (!silient) {
       spinner.success("Spheron initialized");
     }
