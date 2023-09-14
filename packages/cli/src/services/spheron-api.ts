@@ -1,5 +1,6 @@
 import {
   AppTypeEnum,
+  ComputeMachine,
   Deployment,
   DeploymentEnvironment,
   DeploymentStatusEnum,
@@ -143,6 +144,27 @@ const SpheronApiService = {
     const deploymentEnvironments: DeploymentEnvironment[] =
       await client.getDeploymentEnvironments(projectId);
     return deploymentEnvironments;
+  },
+
+  async getComputePlans(name?: string): Promise<ComputeMachine[]> {
+    const client: SpheronApi = await this.initialize();
+    const options: any = {
+      skip: 0,
+      limit: 50,
+    };
+    if (name) {
+      options.searchString = name;
+    }
+    const computePlans: ComputeMachine[] = await client.getComputeMachines(
+      options
+    );
+    return computePlans;
+  },
+
+  async getComputeRegions(): Promise<string[]> {
+    const client: SpheronApi = await this.initialize();
+    const regions: string[] = await client.getComputeMachineRegions();
+    return regions;
   },
 
   async isWhitelisted(): Promise<any> {

@@ -1,5 +1,6 @@
 import {
   AppTypeEnum,
+  ComputeMachine,
   Deployment,
   DeploymentEnvironment,
   DeploymentStatusEnum,
@@ -8,17 +9,22 @@ import {
   Project,
   User,
 } from "@spheron/core";
-import Spinner from "../../outputs/spinner";
-import SpheronApiService from "../../services/spheron-api";
-import MetadataService from "../../services/metadata-service";
+import Spinner from "../outputs/spinner";
+import SpheronApiService from "../services/spheron-api";
+import MetadataService from "../services/metadata-service";
 
 export const ResourceFetcher = {
-  async getOrganization(id: string) {
+  async getOrganization(id: string, type: AppTypeEnum) {
     const spinner = new Spinner();
     try {
       spinner.spin("Fetching ");
       if (!id) {
-        const siteData = await MetadataService.getSiteData();
+        let siteData;
+        if (type == AppTypeEnum.COMPUTE) {
+          siteData = await MetadataService.getComputeData();
+        } else {
+          siteData = await MetadataService.getSiteData();
+        }
         id = siteData?.organizationId;
         if (!id) {
           throw new Error("OrganizationId not provided");
@@ -198,9 +204,45 @@ export const ResourceFetcher = {
       spinner.stop();
     }
   },
+
+  async getComputePlans(name?: string) {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching ");
+      const computesPlans: ComputeMachine[] =
+        await SpheronApiService.getComputePlans(name);
+      console.log("Compute plans:");
+      const computePlansDtos = computesPlans.map((x) => {
+        return toComputePlansDTO(x);
+      });
+      console.log(JSON.stringify(computePlansDtos, null, 2));
+      spinner.success(``);
+    } catch (error) {
+      console.log(`✖️  Error while fetching compute plans`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
+
+  async getComputeRegions() {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching ");
+      const regions: string[] = await SpheronApiService.getComputeRegions();
+      console.log("Compute regions:");
+      console.log(JSON.stringify(regions, null, 2));
+      spinner.success(``);
+    } catch (error) {
+      console.log(`✖️  Error while fetching compute regions`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
 };
 
-export enum ResourceEnum {
+export enum SiteResourceEnum {
   PROJECT = "project",
   PROJECTS = "projects",
   DEPLOYMENT = "deployment",
@@ -209,6 +251,13 @@ export enum ResourceEnum {
   ORGANIZATIONS = "organizations",
   DOMAINS = "domains",
   DEPLOYMENT_ENVIRONMENTS = "deployment-environments",
+}
+
+export enum ComputeResourceEnum {
+  ORGANIZATION = "organization",
+  ORGANIZATIONS = "organizations",
+  PLANS = "plans",
+  REGIONS = "regions",
 }
 
 interface OrganizationDTO {
@@ -265,6 +314,15 @@ interface DeploymentDTO {
   sitePreview: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+interface ComputePlanDTO {
+  _id: string;
+  name: string;
+  cpu: number;
+  storage: string;
+  memory: string;
+  dailyCost: string;
 }
 
 const toOrganizationDTO = function (
@@ -337,5 +395,18 @@ const toDeploymentDTO = function (deployment: Deployment): DeploymentDTO {
     sitePreview: deployment.sitePreview,
     createdAt: deployment.createdAt,
     updatedAt: deployment.updatedAt,
+  };
+};
+
+const toComputePlansDTO = function (
+  computeMachine: ComputeMachine
+): ComputePlanDTO {
+  return {
+    _id: computeMachine._id,
+    name: computeMachine.name,
+    cpu: computeMachine.cpu,
+    storage: computeMachine.storage,
+    memory: computeMachine.memory,
+    dailyCost: computeMachine.defaultDailyTopUp.toFixed(3),
   };
 };

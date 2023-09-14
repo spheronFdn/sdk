@@ -1,5 +1,10 @@
 import { ClusterProtocolEnum } from "./enums";
-import { Env, PersistentStorage, Port } from "./interfaces";
+import {
+  CustomInstanceSpecs,
+  Env,
+  PersistentStorage,
+  Port,
+} from "./interfaces";
 
 interface CreateInstanceRequest {
   organizationId: string;
@@ -52,13 +57,6 @@ interface UpdateInstaceRequest {
   tag: string;
   healthCheckUrl?: string;
   healthCheckPort?: string;
-}
-
-interface CustomInstanceSpecs {
-  cpu?: number;
-  memory?: string;
-  persistentStorage?: PersistentStorage;
-  storage: string;
 }
 
 export {

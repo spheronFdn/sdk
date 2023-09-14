@@ -476,6 +476,13 @@ interface PersistentStorage {
   mountPoint: string;
 }
 
+interface CustomInstanceSpecs {
+  cpu?: number;
+  memory?: string;
+  persistentStorage?: PersistentStorage;
+  storage: string;
+}
+
 interface InstanceTopup {
   time: number;
   amount: number;
@@ -580,6 +587,7 @@ export {
   Env,
   Port,
   PersistentStorage,
+  CustomInstanceSpecs,
   MarketplaceApp,
   ComputeMachine,
   MarketplaceAppMetadata,

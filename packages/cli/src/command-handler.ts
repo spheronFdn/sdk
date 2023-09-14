@@ -1,7 +1,11 @@
 import { changeDefaultOrganization } from "./commands/switch-organization";
 import { createConfiguration } from "./commands/create-configuration";
 import { createOrganization } from "./commands/create-organization";
-import { ResourceEnum, ResourceFetcher } from "./commands/site/get-resources";
+import {
+  SiteResourceEnum,
+  ResourceFetcher,
+  ComputeResourceEnum,
+} from "./commands/get-resources";
 import {
   GptCommandEnum,
   createTestCases,
@@ -231,10 +235,10 @@ export async function commandHandler(options: any) {
     (async () => {
       try {
         if (options.resource) {
-          if (options.resource == ResourceEnum.DEPLOYMENT) {
+          if (options.resource == SiteResourceEnum.DEPLOYMENT) {
             const id = options.id;
             await ResourceFetcher.getDeployment(id);
-          } else if (options.resource == ResourceEnum.DEPLOYMENTS) {
+          } else if (options.resource == SiteResourceEnum.DEPLOYMENTS) {
             const projectId = options.projectId;
             const skip = options.skip;
             const limit = options.limit;
@@ -245,10 +249,10 @@ export async function commandHandler(options: any) {
               limit,
               status
             );
-          } else if (options.resource == ResourceEnum.PROJECT) {
+          } else if (options.resource == SiteResourceEnum.PROJECT) {
             const id = options.id;
             await ResourceFetcher.getProject(id);
-          } else if (options.resource == ResourceEnum.PROJECTS) {
+          } else if (options.resource == SiteResourceEnum.PROJECTS) {
             const organizationId = options.organizationId;
             const skip = options.skip;
             const limit = options.limit;
@@ -259,15 +263,17 @@ export async function commandHandler(options: any) {
               limit,
               state
             );
-          } else if (options.resource == ResourceEnum.ORGANIZATION) {
+          } else if (options.resource == SiteResourceEnum.ORGANIZATION) {
             const id = options.id;
-            await ResourceFetcher.getOrganization(id);
-          } else if (options.resource == ResourceEnum.ORGANIZATIONS) {
+            await ResourceFetcher.getOrganization(id, AppTypeEnum.WEB_APP);
+          } else if (options.resource == SiteResourceEnum.ORGANIZATIONS) {
             await ResourceFetcher.getUserOrganizations();
-          } else if (options.resource == ResourceEnum.DOMAINS) {
+          } else if (options.resource == SiteResourceEnum.DOMAINS) {
             const projectId = options.projectId;
             await ResourceFetcher.getProjectDomains(projectId);
-          } else if (options.resource == ResourceEnum.DEPLOYMENT_ENVIRONMENTS) {
+          } else if (
+            options.resource == SiteResourceEnum.DEPLOYMENT_ENVIRONMENTS
+          ) {
             const projectId = options.projectId;
             await ResourceFetcher.getProjectDeploymentEnvironments(projectId);
           }
@@ -597,6 +603,58 @@ export async function commandHandler(options: any) {
           organizationId = prompt.organization;
         }
         await changeDefaultOrganization(AppTypeEnum.COMPUTE, organizationId);
+      } catch (error) {
+        console.log(error.message);
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (options._[0] === "compute" && options._[1] === ComputeCommandEnum.INIT) {
+    const validOptions = ["organization"];
+    const unknownOptions = Object.keys(options).filter(
+      (option) =>
+        option !== "_" && option !== "$0" && !validOptions.includes(option)
+    );
+    if (unknownOptions.length > 0) {
+      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
+    (async () => {
+      try {
+        let organizationId;
+        if (options.organization) {
+          organizationId = options.organization;
+        } else {
+          const prompt = await promptForSwitchOrganization();
+          organizationId = prompt.organization;
+        }
+        await changeDefaultOrganization(AppTypeEnum.COMPUTE, organizationId);
+      } catch (error) {
+        console.log(error.message);
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (options._[0] === "compute" && options._[1] === SiteCommandEnum.GET) {
+    (async () => {
+      try {
+        if (options.resource) {
+          if (options.resource == ComputeResourceEnum.ORGANIZATION) {
+            const id = options.id;
+            await ResourceFetcher.getOrganization(id, AppTypeEnum.COMPUTE);
+          } else if (options.resource == ComputeResourceEnum.ORGANIZATIONS) {
+            await ResourceFetcher.getUserOrganizations();
+          } else if (options.resource == ComputeResourceEnum.PLANS) {
+            const name = options.name;
+            await ResourceFetcher.getComputePlans(name);
+          } else if (options.resource == ComputeResourceEnum.REGIONS) {
+            await ResourceFetcher.getComputeRegions();
+          }
+        } else {
+          throw new Error("Resource needs to be specified");
+        }
       } catch (error) {
         console.log(error.message);
         process.exit(1);
