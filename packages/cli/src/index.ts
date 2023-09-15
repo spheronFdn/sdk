@@ -288,8 +288,11 @@ import { GlobalCommandEnum } from "./commands/interfaces";
         Examples:
           - get organization            : options: --id 
           - get organizations           : (all organization for your user will be returned)
-          - get plans                   : options --name
+          - get plans                   : options: --name
           - get regions                   
+          - get clusters                : options: --organizationId
+          - get instance                : options: --id  
+          - get instances               : options: --clusterId
         `);
           }
         );

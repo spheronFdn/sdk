@@ -1,10 +1,13 @@
 import {
   AppTypeEnum,
+  Cluster,
   ComputeMachine,
   Deployment,
   DeploymentEnvironment,
   DeploymentStatusEnum,
   Domain,
+  ExtendedInstance,
+  Instance,
   Organization,
   Project,
   SpheronApi,
@@ -165,6 +168,42 @@ const SpheronApiService = {
     const client: SpheronApi = await this.initialize();
     const regions: string[] = await client.getComputeMachineRegions();
     return regions;
+  },
+
+  async getClusters(organizationId: string): Promise<Cluster[]> {
+    const client: SpheronApi = await this.initialize();
+    const options: any = {
+      skip: 0,
+      limit: 50,
+    };
+    const clusters: Cluster[] = await client.getOrganizationClusters(
+      organizationId,
+      options
+    );
+    return clusters;
+  },
+
+  async getClusterInstances(clusterId: string): Promise<ExtendedInstance[]> {
+    const client: SpheronApi = await this.initialize();
+    const options: any = {
+      skip: 0,
+      limit: 50,
+      includeReport: true,
+    };
+    const instances: ExtendedInstance[] = await client.getClusterInstances(
+      clusterId,
+      options
+    );
+    return instances;
+  },
+
+  async getClusterInstance(id: string): Promise<Instance> {
+    const client: SpheronApi = await this.initialize();
+    const options: any = {
+      includeReport: true,
+    };
+    const instance: Instance = await client.getClusterInstance(id, options);
+    return instance;
   },
 
   async isWhitelisted(): Promise<any> {

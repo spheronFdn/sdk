@@ -651,6 +651,15 @@ export async function commandHandler(options: any) {
             await ResourceFetcher.getComputePlans(name);
           } else if (options.resource == ComputeResourceEnum.REGIONS) {
             await ResourceFetcher.getComputeRegions();
+          } else if (options.resource == ComputeResourceEnum.CLUSTERS) {
+            const organizationId = options.organizationId;
+            await ResourceFetcher.getClusters(organizationId);
+          } else if (options.resource == ComputeResourceEnum.INSTANCES) {
+            const clusterId = options.clusterId;
+            await ResourceFetcher.getClusterInstances(clusterId);
+          } else if (options.resource == ComputeResourceEnum.INSTANCE) {
+            const id = options.id;
+            await ResourceFetcher.getClusterInstance(id);
           }
         } else {
           throw new Error("Resource needs to be specified");
