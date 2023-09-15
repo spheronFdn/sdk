@@ -6,7 +6,7 @@ import * as yaml from "js-yaml";
 import Spinner from "../../outputs/spinner";
 import { SpheronComputeConfiguration } from "./interfaces";
 
-export async function init(configuration: SpheronComputeConfiguration) {
+export async function computeInit(configuration: SpheronComputeConfiguration) {
   const spinner = new Spinner();
   try {
     spinner.spin(`Spheron compute file initialization...`);

@@ -74,12 +74,17 @@ import { GlobalCommandEnum } from "./commands/interfaces";
             .help();
         })
         .command(
-          "publish",
+          SiteCommandEnum.PUBLISH,
           "Upload your project setup in spheron.json",
           (yargs: any) => {
             yargs
+              .option("organization", {
+                describe: "Organization ID",
+              })
               .version(false)
-              .usage(`Usage: $0 site publish [--organization <organizationId>]`)
+              .usage(
+                `Usage: $0 site publish [--organizationId <organizationId>]`
+              )
               .help();
           }
         )
@@ -103,7 +108,7 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           }
         )
         .command(
-          "get <resource>",
+          `${SiteCommandEnum.GET} <resource>`,
           "Get resource/s <<resource>>",
           (yargs: any) => {
             yargs.positional("resource", {
@@ -223,7 +228,32 @@ import { GlobalCommandEnum } from "./commands/interfaces";
         )
         .command(
           ComputeCommandEnum.INIT,
-          "Spheron file initialization for compute",
+          "Create initial spheron compute configuration file",
+          (yargs: any) => {
+            yargs
+              .version(false)
+              .usage(`Usage: $0 compute init`)
+              .wrap(150)
+              .help();
+          }
+        )
+        .command(
+          ComputeCommandEnum.PUBLISH,
+          "Deploy instance defined in spheron.yaml",
+          (yargs: any) => {
+            yargs
+              .option("organizationId", {
+                describe: "Organization ID",
+              })
+              .version(false)
+              .usage(`Usage: $0 publish [--organizationId <organizationId>]`)
+              .wrap(150)
+              .help();
+          }
+        )
+        .command(
+          ComputeCommandEnum.DIRECT_DEPLOY,
+          "Spheron direct deployment of docker container",
           (yargs: any) => {
             yargs
               .option("cluster-name", {
@@ -268,14 +298,14 @@ import { GlobalCommandEnum } from "./commands/interfaces";
               })
               .version(false)
               .usage(
-                `Usage: $0 site  init --protocol <protocol> [--project <project_name>] [--path <path>] [--framework <framework>]`
+                `Usage: $0 site  init --cluster-name <protocol> [--project <project_name>] [--path <path>] [--framework <framework>]`
               )
               .wrap(150)
               .help();
           }
         )
         .command(
-          "get <resource>",
+          `${ComputeCommandEnum.GET} <resource>`,
           "Get resource/s <<resource>>",
           (yargs: any) => {
             yargs.positional("resource", {

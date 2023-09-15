@@ -1,13 +1,16 @@
 import {
   AppTypeEnum,
   Cluster,
+  ClusterProtocolEnum,
   ComputeMachine,
+  CreateInstanceRequest,
   Deployment,
   DeploymentEnvironment,
   DeploymentStatusEnum,
   Domain,
   ExtendedInstance,
   Instance,
+  InstanceResponse,
   Organization,
   Project,
   SpheronApi,
@@ -18,6 +21,7 @@ import configuration from "../configuration";
 import { IGPTResponse } from "../commands/gpt/gpt";
 import Spinner from "../outputs/spinner";
 import MetadataService from "./metadata-service";
+import { SpheronComputeConfiguration } from "../commands/compute/interfaces";
 
 const SpheronApiService = {
   async initialize(): Promise<SpheronApi> {
@@ -206,7 +210,38 @@ const SpheronApiService = {
     return instance;
   },
 
-  async isWhitelisted(): Promise<any> {
+  async deployInstance(
+    organizationId: string,
+    configuration: SpheronComputeConfiguration
+  ): Promise<InstanceResponse> {
+    const client: SpheronApi = await this.initialize();
+    const req: CreateInstanceRequest = {
+      organizationId,
+      configuration: {
+        protocol: ClusterProtocolEnum.AKASH,
+        image: configuration.image,
+        tag: configuration.tag,
+        instanceCount: configuration.instanceCount,
+        ports: configuration.ports,
+        env: configuration.env,
+        command: configuration.commands,
+        args: configuration.args,
+        region: configuration.region,
+        akashMachineImageName: configuration.plan,
+        customInstanceSpecs: configuration.customParams,
+      },
+      instanceName: configuration.instanceName,
+      clusterUrl: configuration.image,
+      clusterProvider: "DOCKERHUB",
+      clusterName: configuration.clusterName,
+      healthCheckUrl: configuration.healthCheck?.path,
+      healthCheckPort: configuration.healthCheck?.port,
+    };
+    const response: InstanceResponse = await client.createClusterInstance(req);
+    return response;
+  },
+
+  async isGptWhitelisted(): Promise<any> {
     const client: any = await this.initialize();
     if (!client.token) {
       return {

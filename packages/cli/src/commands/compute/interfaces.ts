@@ -1,10 +1,12 @@
 import { CustomInstanceSpecs, Env, Port } from "@spheron/core";
 
 export enum ComputeCommandEnum {
+  GET = "get",
   CREATE_ORGANIZATION = "create-organization",
   SWITCH_ORGANIZATION = "switch-organization",
   SWITHC_CLUSTER = "switch-cluster",
   INIT = "init",
+  DIRECT_DEPLOY = "direct_deploy",
   BUILD = "build",
   PUBLISH = "publish",
   VALIDATE = "validate",
@@ -24,8 +26,13 @@ export interface SpheronComputeConfiguration {
   commands: Array<string>;
   args: Array<string>;
   region: string;
-  plan?: string;
-  customPlan?: CustomInstanceSpecs;
+  type: ComputeInstanceType;
+  plan: string;
+  customParams: CustomInstanceSpecs;
+  healthCheck?: {
+    path: string;
+    port: number;
+  };
 }
 
 export interface ComputePlanDetails {

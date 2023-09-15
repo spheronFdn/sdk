@@ -9,7 +9,7 @@ import {
 import { upload } from "./upload";
 import MetadataService from "../../services/metadata-service";
 
-export async function publish(organization?: string): Promise<any> {
+export async function sitePublish(organization?: string): Promise<any> {
   try {
     const localJsonPath = "./spheron.json";
     const projectConfig = await fileExists(localJsonPath);
@@ -20,9 +20,7 @@ export async function publish(organization?: string): Promise<any> {
     }
     const spheronConfig = await fileExists(configuration.configFilePath);
     if (!spheronConfig) {
-      throw new Error(
-        `Global configuration does not exist. Please execute spheron init command.`
-      );
+      throw new Error(`Global configuration does not exist`);
     }
     const localConfiguration: any = await readFromJsonFile(
       "configuration",
