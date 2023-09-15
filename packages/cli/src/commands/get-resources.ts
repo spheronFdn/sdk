@@ -1,10 +1,14 @@
 import {
   AppTypeEnum,
+  Cluster,
   ComputeMachine,
   Deployment,
   DeploymentEnvironment,
   DeploymentStatusEnum,
   Domain,
+  ExtendedInstance,
+  HealthCheck,
+  Instance,
   Organization,
   Project,
   User,
@@ -240,6 +244,61 @@ export const ResourceFetcher = {
       spinner.stop();
     }
   },
+
+  async getClusters(organizationId: string) {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching ");
+      const clusters: Cluster[] = await SpheronApiService.getClusters(
+        organizationId
+      );
+      const computeClusterDtos: ComputeClusterDTO[] = clusters.map((x) => {
+        return toComputeClusterDTO(x);
+      });
+      console.log(JSON.stringify(computeClusterDtos, null, 2));
+      spinner.success(``);
+    } catch (error) {
+      console.log(`✖️  Error while fetching compute clusters`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
+
+  async getClusterInstances(clusterId: string) {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching ");
+      const instances: ExtendedInstance[] =
+        await SpheronApiService.getClusterInstances(clusterId);
+      const instancesDtos: ComputeInstanceDTO[] = instances.map((x) => {
+        return toComputeInstanceDTO(x);
+      });
+      console.log(JSON.stringify(instancesDtos, null, 2));
+      spinner.success(``);
+    } catch (error) {
+      console.log(`✖️  Error while fetching compute clusters`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
+
+  async getClusterInstance(id: string) {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching ");
+      const instance: Instance = await SpheronApiService.getClusterInstance(id);
+      const instanceDto = toComputeInstanceDTO(instance as ExtendedInstance);
+      console.log(JSON.stringify(instanceDto, null, 2));
+      spinner.success(``);
+    } catch (error) {
+      console.log(`✖️  Error while fetching compute clusters`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
 };
 
 export enum SiteResourceEnum {
@@ -258,6 +317,9 @@ export enum ComputeResourceEnum {
   ORGANIZATIONS = "organizations",
   PLANS = "plans",
   REGIONS = "regions",
+  CLUSTERS = "clusters",
+  INSTANCE = "instance",
+  INSTANCES = "instances",
 }
 
 interface OrganizationDTO {
@@ -323,6 +385,34 @@ interface ComputePlanDTO {
   storage: string;
   memory: string;
   dailyCost: string;
+}
+
+interface ComputeClusterDTO {
+  _id: string;
+  name: string;
+  imageSource: string;
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ComputeInstanceDTO {
+  _id: string;
+  state: string;
+  name: string;
+  versions: Array<string>;
+  activeVersion: string;
+  cluster: string;
+  healthCheck: HealthCheck;
+  cpu: number;
+  memory: string;
+  storage: string;
+  image: string;
+  tag: string;
+  dailySpending?: number;
+  alreadySpent?: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const toOrganizationDTO = function (
@@ -408,5 +498,39 @@ const toComputePlansDTO = function (
     storage: computeMachine.storage,
     memory: computeMachine.memory,
     dailyCost: computeMachine.defaultDailyTopUp.toFixed(3),
+  };
+};
+
+const toComputeClusterDTO = function (cluster: Cluster): ComputeClusterDTO {
+  return {
+    _id: cluster._id,
+    name: cluster.name,
+    imageSource: cluster.url,
+    createdBy: cluster.createdBy,
+    createdAt: cluster.createdAt,
+    updatedAt: cluster.updatedAt,
+  };
+};
+
+const toComputeInstanceDTO = function (
+  instance: ExtendedInstance
+): ComputeInstanceDTO {
+  return {
+    _id: instance._id,
+    state: instance.state,
+    name: instance.name,
+    versions: instance.orders,
+    activeVersion: instance.activeOrder,
+    cluster: instance.cluster,
+    healthCheck: instance.healthCheck,
+    cpu: instance.cpu,
+    memory: instance.memory,
+    storage: instance.storage,
+    image: instance.image,
+    tag: instance.tag,
+    dailySpending: instance.defaultDailyTopup,
+    alreadySpent: instance.withdrawnAkt,
+    createdAt: instance.createdAt,
+    updatedAt: instance.updatedAt,
   };
 };
