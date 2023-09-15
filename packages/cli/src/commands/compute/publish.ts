@@ -10,7 +10,6 @@ export async function computePublish(organization?: string): Promise<any> {
     const yamlFilePath = path.join(process.cwd(), "spheron.yaml"); // Read spheron.yaml from the current working directory
     const yamlData = await fs.readFile(yamlFilePath, "utf8");
     const spheronConfig = yaml.load(yamlData) as SpheronComputeConfiguration;
-    console.log(spheronConfig);
     const organizationId: string = organization
       ? organization
       : (await MetadataService.getComputeData())?.organizationId;
