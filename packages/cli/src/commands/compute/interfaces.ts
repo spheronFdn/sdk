@@ -1,4 +1,4 @@
-import { CustomInstanceSpecs, Env, Port } from "@spheron/core";
+import { Env, Port } from "@spheron/core";
 
 export enum ComputeCommandEnum {
   GET = "get",
@@ -28,7 +28,7 @@ export interface SpheronComputeConfiguration {
   region: string;
   type: ComputeInstanceType;
   plan: string;
-  customParams: CustomInstanceSpecs;
+  customParams: CustomParams;
   healthCheck?: {
     path: string;
     port: number;
@@ -43,4 +43,22 @@ export interface ComputePlanDetails {
 export enum ComputeInstanceType {
   SPOT = "spot",
   ON_DEMAND = "on_demand",
+}
+
+export enum PersistentStorageTypesEnum {
+  HDD = "hdd",
+  SSD = "ssd",
+  NVMe = "nvme",
+}
+
+interface CustomPersistentStorage {
+  size: string;
+  class: PersistentStorageTypesEnum;
+  mountPoint: string;
+}
+interface CustomParams {
+  cpu?: number;
+  memory?: string;
+  persistentStorage?: CustomPersistentStorage;
+  storage: string;
 }
