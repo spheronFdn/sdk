@@ -252,6 +252,21 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           }
         )
         .command(
+          ComputeCommandEnum.VALIDATE,
+          "Validate spheron.yaml (or some other spheron compute configuration file)",
+          (yargs: any) => {
+            yargs
+              .option("path", {
+                describe: "Relative path to file",
+                demandOption: false,
+              })
+              .version(false)
+              .usage(`Usage: $0 publish [--filepath <file_path>]`)
+              .wrap(150)
+              .help();
+          }
+        )
+        .command(
           ComputeCommandEnum.DIRECT_DEPLOY,
           "Spheron direct deployment of docker container",
           (yargs: any) => {

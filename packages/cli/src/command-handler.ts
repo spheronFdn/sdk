@@ -46,6 +46,7 @@ import { AppTypeEnum } from "@spheron/core";
 import MetadataService, { SiteMetadata } from "./services/metadata-service";
 import { computeInit } from "./commands/compute/init";
 import { computePublish } from "./commands/compute/publish";
+import { validate } from "./commands/compute/validate";
 
 export async function commandHandler(options: any) {
   if (!(await fileExists(configuration.configFilePath))) {
@@ -628,7 +629,7 @@ export async function commandHandler(options: any) {
           ports: [{ containerPort: 3000, exposedPort: 80 }],
           env: [
             {
-              value: "my_env",
+              value: "my_env:123",
               isSecret: false,
             },
           ],
@@ -691,6 +692,35 @@ export async function commandHandler(options: any) {
       try {
         const organizationId = options.organizationId;
         await computePublish(organizationId);
+      } catch (error) {
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (
+    options._[0] === "compute" &&
+    options._[1] === ComputeCommandEnum.VALIDATE
+  ) {
+    const validOptions = ["path"];
+    const unknownOptions = Object.keys(options).filter(
+      (option) =>
+        option !== "_" && option !== "$0" && !validOptions.includes(option)
+    );
+    if (unknownOptions.length > 0) {
+      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
+    (async () => {
+      let path;
+      if (options.path) {
+        path = options.path;
+      }
+      if (!path) {
+        path = "./";
+      }
+      try {
+        await validate(path);
       } catch (error) {
         process.exit(1);
       }

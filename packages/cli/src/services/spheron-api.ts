@@ -4,6 +4,7 @@ import {
   ClusterProtocolEnum,
   ComputeMachine,
   CreateInstanceRequest,
+  CustomInstanceSpecs,
   Deployment,
   DeploymentEnvironment,
   DeploymentStatusEnum,
@@ -12,6 +13,7 @@ import {
   Instance,
   InstanceResponse,
   Organization,
+  PersistentStorageClassEnum,
   Project,
   SpheronApi,
   User,
@@ -21,7 +23,10 @@ import configuration from "../configuration";
 import { IGPTResponse } from "../commands/gpt/gpt";
 import Spinner from "../outputs/spinner";
 import MetadataService from "./metadata-service";
-import { SpheronComputeConfiguration } from "../commands/compute/interfaces";
+import {
+  PersistentStorageTypesEnum,
+  SpheronComputeConfiguration,
+} from "../commands/compute/interfaces";
 
 const SpheronApiService = {
   async initialize(): Promise<SpheronApi> {
@@ -215,6 +220,23 @@ const SpheronApiService = {
     configuration: SpheronComputeConfiguration
   ): Promise<InstanceResponse> {
     const client: SpheronApi = await this.initialize();
+    const apiPersistentSpecs: CustomInstanceSpecs = {
+      storage: configuration.customParams.storage,
+      cpu: configuration.customParams.cpu,
+      memory: configuration.customParams.memory,
+    };
+    let persistentStorageApi = undefined;
+    if (configuration.customParams.persistentStorage) {
+      persistentStorageApi = {
+        size: configuration.customParams.persistentStorage.size,
+        class: mapPersistentStorageClass(
+          configuration.customParams.persistentStorage.class
+        ),
+        mountPoint: configuration.customParams.persistentStorage.mountPoint,
+      };
+      apiPersistentSpecs.persistentStorage = persistentStorageApi;
+    }
+
     const req: CreateInstanceRequest = {
       organizationId,
       configuration: {
@@ -228,7 +250,7 @@ const SpheronApiService = {
         args: configuration.args,
         region: configuration.region,
         akashMachineImageName: configuration.plan,
-        customInstanceSpecs: configuration.customParams,
+        customInstanceSpecs: apiPersistentSpecs,
       },
       instanceName: configuration.instanceName,
       clusterUrl: configuration.image,
@@ -289,5 +311,20 @@ const SpheronApiService = {
     return gptResponse;
   },
 };
+
+function mapPersistentStorageClass(
+  param: PersistentStorageTypesEnum
+): PersistentStorageClassEnum {
+  if (param == PersistentStorageTypesEnum.HDD) {
+    return PersistentStorageClassEnum.HDD;
+  } else if (param == PersistentStorageTypesEnum.SSD) {
+    return PersistentStorageClassEnum.SSD;
+  } else if (param == PersistentStorageTypesEnum.NVMe) {
+    return PersistentStorageClassEnum.NVMe;
+  }
+  throw Error(
+    "Persistent storage class cannot be mapped to api supported version."
+  );
+}
 
 export default SpheronApiService;
