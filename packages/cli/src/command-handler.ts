@@ -39,12 +39,12 @@ import { fileExists } from "./utils";
 import { SiteCommandEnum } from "./commands/site/interfaces";
 import {
   ComputeCommandEnum,
+  ComputeConfigFileType,
   ComputeInstanceType,
-  SpheronComputeConfiguration,
 } from "./commands/compute/interfaces";
-import { AppTypeEnum } from "@spheron/core";
+import { AppTypeEnum, MarketplaceApp } from "@spheron/core";
 import MetadataService, { SiteMetadata } from "./services/metadata-service";
-import { computeInit } from "./commands/compute/init";
+import { computeInit, computeTemplateInit } from "./commands/compute/init";
 import { computePublish } from "./commands/compute/publish";
 import { validate } from "./commands/compute/validate";
 
@@ -620,29 +620,67 @@ export async function commandHandler(options: any) {
   if (options._[0] === "compute" && options._[1] === ComputeCommandEnum.INIT) {
     (async () => {
       try {
-        const initialConfig: SpheronComputeConfiguration = {
-          instanceName: "my_first_instance",
-          clusterName: "my_first_cluster",
-          image: "ovrclk/lunie-light",
-          tag: "latest",
-          instanceCount: 1,
-          ports: [{ containerPort: 3000, exposedPort: 80 }],
-          env: [
-            {
-              value: "my_env:123",
-              isSecret: false,
+        const templateId = options.templateId;
+        let initialConfig;
+        if (!templateId) {
+          initialConfig = {
+            configType: ComputeConfigFileType.DIRECT,
+            clusterName: "my_first_cluster",
+            image: "ovrclk/lunie-light",
+            tag: "latest",
+            instanceCount: 1,
+            ports: [{ containerPort: 3000, exposedPort: 80 }],
+            env: [
+              {
+                name: "my_env",
+                value: "123",
+                hidden: false,
+              },
+            ],
+            commands: [],
+            args: [],
+            region: "any",
+            type: ComputeInstanceType.SPOT,
+            plan: "Ventus Nano 1",
+            customParams: {
+              storage: "10Gi",
             },
-          ],
-          commands: [],
-          args: [],
-          region: "any",
-          type: ComputeInstanceType.SPOT,
-          plan: "Ventus Nano 1",
-          customParams: {
-            storage: "10Gi",
-          },
-        };
-        await computeInit(initialConfig);
+          };
+          await computeInit(initialConfig);
+          return;
+        } else {
+          const template: MarketplaceApp =
+            await SpheronApiService.getComputeTemplate(templateId);
+          if (!template) {
+            throw new Error("Specified template does not exist");
+          }
+          const plans = await SpheronApiService.getComputePlans();
+          const defaultPlan = plans.find(
+            (x) => x._id == template.serviceData.defaultAkashMachineImageId
+          );
+          const envs = template.serviceData.variables.map((x) => {
+            return {
+              name: x.label,
+              value: `${x.defaultValue}`,
+              hidden: x.hidden ? x.hidden : false,
+            };
+          });
+          initialConfig = {
+            configType: ComputeConfigFileType.TEMPLATE,
+            templateId: template._id,
+            templateName: template.name,
+            clusterName: template.name,
+            env: envs,
+            instanceCount: 1,
+            plan: defaultPlan ? defaultPlan.name : "Ventus Nano 1",
+            region: "any",
+            type: ComputeInstanceType.SPOT,
+            customParams: {
+              storage: "10Gi",
+            },
+          };
+          await computeTemplateInit(initialConfig);
+        }
       } catch (error) {
         console.log(error.message);
         process.exit(1);
@@ -686,6 +724,9 @@ export async function commandHandler(options: any) {
               to,
               search
             );
+          } else if (options.resource == ComputeResourceEnum.TEMPLATES) {
+            const category = options.category;
+            await ResourceFetcher.getComputeTemplates(category);
           }
         } else {
           throw new Error("Resource needs to be specified");

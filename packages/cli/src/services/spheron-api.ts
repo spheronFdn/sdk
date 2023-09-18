@@ -3,6 +3,7 @@ import {
   Cluster,
   ClusterProtocolEnum,
   ComputeMachine,
+  CreateInstanceFromMarketplaceRequest,
   CreateInstanceRequest,
   CustomInstanceSpecs,
   Deployment,
@@ -15,6 +16,7 @@ import {
   InstanceOrder,
   InstanceOrderLogs,
   InstanceResponse,
+  MarketplaceApp,
   Organization,
   PersistentStorageClassEnum,
   Project,
@@ -29,7 +31,8 @@ import MetadataService from "./metadata-service";
 import {
   InstanceVersionLogsTypeEnum,
   PersistentStorageTypesEnum,
-  SpheronComputeConfiguration,
+  SpheronComputeDirectConfiguration,
+  SpheronComputeTemplateConfiguration,
 } from "../commands/compute/interfaces";
 
 const SpheronApiService = {
@@ -249,7 +252,7 @@ const SpheronApiService = {
 
   async deployInstance(
     organizationId: string,
-    configuration: SpheronComputeConfiguration
+    configuration: SpheronComputeDirectConfiguration
   ): Promise<InstanceResponse> {
     const client: SpheronApi = await this.initialize();
     const apiPersistentSpecs: CustomInstanceSpecs = {
@@ -268,7 +271,12 @@ const SpheronApiService = {
       };
       apiPersistentSpecs.persistentStorage = persistentStorageApi;
     }
-
+    const apiEnvs = configuration.env.map((x) => {
+      return {
+        value: `${x.name}:${x.value}`,
+        isSecret: x.hidden,
+      };
+    });
     const req: CreateInstanceRequest = {
       organizationId,
       configuration: {
@@ -277,14 +285,13 @@ const SpheronApiService = {
         tag: configuration.tag,
         instanceCount: configuration.instanceCount,
         ports: configuration.ports,
-        env: configuration.env,
+        env: apiEnvs,
         command: configuration.commands,
         args: configuration.args,
         region: configuration.region,
         akashMachineImageName: configuration.plan,
         customInstanceSpecs: apiPersistentSpecs,
       },
-      instanceName: configuration.instanceName,
       clusterUrl: configuration.image,
       clusterProvider: "DOCKERHUB",
       clusterName: configuration.clusterName,
@@ -293,6 +300,62 @@ const SpheronApiService = {
     };
     const response: InstanceResponse = await client.createClusterInstance(req);
     return response;
+  },
+
+  async deployTemplateInstance(
+    organizationId: string,
+    configuration: SpheronComputeTemplateConfiguration
+  ): Promise<InstanceResponse> {
+    const client: SpheronApi = await this.initialize();
+    const apiPersistentSpecs: CustomInstanceSpecs = {
+      storage: configuration.customParams.storage,
+      cpu: configuration.customParams.cpu,
+      memory: configuration.customParams.memory,
+    };
+    let persistentStorageApi = undefined;
+    if (configuration.customParams.persistentStorage) {
+      persistentStorageApi = {
+        size: configuration.customParams.persistentStorage.size,
+        class: mapPersistentStorageClass(
+          configuration.customParams.persistentStorage.class
+        ),
+        mountPoint: configuration.customParams.persistentStorage.mountPoint,
+      };
+      apiPersistentSpecs.persistentStorage = persistentStorageApi;
+    }
+    const plans = await SpheronApiService.getComputePlans();
+    const plan = plans.find((x) => x.name == configuration.plan);
+    if (!plan) {
+      throw new Error("Specified plan not valid");
+    }
+
+    const marketplaceApiVars = configuration.env.map((x) => {
+      return { label: x.name, value: x.value };
+    });
+    const req: CreateInstanceFromMarketplaceRequest = {
+      templateId: configuration.templateId,
+      environmentVariables: marketplaceApiVars,
+      organizationId: organizationId,
+      akashImageId: plan._id,
+      region: configuration.region,
+      customInstanceSpecs: apiPersistentSpecs,
+      instanceCount: 0,
+    };
+    const response: InstanceResponse =
+      await client.createClusterInstanceFromTemplate(req);
+    return response;
+  },
+
+  async getComputeTemplates(): Promise<MarketplaceApp[]> {
+    const client: SpheronApi = await this.initialize();
+    const templates: MarketplaceApp[] = await client.getClusterTemplates();
+    return templates;
+  },
+
+  async getComputeTemplate(id: string): Promise<MarketplaceApp> {
+    const client: SpheronApi = await this.initialize();
+    const template: MarketplaceApp = await client.getClusterTemplate(id);
+    return template;
   },
 
   async isGptWhitelisted(): Promise<any> {
