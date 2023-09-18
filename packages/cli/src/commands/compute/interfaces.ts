@@ -1,12 +1,10 @@
-import { Env, Port } from "@spheron/core";
+import { Port } from "@spheron/core";
 
 export enum ComputeCommandEnum {
   GET = "get",
   CREATE_ORGANIZATION = "create-organization",
   SWITCH_ORGANIZATION = "switch-organization",
-  SWITHC_CLUSTER = "switch-cluster",
   INIT = "init",
-  BUILD = "build",
   PUBLISH = "publish",
   VALIDATE = "validate",
   UPDATE = "update",
@@ -14,14 +12,23 @@ export enum ComputeCommandEnum {
   SHELL = "shell",
 }
 
+export enum ComputeConfigFileType {
+  DIRECT = "direct",
+  TEMPLATE = "template",
+}
+
 export interface SpheronComputeConfiguration {
-  instanceName: string;
+  configType: ComputeConfigFileType;
+}
+
+export interface SpheronComputeDirectConfiguration
+  extends SpheronComputeConfiguration {
   clusterName: string;
   image: string;
   tag: string;
   instanceCount: number;
   ports: Array<Port>;
-  env: Array<Env>;
+  env: Array<{ name: string; value: string; hidden: boolean }>;
   commands: Array<string>;
   args: Array<string>;
   region: string;
@@ -32,6 +39,19 @@ export interface SpheronComputeConfiguration {
     path: string;
     port: number;
   };
+}
+
+export interface SpheronComputeTemplateConfiguration
+  extends SpheronComputeConfiguration {
+  templateId: string;
+  templateName: string;
+  clusterName: string;
+  env: Array<{ name: string; value: string; hidden: boolean }>;
+  instanceCount: number;
+  plan: string;
+  region: string;
+  type: ComputeInstanceType;
+  customParams: CustomParams;
 }
 
 export interface ComputePlanDetails {

@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import SpheronApiService from "../../services/spheron-api";
 import {
+  ComputeConfigFileType,
   PersistentStorageTypesEnum,
-  SpheronComputeConfiguration,
+  SpheronComputeDirectConfiguration,
+  SpheronComputeTemplateConfiguration,
 } from "./interfaces";
 import * as yaml from "js-yaml";
 import * as fs from "fs/promises"; // Node.js fs module with promises
@@ -16,18 +18,27 @@ export async function validate(rootPath: string): Promise<any> {
       throw new Error(`File ${rootPath} does not exist`);
     }
     const yamlData = await fs.readFile(rootPath, "utf8");
-    const spheronConfig = yaml.load(yamlData) as SpheronComputeConfiguration;
+    const spheronConfig: any = yaml.load(yamlData);
+    if (spheronConfig.configType === ComputeConfigFileType.DIRECT) {
+      const config = spheronConfig as SpheronComputeDirectConfiguration;
+      if (!config.image) {
+        console.log("image not specifed  ✖️");
+        validationErrors += 1;
+      }
+      if (!config.tag) {
+        console.log("tag not specifed -> deafult is latest ⚠️");
+        validationWarnings += 1;
+      }
+    } else if (spheronConfig.configType === ComputeConfigFileType.TEMPLATE) {
+      const config = spheronConfig as SpheronComputeTemplateConfiguration;
+      if (!config.templateId) {
+        console.log("Template it is not specified ✖️");
+        validationErrors += 1;
+      }
+    }
     if (!spheronConfig.clusterName) {
       console.log("cluster name not specified  ✖️");
       validationErrors += 1;
-    }
-    if (!spheronConfig.image) {
-      console.log("image not specifed  ✖️");
-      validationErrors += 1;
-    }
-    if (!spheronConfig.tag) {
-      console.log("tag not specifed -> deafult is latest ⚠️");
-      validationWarnings += 1;
     }
     if (!spheronConfig.instanceCount) {
       console.log("Instance count not specified  ✖️");
@@ -45,9 +56,9 @@ export async function validate(rootPath: string): Promise<any> {
     }
     if (spheronConfig.env) {
       for (const e of spheronConfig.env) {
-        if (e.value == undefined || e.isSecret == undefined) {
+        if (e.value == undefined || e.hidden == undefined) {
           console.log(
-            "Env specification not valid. Need to have [value, isSecret] combination✖️"
+            "Env specification not valid. Need to have [value, hidden] combination✖️"
           );
           validationErrors += 1;
         }

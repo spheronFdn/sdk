@@ -236,7 +236,7 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           (yargs: any) => {
             yargs
               .version(false)
-              .usage(`Usage: $0 compute init`)
+              .usage(`Usage: $0 compute init [--templateId <id>]`)
               .wrap(150)
               .help();
           }
