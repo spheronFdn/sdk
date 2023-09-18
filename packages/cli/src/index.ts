@@ -12,7 +12,7 @@ import {
 import { GptCommandEnum } from "./commands/gpt/gpt";
 import {
   ComputeCommandEnum,
-  ComputeInstanceType,
+  InstanceVersionLogsTypeEnum,
 } from "./commands/compute/interfaces";
 import { SiteCommandEnum } from "./commands/site/interfaces";
 import { GlobalCommandEnum } from "./commands/interfaces";
@@ -267,59 +267,6 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           }
         )
         .command(
-          ComputeCommandEnum.DIRECT_DEPLOY,
-          "Spheron direct deployment of docker container",
-          (yargs: any) => {
-            yargs
-              .option("cluster-name", {
-                describe:
-                  "Name of cluster where instance will reside (will be created if it doesnt exist) ",
-              })
-              .option("instance-name", {
-                describe: "Alias for instance",
-              })
-              .option("image", {
-                describe: "Docker image name",
-              })
-              .option("tag", {
-                describe: "Docker image tag",
-                // choices: Object.values(FrameworkOptions),
-              })
-              .option("replicas", {
-                describe: "Number of replicas for this service",
-              })
-              .option("region", {
-                describe: "Region where instance will be deployed",
-              })
-              .option("plan", {
-                describe: "Plan name (fetch plans to see possible values)",
-                choices: Object.values(FrameworkOptions),
-              })
-              .option("ports", {
-                describe:
-                  "Port mapping in containerPort:exposedPort pairs ex: 8080:80, 8081:random",
-              })
-              .option("env-var", {
-                describe:
-                  "Env variable (can be called multiple times) NAME=VALUE ",
-              })
-              .option("env-var-secret", {
-                describe:
-                  "Secret env variable (can be called multiple times) NAME=VALUE ",
-              })
-              .option("type", {
-                describe: "Instance type",
-                choices: Object.values(ComputeInstanceType),
-              })
-              .version(false)
-              .usage(
-                `Usage: $0 site  init --cluster-name <protocol> [--project <project_name>] [--path <path>] [--framework <framework>]`
-              )
-              .wrap(150)
-              .help();
-          }
-        )
-        .command(
           `${ComputeCommandEnum.GET} <resource>`,
           "Get resource/s <<resource>>",
           (yargs: any) => {
@@ -331,13 +278,15 @@ import { GlobalCommandEnum } from "./commands/interfaces";
             yargs.epilogue(`Custom help text for 'get <resource>' command.
   
         Examples:
-          - get organization            : options: --id 
+          - get organization            : options: --id <instanceId>
           - get organizations           : (all organization for your user will be returned)
-          - get plans                   : options: --name
+          - get plans                   : options: --name <plan_name>
           - get regions                   
-          - get clusters                : options: --organizationId
-          - get instance                : options: --id  
-          - get instances               : options: --clusterId
+          - get clusters                : options: --organizationId <orgId>
+          - get instance                : options: --id <instanceId> [--logs [${Object.values(
+            InstanceVersionLogsTypeEnum
+          )}] [--from <number>] [--to <number>] [--search <filter_string>] ]
+          - get instances               : options: --clusterId <clusterId> 
         `);
           }
         );

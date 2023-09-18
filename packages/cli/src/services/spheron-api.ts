@@ -11,6 +11,9 @@ import {
   Domain,
   ExtendedInstance,
   Instance,
+  InstanceLogType,
+  InstanceOrder,
+  InstanceOrderLogs,
   InstanceResponse,
   Organization,
   PersistentStorageClassEnum,
@@ -24,6 +27,7 @@ import { IGPTResponse } from "../commands/gpt/gpt";
 import Spinner from "../outputs/spinner";
 import MetadataService from "./metadata-service";
 import {
+  InstanceVersionLogsTypeEnum,
   PersistentStorageTypesEnum,
   SpheronComputeConfiguration,
 } from "../commands/compute/interfaces";
@@ -215,6 +219,34 @@ const SpheronApiService = {
     return instance;
   },
 
+  async getClusterInstanceOrder(versionId: string): Promise<InstanceOrder> {
+    const client: SpheronApi = await this.initialize();
+    const { order } = await client.getClusterInstanceOrder(versionId);
+    return order;
+  },
+
+  async getClusterInstanceLogs(
+    versionId: string,
+    logType: InstanceVersionLogsTypeEnum,
+    from: number,
+    to: number,
+    search?: string
+  ): Promise<{ logs: Array<string>; logsLength: number }> {
+    const client: SpheronApi = await this.initialize();
+    const logsOptions = {
+      from,
+      to,
+      logType: mapVersionOrderLogsType(logType),
+      search,
+    };
+    const instanceWihtLogs: InstanceOrderLogs =
+      await client.getClusterInstanceOrderLogs(versionId, logsOptions);
+    return {
+      logs: instanceWihtLogs.logs,
+      logsLength: instanceWihtLogs.logsLength,
+    };
+  },
+
   async deployInstance(
     organizationId: string,
     configuration: SpheronComputeConfiguration
@@ -325,6 +357,19 @@ function mapPersistentStorageClass(
   throw Error(
     "Persistent storage class cannot be mapped to api supported version."
   );
+}
+
+function mapVersionOrderLogsType(
+  param: InstanceVersionLogsTypeEnum
+): InstanceLogType {
+  if (param == InstanceVersionLogsTypeEnum.DEPLOYMENT) {
+    return InstanceLogType.DEPLOYMENT_LOGS;
+  } else if (param == InstanceVersionLogsTypeEnum.LIVE) {
+    return InstanceLogType.INSTANCE_LOGS;
+  } else if (param == InstanceVersionLogsTypeEnum.EVENTS) {
+    return InstanceLogType.INSTANCE_LOGS;
+  }
+  throw Error("Log type cannot be converted to api supported version.");
 }
 
 export default SpheronApiService;

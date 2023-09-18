@@ -672,6 +672,20 @@ export async function commandHandler(options: any) {
             await ResourceFetcher.getClusterInstances(clusterId);
           } else if (options.resource == ComputeResourceEnum.INSTANCE) {
             const id = options.id;
+            const logs = options.logs;
+            if (logs) {
+              const from = options.from;
+              const to = options.to;
+              const search = options.search;
+              await ResourceFetcher.getClusterInstanceOrderLogs(
+                id,
+                logs,
+                from,
+                to,
+                search
+              );
+              return;
+            }
             await ResourceFetcher.getClusterInstance(id);
           }
         } else {
