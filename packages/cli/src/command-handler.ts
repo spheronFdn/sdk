@@ -47,6 +47,7 @@ import MetadataService, { SiteMetadata } from "./services/metadata-service";
 import { computeInit, computeTemplateInit } from "./commands/compute/init";
 import { computePublish } from "./commands/compute/publish";
 import { validate } from "./commands/compute/validate";
+import { executeShell } from "./commands/compute/execute-shell";
 
 export async function commandHandler(options: any) {
   if (!(await fileExists(configuration.configFilePath))) {
@@ -775,6 +776,27 @@ export async function commandHandler(options: any) {
       }
       try {
         await validate(path);
+      } catch (error) {
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (options._[0] === "compute" && options._[1] === ComputeCommandEnum.SHELL) {
+    const validOptions = ["instanceId", "command"];
+    const unknownOptions = Object.keys(options).filter(
+      (option) =>
+        option !== "_" && option !== "$0" && !validOptions.includes(option)
+    );
+    if (unknownOptions.length > 0) {
+      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
+    (async () => {
+      const instanceId = options.instanceId;
+      const command = options.command;
+      try {
+        await executeShell(instanceId, command);
       } catch (error) {
         process.exit(1);
       }

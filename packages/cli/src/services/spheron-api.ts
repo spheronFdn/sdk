@@ -20,6 +20,7 @@ import {
   Organization,
   PersistentStorageClassEnum,
   Project,
+  ShellExecutionResponse,
   SpheronApi,
   User,
   VerifiedTokenResponse,
@@ -375,6 +376,18 @@ const SpheronApiService = {
         message: "✖️  Error: User is not whitelisted for this service",
       };
     }
+  },
+
+  async executeShellCommand(
+    instanceId: string,
+    command: string
+  ): Promise<ShellExecutionResponse> {
+    const client: SpheronApi = await this.initialize();
+    const result: ShellExecutionResponse = await client.executeShellCommand(
+      instanceId,
+      command
+    );
+    return result;
   },
 
   async generateCode(

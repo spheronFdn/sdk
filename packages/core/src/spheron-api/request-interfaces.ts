@@ -11,12 +11,12 @@ interface CreateInstanceRequest {
   uniqueTopicId?: string;
   configuration: {
     branch?: string;
-    folderName: string; // folder where docker image is located in repo
+    folderName?: string; // folder where docker image is located in repo
     protocol: ClusterProtocolEnum; // ex: akash
     image: string; // name of the docker image if it is not located in repo
     tag: string; // name of the docker image if it is not located in repo
     instanceCount: number;
-    buildImage: boolean; // if container should build the image, or if user has already defined it
+    buildImage?: boolean; // if container should build the image, or if user has already defined it
     ports: Array<Port>;
     env: Array<Env>;
     command: Array<string>;
