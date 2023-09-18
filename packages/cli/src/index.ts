@@ -283,9 +283,10 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           - get plans                   : options: --name <plan_name>
           - get regions                   
           - get clusters                : options: --organizationId <orgId>
-          - get instance                : options: --id <instanceId> [--logs [${Object.values(
+          - get instance                : options: --id <instanceId> 
+          - get logs                    : options: --instanceId <instanceId> --type [${Object.values(
             InstanceVersionLogsTypeEnum
-          )}] [--from <number>] [--to <number>] [--search <filter_string>] ]
+          )} [--from <number>] [--to <number>] [--search <filter_string>] ]
           - get instances               : options: --clusterId <clusterId> 
         `);
           }

@@ -11,7 +11,6 @@ import {
   HealthCheck,
   Instance,
   InstanceOrder,
-  InstanceOrderLogs,
   Organization,
   PersistentStorage,
   Port,
@@ -369,6 +368,7 @@ export enum ComputeResourceEnum {
   CLUSTERS = "clusters",
   INSTANCE = "instance",
   INSTANCES = "instances",
+  LOGS = "logs",
 }
 
 interface OrganizationDTO {
