@@ -6,16 +6,22 @@ import {
   DeploymentEnvironment,
   DeploymentStatusEnum,
   Domain,
+  Env,
   ExtendedInstance,
   HealthCheck,
   Instance,
+  InstanceOrder,
+  InstanceOrderLogs,
   Organization,
+  PersistentStorage,
+  Port,
   Project,
   User,
 } from "@spheron/core";
 import Spinner from "../outputs/spinner";
 import SpheronApiService from "../services/spheron-api";
 import MetadataService from "../services/metadata-service";
+import { InstanceVersionLogsTypeEnum } from "./compute/interfaces";
 
 export const ResourceFetcher = {
   async getOrganization(id: string, type: AppTypeEnum) {
@@ -271,8 +277,8 @@ export const ResourceFetcher = {
       spinner.spin("Fetching ");
       const instances: ExtendedInstance[] =
         await SpheronApiService.getClusterInstances(clusterId);
-      const instancesDtos: ComputeInstanceDTO[] = instances.map((x) => {
-        return toComputeInstanceDTO(x);
+      const instancesDtos: BasicComputeInstanceDTO[] = instances.map((x) => {
+        return toBasicComputeInstanceDTO(x);
       });
       console.log(JSON.stringify(instancesDtos, null, 2));
       spinner.success(``);
@@ -284,16 +290,59 @@ export const ResourceFetcher = {
     }
   },
 
-  async getClusterInstance(id: string) {
+  async getClusterInstance(id: string, versionId?: string) {
     const spinner = new Spinner();
     try {
-      spinner.spin("Fetching ");
+      spinner.spin("Fetching");
       const instance: Instance = await SpheronApiService.getClusterInstance(id);
-      const instanceDto = toComputeInstanceDTO(instance as ExtendedInstance);
-      console.log(JSON.stringify(instanceDto, null, 2));
+      let dto;
+      if (instance && instance.activeOrder) {
+        const order: InstanceOrder =
+          await SpheronApiService.getClusterInstanceOrder(
+            versionId ? versionId : instance.activeOrder
+          );
+        dto = toSuperComputeInstanceDTO(instance as ExtendedInstance, order);
+      } else {
+        dto = toSuperComputeInstanceDTO(instance as ExtendedInstance);
+      }
+      console.log(JSON.stringify(dto, null, 2));
       spinner.success(``);
     } catch (error) {
-      console.log(`✖️  Error while fetching compute clusters`);
+      console.log(`✖️  Error while fetching compute instance`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
+
+  async getClusterInstanceOrderLogs(
+    instanceId: string,
+    logType: InstanceVersionLogsTypeEnum,
+    from: number,
+    to: number,
+    search?: string
+  ) {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching");
+      const instance: Instance = await SpheronApiService.getClusterInstance(
+        instanceId
+      );
+      if (instance && instance.activeOrder) {
+        const result = await SpheronApiService.getClusterInstanceLogs(
+          instance.activeOrder,
+          logType,
+          from,
+          to,
+          search
+        );
+        console.log(JSON.stringify(result, null, 2));
+        spinner.success(``);
+      } else {
+        console.log("[]");
+      }
+    } catch (error) {
+      console.log(`✖️  Error while fetching compute instance`);
       throw error;
     } finally {
       spinner.stop();
@@ -396,7 +445,7 @@ interface ComputeClusterDTO {
   updatedAt: Date;
 }
 
-interface ComputeInstanceDTO {
+interface BasicComputeInstanceDTO {
   _id: string;
   state: string;
   name: string;
@@ -409,6 +458,41 @@ interface ComputeInstanceDTO {
   storage: string;
   image: string;
   tag: string;
+  dailySpending?: number;
+  alreadySpent?: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface SuperComputeInstanceDTO {
+  _id: string;
+  state: string;
+  name: string;
+  versions: Array<string>;
+  activeVersionId: string;
+  activeVersion: {
+    env: any;
+    configuration: {
+      protocol: string;
+      image: string;
+      tag: string;
+      instanceCount: number;
+      ports: Array<Port>;
+      env: Array<Env>;
+      command: Array<string>;
+      args: Array<string>;
+      region: string;
+      plan: string;
+      agreementDate: number;
+      cpu: number;
+      memory: string;
+      storage: string;
+      persistentStorage?: PersistentStorage;
+    };
+    protocolData: any;
+  } | null;
+  cluster: string;
+  healthCheck: HealthCheck;
   dailySpending?: number;
   alreadySpent?: number;
   createdAt: Date;
@@ -512,9 +596,9 @@ const toComputeClusterDTO = function (cluster: Cluster): ComputeClusterDTO {
   };
 };
 
-const toComputeInstanceDTO = function (
+const toBasicComputeInstanceDTO = function (
   instance: ExtendedInstance
-): ComputeInstanceDTO {
+): BasicComputeInstanceDTO {
   return {
     _id: instance._id,
     state: instance.state,
@@ -533,4 +617,54 @@ const toComputeInstanceDTO = function (
     createdAt: instance.createdAt,
     updatedAt: instance.updatedAt,
   };
+};
+
+const toSuperComputeInstanceDTO = function (
+  instance: ExtendedInstance,
+  order?: InstanceOrder
+): SuperComputeInstanceDTO {
+  const dto: SuperComputeInstanceDTO = {
+    _id: instance._id,
+    state: instance.state,
+    name: instance.name,
+    versions: instance.orders,
+    activeVersionId: instance.activeOrder,
+    activeVersion: order
+      ? {
+          env: order.env,
+          configuration: {
+            protocol: order.clusterInstanceConfiguration.protocol,
+            image: order.clusterInstanceConfiguration.image,
+            tag: order.clusterInstanceConfiguration.tag,
+            instanceCount: order.clusterInstanceConfiguration.instanceCount,
+            ports: order.clusterInstanceConfiguration.ports,
+            env: order.clusterInstanceConfiguration.env,
+            command: order.clusterInstanceConfiguration.command,
+            args: order.clusterInstanceConfiguration.args,
+            region: order.clusterInstanceConfiguration.region,
+            plan: order.clusterInstanceConfiguration.agreedMachineImage
+              .machineType,
+            agreementDate:
+              order.clusterInstanceConfiguration.agreedMachineImage
+                .agreementDate,
+            cpu: order.clusterInstanceConfiguration.agreedMachineImage.cpu,
+            memory:
+              order.clusterInstanceConfiguration.agreedMachineImage.memory,
+            storage:
+              order.clusterInstanceConfiguration.agreedMachineImage.storage,
+            persistentStorage:
+              order.clusterInstanceConfiguration.agreedMachineImage
+                .persistentStorage,
+          },
+          protocolData: order.protocolData,
+        }
+      : null,
+    cluster: instance.cluster,
+    healthCheck: instance.healthCheck,
+    dailySpending: instance.defaultDailyTopup,
+    alreadySpent: instance.withdrawnAkt,
+    createdAt: instance.createdAt,
+    updatedAt: instance.updatedAt,
+  };
+  return dto;
 };

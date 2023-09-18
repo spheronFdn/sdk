@@ -6,7 +6,6 @@ export enum ComputeCommandEnum {
   SWITCH_ORGANIZATION = "switch-organization",
   SWITHC_CLUSTER = "switch-cluster",
   INIT = "init",
-  DIRECT_DEPLOY = "direct_deploy",
   BUILD = "build",
   PUBLISH = "publish",
   VALIDATE = "validate",
@@ -51,7 +50,13 @@ export enum PersistentStorageTypesEnum {
   NVMe = "nvme",
 }
 
-interface CustomPersistentStorage {
+export enum InstanceVersionLogsTypeEnum {
+  DEPLOYMENT = "deployment",
+  LIVE = "live",
+  EVENTS = "events",
+}
+
+export interface CustomPersistentStorage {
   size: string;
   class: PersistentStorageTypesEnum;
   mountPoint: string;
