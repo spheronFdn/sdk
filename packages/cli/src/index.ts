@@ -5,9 +5,15 @@ import { DeploymentStatusEnum, ProjectStateEnum } from "@spheron/core";
 import configuration from "./configuration";
 import { commandHandler } from "./command-handler";
 import { FrameworkOptions } from "./commands/site/init";
-import { ResourceEnum } from "./commands/site/get-resources";
+import {
+  ComputeResourceEnum,
+  SiteResourceEnum,
+} from "./commands/get-resources";
 import { GptCommandEnum } from "./commands/gpt/gpt";
-import { ComputeCommandEnum } from "./commands/compute/interfaces";
+import {
+  ComputeCommandEnum,
+  ComputeInstanceType,
+} from "./commands/compute/interfaces";
 import { SiteCommandEnum } from "./commands/site/interfaces";
 import { GlobalCommandEnum } from "./commands/interfaces";
 
@@ -68,12 +74,17 @@ import { GlobalCommandEnum } from "./commands/interfaces";
             .help();
         })
         .command(
-          "publish",
+          SiteCommandEnum.PUBLISH,
           "Upload your project setup in spheron.json",
           (yargs: any) => {
             yargs
+              .option("organization", {
+                describe: "Organization ID",
+              })
               .version(false)
-              .usage(`Usage: $0 site publish [--organization <organizationId>]`)
+              .usage(
+                `Usage: $0 site publish [--organizationId <organizationId>]`
+              )
               .help();
           }
         )
@@ -97,12 +108,12 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           }
         )
         .command(
-          "get <resource>",
+          `${SiteCommandEnum.GET} <resource>`,
           "Get resource/s <<resource>>",
           (yargs: any) => {
             yargs.positional("resource", {
               describe: "The resource to get information about",
-              choices: Object.values(ResourceEnum),
+              choices: Object.values(SiteResourceEnum),
             });
             yargs.version(false).wrap(150).help();
             yargs.epilogue(`Custom help text for 'get <resource>' command.
@@ -213,6 +224,121 @@ import { GlobalCommandEnum } from "./commands/interfaces";
               )
               .wrap(150)
               .help();
+          }
+        )
+        .command(
+          ComputeCommandEnum.INIT,
+          "Create initial spheron compute configuration file",
+          (yargs: any) => {
+            yargs
+              .version(false)
+              .usage(`Usage: $0 compute init`)
+              .wrap(150)
+              .help();
+          }
+        )
+        .command(
+          ComputeCommandEnum.PUBLISH,
+          "Deploy instance defined in spheron.yaml",
+          (yargs: any) => {
+            yargs
+              .option("organizationId", {
+                describe: "Organization ID",
+              })
+              .version(false)
+              .usage(`Usage: $0 publish [--organizationId <organizationId>]`)
+              .wrap(150)
+              .help();
+          }
+        )
+        .command(
+          ComputeCommandEnum.VALIDATE,
+          "Validate spheron.yaml (or some other spheron compute configuration file)",
+          (yargs: any) => {
+            yargs
+              .option("path", {
+                describe: "Relative path to file",
+                demandOption: false,
+              })
+              .version(false)
+              .usage(`Usage: $0 publish [--filepath <file_path>]`)
+              .wrap(150)
+              .help();
+          }
+        )
+        .command(
+          ComputeCommandEnum.DIRECT_DEPLOY,
+          "Spheron direct deployment of docker container",
+          (yargs: any) => {
+            yargs
+              .option("cluster-name", {
+                describe:
+                  "Name of cluster where instance will reside (will be created if it doesnt exist) ",
+              })
+              .option("instance-name", {
+                describe: "Alias for instance",
+              })
+              .option("image", {
+                describe: "Docker image name",
+              })
+              .option("tag", {
+                describe: "Docker image tag",
+                // choices: Object.values(FrameworkOptions),
+              })
+              .option("replicas", {
+                describe: "Number of replicas for this service",
+              })
+              .option("region", {
+                describe: "Region where instance will be deployed",
+              })
+              .option("plan", {
+                describe: "Plan name (fetch plans to see possible values)",
+                choices: Object.values(FrameworkOptions),
+              })
+              .option("ports", {
+                describe:
+                  "Port mapping in containerPort:exposedPort pairs ex: 8080:80, 8081:random",
+              })
+              .option("env-var", {
+                describe:
+                  "Env variable (can be called multiple times) NAME=VALUE ",
+              })
+              .option("env-var-secret", {
+                describe:
+                  "Secret env variable (can be called multiple times) NAME=VALUE ",
+              })
+              .option("type", {
+                describe: "Instance type",
+                choices: Object.values(ComputeInstanceType),
+              })
+              .version(false)
+              .usage(
+                `Usage: $0 site  init --cluster-name <protocol> [--project <project_name>] [--path <path>] [--framework <framework>]`
+              )
+              .wrap(150)
+              .help();
+          }
+        )
+        .command(
+          `${ComputeCommandEnum.GET} <resource>`,
+          "Get resource/s <<resource>>",
+          (yargs: any) => {
+            yargs.positional("resource", {
+              describe: "The resource to get information about",
+              choices: Object.values(ComputeResourceEnum),
+            });
+            yargs.version(false).wrap(150).help();
+            yargs.epilogue(`Custom help text for 'get <resource>' command.
+  
+        Examples:
+          - get organization            : options: --id 
+          - get organizations           : (all organization for your user will be returned)
+          - get plans                   : options: --name
+          - get regions                   
+          - get clusters                : options: --organizationId
+          - get instance                : options: --id  
+          - get instances               : options: --clusterId
+        `);
           }
         );
     })

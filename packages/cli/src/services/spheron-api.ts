@@ -1,10 +1,19 @@
 import {
   AppTypeEnum,
+  Cluster,
+  ClusterProtocolEnum,
+  ComputeMachine,
+  CreateInstanceRequest,
+  CustomInstanceSpecs,
   Deployment,
   DeploymentEnvironment,
   DeploymentStatusEnum,
   Domain,
+  ExtendedInstance,
+  Instance,
+  InstanceResponse,
   Organization,
+  PersistentStorageClassEnum,
   Project,
   SpheronApi,
   User,
@@ -14,6 +23,10 @@ import configuration from "../configuration";
 import { IGPTResponse } from "../commands/gpt/gpt";
 import Spinner from "../outputs/spinner";
 import MetadataService from "./metadata-service";
+import {
+  PersistentStorageTypesEnum,
+  SpheronComputeConfiguration,
+} from "../commands/compute/interfaces";
 
 const SpheronApiService = {
   async initialize(): Promise<SpheronApi> {
@@ -145,7 +158,112 @@ const SpheronApiService = {
     return deploymentEnvironments;
   },
 
-  async isWhitelisted(): Promise<any> {
+  async getComputePlans(name?: string): Promise<ComputeMachine[]> {
+    const client: SpheronApi = await this.initialize();
+    const options: any = {
+      skip: 0,
+      limit: 50,
+    };
+    if (name) {
+      options.searchString = name;
+    }
+    const computePlans: ComputeMachine[] = await client.getComputeMachines(
+      options
+    );
+    return computePlans;
+  },
+
+  async getComputeRegions(): Promise<string[]> {
+    const client: SpheronApi = await this.initialize();
+    const regions: string[] = await client.getComputeMachineRegions();
+    return regions;
+  },
+
+  async getClusters(organizationId: string): Promise<Cluster[]> {
+    const client: SpheronApi = await this.initialize();
+    const options: any = {
+      skip: 0,
+      limit: 50,
+    };
+    const clusters: Cluster[] = await client.getOrganizationClusters(
+      organizationId,
+      options
+    );
+    return clusters;
+  },
+
+  async getClusterInstances(clusterId: string): Promise<ExtendedInstance[]> {
+    const client: SpheronApi = await this.initialize();
+    const options: any = {
+      skip: 0,
+      limit: 50,
+      includeReport: true,
+    };
+    const instances: ExtendedInstance[] = await client.getClusterInstances(
+      clusterId,
+      options
+    );
+    return instances;
+  },
+
+  async getClusterInstance(id: string): Promise<Instance> {
+    const client: SpheronApi = await this.initialize();
+    const options: any = {
+      includeReport: true,
+    };
+    const instance: Instance = await client.getClusterInstance(id, options);
+    return instance;
+  },
+
+  async deployInstance(
+    organizationId: string,
+    configuration: SpheronComputeConfiguration
+  ): Promise<InstanceResponse> {
+    const client: SpheronApi = await this.initialize();
+    const apiPersistentSpecs: CustomInstanceSpecs = {
+      storage: configuration.customParams.storage,
+      cpu: configuration.customParams.cpu,
+      memory: configuration.customParams.memory,
+    };
+    let persistentStorageApi = undefined;
+    if (configuration.customParams.persistentStorage) {
+      persistentStorageApi = {
+        size: configuration.customParams.persistentStorage.size,
+        class: mapPersistentStorageClass(
+          configuration.customParams.persistentStorage.class
+        ),
+        mountPoint: configuration.customParams.persistentStorage.mountPoint,
+      };
+      apiPersistentSpecs.persistentStorage = persistentStorageApi;
+    }
+
+    const req: CreateInstanceRequest = {
+      organizationId,
+      configuration: {
+        protocol: ClusterProtocolEnum.AKASH,
+        image: configuration.image,
+        tag: configuration.tag,
+        instanceCount: configuration.instanceCount,
+        ports: configuration.ports,
+        env: configuration.env,
+        command: configuration.commands,
+        args: configuration.args,
+        region: configuration.region,
+        akashMachineImageName: configuration.plan,
+        customInstanceSpecs: apiPersistentSpecs,
+      },
+      instanceName: configuration.instanceName,
+      clusterUrl: configuration.image,
+      clusterProvider: "DOCKERHUB",
+      clusterName: configuration.clusterName,
+      healthCheckUrl: configuration.healthCheck?.path,
+      healthCheckPort: configuration.healthCheck?.port,
+    };
+    const response: InstanceResponse = await client.createClusterInstance(req);
+    return response;
+  },
+
+  async isGptWhitelisted(): Promise<any> {
     const client: any = await this.initialize();
     if (!client.token) {
       return {
@@ -193,5 +311,20 @@ const SpheronApiService = {
     return gptResponse;
   },
 };
+
+function mapPersistentStorageClass(
+  param: PersistentStorageTypesEnum
+): PersistentStorageClassEnum {
+  if (param == PersistentStorageTypesEnum.HDD) {
+    return PersistentStorageClassEnum.HDD;
+  } else if (param == PersistentStorageTypesEnum.SSD) {
+    return PersistentStorageClassEnum.SSD;
+  } else if (param == PersistentStorageTypesEnum.NVMe) {
+    return PersistentStorageClassEnum.NVMe;
+  }
+  throw Error(
+    "Persistent storage class cannot be mapped to api supported version."
+  );
+}
 
 export default SpheronApiService;

@@ -1,7 +1,11 @@
 import { changeDefaultOrganization } from "./commands/switch-organization";
 import { createConfiguration } from "./commands/create-configuration";
 import { createOrganization } from "./commands/create-organization";
-import { ResourceEnum, ResourceFetcher } from "./commands/site/get-resources";
+import {
+  SiteResourceEnum,
+  ResourceFetcher,
+  ComputeResourceEnum,
+} from "./commands/get-resources";
 import {
   GptCommandEnum,
   createTestCases,
@@ -12,10 +16,10 @@ import {
   transpileCode,
   updateCode,
 } from "./commands/gpt/gpt";
-import { init } from "./commands/site/init";
+import { siteInit } from "./commands/site/init";
 import { login } from "./commands/login";
 import { logout } from "./commands/logout";
-import { publish } from "./commands/site/publish";
+import { sitePublish } from "./commands/site/publish";
 import { upload } from "./commands/site/upload";
 import configuration from "./configuration";
 import {
@@ -33,9 +37,16 @@ import {
 import SpheronApiService from "./services/spheron-api";
 import { fileExists } from "./utils";
 import { SiteCommandEnum } from "./commands/site/interfaces";
-import { ComputeCommandEnum } from "./commands/compute/interfaces";
+import {
+  ComputeCommandEnum,
+  ComputeInstanceType,
+  SpheronComputeConfiguration,
+} from "./commands/compute/interfaces";
 import { AppTypeEnum } from "@spheron/core";
 import MetadataService, { SiteMetadata } from "./services/metadata-service";
+import { computeInit } from "./commands/compute/init";
+import { computePublish } from "./commands/compute/publish";
+import { validate } from "./commands/compute/validate";
 
 export async function commandHandler(options: any) {
   if (!(await fileExists(configuration.configFilePath))) {
@@ -119,10 +130,10 @@ export async function commandHandler(options: any) {
   if (options._[0] === "site" && options._[1] === SiteCommandEnum.PUBLISH) {
     (async () => {
       try {
-        if (options.organization) {
-          await publish(options.organization);
+        if (options.organizationId) {
+          await sitePublish(options.organizationId);
         } else {
-          await publish();
+          await sitePublish();
         }
       } catch (error) {
         process.exit(1);
@@ -204,7 +215,7 @@ export async function commandHandler(options: any) {
         if (!path) {
           path = "./";
         }
-        await init(project, protocol, path, framework);
+        await siteInit(project, protocol, path, framework);
       } catch (error) {
         console.log(error.message);
         process.exit(1);
@@ -231,10 +242,10 @@ export async function commandHandler(options: any) {
     (async () => {
       try {
         if (options.resource) {
-          if (options.resource == ResourceEnum.DEPLOYMENT) {
+          if (options.resource == SiteResourceEnum.DEPLOYMENT) {
             const id = options.id;
             await ResourceFetcher.getDeployment(id);
-          } else if (options.resource == ResourceEnum.DEPLOYMENTS) {
+          } else if (options.resource == SiteResourceEnum.DEPLOYMENTS) {
             const projectId = options.projectId;
             const skip = options.skip;
             const limit = options.limit;
@@ -245,10 +256,10 @@ export async function commandHandler(options: any) {
               limit,
               status
             );
-          } else if (options.resource == ResourceEnum.PROJECT) {
+          } else if (options.resource == SiteResourceEnum.PROJECT) {
             const id = options.id;
             await ResourceFetcher.getProject(id);
-          } else if (options.resource == ResourceEnum.PROJECTS) {
+          } else if (options.resource == SiteResourceEnum.PROJECTS) {
             const organizationId = options.organizationId;
             const skip = options.skip;
             const limit = options.limit;
@@ -259,15 +270,17 @@ export async function commandHandler(options: any) {
               limit,
               state
             );
-          } else if (options.resource == ResourceEnum.ORGANIZATION) {
+          } else if (options.resource == SiteResourceEnum.ORGANIZATION) {
             const id = options.id;
-            await ResourceFetcher.getOrganization(id);
-          } else if (options.resource == ResourceEnum.ORGANIZATIONS) {
+            await ResourceFetcher.getOrganization(id, AppTypeEnum.WEB_APP);
+          } else if (options.resource == SiteResourceEnum.ORGANIZATIONS) {
             await ResourceFetcher.getUserOrganizations();
-          } else if (options.resource == ResourceEnum.DOMAINS) {
+          } else if (options.resource == SiteResourceEnum.DOMAINS) {
             const projectId = options.projectId;
             await ResourceFetcher.getProjectDomains(projectId);
-          } else if (options.resource == ResourceEnum.DEPLOYMENT_ENVIRONMENTS) {
+          } else if (
+            options.resource == SiteResourceEnum.DEPLOYMENT_ENVIRONMENTS
+          ) {
             const projectId = options.projectId;
             await ResourceFetcher.getProjectDeploymentEnvironments(projectId);
           }
@@ -321,7 +334,7 @@ export async function commandHandler(options: any) {
       console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
       process.exit(1);
     }
-    const isWhitelisted = await SpheronApiService.isWhitelisted();
+    const isWhitelisted = await SpheronApiService.isGptWhitelisted();
     // check if the user is whitelisted
     if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
       console.log(isWhitelisted?.message);
@@ -356,7 +369,7 @@ export async function commandHandler(options: any) {
       console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
       process.exit(1);
     }
-    const isWhitelisted = await SpheronApiService.isWhitelisted();
+    const isWhitelisted = await SpheronApiService.isGptWhitelisted();
     // check if the user is whitelisted
     if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
       console.log(isWhitelisted?.message);
@@ -396,7 +409,7 @@ export async function commandHandler(options: any) {
       console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
       process.exit(1);
     }
-    const isWhitelisted = await SpheronApiService.isWhitelisted();
+    const isWhitelisted = await SpheronApiService.isGptWhitelisted();
     // check if the user is whitelisted
     if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
       console.log(isWhitelisted?.message);
@@ -429,7 +442,7 @@ export async function commandHandler(options: any) {
       console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
       process.exit(1);
     }
-    const isWhitelisted = await SpheronApiService.isWhitelisted();
+    const isWhitelisted = await SpheronApiService.isGptWhitelisted();
     // check if the user is whitelisted
     if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
       console.log(isWhitelisted?.message);
@@ -462,7 +475,7 @@ export async function commandHandler(options: any) {
       console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
       process.exit(1);
     }
-    const isWhitelisted = await SpheronApiService.isWhitelisted();
+    const isWhitelisted = await SpheronApiService.isGptWhitelisted();
     // check if the user is whitelisted
     if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
       console.log(isWhitelisted?.message);
@@ -502,7 +515,7 @@ export async function commandHandler(options: any) {
       console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
       process.exit(1);
     }
-    const isWhitelisted = await SpheronApiService.isWhitelisted();
+    const isWhitelisted = await SpheronApiService.isGptWhitelisted();
     // check if the user is whitelisted
     if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
       console.log(isWhitelisted?.message);
@@ -599,6 +612,116 @@ export async function commandHandler(options: any) {
         await changeDefaultOrganization(AppTypeEnum.COMPUTE, organizationId);
       } catch (error) {
         console.log(error.message);
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (options._[0] === "compute" && options._[1] === ComputeCommandEnum.INIT) {
+    (async () => {
+      try {
+        const initialConfig: SpheronComputeConfiguration = {
+          instanceName: "my_first_instance",
+          clusterName: "my_first_cluster",
+          image: "ovrclk/lunie-light",
+          tag: "latest",
+          instanceCount: 1,
+          ports: [{ containerPort: 3000, exposedPort: 80 }],
+          env: [
+            {
+              value: "my_env:123",
+              isSecret: false,
+            },
+          ],
+          commands: [],
+          args: [],
+          region: "any",
+          type: ComputeInstanceType.SPOT,
+          plan: "Ventus Nano 1",
+          customParams: {
+            storage: "10Gi",
+          },
+        };
+        await computeInit(initialConfig);
+      } catch (error) {
+        console.log(error.message);
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (options._[0] === "compute" && options._[1] === SiteCommandEnum.GET) {
+    (async () => {
+      try {
+        if (options.resource) {
+          if (options.resource == ComputeResourceEnum.ORGANIZATION) {
+            const id = options.id;
+            await ResourceFetcher.getOrganization(id, AppTypeEnum.COMPUTE);
+          } else if (options.resource == ComputeResourceEnum.ORGANIZATIONS) {
+            await ResourceFetcher.getUserOrganizations();
+          } else if (options.resource == ComputeResourceEnum.PLANS) {
+            const name = options.name;
+            await ResourceFetcher.getComputePlans(name);
+          } else if (options.resource == ComputeResourceEnum.REGIONS) {
+            await ResourceFetcher.getComputeRegions();
+          } else if (options.resource == ComputeResourceEnum.CLUSTERS) {
+            const organizationId = options.organizationId;
+            await ResourceFetcher.getClusters(organizationId);
+          } else if (options.resource == ComputeResourceEnum.INSTANCES) {
+            const clusterId = options.clusterId;
+            await ResourceFetcher.getClusterInstances(clusterId);
+          } else if (options.resource == ComputeResourceEnum.INSTANCE) {
+            const id = options.id;
+            await ResourceFetcher.getClusterInstance(id);
+          }
+        } else {
+          throw new Error("Resource needs to be specified");
+        }
+      } catch (error) {
+        console.log(error.message);
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (
+    options._[0] === "compute" &&
+    options._[1] === ComputeCommandEnum.PUBLISH
+  ) {
+    (async () => {
+      try {
+        const organizationId = options.organizationId;
+        await computePublish(organizationId);
+      } catch (error) {
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (
+    options._[0] === "compute" &&
+    options._[1] === ComputeCommandEnum.VALIDATE
+  ) {
+    const validOptions = ["path"];
+    const unknownOptions = Object.keys(options).filter(
+      (option) =>
+        option !== "_" && option !== "$0" && !validOptions.includes(option)
+    );
+    if (unknownOptions.length > 0) {
+      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
+    (async () => {
+      let path;
+      if (options.path) {
+        path = options.path;
+      }
+      if (!path) {
+        path = "./";
+      }
+      try {
+        await validate(path);
+      } catch (error) {
         process.exit(1);
       }
     })();

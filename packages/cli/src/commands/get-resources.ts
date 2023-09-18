@@ -1,24 +1,34 @@
 import {
   AppTypeEnum,
+  Cluster,
+  ComputeMachine,
   Deployment,
   DeploymentEnvironment,
   DeploymentStatusEnum,
   Domain,
+  ExtendedInstance,
+  HealthCheck,
+  Instance,
   Organization,
   Project,
   User,
 } from "@spheron/core";
-import Spinner from "../../outputs/spinner";
-import SpheronApiService from "../../services/spheron-api";
-import MetadataService from "../../services/metadata-service";
+import Spinner from "../outputs/spinner";
+import SpheronApiService from "../services/spheron-api";
+import MetadataService from "../services/metadata-service";
 
 export const ResourceFetcher = {
-  async getOrganization(id: string) {
+  async getOrganization(id: string, type: AppTypeEnum) {
     const spinner = new Spinner();
     try {
       spinner.spin("Fetching ");
       if (!id) {
-        const siteData = await MetadataService.getSiteData();
+        let siteData;
+        if (type == AppTypeEnum.COMPUTE) {
+          siteData = await MetadataService.getComputeData();
+        } else {
+          siteData = await MetadataService.getSiteData();
+        }
         id = siteData?.organizationId;
         if (!id) {
           throw new Error("OrganizationId not provided");
@@ -198,9 +208,100 @@ export const ResourceFetcher = {
       spinner.stop();
     }
   },
+
+  async getComputePlans(name?: string) {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching ");
+      const computesPlans: ComputeMachine[] =
+        await SpheronApiService.getComputePlans(name);
+      console.log("Compute plans:");
+      const computePlansDtos = computesPlans.map((x) => {
+        return toComputePlansDTO(x);
+      });
+      console.log(JSON.stringify(computePlansDtos, null, 2));
+      spinner.success(``);
+    } catch (error) {
+      console.log(`✖️  Error while fetching compute plans`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
+
+  async getComputeRegions() {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching ");
+      const regions: string[] = await SpheronApiService.getComputeRegions();
+      console.log("Compute regions:");
+      console.log(JSON.stringify(regions, null, 2));
+      spinner.success(``);
+    } catch (error) {
+      console.log(`✖️  Error while fetching compute regions`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
+
+  async getClusters(organizationId: string) {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching ");
+      const clusters: Cluster[] = await SpheronApiService.getClusters(
+        organizationId
+      );
+      const computeClusterDtos: ComputeClusterDTO[] = clusters.map((x) => {
+        return toComputeClusterDTO(x);
+      });
+      console.log(JSON.stringify(computeClusterDtos, null, 2));
+      spinner.success(``);
+    } catch (error) {
+      console.log(`✖️  Error while fetching compute clusters`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
+
+  async getClusterInstances(clusterId: string) {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching ");
+      const instances: ExtendedInstance[] =
+        await SpheronApiService.getClusterInstances(clusterId);
+      const instancesDtos: ComputeInstanceDTO[] = instances.map((x) => {
+        return toComputeInstanceDTO(x);
+      });
+      console.log(JSON.stringify(instancesDtos, null, 2));
+      spinner.success(``);
+    } catch (error) {
+      console.log(`✖️  Error while fetching compute clusters`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
+
+  async getClusterInstance(id: string) {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching ");
+      const instance: Instance = await SpheronApiService.getClusterInstance(id);
+      const instanceDto = toComputeInstanceDTO(instance as ExtendedInstance);
+      console.log(JSON.stringify(instanceDto, null, 2));
+      spinner.success(``);
+    } catch (error) {
+      console.log(`✖️  Error while fetching compute clusters`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
 };
 
-export enum ResourceEnum {
+export enum SiteResourceEnum {
   PROJECT = "project",
   PROJECTS = "projects",
   DEPLOYMENT = "deployment",
@@ -209,6 +310,16 @@ export enum ResourceEnum {
   ORGANIZATIONS = "organizations",
   DOMAINS = "domains",
   DEPLOYMENT_ENVIRONMENTS = "deployment-environments",
+}
+
+export enum ComputeResourceEnum {
+  ORGANIZATION = "organization",
+  ORGANIZATIONS = "organizations",
+  PLANS = "plans",
+  REGIONS = "regions",
+  CLUSTERS = "clusters",
+  INSTANCE = "instance",
+  INSTANCES = "instances",
 }
 
 interface OrganizationDTO {
@@ -263,6 +374,43 @@ interface DeploymentDTO {
   protocol: string;
   contentHash: string;
   sitePreview: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ComputePlanDTO {
+  _id: string;
+  name: string;
+  cpu: number;
+  storage: string;
+  memory: string;
+  dailyCost: string;
+}
+
+interface ComputeClusterDTO {
+  _id: string;
+  name: string;
+  imageSource: string;
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ComputeInstanceDTO {
+  _id: string;
+  state: string;
+  name: string;
+  versions: Array<string>;
+  activeVersion: string;
+  cluster: string;
+  healthCheck: HealthCheck;
+  cpu: number;
+  memory: string;
+  storage: string;
+  image: string;
+  tag: string;
+  dailySpending?: number;
+  alreadySpent?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -337,5 +485,52 @@ const toDeploymentDTO = function (deployment: Deployment): DeploymentDTO {
     sitePreview: deployment.sitePreview,
     createdAt: deployment.createdAt,
     updatedAt: deployment.updatedAt,
+  };
+};
+
+const toComputePlansDTO = function (
+  computeMachine: ComputeMachine
+): ComputePlanDTO {
+  return {
+    _id: computeMachine._id,
+    name: computeMachine.name,
+    cpu: computeMachine.cpu,
+    storage: computeMachine.storage,
+    memory: computeMachine.memory,
+    dailyCost: computeMachine.defaultDailyTopUp.toFixed(3),
+  };
+};
+
+const toComputeClusterDTO = function (cluster: Cluster): ComputeClusterDTO {
+  return {
+    _id: cluster._id,
+    name: cluster.name,
+    imageSource: cluster.url,
+    createdBy: cluster.createdBy,
+    createdAt: cluster.createdAt,
+    updatedAt: cluster.updatedAt,
+  };
+};
+
+const toComputeInstanceDTO = function (
+  instance: ExtendedInstance
+): ComputeInstanceDTO {
+  return {
+    _id: instance._id,
+    state: instance.state,
+    name: instance.name,
+    versions: instance.orders,
+    activeVersion: instance.activeOrder,
+    cluster: instance.cluster,
+    healthCheck: instance.healthCheck,
+    cpu: instance.cpu,
+    memory: instance.memory,
+    storage: instance.storage,
+    image: instance.image,
+    tag: instance.tag,
+    dailySpending: instance.defaultDailyTopup,
+    alreadySpent: instance.withdrawnAkt,
+    createdAt: instance.createdAt,
+    updatedAt: instance.updatedAt,
   };
 };

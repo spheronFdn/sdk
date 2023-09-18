@@ -8,7 +8,7 @@ import MetadataService, {
   ProjectTrackingElement,
 } from "../../services/metadata-service";
 
-export async function init(
+export async function siteInit(
   name: string,
   protocol: string,
   projectPath: string,
