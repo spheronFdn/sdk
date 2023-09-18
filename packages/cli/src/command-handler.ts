@@ -629,7 +629,7 @@ export async function commandHandler(options: any) {
           ports: [{ containerPort: 3000, exposedPort: 80 }],
           env: [
             {
-              value: "my_env",
+              value: "my_env:123",
               isSecret: false,
             },
           ],

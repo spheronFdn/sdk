@@ -17,28 +17,60 @@ export async function validate(rootPath: string): Promise<any> {
     }
     const yamlData = await fs.readFile(rootPath, "utf8");
     const spheronConfig = yaml.load(yamlData) as SpheronComputeConfiguration;
+    if (!spheronConfig.clusterName) {
+      console.log("cluster name not specified  ✖️");
+      validationErrors += 1;
+    }
+    if (!spheronConfig.image) {
+      console.log("image not specifed  ✖️");
+      validationErrors += 1;
+    }
     if (!spheronConfig.tag) {
-      console.log("⚠️ tag not specifed -> deafult is latest");
+      console.log("tag not specifed -> deafult is latest ⚠️");
       validationWarnings += 1;
     }
+    if (!spheronConfig.instanceCount) {
+      console.log("Instance count not specified  ✖️");
+      validationErrors += 1;
+    }
+    if (spheronConfig.ports) {
+      for (const port of spheronConfig.ports) {
+        if (!port.containerPort || !port.exposedPort) {
+          console.log(
+            "Port specification not valid. Need to have [containerPort, exposedPort] combination✖️"
+          );
+          validationErrors += 1;
+        }
+      }
+    }
+    if (spheronConfig.env) {
+      for (const e of spheronConfig.env) {
+        if (e.value == undefined || e.isSecret == undefined) {
+          console.log(
+            "Env specification not valid. Need to have [value, isSecret] combination✖️"
+          );
+          validationErrors += 1;
+        }
+      }
+    }
     if (!spheronConfig.region) {
-      console.log("✖️ region not specified");
+      console.log("region not specified ✖️");
       validationErrors += 1;
     } else {
       const regions: string[] = await SpheronApiService.getComputeRegions();
       if (!regions.find((x) => x == spheronConfig.region)) {
-        console.log("✖️ specified region is not supported");
+        console.log("specified region is not supported ✖️");
         validationErrors += 1;
       }
     }
     if (!spheronConfig.type) {
-      console.log("✖️ type of instance must be specified");
+      console.log("type of instance must be specified ✖️");
       validationErrors += 1;
     }
     if (spheronConfig.plan) {
       const plans = await SpheronApiService.getComputePlans();
       if (!plans.find((x) => x.name == spheronConfig.plan)) {
-        console.log("✖️ specified plan does not exist");
+        console.log("specified plan does not exist ✖️");
         validationErrors += 1;
       }
     } else {
@@ -50,7 +82,7 @@ export async function validate(rootPath: string): Promise<any> {
         spheronConfig.customParams.storage
       ) {
         if (!(typeof spheronConfig.customParams.cpu === "number")) {
-          console.log("✖️ cpu parameter must be an integer");
+          console.log("cpu parameter must be an integer ✖️");
           validationErrors += 1;
         }
         if (
@@ -60,7 +92,7 @@ export async function validate(rootPath: string): Promise<any> {
           )
         ) {
           console.log(
-            "✖️ memory parameter not set properly (proper example: 1Gi)"
+            "memory parameter not set properly (proper example: 1Gi) ✖️"
           );
           validationErrors += 1;
         }
@@ -71,13 +103,13 @@ export async function validate(rootPath: string): Promise<any> {
           )
         ) {
           console.log(
-            "✖️ storage parameter not set properly (proper example: 4Gi)"
+            "storage parameter not set properly (proper example: 4Gi) ✖️"
           );
           validationErrors += 1;
         }
       } else {
         console.log(
-          "✖️ Custom plan needs to specify cpu, memory and storage to be valid"
+          "Custom plan needs to specify cpu, memory and storage to be valid ✖️"
         );
         validationErrors += 1;
       }
@@ -98,9 +130,9 @@ export async function validate(rootPath: string): Promise<any> {
           )
         ) {
           console.log(
-            `✖️ persistent storage class not set up properly. Valid values are ${Object.values(
+            `persistent storage class not set up properly. Valid values are ${Object.values(
               PersistentStorageTypesEnum
-            ).toString()}`
+            ).toString()} ✖️`
           );
           validationErrors += 1;
         }
@@ -111,19 +143,19 @@ export async function validate(rootPath: string): Promise<any> {
           )
         ) {
           console.log(
-            "✖️ Persistent storage size parameter not set properly (proper example: 4Gi)"
+            "Persistent storage size parameter not set properly (proper example: 4Gi) ✖️"
           );
           validationErrors += 1;
         }
         if (!(typeof persistentStorage.mountPoint === "string")) {
           console.log(
-            "✖️ Persistent storage mount point parameter needs to be valid path"
+            "Persistent storage mount point parameter needs to be valid path ✖️"
           );
           validationErrors += 1;
         }
       } else {
         console.log(
-          "✖️ Persistent storage needs to specify class, size, and mountPoint to be valid"
+          "Persistent storage needs to specify class, size, and mountPoint to be valid ✖️"
         );
         validationErrors += 1;
       }
@@ -132,7 +164,7 @@ export async function validate(rootPath: string): Promise<any> {
     console.log(`Warnings count: ${validationWarnings}`);
     console.log(`Errors count: ${validationErrors}`);
     if (validationErrors == 0) {
-      console.log("✅ Configuration is ready to go !");
+      console.log("Configuration is ready to go 🚀");
     }
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);
