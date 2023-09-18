@@ -1,7 +1,11 @@
 #! /usr/bin/env node
 /* eslint-disable @typescript-eslint/no-var-requires */
 const yargs = require("yargs");
-import { DeploymentStatusEnum, ProjectStateEnum } from "@spheron/core";
+import {
+  DeploymentStatusEnum,
+  MarketplaceCategoryEnum,
+  ProjectStateEnum,
+} from "@spheron/core";
 import configuration from "./configuration";
 import { commandHandler } from "./command-handler";
 import { FrameworkOptions } from "./commands/site/init";
@@ -288,6 +292,9 @@ import { GlobalCommandEnum } from "./commands/interfaces";
             InstanceVersionLogsTypeEnum
           )} [--from <number>] [--to <number>] [--search <filter_string>] ]
           - get instances               : options: --clusterId <clusterId> 
+          - get templates               : options: [--category [${Object.values(
+            MarketplaceCategoryEnum
+          )}]                
         `);
           }
         );

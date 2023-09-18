@@ -11,6 +11,10 @@ import {
   HealthCheck,
   Instance,
   InstanceOrder,
+  MarketplaceApp,
+  MarketplaceAppPort,
+  MarketplaceAppVariable,
+  MarketplaceCategoryEnum,
   Organization,
   PersistentStorage,
   Port,
@@ -347,6 +351,33 @@ export const ResourceFetcher = {
       spinner.stop();
     }
   },
+
+  async getComputeTemplates(category?: MarketplaceCategoryEnum) {
+    const spinner = new Spinner();
+    try {
+      spinner.spin("Fetching");
+      let templates: MarketplaceApp[] =
+        await SpheronApiService.getComputeTemplates();
+      if (category) {
+        if (
+          !Object.values(MarketplaceCategoryEnum).find((x) => x == category)
+        ) {
+          throw new Error("Specified category does not exist");
+        }
+        templates = templates.filter((x) => x.metadata.category == category);
+      }
+      const templateDtos: ComputeTemplateDto[] = templates.map((x) => {
+        return toComputeTemplateDTO(x);
+      });
+      console.log(JSON.stringify(templateDtos, null, 2));
+      spinner.success(``);
+    } catch (error) {
+      console.log(`✖️  Error while fetching compute templates`);
+      throw error;
+    } finally {
+      spinner.stop();
+    }
+  },
 };
 
 export enum SiteResourceEnum {
@@ -369,6 +400,7 @@ export enum ComputeResourceEnum {
   INSTANCE = "instance",
   INSTANCES = "instances",
   LOGS = "logs",
+  TEMPLATES = "templates",
 }
 
 interface OrganizationDTO {
@@ -497,6 +529,25 @@ interface SuperComputeInstanceDTO {
   alreadySpent?: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+interface ComputeTemplateDto {
+  _id: string;
+  name: string;
+  metadata: {
+    description: string;
+    docsLink: string;
+    category: string;
+  };
+  serviceData: {
+    defaultPlan: string;
+    image: string;
+    tag: string;
+    variables: MarketplaceAppVariable[];
+    ports: MarketplaceAppPort[];
+    commands: string[];
+    args: string[];
+  };
 }
 
 const toOrganizationDTO = function (
@@ -667,4 +718,28 @@ const toSuperComputeInstanceDTO = function (
     updatedAt: instance.updatedAt,
   };
   return dto;
+};
+
+const toComputeTemplateDTO = function (
+  app: MarketplaceApp
+): ComputeTemplateDto {
+  const template: ComputeTemplateDto = {
+    _id: app._id,
+    name: app.name,
+    metadata: {
+      description: app.metadata.description,
+      docsLink: app.metadata.docsLink,
+      category: app.metadata.category,
+    },
+    serviceData: {
+      defaultPlan: app.serviceData.defaultAkashMachineImageId,
+      image: app.serviceData.dockerImage,
+      tag: app.serviceData.dockerImageTag,
+      variables: app.serviceData.variables,
+      ports: app.serviceData.ports,
+      commands: app.serviceData.commands,
+      args: app.serviceData.args,
+    },
+  };
+  return template;
 };

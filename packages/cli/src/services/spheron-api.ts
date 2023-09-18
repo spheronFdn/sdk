@@ -15,6 +15,7 @@ import {
   InstanceOrder,
   InstanceOrderLogs,
   InstanceResponse,
+  MarketplaceApp,
   Organization,
   PersistentStorageClassEnum,
   Project,
@@ -293,6 +294,12 @@ const SpheronApiService = {
     };
     const response: InstanceResponse = await client.createClusterInstance(req);
     return response;
+  },
+
+  async getComputeTemplates(): Promise<MarketplaceApp[]> {
+    const client: SpheronApi = await this.initialize();
+    const templates: MarketplaceApp[] = await client.getClusterTemplates();
+    return templates;
   },
 
   async isGptWhitelisted(): Promise<any> {

@@ -42,7 +42,7 @@ import {
   ComputeInstanceType,
   SpheronComputeConfiguration,
 } from "./commands/compute/interfaces";
-import { AppTypeEnum } from "@spheron/core";
+import { AppTypeEnum, MarketplaceCategoryEnum } from "@spheron/core";
 import MetadataService, { SiteMetadata } from "./services/metadata-service";
 import { computeInit } from "./commands/compute/init";
 import { computePublish } from "./commands/compute/publish";
@@ -686,6 +686,9 @@ export async function commandHandler(options: any) {
               to,
               search
             );
+          } else if (options.resource == ComputeResourceEnum.TEMPLATES) {
+            const category = options.category;
+            await ResourceFetcher.getComputeTemplates(category);
           }
         } else {
           throw new Error("Resource needs to be specified");
