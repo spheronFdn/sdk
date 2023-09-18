@@ -49,6 +49,7 @@ import {
 import {
   InstanceResponse,
   MarketplaceInstanceResponse,
+  ShellExecutionResponse,
 } from "./response-interfaces";
 
 class SpheronApi {
@@ -971,6 +972,18 @@ class SpheronApi {
     }>(HttpMethods.GET, `/v1/price/liveTokenPrice/${tokenId}`);
 
     return response.price;
+  }
+
+  async executeShellCommand(
+    instanceId: string,
+    command: string
+  ): Promise<ShellExecutionResponse> {
+    const response = await this.sendApiRequest<ShellExecutionResponse>(
+      HttpMethods.POST,
+      `/v1/cluster-instance/${instanceId}/exec-command`,
+      { command }
+    );
+    return response;
   }
 
   //#gpt api

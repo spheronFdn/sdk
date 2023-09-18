@@ -256,6 +256,25 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           }
         )
         .command(
+          ComputeCommandEnum.SHELL,
+          "Execute shell command inside of instance",
+          (yargs: any) => {
+            yargs
+              .option("instanceId", {
+                describe: "Instance id",
+              })
+              .option("command", {
+                describe: "shell command",
+              })
+              .version(false)
+              .usage(
+                `Usage: $0 shell --instanceId <instanceId> --command 'ls -a'`
+              )
+              .wrap(150)
+              .help();
+          }
+        )
+        .command(
           ComputeCommandEnum.VALIDATE,
           "Validate spheron.yaml (or some other spheron compute configuration file)",
           (yargs: any) => {
