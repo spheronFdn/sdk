@@ -1,6 +1,6 @@
 {
   "name": "@spheron/compute",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Typescript library for deploying compute instances to Decentralised Compute via Spheron",
   "keywords": [
     "Compute",
@@ -33,7 +33,7 @@
     "dist/"
   ],
   "dependencies": {
-    "@spheron/core": "^2.0.0"
+    "@spheron/core": "^2.0.2"
   },
   "license": "Apache-2.0",
   "repository": {
