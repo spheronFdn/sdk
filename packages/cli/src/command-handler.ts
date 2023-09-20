@@ -33,6 +33,7 @@ import {
   promptForInit,
   promptForLogin,
   promptForUploadFile,
+  promptForComputeInit,
 } from "./prompts/prompts";
 import SpheronApiService from "./services/spheron-api";
 import { fileExists } from "./utils";
@@ -621,7 +622,13 @@ export async function commandHandler(options: any) {
   if (options._[0] === "compute" && options._[1] === ComputeCommandEnum.INIT) {
     (async () => {
       try {
-        const templateId = options.templateId;
+        let templateId;
+        if (options.templateId) {
+          templateId = options.templateId;
+        } else {
+          const prompt = await promptForComputeInit();
+          templateId = prompt?.template._id;
+        }
         let initialConfig;
         if (!templateId) {
           initialConfig = {

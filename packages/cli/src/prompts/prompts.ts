@@ -1,6 +1,8 @@
 import { createDapp, templateTypesMap } from "../commands/site/create-dapp";
 import { FixBugEnum } from "../commands/gpt/gpt";
 import { FrameworkOptions } from "../commands/site/init";
+import SpheronApiService from "../services/spheron-api";
+import { MarketplaceApp, MarketplaceCategoryEnum } from "@spheron/core";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const inquirer = require("inquirer");
@@ -120,7 +122,7 @@ export async function promptForCreateDapp(appName?: string): Promise<any> {
         type: "list",
         name: "projectType",
         message: "What type of dapp do you want to create?",
-        choices: templateTypes,
+        choices: dappTemplateTypes,
       },
     ])
     .then((answers: any) => {
@@ -221,7 +223,61 @@ export async function languageForGPTTest(): Promise<any> {
   return inquirer.prompt(questions);
 }
 
-const templateTypes = Array.from(templateTypesMap.values()).map((t) => ({
+export async function promptForComputeInit(): Promise<any> {
+  return inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "computeInitializationType",
+        message: "Do you want to deploy from template?",
+        choices: ["yes", "no"],
+      },
+    ])
+    .then(async (answers: any) => {
+      if (answers.computeInitializationType === "no") {
+        return null;
+      } else if (answers.computeInitializationType === "yes") {
+        const pcategory = await inquirer.prompt([
+          {
+            type: "list",
+            name: "category",
+            message: "Choose the category of template:",
+            choices: Object.values(MarketplaceCategoryEnum).map(
+              (option) => option.charAt(0).toUpperCase() + option.slice(1)
+            ),
+          },
+        ]);
+        let templates: MarketplaceApp[] =
+          await SpheronApiService.getComputeTemplates();
+        if (
+          !Object.values(MarketplaceCategoryEnum).find(
+            (x) => x == pcategory.category
+          )
+        ) {
+          throw new Error("Specified category does not exist");
+        }
+        templates = templates.filter(
+          (x) => x.metadata.category == pcategory.category
+        );
+
+        const templatesDto = Array.from(templates.values()).map((t) => ({
+          name: t.name,
+          value: t,
+        }));
+
+        return inquirer.prompt([
+          {
+            type: "list",
+            name: "template",
+            message: "Choose a template:",
+            choices: templatesDto,
+          },
+        ]);
+      }
+    });
+}
+
+const dappTemplateTypes = Array.from(templateTypesMap.values()).map((t) => ({
   name: t.alias,
   value: t.dapps,
 }));
