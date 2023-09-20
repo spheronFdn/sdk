@@ -315,7 +315,11 @@ export class SpheronClient extends ScopeExtractor {
     return { uploadToken: singleUseToken! };
   }
 
-  async pinCID(configuration: { name: string; cid: string }): Promise<{
+  async pinCID(configuration: {
+    name: string;
+    cid: string;
+    inBackground?: boolean;
+  }): Promise<{
     uploadId: string;
     bucketId: string;
     protocolLink: string;
@@ -327,6 +331,7 @@ export class SpheronClient extends ScopeExtractor {
       name: configuration.name,
       token: this.configuration.token,
       cid: configuration.cid,
+      inBackground: configuration.inBackground,
     });
   }
 
