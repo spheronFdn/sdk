@@ -284,7 +284,7 @@ import { GlobalCommandEnum } from "./commands/interfaces";
                 demandOption: false,
               })
               .version(false)
-              .usage(`Usage: $0 publish [--filepath <file_path>]`)
+              .usage(`Usage: $0 validate [--path <file_path>]`)
               .wrap(150)
               .help();
           }

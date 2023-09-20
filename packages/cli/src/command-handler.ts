@@ -696,7 +696,7 @@ export async function commandHandler(options: any) {
     })();
   }
 
-  if (options._[0] === "compute" && options._[1] === SiteCommandEnum.GET) {
+  if (options._[0] === "compute" && options._[1] === ComputeCommandEnum.GET) {
     (async () => {
       try {
         if (options.resource) {

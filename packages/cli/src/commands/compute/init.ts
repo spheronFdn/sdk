@@ -42,7 +42,7 @@ export async function computeTemplateInit(
   const spinner = new Spinner();
   try {
     spinner.spin(`Spheron compute file initialization...`);
-    if (await fileExists("./spheron-tempalte.yaml")) {
+    if (await fileExists("./spheron.yaml")) {
       throw new Error("Spheron template file already exists");
     }
     // Convert the configuration to YAML format
@@ -50,7 +50,7 @@ export async function computeTemplateInit(
 
     // Write to spheron.yaml file
     await fs.promises.writeFile(
-      path.join(process.cwd(), "./spheron-template.yaml"),
+      path.join(process.cwd(), "./spheron.yaml"),
       yamlData,
       "utf8"
     );
