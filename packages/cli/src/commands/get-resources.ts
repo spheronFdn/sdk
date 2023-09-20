@@ -258,6 +258,13 @@ export const ResourceFetcher = {
     const spinner = new Spinner();
     try {
       spinner.spin("Fetching ");
+      if (!organizationId) {
+        const computeData = await MetadataService.getComputeData();
+        organizationId = computeData?.organizationId;
+        if (!organizationId) {
+          throw new Error("OrganizationId not provided");
+        }
+      }
       const clusters: Cluster[] = await SpheronApiService.getClusters(
         organizationId
       );
