@@ -37,6 +37,7 @@ class UploadManager {
     organizationId?: string;
     token: string;
     createSingleUseToken?: boolean;
+    maxSize?: number;
   }): Promise<{
     uploadId: string;
     parallelUploadCount: number;
@@ -46,7 +47,9 @@ class UploadManager {
     try {
       this.validateUploadConfiguration(configuration);
 
-      let url = `${this.spheronApiUrl}/v1/upload/initiate?protocol=${configuration.protocol}&bucket=${configuration.name}`;
+      let url = `${this.spheronApiUrl}/v1/upload/initiate?protocol=${
+        configuration.protocol
+      }&bucket=${configuration.name}&maxSize=${configuration.maxSize ?? ""}`;
 
       if (configuration.organizationId) {
         url += `&organization=${configuration.organizationId}`;
