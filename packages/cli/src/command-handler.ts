@@ -34,21 +34,24 @@ import {
   promptForLogin,
   promptForUploadFile,
   promptForComputeInit,
+  promptComputePublish,
+  promptComputeUpdate,
 } from "./prompts/prompts";
 import SpheronApiService from "./services/spheron-api";
 import { fileExists } from "./utils";
 import { SiteCommandEnum } from "./commands/site/interfaces";
 import {
   ComputeCommandEnum,
-  ComputeConfigFileType,
-  ComputeInstanceType,
+  CliComputeInstanceType,
+  SpheronComputeConfiguration,
 } from "./commands/compute/interfaces";
 import { AppTypeEnum, MarketplaceApp } from "@spheron/core";
 import MetadataService, { SiteMetadata } from "./services/metadata-service";
-import { computeInit, computeTemplateInit } from "./commands/compute/init";
+import { computeInit } from "./commands/compute/init";
 import { computePublish } from "./commands/compute/publish";
 import { validate } from "./commands/compute/validate";
 import { executeShell } from "./commands/compute/execute-shell";
+import { computeUpdate } from "./commands/compute/update-instance";
 
 export async function commandHandler(options: any) {
   if (!(await fileExists(configuration.configFilePath))) {
@@ -629,11 +632,11 @@ export async function commandHandler(options: any) {
           const prompt = await promptForComputeInit();
           templateId = prompt?.template._id;
         }
-        let initialConfig;
+        let initialConfig: SpheronComputeConfiguration;
         if (!templateId) {
           initialConfig = {
-            configType: ComputeConfigFileType.DIRECT,
             clusterName: "my_first_cluster",
+            region: "any",
             image: "ovrclk/lunie-light",
             tag: "latest",
             instanceCount: 1,
@@ -647,8 +650,7 @@ export async function commandHandler(options: any) {
             ],
             commands: [],
             args: [],
-            region: "any",
-            type: ComputeInstanceType.SPOT,
+            type: CliComputeInstanceType.SPOT,
             plan: "Ventus Nano 1",
             customParams: {
               storage: "10Gi",
@@ -666,28 +668,38 @@ export async function commandHandler(options: any) {
           const defaultPlan = plans.find(
             (x) => x._id == template.serviceData.defaultAkashMachineImageId
           );
-          const envs = template.serviceData.variables.map((x) => {
+          const configEnvs = template.serviceData.variables.map((x) => {
             return {
               name: x.label,
               value: `${x.defaultValue}`,
               hidden: x.hidden ? x.hidden : false,
             };
           });
+          const configPorts = template.serviceData.ports.map((x) => {
+            return {
+              containerPort: x.containerPort,
+              exposedPort: x.exposedPort,
+            };
+          });
           initialConfig = {
-            configType: ComputeConfigFileType.TEMPLATE,
             templateId: template._id,
             templateName: template.name,
             clusterName: template.name,
-            env: envs,
-            instanceCount: 1,
-            plan: defaultPlan ? defaultPlan.name : "Ventus Nano 1",
             region: "any",
-            type: ComputeInstanceType.SPOT,
+            image: template.serviceData.dockerImage,
+            tag: template.serviceData.dockerImageTag,
+            instanceCount: 1,
+            ports: configPorts,
+            env: configEnvs,
+            commands: template.serviceData.commands,
+            args: template.serviceData.args,
+            type: CliComputeInstanceType.SPOT,
+            plan: defaultPlan ? defaultPlan.name : "Ventus Nano 1",
             customParams: {
               storage: "10Gi",
             },
           };
-          await computeTemplateInit(initialConfig);
+          await computeInit(initialConfig);
         }
       } catch (error) {
         console.log(error.message);
@@ -696,7 +708,7 @@ export async function commandHandler(options: any) {
     })();
   }
 
-  if (options._[0] === "compute" && options._[1] === ComputeCommandEnum.GET) {
+  if (options._[0] === "compute" && options._[1] === SiteCommandEnum.GET) {
     (async () => {
       try {
         if (options.resource) {
@@ -718,7 +730,8 @@ export async function commandHandler(options: any) {
             await ResourceFetcher.getClusterInstances(clusterId);
           } else if (options.resource == ComputeResourceEnum.INSTANCE) {
             const id = options.id;
-            await ResourceFetcher.getClusterInstance(id);
+            const downloadConfig = options.downloadConfig;
+            await ResourceFetcher.getClusterInstance(id, downloadConfig);
           } else if (options.resource == ComputeResourceEnum.LOGS) {
             const instanceId = options.instanceId;
             const type = options.type;
@@ -752,8 +765,40 @@ export async function commandHandler(options: any) {
   ) {
     (async () => {
       try {
-        const organizationId = options.organizationId;
-        await computePublish(organizationId);
+        let organizationId, config;
+        if (options.organizationId && options.config) {
+          organizationId = options.organizationId;
+          config = options.config;
+        } else {
+          const prompt = await promptComputePublish();
+          organizationId = prompt.organization;
+          config = prompt.config;
+        }
+        await computePublish(organizationId, config);
+      } catch (error) {
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (
+    options._[0] === "compute" &&
+    options._[1] === ComputeCommandEnum.UPDATE
+  ) {
+    (async () => {
+      try {
+        let instanceId, organizationId, config;
+        if (options.organizationId && options.config) {
+          organizationId = options.organizationId;
+          config = options.config;
+          instanceId = options.instanceId;
+        } else {
+          const prompt = await promptComputeUpdate();
+          organizationId = prompt.organizationId;
+          config = prompt.config;
+          instanceId = prompt.instanceId;
+        }
+        await computeUpdate(instanceId, config, organizationId);
       } catch (error) {
         process.exit(1);
       }

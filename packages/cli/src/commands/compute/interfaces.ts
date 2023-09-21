@@ -8,63 +8,46 @@ export enum ComputeCommandEnum {
   PUBLISH = "publish",
   VALIDATE = "validate",
   UPDATE = "update",
-  LOGS = "logs",
   SHELL = "shell",
 }
 
-export enum ComputeConfigFileType {
-  DIRECT = "direct",
-  TEMPLATE = "template",
-}
-
 export interface SpheronComputeConfiguration {
-  configType: ComputeConfigFileType;
-}
-
-export interface SpheronComputeDirectConfiguration
-  extends SpheronComputeConfiguration {
   clusterName: string;
+  region: string;
   image: string;
   tag: string;
   instanceCount: number;
   ports: Array<Port>;
-  env: Array<{ name: string; value: string; hidden: boolean }>;
+  env: Array<CliComputeEnv>;
   commands: Array<string>;
   args: Array<string>;
-  region: string;
-  type: ComputeInstanceType;
+  type: CliComputeInstanceType;
   plan: string;
-  customParams: CustomParams;
+  customParams: CliCustomParams;
+  templateId?: string;
+  templateName?: string;
   healthCheck?: {
     path: string;
     port: number;
   };
+  instanceId?: string;
+  clusterId?: string;
+  organizationId?: string;
+  versionId?: string;
 }
 
-export interface SpheronComputeTemplateConfiguration
-  extends SpheronComputeConfiguration {
-  templateId: string;
-  templateName: string;
-  clusterName: string;
-  env: Array<{ name: string; value: string; hidden: boolean }>;
-  instanceCount: number;
-  plan: string;
-  region: string;
-  type: ComputeInstanceType;
-  customParams: CustomParams;
+export interface CliComputeEnv {
+  name: string;
+  value: string;
+  hidden: boolean;
 }
 
-export interface ComputePlanDetails {
-  cpu: string;
-  memory: string;
-}
-
-export enum ComputeInstanceType {
+export enum CliComputeInstanceType {
   SPOT = "spot",
   ON_DEMAND = "on_demand",
 }
 
-export enum PersistentStorageTypesEnum {
+export enum CliPersistentStorageTypesEnum {
   HDD = "hdd",
   SSD = "ssd",
   NVMe = "nvme",
@@ -76,14 +59,15 @@ export enum InstanceVersionLogsTypeEnum {
   EVENTS = "events",
 }
 
-export interface CustomPersistentStorage {
+export interface CliCustomPersistentStorage {
   size: string;
-  class: PersistentStorageTypesEnum;
+  class: CliPersistentStorageTypesEnum;
   mountPoint: string;
 }
-interface CustomParams {
+
+export interface CliCustomParams {
   cpu?: number;
   memory?: string;
-  persistentStorage?: CustomPersistentStorage;
+  persistentStorage?: CliCustomPersistentStorage;
   storage: string;
 }

@@ -22,9 +22,19 @@ import {
   User,
 } from "@spheron/core";
 import Spinner from "../outputs/spinner";
-import SpheronApiService from "../services/spheron-api";
+import SpheronApiService, {
+  toCliPersistentStorage,
+} from "../services/spheron-api";
 import MetadataService from "../services/metadata-service";
-import { InstanceVersionLogsTypeEnum } from "./compute/interfaces";
+import {
+  CliComputeInstanceType,
+  CliCustomParams,
+  InstanceVersionLogsTypeEnum,
+  SpheronComputeConfiguration,
+} from "./compute/interfaces";
+import path from "path";
+import * as fs from "fs";
+import * as yaml from "js-yaml";
 
 export const ResourceFetcher = {
   async getOrganization(id: string, type: AppTypeEnum) {
@@ -300,7 +310,11 @@ export const ResourceFetcher = {
     }
   },
 
-  async getClusterInstance(id: string, versionId?: string) {
+  async getClusterInstance(
+    id: string,
+    downloadConfig: boolean,
+    versionId?: string
+  ) {
     const spinner = new Spinner();
     try {
       spinner.spin("Fetching");
@@ -312,10 +326,33 @@ export const ResourceFetcher = {
             versionId ? versionId : instance.activeOrder
           );
         dto = toSuperComputeInstanceDTO(instance as ExtendedInstance, order);
+        if (downloadConfig) {
+          const config = await toSpheronComputeConfiguration(
+            instance as ExtendedInstance,
+            order
+          );
+          const updatedYamlData = yaml.dump(config);
+          const instanceYamlFilePath = path.join(
+            process.cwd(),
+            `instance-${instance._id}.yaml`
+          );
+          fs.writeFile(instanceYamlFilePath, updatedYamlData, "utf8", (err) => {
+            if (err) {
+              console.error("Error writing file:", err);
+            } else {
+              console.log(`Instance data saved to ${instanceYamlFilePath}`);
+            }
+          });
+        }
       } else {
         dto = toSuperComputeInstanceDTO(instance as ExtendedInstance);
+        if (downloadConfig) {
+          console.log(
+            "✖️ There is no active version for this instance, configuration file could not be downloaded."
+          );
+        }
+        console.log(JSON.stringify(dto, null, 2));
       }
-      console.log(JSON.stringify(dto, null, 2));
       spinner.success(``);
     } catch (error) {
       console.log(`✖️  Error while fetching compute instance`);
@@ -749,4 +786,70 @@ const toComputeTemplateDTO = function (
     },
   };
   return template;
+};
+
+const toSpheronComputeConfiguration = async function (
+  instance: ExtendedInstance,
+  order: InstanceOrder
+): Promise<SpheronComputeConfiguration> {
+  const configHealthCheck = instance.healthCheck?.url
+    ? {
+        path: instance.healthCheck.url,
+        port: instance.healthCheck.port?.containerPort
+          ? instance.healthCheck.port.containerPort
+          : 80,
+      }
+    : undefined;
+
+  const configEnvs = order.clusterInstanceConfiguration.env.map((x) => {
+    return {
+      name: x.value.split(":")[0],
+      value: x.value.split(":")[1],
+      hidden: x.isSecret,
+    };
+  });
+
+  const customParams: CliCustomParams = {
+    cpu: order.clusterInstanceConfiguration.agreedMachineImage.cpu,
+    memory: order.clusterInstanceConfiguration.agreedMachineImage.memory,
+    storage: order.clusterInstanceConfiguration.agreedMachineImage.storage,
+    persistentStorage: order.clusterInstanceConfiguration.agreedMachineImage
+      .persistentStorage
+      ? {
+          size: order.clusterInstanceConfiguration.agreedMachineImage
+            .persistentStorage.size,
+          class: toCliPersistentStorage(
+            order.clusterInstanceConfiguration.agreedMachineImage
+              .persistentStorage.class
+          ),
+          mountPoint:
+            order.clusterInstanceConfiguration.agreedMachineImage
+              .persistentStorage.mountPoint,
+        }
+      : undefined,
+  };
+  const cluster: Cluster = await SpheronApiService.getCluster(instance._id);
+  const config: SpheronComputeConfiguration = {
+    clusterName: cluster.name,
+    region: order.clusterInstanceConfiguration.region,
+    image: order.clusterInstanceConfiguration.image,
+    tag: order.clusterInstanceConfiguration.tag,
+    instanceCount: order.clusterInstanceConfiguration.instanceCount,
+    ports: order.clusterInstanceConfiguration.ports,
+    env: configEnvs,
+    commands: order.clusterInstanceConfiguration.command,
+    args: order.clusterInstanceConfiguration.args,
+    type: instance.scalable
+      ? CliComputeInstanceType.ON_DEMAND
+      : CliComputeInstanceType.SPOT,
+    plan: order.clusterInstanceConfiguration.agreedMachineImage.machineType,
+    customParams: customParams,
+    healthCheck: configHealthCheck,
+    instanceId: instance._id,
+    clusterId: instance.cluster,
+    organizationId: cluster.organization,
+    versionId: instance.activeOrder,
+  };
+
+  return config;
 };

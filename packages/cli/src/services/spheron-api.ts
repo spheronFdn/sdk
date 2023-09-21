@@ -3,13 +3,13 @@ import {
   Cluster,
   ClusterProtocolEnum,
   ComputeMachine,
-  CreateInstanceFromMarketplaceRequest,
   CreateInstanceRequest,
   CustomInstanceSpecs,
   Deployment,
   DeploymentEnvironment,
   DeploymentStatusEnum,
   Domain,
+  Env,
   ExtendedInstance,
   Instance,
   InstanceLogType,
@@ -22,6 +22,7 @@ import {
   Project,
   ShellExecutionResponse,
   SpheronApi,
+  UpdateInstaceRequest,
   User,
   VerifiedTokenResponse,
 } from "@spheron/core";
@@ -30,11 +31,14 @@ import { IGPTResponse } from "../commands/gpt/gpt";
 import Spinner from "../outputs/spinner";
 import MetadataService from "./metadata-service";
 import {
+  CliComputeEnv,
+  CliCustomParams,
   InstanceVersionLogsTypeEnum,
-  PersistentStorageTypesEnum,
-  SpheronComputeDirectConfiguration,
-  SpheronComputeTemplateConfiguration,
+  CliPersistentStorageTypesEnum,
+  SpheronComputeConfiguration,
+  CliComputeInstanceType,
 } from "../commands/compute/interfaces";
+import { v4 as uuidv4 } from "uuid";
 
 const SpheronApiService = {
   async initialize(): Promise<SpheronApi> {
@@ -200,6 +204,12 @@ const SpheronApiService = {
     return clusters;
   },
 
+  async getCluster(id: string): Promise<Cluster> {
+    const client: SpheronApi = await this.initialize();
+    const clusters: Cluster = await client.getCluster(id);
+    return clusters;
+  },
+
   async getClusterInstances(clusterId: string): Promise<ExtendedInstance[]> {
     const client: SpheronApi = await this.initialize();
     const options: any = {
@@ -253,31 +263,13 @@ const SpheronApiService = {
 
   async deployInstance(
     organizationId: string,
-    configuration: SpheronComputeDirectConfiguration
+    configuration: SpheronComputeConfiguration
   ): Promise<InstanceResponse> {
     const client: SpheronApi = await this.initialize();
-    const apiPersistentSpecs: CustomInstanceSpecs = {
-      storage: configuration.customParams.storage,
-      cpu: configuration.customParams.cpu,
-      memory: configuration.customParams.memory,
-    };
-    let persistentStorageApi = undefined;
-    if (configuration.customParams.persistentStorage) {
-      persistentStorageApi = {
-        size: configuration.customParams.persistentStorage.size,
-        class: mapPersistentStorageClass(
-          configuration.customParams.persistentStorage.class
-        ),
-        mountPoint: configuration.customParams.persistentStorage.mountPoint,
-      };
-      apiPersistentSpecs.persistentStorage = persistentStorageApi;
-    }
-    const apiEnvs = configuration.env.map((x) => {
-      return {
-        value: `${x.name}:${x.value}`,
-        isSecret: x.hidden,
-      };
-    });
+    const apiPersistentSpecs = toCustomInstanceSpecs(
+      configuration.customParams
+    );
+    const apiEnvs = toApiEnvs(configuration.env);
     const req: CreateInstanceRequest = {
       organizationId,
       configuration: {
@@ -298,52 +290,38 @@ const SpheronApiService = {
       clusterName: configuration.clusterName,
       healthCheckUrl: configuration.healthCheck?.path,
       healthCheckPort: configuration.healthCheck?.port,
+      scalable:
+        configuration.type == CliComputeInstanceType.ON_DEMAND ? true : false,
     };
     const response: InstanceResponse = await client.createClusterInstance(req);
     return response;
   },
 
-  async deployTemplateInstance(
+  async updateInstance(
+    id: string,
     organizationId: string,
-    configuration: SpheronComputeTemplateConfiguration
+    configuration: SpheronComputeConfiguration
   ): Promise<InstanceResponse> {
     const client: SpheronApi = await this.initialize();
-    const apiPersistentSpecs: CustomInstanceSpecs = {
-      storage: configuration.customParams.storage,
-      cpu: configuration.customParams.cpu,
-      memory: configuration.customParams.memory,
+    const apiEnvs = toApiEnvs(configuration.env);
+    const customInstanceSpecs = toCustomInstanceSpecs(
+      configuration.customParams
+    );
+    const updateRequest: UpdateInstaceRequest = {
+      env: apiEnvs,
+      command: configuration.commands,
+      args: configuration.args,
+      uniqueTopicId: uuidv4(),
+      tag: configuration.tag,
+      akashMachineImageName: configuration.plan,
+      customInstanceSpecs,
+      instanceCount: configuration.instanceCount,
     };
-    let persistentStorageApi = undefined;
-    if (configuration.customParams.persistentStorage) {
-      persistentStorageApi = {
-        size: configuration.customParams.persistentStorage.size,
-        class: mapPersistentStorageClass(
-          configuration.customParams.persistentStorage.class
-        ),
-        mountPoint: configuration.customParams.persistentStorage.mountPoint,
-      };
-      apiPersistentSpecs.persistentStorage = persistentStorageApi;
-    }
-    const plans = await SpheronApiService.getComputePlans();
-    const plan = plans.find((x) => x.name == configuration.plan);
-    if (!plan) {
-      throw new Error("Specified plan not valid");
-    }
-
-    const marketplaceApiVars = configuration.env.map((x) => {
-      return { label: x.name, value: x.value };
-    });
-    const req: CreateInstanceFromMarketplaceRequest = {
-      templateId: configuration.templateId,
-      environmentVariables: marketplaceApiVars,
-      organizationId: organizationId,
-      akashImageId: plan._id,
-      region: configuration.region,
-      customInstanceSpecs: apiPersistentSpecs,
-      instanceCount: 0,
-    };
-    const response: InstanceResponse =
-      await client.createClusterInstanceFromTemplate(req);
+    const response: InstanceResponse = await client.updateClusterInstance(
+      id,
+      organizationId,
+      updateRequest
+    );
     return response;
   },
 
@@ -420,21 +398,6 @@ const SpheronApiService = {
   },
 };
 
-function mapPersistentStorageClass(
-  param: PersistentStorageTypesEnum
-): PersistentStorageClassEnum {
-  if (param == PersistentStorageTypesEnum.HDD) {
-    return PersistentStorageClassEnum.HDD;
-  } else if (param == PersistentStorageTypesEnum.SSD) {
-    return PersistentStorageClassEnum.SSD;
-  } else if (param == PersistentStorageTypesEnum.NVMe) {
-    return PersistentStorageClassEnum.NVMe;
-  }
-  throw Error(
-    "Persistent storage class cannot be mapped to api supported version."
-  );
-}
-
 function mapVersionOrderLogsType(
   param: InstanceVersionLogsTypeEnum
 ): InstanceLogType {
@@ -446,6 +409,66 @@ function mapVersionOrderLogsType(
     return InstanceLogType.INSTANCE_LOGS;
   }
   throw Error("Log type cannot be converted to api supported version.");
+}
+
+export function toCustomInstanceSpecs(
+  spec: CliCustomParams
+): CustomInstanceSpecs {
+  let persistentStorageApi = undefined;
+  const config: CustomInstanceSpecs = {
+    storage: spec.storage,
+    cpu: spec.cpu,
+    memory: spec.memory,
+  };
+  if (spec.persistentStorage) {
+    persistentStorageApi = {
+      size: spec.persistentStorage.size,
+      class: toApiPersistentStorage(spec.persistentStorage.class),
+      mountPoint: spec.persistentStorage.mountPoint,
+    };
+    config.persistentStorage = persistentStorageApi;
+  }
+  return config;
+}
+
+function toApiPersistentStorage(
+  param: CliPersistentStorageTypesEnum
+): PersistentStorageClassEnum {
+  if (param == CliPersistentStorageTypesEnum.HDD) {
+    return PersistentStorageClassEnum.HDD;
+  } else if (param == CliPersistentStorageTypesEnum.SSD) {
+    return PersistentStorageClassEnum.SSD;
+  } else if (param == CliPersistentStorageTypesEnum.NVMe) {
+    return PersistentStorageClassEnum.NVMe;
+  }
+  throw Error(
+    "Persistent storage class cannot be mapped to api supported version."
+  );
+}
+
+export function toCliPersistentStorage(
+  param: PersistentStorageClassEnum
+): CliPersistentStorageTypesEnum {
+  if (param == PersistentStorageClassEnum.HDD) {
+    return CliPersistentStorageTypesEnum.HDD;
+  } else if (param == PersistentStorageClassEnum.SSD) {
+    return CliPersistentStorageTypesEnum.SSD;
+  } else if (param == PersistentStorageClassEnum.NVMe) {
+    return CliPersistentStorageTypesEnum.NVMe;
+  }
+  throw Error(
+    "Persistent storage class cannot be mapped to api supported version."
+  );
+}
+
+function toApiEnvs(envs: Array<CliComputeEnv>): Array<Env> {
+  const apiEnvs = envs.map((x) => {
+    return {
+      value: `${x.name}:${x.value}`,
+      isSecret: x.hidden,
+    };
+  });
+  return apiEnvs;
 }
 
 export default SpheronApiService;

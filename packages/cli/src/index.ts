@@ -249,8 +249,13 @@ import { GlobalCommandEnum } from "./commands/interfaces";
               .option("organizationId", {
                 describe: "Organization ID",
               })
+              .option("config", {
+                describe: "Relative path to config file",
+              })
               .version(false)
-              .usage(`Usage: $0 publish [--organizationId <organizationId>]`)
+              .usage(
+                `Usage: $0 compute publish [--organizationId <organizationId>] [--config <path_to_config>]`
+              )
               .wrap(150)
               .help();
           }
@@ -268,7 +273,7 @@ import { GlobalCommandEnum } from "./commands/interfaces";
               })
               .version(false)
               .usage(
-                `Usage: $0 shell --instanceId <instanceId> --command 'ls -a'`
+                `Usage: $0 compute shell --instanceId <instanceId> --command 'ls -a'`
               )
               .wrap(150)
               .help();
@@ -284,7 +289,7 @@ import { GlobalCommandEnum } from "./commands/interfaces";
                 demandOption: false,
               })
               .version(false)
-              .usage(`Usage: $0 validate [--path <file_path>]`)
+              .usage(`Usage: $0 compute validate [--path <file_path>]`)
               .wrap(150)
               .help();
           }
@@ -306,11 +311,11 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           - get plans                   : options: --name <plan_name>
           - get regions                   
           - get clusters                : options: --organizationId <orgId>
-          - get instance                : options: --id <instanceId> 
+          - get instance                : options: --id <instanceId> [--download-config]
           - get logs                    : options: --instanceId <instanceId> --type [${Object.values(
             InstanceVersionLogsTypeEnum
           )} [--from <number>] [--to <number>] [--search <filter_string>] ]
-          - get instances               : options: --clusterId <clusterId> 
+          - get instances               : options: --clusterId <clusterId>  
           - get templates               : options: [--category [${Object.values(
             MarketplaceCategoryEnum
           )}]                
@@ -318,6 +323,29 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           }
         );
     })
+    .command(
+      ComputeCommandEnum.UPDATE,
+      "Update instance configuration",
+      (yargs: any) => {
+        yargs
+          .option("config", {
+            describe: "Relative path to config file",
+            demandOption: false,
+          })
+          .option("organizationId", {
+            describe: "organization ID",
+          })
+          .option("instanceId", {
+            describe: "Instance id",
+          })
+          .version(false)
+          .usage(
+            `Usage: $0 compute update --config <config_path> [--organizationId <orgId>] [--instanceId <instanceId>] `
+          )
+          .wrap(150)
+          .help();
+      }
+    )
     .command("gpt <command>", "GPT related commands", (yargs: any) => {
       yargs
         .command(

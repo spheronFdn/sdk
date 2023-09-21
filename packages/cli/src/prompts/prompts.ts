@@ -277,6 +277,46 @@ export async function promptForComputeInit(): Promise<any> {
     });
 }
 
+export async function promptComputePublish(): Promise<any> {
+  const questions = [
+    {
+      type: "input",
+      name: "config",
+      message: "Path to configuration file:",
+      default: "./spheron.yaml",
+    },
+    {
+      type: "input",
+      name: "organizationId",
+      message: "Organization where instance will be deployed to (optional):",
+    },
+  ];
+  return inquirer.prompt(questions);
+}
+
+export async function promptComputeUpdate(): Promise<any> {
+  const questions = [
+    {
+      type: "input",
+      name: "config",
+      message: "Path to configuration file:",
+      default: "./spheron.yaml",
+    },
+    {
+      type: "input",
+      name: "organizationId",
+      message: "Organization where instance will be deployed to (optional):",
+    },
+    {
+      type: "input",
+      name: "instanceId",
+      message:
+        "Explicitly specify instance id, will be taken from file if not specified (optional):",
+    },
+  ];
+  return inquirer.prompt(questions);
+}
+
 const dappTemplateTypes = Array.from(templateTypesMap.values()).map((t) => ({
   name: t.alias,
   value: t.dapps,

@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import SpheronApiService from "../../services/spheron-api";
 import {
-  ComputeConfigFileType,
-  PersistentStorageTypesEnum,
-  SpheronComputeDirectConfiguration,
-  SpheronComputeTemplateConfiguration,
+  CliPersistentStorageTypesEnum,
+  SpheronComputeConfiguration,
 } from "./interfaces";
 import * as yaml from "js-yaml";
 import * as fs from "fs/promises"; // Node.js fs module with promises
@@ -18,24 +16,18 @@ export async function validate(rootPath: string): Promise<any> {
       throw new Error(`File ${rootPath} does not exist`);
     }
     const yamlData = await fs.readFile(rootPath, "utf8");
-    const spheronConfig: any = yaml.load(yamlData);
-    if (spheronConfig.configType === ComputeConfigFileType.DIRECT) {
-      const config = spheronConfig as SpheronComputeDirectConfiguration;
-      if (!config.image) {
-        console.log("image not specifed  ✖️");
-        validationErrors += 1;
-      }
-      if (!config.tag) {
-        console.log("tag not specifed -> deafult is latest ⚠️");
-        validationWarnings += 1;
-      }
-    } else if (spheronConfig.configType === ComputeConfigFileType.TEMPLATE) {
-      const config = spheronConfig as SpheronComputeTemplateConfiguration;
-      if (!config.templateId) {
-        console.log("Template it is not specified ✖️");
-        validationErrors += 1;
-      }
+    const spheronConfig: any = yaml.load(
+      yamlData
+    ) as SpheronComputeConfiguration;
+    if (!spheronConfig.image) {
+      console.log("image not specifed  ✖️");
+      validationErrors += 1;
     }
+    if (!spheronConfig.tag) {
+      console.log("tag not specifed -> deafult is latest ⚠️");
+      validationWarnings += 1;
+    }
+
     if (!spheronConfig.clusterName) {
       console.log("cluster name not specified  ✖️");
       validationErrors += 1;
@@ -136,13 +128,13 @@ export async function validate(rootPath: string): Promise<any> {
         persistentStorage.mountPoint
       ) {
         if (
-          !Object.values(PersistentStorageTypesEnum).find(
+          !Object.values(CliPersistentStorageTypesEnum).find(
             (x) => x == persistentStorage.class
           )
         ) {
           console.log(
             `persistent storage class not set up properly. Valid values are ${Object.values(
-              PersistentStorageTypesEnum
+              CliPersistentStorageTypesEnum
             ).toString()} ✖️`
           );
           validationErrors += 1;
