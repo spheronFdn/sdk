@@ -301,6 +301,7 @@ export class SpheronClient extends ScopeExtractor {
   async createSingleUploadToken(configuration: {
     name: string;
     protocol: ProtocolEnum;
+    maxSize?: number;
   }): Promise<{ uploadToken: string }> {
     await this.validateStorageOrganizationType();
 
@@ -309,13 +310,18 @@ export class SpheronClient extends ScopeExtractor {
       name: configuration.name,
       token: this.configuration.token,
       createSingleUseToken: true,
+      maxSize: configuration.maxSize,
     });
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return { uploadToken: singleUseToken! };
   }
 
-  async pinCID(configuration: { name: string; cid: string }): Promise<{
+  async pinCID(configuration: {
+    name: string;
+    cid: string;
+    inBackground?: boolean;
+  }): Promise<{
     uploadId: string;
     bucketId: string;
     protocolLink: string;
@@ -327,6 +333,7 @@ export class SpheronClient extends ScopeExtractor {
       name: configuration.name,
       token: this.configuration.token,
       cid: configuration.cid,
+      inBackground: configuration.inBackground,
     });
   }
 

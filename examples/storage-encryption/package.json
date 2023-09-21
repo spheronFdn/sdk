@@ -12,7 +12,7 @@
     "@lit-protocol/lit-node-client": "^2.2.23",
     "ethers": "^6.5.1",
     "siwe": "^2.1.4",
-    "@spheron/storage": "1.0.17"
+    "@spheron/storage": "2.0.0"
   },
   "license": "Apache-2.0",
   "repository": {

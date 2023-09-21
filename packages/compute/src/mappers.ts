@@ -20,6 +20,7 @@ import {
   MarketplaceDeploymentVariable,
   InstancesInfo as InstancesInfoCore,
   Port,
+  ComputeTypeEnum,
 } from "@spheron/core";
 import {
   InstanceDetailed,
@@ -42,6 +43,7 @@ import {
   MarketplaceAppVariable,
   InstancesInfo,
   DomainTypeEnum,
+  PersistentStorageClassEnum,
 } from "./interfaces";
 import { v4 as uuidv4 } from "uuid";
 
@@ -280,6 +282,7 @@ const mapCreateInstanceRequest = (
     clusterName: input.clusterName,
     healthCheckUrl: input?.healthCheckConfig?.path,
     healthCheckPort: input?.healthCheckConfig?.port,
+    scalable: input.type === ComputeTypeEnum.DEMAND,
   };
 };
 
@@ -346,6 +349,17 @@ const mapInstanceUpdateRequest = (
     secretEnvironmentVariables: Array<EnvironmentVariable>;
     commands: Array<string>;
     args: Array<string>;
+    storage?: number;
+    persistentStorage?: {
+      size: number;
+      class: PersistentStorageClassEnum;
+      mountPoint: string;
+    };
+    customSpecs?: {
+      cpu: number;
+      memory: number;
+    };
+    instanceCount?: number;
   }
 ): UpdateInstaceRequest => {
   return {
@@ -361,6 +375,18 @@ const mapInstanceUpdateRequest = (
     args: input.args ?? existingConfig.args,
     uniqueTopicId: uuidv4(),
     tag: input.tag ?? existingConfig.tag,
+    customInstanceSpecs: {
+      storage: `${input.storage}Gi` ?? existingConfig.storage,
+      persistentStorage: input.persistentStorage && {
+        size: `${input.persistentStorage.size}Gi`,
+        class: input.persistentStorage.class,
+        mountPoint: input.persistentStorage.mountPoint,
+      }, 
+      cpu: input.customSpecs?.cpu ?? existingConfig.customSpecs?.cpu,
+      memory: input.customSpecs?.memory ? `${input.customSpecs.memory}Gi` : (existingConfig.customSpecs?.memory || undefined),
+    },
+    instanceCount: input.instanceCount ?? existingConfig.instanceCount,
+    
   };
 };
 

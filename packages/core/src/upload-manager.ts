@@ -37,6 +37,7 @@ class UploadManager {
     organizationId?: string;
     token: string;
     createSingleUseToken?: boolean;
+    maxSize?: number;
   }): Promise<{
     uploadId: string;
     parallelUploadCount: number;
@@ -46,7 +47,9 @@ class UploadManager {
     try {
       this.validateUploadConfiguration(configuration);
 
-      let url = `${this.spheronApiUrl}/v1/upload/initiate?protocol=${configuration.protocol}&bucket=${configuration.name}`;
+      let url = `${this.spheronApiUrl}/v1/upload/initiate?protocol=${
+        configuration.protocol
+      }&bucket=${configuration.name}&maxSize=${configuration.maxSize ?? ""}`;
 
       if (configuration.organizationId) {
         url += `&organization=${configuration.organizationId}`;
@@ -81,6 +84,7 @@ class UploadManager {
     organizationId?: string;
     token: string;
     cid: string;
+    inBackground?: boolean;
   }): Promise<{
     uploadId: string;
     bucketId: string;
@@ -91,7 +95,11 @@ class UploadManager {
       if (!configuration.name) {
         throw new Error("Bucket name is not provided.");
       }
-      let url = `${this.spheronApiUrl}/v2/ipfs/pin/${configuration.cid}?bucket=${configuration.name}`;
+      let url = `${this.spheronApiUrl}/v2/ipfs/pin/${
+        configuration.cid
+      }?bucket=${configuration.name}&in_background=${
+        configuration.inBackground ? "true" : "false"
+      }`;
 
       if (configuration.organizationId) {
         url += `&organization=${configuration.organizationId}`;
