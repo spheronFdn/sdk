@@ -121,8 +121,14 @@ enum PersistentStorageClassEnum {
   SSD = "beta2",
   NVMe = "beta3",
 }
+
 enum ClusterProtocolEnum {
   AKASH = "akash",
+}
+
+enum ComputeTypeEnum {
+  SPOT = "spot",
+  DEMAND = "demand",
 }
 
 export {
@@ -143,4 +149,5 @@ export {
   InstanceLogType,
   PersistentStorageClassEnum,
   ClusterProtocolEnum,
+  ComputeTypeEnum,
 };

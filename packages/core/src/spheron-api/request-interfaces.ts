@@ -22,7 +22,7 @@ interface CreateInstanceRequest {
     command: Array<string>;
     args: Array<string>;
     region: string;
-    akashMachineImageName: string;
+    akashMachineImageName?: string;
     customInstanceSpecs: CustomInstanceSpecs;
   };
   instanceName?: string;
@@ -31,6 +31,7 @@ interface CreateInstanceRequest {
   clusterName: string;
   healthCheckUrl?: string;
   healthCheckPort?: number;
+  scalable?: boolean;
 }
 
 interface CreateInstanceFromMarketplaceRequest {
@@ -40,8 +41,9 @@ interface CreateInstanceFromMarketplaceRequest {
   akashImageId: string;
   uniqueTopicId?: string;
   region: string;
-  customInstanceSpecs: CustomInstanceSpecs;
-  instanceCount: number;
+  customInstanceSpecs?: CustomInstanceSpecs;
+  scalable: boolean;
+  instanceCount?: number;
 }
 
 interface MarketplaceDeploymentVariable {
@@ -55,8 +57,9 @@ interface UpdateInstaceRequest {
   args: Array<string>;
   uniqueTopicId: string;
   tag: string;
-  healthCheckUrl?: string;
-  healthCheckPort?: string;
+  akashMachineImageName?: string;
+  customInstanceSpecs?: CustomInstanceSpecs;
+  instanceCount?: number;
 }
 
 export {

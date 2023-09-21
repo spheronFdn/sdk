@@ -296,6 +296,7 @@ interface Cluster {
   proivder: ProviderEnum;
   createdBy: string;
   state: ClusterStateEnum;
+  organization: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -325,6 +326,7 @@ interface Instance {
   retrievableAkt: number;
   withdrawnAkt: number;
   healthCheck: HealthCheck;
+  scalable: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -405,8 +407,8 @@ interface MarketplaceAppVariable {
 }
 
 interface MarketplaceAppPort {
-  containerValue: number;
-  defaultExposedValue: number;
+  containerPort: number;
+  exposedPort: number;
 }
 
 interface InstanceOrder {
