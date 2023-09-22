@@ -305,13 +305,13 @@ export async function promptComputeUpdate(): Promise<any> {
     {
       type: "input",
       name: "organizationId",
-      message: "Organization where instance will be deployed to (optional):",
+      message: "Organization where instance is deployed (optional):",
     },
     {
       type: "input",
       name: "instanceId",
       message:
-        "Explicitly specify instance id, will be taken from file if not specified (optional):",
+        "Explicitly specify instance ID which you want to update. Will be taken from file if not specified (optional):",
     },
   ];
   return inquirer.prompt(questions);
