@@ -326,6 +326,7 @@ export const ResourceFetcher = {
             versionId ? versionId : instance.activeOrder
           );
         dto = toSuperComputeInstanceDTO(instance as ExtendedInstance, order);
+        console.log(JSON.stringify(dto, null, 2));
         if (downloadConfig) {
           const config = await toSpheronComputeConfiguration(
             instance as ExtendedInstance,
@@ -803,8 +804,8 @@ const toSpheronComputeConfiguration = async function (
 
   const configEnvs = order.clusterInstanceConfiguration.env.map((x) => {
     return {
-      name: x.value.split(":")[0],
-      value: x.value.split(":")[1],
+      name: x.value.split("=")[0],
+      value: x.value.split("=")[1],
       hidden: x.isSecret,
     };
   });
@@ -828,14 +829,16 @@ const toSpheronComputeConfiguration = async function (
         }
       : undefined,
   };
-  const cluster: Cluster = await SpheronApiService.getCluster(instance._id);
+  const cluster: Cluster = await SpheronApiService.getCluster(instance.cluster);
   const config: SpheronComputeConfiguration = {
     clusterName: cluster.name,
     region: order.clusterInstanceConfiguration.region,
     image: order.clusterInstanceConfiguration.image,
     tag: order.clusterInstanceConfiguration.tag,
     instanceCount: order.clusterInstanceConfiguration.instanceCount,
-    ports: order.clusterInstanceConfiguration.ports,
+    ports: order.clusterInstanceConfiguration.ports.map((x) => {
+      return { containerPort: x.containerPort, exposedPort: x.exposedPort };
+    }),
     env: configEnvs,
     commands: order.clusterInstanceConfiguration.command,
     args: order.clusterInstanceConfiguration.args,
