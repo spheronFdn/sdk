@@ -788,7 +788,7 @@ export async function commandHandler(options: any) {
     (async () => {
       try {
         let instanceId, organizationId, config;
-        if (options.organizationId && options.config) {
+        if (options.config) {
           organizationId = options.organizationId;
           config = options.config;
           instanceId = options.instanceId;
@@ -809,7 +809,7 @@ export async function commandHandler(options: any) {
     options._[0] === "compute" &&
     options._[1] === ComputeCommandEnum.VALIDATE
   ) {
-    const validOptions = ["path"];
+    const validOptions = ["config"];
     const unknownOptions = Object.keys(options).filter(
       (option) =>
         option !== "_" && option !== "$0" && !validOptions.includes(option)
@@ -819,15 +819,15 @@ export async function commandHandler(options: any) {
       process.exit(1);
     }
     (async () => {
-      let path;
-      if (options.path) {
-        path = options.path;
+      let config;
+      if (options.config) {
+        config = options.path;
       }
-      if (!path) {
-        path = "./";
+      if (!config) {
+        config = "./spheron.yaml";
       }
       try {
-        await validate(path);
+        await validate(config);
       } catch (error) {
         process.exit(1);
       }

@@ -261,6 +261,29 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           }
         )
         .command(
+          ComputeCommandEnum.UPDATE,
+          "Update instance configuration",
+          (yargs: any) => {
+            yargs
+              .option("config", {
+                describe: "Relative path to config file",
+                demandOption: false,
+              })
+              .option("organizationId", {
+                describe: "organization ID",
+              })
+              .option("instanceId", {
+                describe: "Instance id",
+              })
+              .version(false)
+              .usage(
+                `Usage: $0 compute update --config <config_path> [--instanceId <instanceId>] [--organizationId <orgId>] `
+              )
+              .wrap(150)
+              .help();
+          }
+        )
+        .command(
           ComputeCommandEnum.SHELL,
           "Execute shell command inside of instance",
           (yargs: any) => {
@@ -281,15 +304,15 @@ import { GlobalCommandEnum } from "./commands/interfaces";
         )
         .command(
           ComputeCommandEnum.VALIDATE,
-          "Validate spheron.yaml (or some other spheron compute configuration file)",
+          "Validate spheron configuration (or some other spheron compute configuration file)",
           (yargs: any) => {
             yargs
-              .option("path", {
-                describe: "Relative path to file",
+              .option("config", {
+                describe: "Relative path to config file",
                 demandOption: false,
               })
               .version(false)
-              .usage(`Usage: $0 compute validate [--path <file_path>]`)
+              .usage(`Usage: $0 compute validate [--config <file_path>]`)
               .wrap(150)
               .help();
           }
@@ -323,29 +346,6 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           }
         );
     })
-    .command(
-      ComputeCommandEnum.UPDATE,
-      "Update instance configuration",
-      (yargs: any) => {
-        yargs
-          .option("config", {
-            describe: "Relative path to config file",
-            demandOption: false,
-          })
-          .option("organizationId", {
-            describe: "organization ID",
-          })
-          .option("instanceId", {
-            describe: "Instance id",
-          })
-          .version(false)
-          .usage(
-            `Usage: $0 compute update --config <config_path> [--organizationId <orgId>] [--instanceId <instanceId>] `
-          )
-          .wrap(150)
-          .help();
-      }
-    )
     .command("gpt <command>", "GPT related commands", (yargs: any) => {
       yargs
         .command(

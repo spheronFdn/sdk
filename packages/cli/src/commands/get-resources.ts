@@ -809,10 +809,18 @@ const toSpheronComputeConfiguration = async function (
       hidden: x.isSecret,
     };
   });
+  const plan =
+    order.clusterInstanceConfiguration.agreedMachineImage.machineType;
 
   const customParams: CliCustomParams = {
-    cpu: order.clusterInstanceConfiguration.agreedMachineImage.cpu,
-    memory: order.clusterInstanceConfiguration.agreedMachineImage.memory,
+    cpu:
+      plan == AKASH_IMAGE_CUSTOM_PLAN
+        ? order.clusterInstanceConfiguration.agreedMachineImage.cpu
+        : undefined,
+    memory:
+      plan == AKASH_IMAGE_CUSTOM_PLAN
+        ? order.clusterInstanceConfiguration.agreedMachineImage.memory
+        : undefined,
     storage: order.clusterInstanceConfiguration.agreedMachineImage.storage,
     persistentStorage: order.clusterInstanceConfiguration.agreedMachineImage
       .persistentStorage
@@ -856,3 +864,5 @@ const toSpheronComputeConfiguration = async function (
 
   return config;
 };
+
+const AKASH_IMAGE_CUSTOM_PLAN = "Custom Plan";
