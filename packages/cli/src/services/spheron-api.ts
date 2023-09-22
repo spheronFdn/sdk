@@ -464,7 +464,7 @@ export function toCliPersistentStorage(
 function toApiEnvs(envs: Array<CliComputeEnv>): Array<Env> {
   const apiEnvs = envs.map((x) => {
     return {
-      value: `${x.name}:${x.value}`,
+      value: `${x.name}=${x.value}`,
       isSecret: x.hidden,
     };
   });

@@ -6,12 +6,14 @@ import * as fs from "fs/promises"; // Node.js fs module with promises
 import * as path from "path";
 import { SpheronComputeConfiguration } from "./interfaces";
 import { InstanceResponse } from "@spheron/core";
+import Spinner from "../../outputs/spinner";
 
 export async function computeUpdate(
   instanceId?: string,
   configPath?: string,
   organizationId?: string
 ): Promise<any> {
+  const spinner = new Spinner();
   try {
     if (!organizationId) {
       const computeData = await MetadataService.getComputeData();
@@ -33,14 +35,15 @@ export async function computeUpdate(
     if (!id) {
       throw new Error("Instance ID not provided");
     }
-    console.log(`Updating compute instance ${id} 🚀`);
+    spinner.spin(`Updating compute instance ${id} 🚀`);
+    console.log(`Reading from ${configPath}`);
     const result: InstanceResponse = await SpheronApiService.updateInstance(
       id,
       organizationId,
       spheronConfig
     );
     if (result && result.clusterInstanceId) {
-      // Read the existing YAML file.
+      spinner.success("Update successful !");
       const existingYamlConfig = yaml.load(
         yamlData
       ) as SpheronComputeConfiguration;
@@ -67,5 +70,7 @@ export async function computeUpdate(
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);
     throw error;
+  } finally {
+    spinner.stop();
   }
 }

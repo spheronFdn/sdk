@@ -5,11 +5,13 @@ import * as yaml from "js-yaml";
 import * as fs from "fs/promises"; // Node.js fs module with promises
 import * as path from "path";
 import { InstanceResponse } from "@spheron/core";
+import Spinner from "../../outputs/spinner";
 
 export async function computePublish(
   organization?: string,
   configPath?: string
 ): Promise<any> {
+  const spinner = new Spinner();
   try {
     if (!organization) {
       const computeData = await MetadataService.getComputeData();
@@ -21,6 +23,7 @@ export async function computePublish(
     if (!configPath) {
       configPath = "spheron.yaml";
     }
+    spinner.spin(`Publishing new compute instance 🚀`);
     console.log(`Reading from ${configPath}`);
     const yamlFilePath = path.join(process.cwd(), configPath); // Read spheron.yaml from the current working directory
     const yamlData = await fs.readFile(yamlFilePath, "utf8");
@@ -35,7 +38,6 @@ export async function computePublish(
         "Please specify the organization that you would wish to use while deploying your instance"
       );
     }
-    console.log(`Publishing your compute instance 🚀`);
     const result: InstanceResponse = await SpheronApiService.deployInstance(
       organizationId,
       spheronConfig
@@ -58,15 +60,17 @@ export async function computePublish(
       );
       await fs.writeFile(instanceYamlFilePath, updatedYamlData, "utf8");
       console.log(`Instance data saved to ${instanceYamlFilePath}`);
+      spinner.success("Deployment finished 🚀");
     } else {
       console.log(
         "Instance ID not found in the response. Unable to save the YAML file."
       );
     }
-
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);
     throw error;
+  } finally {
+    spinner.stop();
   }
 }
