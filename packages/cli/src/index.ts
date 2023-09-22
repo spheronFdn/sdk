@@ -279,6 +279,7 @@ import { GlobalCommandEnum } from "./commands/interfaces";
               .usage(
                 `Usage: $0 compute update --config <config_path> [--instanceId <instanceId>] [--organizationId <orgId>] `
               )
+
               .wrap(150)
               .help();
           }
@@ -346,6 +347,29 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           }
         );
     })
+    .command(
+      ComputeCommandEnum.UPDATE,
+      "Update instance configuration",
+      (yargs: any) => {
+        yargs
+          .option("config", {
+            describe: "Relative path to config file",
+            demandOption: false,
+          })
+          .option("organizationId", {
+            describe: "organization ID",
+          })
+          .option("instanceId", {
+            describe: "Instance id",
+          })
+          .version(false)
+          .usage(
+            `Usage: $0 compute update --config <config_path> [--organizationId <orgId>] [--instanceId <instanceId>] `
+          )
+          .wrap(150)
+          .help();
+      }
+    )
     .command("gpt <command>", "GPT related commands", (yargs: any) => {
       yargs
         .command(
