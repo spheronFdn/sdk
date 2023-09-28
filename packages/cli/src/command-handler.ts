@@ -762,7 +762,7 @@ export async function commandHandler(options: any) {
     })();
   }
 
-  if (options._[0] === "compute" && options._[1] === SiteCommandEnum.GET) {
+  if (options._[0] === "compute" && options._[1] === ComputeCommandEnum.GET) {
     (async () => {
       try {
         if (options.resource) {
@@ -789,15 +789,21 @@ export async function commandHandler(options: any) {
           } else if (options.resource == ComputeResourceEnum.LOGS) {
             const instanceId = options.instanceId;
             const type = options.type;
+            const versionId = options.versionId;
             const from = options.from;
             const to = options.to;
             const search = options.search;
+            const download = options.d;
+            const outputFile = options.outputFile;
             await ResourceFetcher.getClusterInstanceOrderLogs(
               instanceId,
               type,
               from,
               to,
-              search
+              versionId,
+              search,
+              download,
+              outputFile
             );
           } else if (options.resource == ComputeResourceEnum.TEMPLATES) {
             const category = options.category;
