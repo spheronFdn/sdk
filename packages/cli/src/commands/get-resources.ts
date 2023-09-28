@@ -368,7 +368,10 @@ export const ResourceFetcher = {
     logType: InstanceVersionLogsTypeEnum,
     from: number,
     to: number,
-    search?: string
+    versionId?: string,
+    search?: string,
+    download?: boolean,
+    outputFileName?: string // Optional output file name parameter
   ) {
     const spinner = new Spinner();
     try {
@@ -376,18 +379,38 @@ export const ResourceFetcher = {
       const instance: Instance = await SpheronApiService.getClusterInstance(
         instanceId
       );
-      if (instance && instance.activeOrder) {
-        const result = await SpheronApiService.getClusterInstanceLogs(
+      let result;
+      if (instance && instance.activeOrder && !versionId) {
+        result = await SpheronApiService.getClusterInstanceLogs(
           instance.activeOrder,
           logType,
           from,
           to,
           search
         );
-        console.log(JSON.stringify(result, null, 2));
-        spinner.success(``);
       } else {
-        console.log("[]");
+        const latestVersion = versionId
+          ? versionId
+          : instance.orders[instance.orders.length - 1];
+        console.log(`Fetching logs for version: ${versionId}...`);
+        result = await SpheronApiService.getClusterInstanceLogs(
+          latestVersion,
+          logType,
+          from,
+          to,
+          search
+        );
+      }
+      spinner.success(``);
+      if (download) {
+        const fileName = outputFileName || `instance-${instanceId}-logs.txt`;
+        console.log(`Downloading logs to ${fileName}...`);
+        const logText = result.logs.join("\n"); // Combine logs into a string
+        // Write the logText to the specified file
+        fs.writeFileSync(fileName, logText);
+        console.log(`Logs have been downloaded to ${fileName}`);
+      } else {
+        console.log(JSON.stringify(result, null, 2));
       }
     } catch (error) {
       console.log(`✖️  Error while fetching compute instance`);
@@ -866,4 +889,3 @@ const toSpheronComputeConfiguration = async function (
 };
 
 const AKASH_IMAGE_CUSTOM_PLAN = "Custom Plan";
-

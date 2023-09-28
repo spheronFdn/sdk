@@ -395,7 +395,7 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           - get instance                : options: --id <instanceId> [--download-config]
           - get logs                    : options: --instanceId <instanceId> --type [${Object.values(
             InstanceVersionLogsTypeEnum
-          )} [--from <number>] [--to <number>] [--search <filter_string>] ]
+          )}] [--versionId <version>] [--from <number>]   [--to <number>] [--search <filter_string>] [-d (download logs)] [--outputFile <file_name>]
           - get instances               : options: --clusterId <clusterId>  
           - get templates               : options: [--category [${Object.values(
             MarketplaceCategoryEnum
