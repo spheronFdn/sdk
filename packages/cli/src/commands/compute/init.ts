@@ -11,7 +11,7 @@ export async function computeInit(configuration: SpheronComputeConfiguration) {
   try {
     spinner.spin(`Spheron compute file initialization...`);
     if (await fileExists("./spheron.yaml")) {
-      throw new Error("Spheron file already exists");
+      console.log("Spheron file already exists, overriding it ⚠️");
     }
     // Convert the configuration to YAML format
     const yamlData = yaml.dump(configuration);

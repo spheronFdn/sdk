@@ -5,6 +5,7 @@ export enum ComputeCommandEnum {
   CREATE_ORGANIZATION = "create-organization",
   SWITCH_ORGANIZATION = "switch-organization",
   INIT = "init",
+  BUILD = "build",
   PUBLISH = "publish",
   VALIDATE = "validate",
   UPDATE = "update",
@@ -30,6 +31,7 @@ export interface SpheronComputeConfiguration {
     path: string;
     port: number;
   };
+  dockerhubRepository?: string;
   instanceId?: string;
   clusterId?: string;
   organizationId?: string;

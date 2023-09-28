@@ -52,6 +52,7 @@ import { computePublish } from "./commands/compute/publish";
 import { validate } from "./commands/compute/validate";
 import { executeShell } from "./commands/compute/execute-shell";
 import { computeUpdate } from "./commands/compute/update-instance";
+import { build } from "./commands/compute/build";
 
 export async function commandHandler(options: any) {
   if (!(await fileExists(configuration.configFilePath))) {
@@ -625,20 +626,31 @@ export async function commandHandler(options: any) {
   if (options._[0] === "compute" && options._[1] === ComputeCommandEnum.INIT) {
     (async () => {
       try {
-        let templateId;
-        if (options.templateId) {
+        let templateId, dockerfile, tag, dockerhubRepository;
+        if (options.templateId && options.dockerfile) {
+          throw new Error("Cannot specify both template and dockerfile");
+        }
+        if (options.templateId || options.dockerfile) {
           templateId = options.templateId;
+          dockerfile = options.dockerfile;
+          tag = options.tag;
+          dockerhubRepository = options.dockerhubRepository;
         } else {
           const prompt = await promptForComputeInit();
-          templateId = prompt?.template._id;
+          templateId = prompt?.template?._id;
+          dockerfile = prompt?.dockerfile
+            ? `${prompt.dockerfile}Dockerfile`
+            : null;
+          tag = prompt?.tag;
+          dockerhubRepository = prompt?.dockerhubRepository;
         }
         let initialConfig: SpheronComputeConfiguration;
         if (!templateId) {
           initialConfig = {
             clusterName: "my_first_cluster",
             region: "any",
-            image: "ovrclk/lunie-light",
-            tag: "latest",
+            image: dockerfile ? dockerfile : "ovrclk/lunie-light",
+            tag: tag ? tag : "latest",
             instanceCount: 1,
             ports: [{ containerPort: 3000, exposedPort: 80 }],
             env: [
@@ -656,6 +668,9 @@ export async function commandHandler(options: any) {
               storage: "10Gi",
             },
           };
+          if (dockerhubRepository) {
+            initialConfig.dockerhubRepository = dockerhubRepository;
+          }
           await computeInit(initialConfig);
           return;
         } else {
@@ -701,6 +716,32 @@ export async function commandHandler(options: any) {
           };
           await computeInit(initialConfig);
         }
+      } catch (error) {
+        console.log(error.message);
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (options._[0] === "compute" && options._[1] === ComputeCommandEnum.BUILD) {
+    const validOptions = ["config", "u", "p"];
+    const unknownOptions = Object.keys(options).filter(
+      (option) =>
+        option !== "_" && option !== "$0" && !validOptions.includes(option)
+    );
+    if (unknownOptions.length > 0) {
+      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+      process.exit(1);
+    }
+    (async () => {
+      try {
+        const config = options.config;
+        const dockerUsername = options.u;
+        const dockerPassword = options.p;
+        console.log("CONFIG:", config);
+        console.log("Username:", dockerUsername);
+        console.log("Password:", dockerPassword);
+        await build(config, dockerUsername, dockerPassword);
       } catch (error) {
         console.log(error.message);
         process.exit(1);
