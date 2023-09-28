@@ -12,10 +12,6 @@ const configuration = {
     process.env.HOME ? process.env.HOME : "/home/ubuntu",
     ".spheron/project-tracking.json"
   ),
-  computeClusterTrackingFilePath: path.join(
-    process.env.HOME ? process.env.HOME : "/home/ubuntu",
-    ".spheron/compute-cluster-tracking.json"
-  ),
   homePath: process.env.HOME || "",
 };
 
