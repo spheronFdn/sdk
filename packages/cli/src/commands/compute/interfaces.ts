@@ -10,6 +10,7 @@ export enum ComputeCommandEnum {
   VALIDATE = "validate",
   UPDATE = "update",
   SHELL = "shell",
+  CLOSE = "close",
 }
 
 export interface SpheronComputeConfiguration {

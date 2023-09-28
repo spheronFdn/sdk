@@ -53,6 +53,7 @@ import { validate } from "./commands/compute/validate";
 import { executeShell } from "./commands/compute/execute-shell";
 import { computeUpdate } from "./commands/compute/update-instance";
 import { build } from "./commands/compute/build";
+import { close } from "./commands/compute/close";
 
 export async function commandHandler(options: any) {
   if (!(await fileExists(configuration.configFilePath))) {
@@ -744,6 +745,18 @@ export async function commandHandler(options: any) {
         await build(config, dockerUsername, dockerPassword);
       } catch (error) {
         console.log(error.message);
+        process.exit(1);
+      }
+    })();
+  }
+
+  if (options._[0] === "compute" && options._[1] === ComputeCommandEnum.CLOSE) {
+    (async () => {
+      try {
+        const config = options.config;
+        const instanceId = options.id;
+        await close(instanceId, config);
+      } catch (error) {
         process.exit(1);
       }
     })();

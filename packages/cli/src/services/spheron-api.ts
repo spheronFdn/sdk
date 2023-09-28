@@ -325,6 +325,15 @@ const SpheronApiService = {
     return response;
   },
 
+  async closeInstance(
+    id: string
+  ): Promise<{ message: string; success: boolean }> {
+    const client: SpheronApi = await this.initialize();
+
+    const response = await client.closeClusterInstance(id);
+    return response;
+  },
+
   async getComputeTemplates(): Promise<MarketplaceApp[]> {
     const client: SpheronApi = await this.initialize();
     const templates: MarketplaceApp[] = await client.getClusterTemplates();
