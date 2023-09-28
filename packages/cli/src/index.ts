@@ -324,6 +324,23 @@ import { GlobalCommandEnum } from "./commands/interfaces";
               .help();
           }
         )
+        .command(ComputeCommandEnum.CLOSE, "Close instance", (yargs: any) => {
+          yargs
+            .option("config", {
+              describe: "Relative path to config file",
+              demandOption: false,
+            })
+            .option("id", {
+              describe: "Instance id",
+            })
+            .version(false)
+            .usage(
+              `Usage: $0 compute close --config <config_path> [--id <instanceId>] [--organizationId <orgId>] `
+            )
+
+            .wrap(150)
+            .help();
+        })
         .command(
           ComputeCommandEnum.SHELL,
           "Execute shell command inside of instance",
