@@ -233,10 +233,46 @@ export async function promptForComputeInit(): Promise<any> {
         choices: ["yes", "no"],
       },
     ])
-    .then(async (answers: any) => {
-      if (answers.computeInitializationType === "no") {
+    .then(async (templateAnswer: any) => {
+      if (templateAnswer.computeInitializationType === "no") {
+        return inquirer
+          .prompt([
+            {
+              type: "list",
+              name: "dockerfileType",
+              message: "Do you want to deploy from local dockerfile ?",
+              choices: ["yes", "no"],
+            },
+          ])
+          .then(async (dockerAnswer: any) => {
+            if (dockerAnswer.dockerfileType === "no") {
+              return null;
+            } else {
+              return inquirer.prompt([
+                {
+                  type: "input",
+                  name: "dockerfile",
+                  message: "Relative path to dockerfile:",
+                  default: "./",
+                },
+                {
+                  type: "input",
+                  name: "tag",
+                  message: "Tag to be used when building image:",
+                  default: "latest",
+                },
+                {
+                  type: "input",
+                  name: "dockerhubRepository",
+                  message: "Dockerhub repository",
+                  default: "dockerprofile/image",
+                },
+              ]);
+            }
+          });
+
         return null;
-      } else if (answers.computeInitializationType === "yes") {
+      } else if (templateAnswer.computeInitializationType === "yes") {
         const pcategory = await inquirer.prompt([
           {
             type: "list",

@@ -23,7 +23,6 @@ export async function computePublish(
     if (!configPath) {
       configPath = "spheron.yaml";
     }
-    spinner.spin(`Publishing new compute instance 🚀`);
     console.log(`Reading from ${configPath}`);
     const yamlFilePath = path.join(process.cwd(), configPath); // Read spheron.yaml from the current working directory
     const yamlData = await fs.readFile(yamlFilePath, "utf8");
@@ -38,6 +37,15 @@ export async function computePublish(
         "Please specify the organization that you would wish to use while deploying your instance"
       );
     }
+    if (
+      spheronConfig.image.startsWith("./") ||
+      spheronConfig.image.startsWith("/")
+    ) {
+      spheronConfig.image = `${spheronConfig.dockerhubRepository}:${spheronConfig.tag}`;
+    }
+
+    spinner.spin(`Publishing new compute instance 🚀`);
+
     const result: InstanceResponse = await SpheronApiService.deployInstance(
       organizationId,
       spheronConfig

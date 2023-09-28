@@ -235,8 +235,26 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           "Create initial spheron compute configuration file",
           (yargs: any) => {
             yargs
+              .option("organization", {
+                describe: "Set id of default organization ",
+              })
+              .option("dockerfile", {
+                describe:
+                  "Set relative path to dockerfile if building from local",
+              })
+              .option("tag", {
+                describe: "Docker image tag",
+              })
+              .option("dockerhubRepository", {
+                describe: "Dockerhub repository ex: user/redis",
+              })
+              .option("template", {
+                describe: "Set template id ",
+              })
               .version(false)
-              .usage(`Usage: $0 compute init [--templateId <id>]`)
+              .usage(
+                `Usage: $0 compute init [--dockerfile <path>] [--tag <tag>] [--templateId <id>] [--dockerhubRepository <repo>]`
+              )
               .wrap(150)
               .help();
           }
@@ -254,7 +272,29 @@ import { GlobalCommandEnum } from "./commands/interfaces";
               })
               .version(false)
               .usage(
-                `Usage: $0 compute publish [--organizationId <organizationId>] [--config <path_to_config>]`
+                `Usage: $0 compute publish [--organizationId <organizationId>] [--config <path_to_config>] [--dockerhub <profile_name>]`
+              )
+              .wrap(150)
+              .help();
+          }
+        )
+        .command(
+          ComputeCommandEnum.BUILD,
+          "Build docker image from spheron.yaml and push it to dockerhub",
+          (yargs: any) => {
+            yargs
+              .option("config", {
+                describe: "Relative path to config file",
+              })
+              .option("u", {
+                describe: "Dockerhub username",
+              })
+              .option("p", {
+                describe: "Dockerhub password",
+              })
+              .version(false)
+              .usage(
+                `Usage: $0 compute build [--config <path_to_config>] [-u <dockerhub_username>] [-p <dockerhub_password>]`
               )
               .wrap(150)
               .help();
