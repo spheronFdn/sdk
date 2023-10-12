@@ -37,7 +37,7 @@
   "dependencies": {
     "@types/async-lock": "^1.4.0",
     "async-lock": "^1.4.0",
-    "axios": "1.1.2",
+    "axios": "^1.5.1",
     "eventsource": "^2.0.2",
     "p-limit": "^3.0.0"
   },

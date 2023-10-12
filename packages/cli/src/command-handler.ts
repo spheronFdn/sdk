@@ -773,7 +773,8 @@ export async function commandHandler(options: any) {
             await ResourceFetcher.getUserOrganizations();
           } else if (options.resource == ComputeResourceEnum.PLANS) {
             const name = options.name;
-            await ResourceFetcher.getComputePlans(name);
+          const info = options.info;
+          await ResourceFetcher.getComputePlans(name, info);
           } else if (options.resource == ComputeResourceEnum.REGIONS) {
             await ResourceFetcher.getComputeRegions();
           } else if (options.resource == ComputeResourceEnum.CLUSTERS) {
@@ -807,8 +808,10 @@ export async function commandHandler(options: any) {
             );
           } else if (options.resource == ComputeResourceEnum.TEMPLATES) {
             const category = options.category;
-            await ResourceFetcher.getComputeTemplates(category);
-          }
+            const name = options.name;
+            const info = options.info;
+            await ResourceFetcher.getComputeTemplates(category, name, info);
+        }
         } else {
           throw new Error("Resource needs to be specified");
         }

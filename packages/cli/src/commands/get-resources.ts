@@ -22,6 +22,7 @@ import {
   User,
 } from "@spheron/core";
 import Spinner from "../outputs/spinner";
+import Table from 'cli-table3';
 import SpheronApiService, {
   toCliPersistentStorage,
 } from "../services/spheron-api";
@@ -35,6 +36,7 @@ import {
 import path from "path";
 import * as fs from "fs";
 import * as yaml from "js-yaml";
+import chalk from "chalk";
 
 export const ResourceFetcher = {
   async getOrganization(id: string, type: AppTypeEnum) {
@@ -228,17 +230,48 @@ export const ResourceFetcher = {
     }
   },
 
-  async getComputePlans(name?: string) {
+  async getComputePlans(name?: string, info?: boolean) {
     const spinner = new Spinner();
     try {
       spinner.spin("Fetching ");
-      const computesPlans: ComputeMachine[] =
-        await SpheronApiService.getComputePlans(name);
-      console.log("Compute plans:");
-      const computePlansDtos = computesPlans.map((x) => {
-        return toComputePlansDTO(x);
-      });
-      console.log(JSON.stringify(computePlansDtos, null, 2));
+      if (name && info) {
+        // Fetch detailed info for the specified plan
+        const planDetail = await SpheronApiService.getComputePlans(name);  // Assume getComputePlans is the method to fetch detailed plan info
+
+        // Prepare the data for the table
+        const data = Object.entries(planDetail[0]).map(([key, value]) => [key, value]);
+
+        // Stop the spinner and log the table
+        spinner.stop();
+        console.log(createTable(['Property', 'Value'], data));
+      } else {
+        // Fetch all compute plans if name and info are not provided
+        console.log("1");
+        const computesPlans: ComputeMachine[] = await SpheronApiService.getComputePlans(name);
+        console.log(computesPlans);
+
+        console.log("Compute plans:");
+
+        // Set the headings and column widths
+        const headings = ['Name', 'CPU', 'Storage', 'Memory', 'Max Price/Block', 'Daily Top Up', 'Top Up Threshold'];
+        const colWidths = [20, 10, 10, 10, 20, 20, 20];
+
+        // Prepare the data for the table
+        const data = computesPlans.map(x => [
+          x.name,
+          x.cpu,
+          x.storage,
+          x.memory,
+          x.maxPricePerBlock,
+          x.defaultDailyTopUp.toFixed(3),
+          x.topupThreashold
+        ]);
+
+        // Stop the spinner and log the table
+        spinner.stop();
+        console.log('\n');
+        console.log(createTable(headings, data, colWidths));
+      }
       spinner.success(``);
     } catch (error) {
       console.log(`✖️  Error while fetching compute plans`);
@@ -246,21 +279,29 @@ export const ResourceFetcher = {
     } finally {
       spinner.stop();
     }
-  },
-
+  }
+  ,
   async getComputeRegions() {
     const spinner = new Spinner();
     try {
       spinner.spin("Fetching ");
       const regions: string[] = await SpheronApiService.getComputeRegions();
+
+      // Prepare the data for the table
+      const data = regions.map((region, index) => {
+        return [region || `Unnamed region ${index + 1}`];  // Handle empty region names
+      });
+
+      spinner.stop();  // Stop spinner before logging the table
+
       console.log("Compute regions:");
-      console.log(JSON.stringify(regions, null, 2));
+      console.log(createTable(['Region Name'], data, [20]));
+
       spinner.success(``);
     } catch (error) {
-      console.log(`✖️  Error while fetching compute regions`);
+      spinner.stop();  // Ensure spinner stops in case of error
+      console.log(`✖️ Error while fetching compute regions`);
       throw error;
-    } finally {
-      spinner.stop();
     }
   },
 
@@ -420,32 +461,84 @@ export const ResourceFetcher = {
     }
   },
 
-  async getComputeTemplates(category?: MarketplaceCategoryEnum) {
+  async getComputeTemplates(category?: MarketplaceCategoryEnum, name?: string, info?: boolean) {
     const spinner = new Spinner();
     try {
       spinner.spin("Fetching");
-      let templates: MarketplaceApp[] =
-        await SpheronApiService.getComputeTemplates();
+      console.log('\n');
+      let templates: MarketplaceApp[] = await SpheronApiService.getComputeTemplates();
+
+      spinner.stop();
+
       if (category) {
-        if (
-          !Object.values(MarketplaceCategoryEnum).find((x) => x == category)
-        ) {
+        if (!Object.values(MarketplaceCategoryEnum).find((x) => x == category)) {
           throw new Error("Specified category does not exist");
         }
         templates = templates.filter((x) => x.metadata.category == category);
       }
-      const templateDtos: ComputeTemplateDto[] = templates.map((x) => {
-        return toComputeTemplateDTO(x);
-      });
-      console.log(JSON.stringify(templateDtos, null, 2));
+
+      if (name) {
+        templates = templates.filter(x => x.name == name);
+      }
+
+      const templateDtos: ComputeTemplateDto[] = templates.map(x => toComputeTemplateDTO(x));
+
+      if (info && name && templateDtos.length > 0) {
+        console.log(JSON.stringify(templateDtos[0], null, 2));
+        spinner.success(`Fetched info for template: ${name}`);
+        return;
+      }
+
+      // Modify tableData to be an array of arrays
+      const tableData = templateDtos.map(templateDto => [
+        templateDto.metadata.category,
+        templateDto.name,
+        templateDto.metadata.docsLink
+      ]);
+
+      // Set the headings for the table
+      const headings = ['Category', 'Name', 'DocsLink'];
+
+      // Call createTable with the appropriate arguments
+      const tableString = createTable(headings, tableData);
+
+      // Output the table to the console
+      console.log(tableString);
+
       spinner.success(``);
+
+      // Output additional helpful commands
+      console.log('\nHelpful Commands:');
+      console.log('------------------');
+      if (category) {
+        console.log('To get more detailed information about a specific template, use the following command:');
+        console.log(chalk.hex('#4AEEFF')('spheron compute get templates --name <name-of-template> --info'));
+        console.log('\n');
+        console.log('To get the list of all available templates, use the following command:');
+        console.log(chalk.hex('#4AEEFF')('spheron compute get templates'));
+      } else if (name && info) {
+        console.log('To get the list of all available templates, use the following command:');
+        console.log(chalk.hex('#4AEEFF')('spheron compute get templates'));
+        console.log('\n');
+        console.log('To get the list of templates in a particular category, use the following command:');
+        console.log(chalk.hex('#4AEEFF')('spheron compute get templates --category <name-of-category>'));
+      } else {
+        console.log('To get more detailed information about a specific template, use the following command:');
+        console.log(chalk.hex('#4AEEFF')('spheron compute get templates --name <name-of-template> --info'));
+        console.log('\n');
+        console.log('To get the list of templates in a particular category, use the following command:');
+        console.log(chalk.hex('#4AEEFF')('spheron compute get templates --category <name-of-category>'));
+      }
+      console.log('\n');
+
     } catch (error) {
       console.log(`✖️  Error while fetching compute templates`);
       throw error;
     } finally {
       spinner.stop();
     }
-  },
+  }
+  ,
 };
 
 export enum SiteResourceEnum {
@@ -750,33 +843,33 @@ const toSuperComputeInstanceDTO = function (
     activeVersionId: instance.activeOrder,
     activeVersion: order
       ? {
-          env: order.env,
-          configuration: {
-            protocol: order.clusterInstanceConfiguration.protocol,
-            image: order.clusterInstanceConfiguration.image,
-            tag: order.clusterInstanceConfiguration.tag,
-            instanceCount: order.clusterInstanceConfiguration.instanceCount,
-            ports: order.clusterInstanceConfiguration.ports,
-            env: order.clusterInstanceConfiguration.env,
-            command: order.clusterInstanceConfiguration.command,
-            args: order.clusterInstanceConfiguration.args,
-            region: order.clusterInstanceConfiguration.region,
-            plan: order.clusterInstanceConfiguration.agreedMachineImage
-              .machineType,
-            agreementDate:
-              order.clusterInstanceConfiguration.agreedMachineImage
-                .agreementDate,
-            cpu: order.clusterInstanceConfiguration.agreedMachineImage.cpu,
-            memory:
-              order.clusterInstanceConfiguration.agreedMachineImage.memory,
-            storage:
-              order.clusterInstanceConfiguration.agreedMachineImage.storage,
-            persistentStorage:
-              order.clusterInstanceConfiguration.agreedMachineImage
-                .persistentStorage,
-          },
-          protocolData: order.protocolData,
-        }
+        env: order.env,
+        configuration: {
+          protocol: order.clusterInstanceConfiguration.protocol,
+          image: order.clusterInstanceConfiguration.image,
+          tag: order.clusterInstanceConfiguration.tag,
+          instanceCount: order.clusterInstanceConfiguration.instanceCount,
+          ports: order.clusterInstanceConfiguration.ports,
+          env: order.clusterInstanceConfiguration.env,
+          command: order.clusterInstanceConfiguration.command,
+          args: order.clusterInstanceConfiguration.args,
+          region: order.clusterInstanceConfiguration.region,
+          plan: order.clusterInstanceConfiguration.agreedMachineImage
+            .machineType,
+          agreementDate:
+            order.clusterInstanceConfiguration.agreedMachineImage
+              .agreementDate,
+          cpu: order.clusterInstanceConfiguration.agreedMachineImage.cpu,
+          memory:
+            order.clusterInstanceConfiguration.agreedMachineImage.memory,
+          storage:
+            order.clusterInstanceConfiguration.agreedMachineImage.storage,
+          persistentStorage:
+            order.clusterInstanceConfiguration.agreedMachineImage
+              .persistentStorage,
+        },
+        protocolData: order.protocolData,
+      }
       : null,
     cluster: instance.cluster,
     healthCheck: instance.healthCheck,
@@ -818,11 +911,11 @@ const toSpheronComputeConfiguration = async function (
 ): Promise<SpheronComputeConfiguration> {
   const configHealthCheck = instance.healthCheck?.url
     ? {
-        path: instance.healthCheck.url,
-        port: instance.healthCheck.port?.containerPort
-          ? instance.healthCheck.port.containerPort
-          : 80,
-      }
+      path: instance.healthCheck.url,
+      port: instance.healthCheck.port?.containerPort
+        ? instance.healthCheck.port.containerPort
+        : 80,
+    }
     : undefined;
 
   const configEnvs = order.clusterInstanceConfiguration.env.map((x) => {
@@ -848,16 +941,16 @@ const toSpheronComputeConfiguration = async function (
     persistentStorage: order.clusterInstanceConfiguration.agreedMachineImage
       .persistentStorage
       ? {
-          size: order.clusterInstanceConfiguration.agreedMachineImage
-            .persistentStorage.size,
-          class: toCliPersistentStorage(
-            order.clusterInstanceConfiguration.agreedMachineImage
-              .persistentStorage.class
-          ),
-          mountPoint:
-            order.clusterInstanceConfiguration.agreedMachineImage
-              .persistentStorage.mountPoint,
-        }
+        size: order.clusterInstanceConfiguration.agreedMachineImage
+          .persistentStorage.size,
+        class: toCliPersistentStorage(
+          order.clusterInstanceConfiguration.agreedMachineImage
+            .persistentStorage.class
+        ),
+        mountPoint:
+          order.clusterInstanceConfiguration.agreedMachineImage
+            .persistentStorage.mountPoint,
+      }
       : undefined,
   };
   const cluster: Cluster = await SpheronApiService.getCluster(instance.cluster);
@@ -887,5 +980,14 @@ const toSpheronComputeConfiguration = async function (
 
   return config;
 };
+
+// Function to create and return a table from an array of compute plans
+function createTable(headings: string[], data: (string | number)[][], colWidths: number[] = []) {
+  const table = new Table({ head: headings, colWidths });
+  data.forEach(item => {
+    table.push(item);
+  });
+  return table.toString();
+}
 
 const AKASH_IMAGE_CUSTOM_PLAN = "Custom Plan";
