@@ -172,19 +172,16 @@ const SpheronApiService = {
 
   async getComputePlans(name?: string): Promise<ComputeMachine[]> {
     const client: SpheronApi = await this.initialize();
-    console.log(client, "speron-api file");
-    const options: any = {
+     const options: any = {
       skip: 0,
       limit: 50,
     };
     if (name) {
       options.searchString = name;
     }
-    console.log("here");
     const computePlans: ComputeMachine[] = await client.getComputeMachines(
       options
     );
-    console.log("hello");
     return computePlans;
   },
 

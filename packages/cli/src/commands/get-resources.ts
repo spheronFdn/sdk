@@ -234,9 +234,12 @@ export const ResourceFetcher = {
     const spinner = new Spinner();
     try {
       spinner.spin("Fetching ");
+      console.log('\n');
+      
       if (name && info) {
         // Fetch detailed info for the specified plan
-        const planDetail = await SpheronApiService.getComputePlans(name);  // Assume getComputePlans is the method to fetch detailed plan info
+        const planDetail = await SpheronApiService.getComputePlans(name);
+        spinner.stop();  // Assume getComputePlans is the method to fetch detailed plan info
 
         // Prepare the data for the table
         const data = Object.entries(planDetail[0]).map(([key, value]) => [key, value]);
@@ -246,9 +249,8 @@ export const ResourceFetcher = {
         console.log(createTable(['Property', 'Value'], data));
       } else {
         // Fetch all compute plans if name and info are not provided
-        console.log("1");
         const computesPlans: ComputeMachine[] = await SpheronApiService.getComputePlans(name);
-        console.log(computesPlans);
+        spinner.stop();
 
         console.log("Compute plans:");
 
@@ -272,7 +274,21 @@ export const ResourceFetcher = {
         console.log('\n');
         console.log(createTable(headings, data, colWidths));
       }
+
       spinner.success(``);
+
+      // Output additional helpful commands
+      console.log('\nHelpful Commands:');
+      console.log('------------------');
+      if (name) {
+        console.log('To get a list of all available plans, use the following command:');
+        console.log(chalk.hex('#4AEEFF')('spheron compute get plans'));
+      } else {
+        console.log('To get more detailed information about a specific plan, use the following command:');
+        console.log(chalk.hex('#4AEEFF')('spheron compute get plans --name <name-of-plan>'));
+      }
+      console.log('\n');
+
     } catch (error) {
       console.log(`✖️  Error while fetching compute plans`);
       throw error;
