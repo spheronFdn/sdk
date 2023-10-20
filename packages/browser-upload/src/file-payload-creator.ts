@@ -22,6 +22,7 @@ const createPayloads = async (
   };
 
   files.forEach((file) => {
+    uploadContext.totalSize += file.size;
     if (file.size > payloadSize) {
       const chunks = splitFileIntoChunks(file, payloadSize);
       chunks.forEach((chunk, index) => {
@@ -34,7 +35,6 @@ const createPayloads = async (
         uploadContext.payloads.push(form);
       });
     } else {
-      uploadContext.totalSize += file.size;
       if (!uploadContext.currentPayload) {
         uploadContext.currentPayload = new FormData();
       }
