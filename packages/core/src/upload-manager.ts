@@ -79,6 +79,7 @@ class UploadManager {
       throw new Error(errorMessage);
     }
   }
+
   public async pinCID(configuration: {
     name: string;
     organizationId?: string;
@@ -113,6 +114,50 @@ class UploadManager {
       }>(
         url,
         {},
+        {
+          headers: {
+            Authorization: `Bearer ${configuration.token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message || error?.message;
+      throw new Error(errorMessage);
+    }
+  }
+
+  public async pinCIDs(configuration: {
+    name: string;
+    organizationId?: string;
+    token: string;
+    cids: string[];
+  }): Promise<
+    {
+      uploadId: string;
+      cid: string;
+    }[]
+  > {
+    try {
+      if (!configuration.name) {
+        throw new Error("Bucket name is not provided.");
+      }
+
+      let url = `${this.spheronApiUrl}/v2/ipfs/pins?bucket=${configuration.name}`;
+      if (configuration.organizationId) {
+        url += `&organization=${configuration.organizationId}`;
+      }
+
+      const response = await axios.post<
+        {
+          uploadId: string;
+          cid: string;
+        }[]
+      >(
+        url,
+        {
+          cids: configuration.cids,
+        },
         {
           headers: {
             Authorization: `Bearer ${configuration.token}`,
