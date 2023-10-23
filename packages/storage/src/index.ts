@@ -337,6 +337,21 @@ export class SpheronClient extends ScopeExtractor {
     });
   }
 
+  async pinCIDs(configuration: { name: string; cids: string[] }): Promise<
+    {
+      uploadId: string;
+      cid: string;
+    }[]
+  > {
+    await this.validateStorageOrganizationType();
+
+    return await this.uploadManager.pinCIDs({
+      name: configuration.name,
+      cids: configuration.cids,
+      token: this.configuration.token,
+    });
+  }
+
   async getOrganizationBuckets(
     organizationId: string,
     options: {
