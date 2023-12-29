@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+
+  app:
+    build: ./app
+    ports:
+      - "80:80"
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: user
+      DATABASE_PASSWORD: password
+      DATABASE_NAME: mydatabase
+    depends_on:
+      - db
+
+  db:
+    image: postgres:alpine
+    ports:
+      - "80:80"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+
+volumes:
+  dbdata:

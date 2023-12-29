@@ -47,10 +47,27 @@ export async function login(provider: string): Promise<void> {
                 verify.jwtToken,
                 configuration.configFilePath
               );
+
+              await writeToJsonFile(
+                "masterOrganization",
+                {
+                  organizationId: verify.masterOrganizationId,
+                },
+                configuration.configFilePath
+              );
+
               await writeToJsonFile(
                 AppTypeEnum.WEB_APP,
                 {
                   organizationId: verify.siteOrganizationId,
+                },
+                configuration.configFilePath
+              );
+
+              await writeToJsonFile(
+                AppTypeEnum.STORAGE,
+                {
+                  organizationId: verify.storageOrganizationId,
                 },
                 configuration.configFilePath
               );

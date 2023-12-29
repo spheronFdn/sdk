@@ -7,6 +7,11 @@ import {
   PersistentStorageClassEnum,
   ProtocolEnum,
   ProviderEnum,
+  AutoscalingNumberOfChecksEnum,
+  AutoscalingTimeWindowEnum,
+  AutoscalingPlanEnum,
+  AutoscalingCooldownEnum,
+  ComputeTypeEnum,
 } from "./enums";
 import {
   DeploymentEnvironmentStatusEnum,
@@ -131,6 +136,20 @@ interface Deployment {
   updatedAt: Date;
 }
 
+interface MasterOrganization {
+  _id: string;
+  profile: {
+    name: string;
+    image: string;
+    username: string;
+  };
+  site: Organization;
+  compute: Organization;
+  storage: Organization;
+  preferedAppType: AppTypeEnum;
+  publiclyAccessible: AppTypeEnum;
+}
+
 interface Organization {
   _id: string;
   profile: {
@@ -149,7 +168,7 @@ interface User {
   platformProfile: PlatformUser;
   createdAt: Date;
   updatedAt: Date;
-  organizations: [Organization];
+  organizations: [MasterOrganization];
 }
 
 interface PlatformUser {
@@ -162,9 +181,10 @@ interface PlatformUser {
 
 interface VerifiedTokenResponse {
   jwtToken: string;
-  organizationId: string;
+  masterOrganizationId: string;
   computeOrganizationId: string;
   siteOrganizationId: string;
+  storageOrganizationId: string;
   email: string;
 }
 
@@ -289,12 +309,11 @@ interface EnvironmentVariable {
   deploymentEnvironments: DeploymentEnvironment[];
 }
 
-interface Cluster {
+interface ComputeProject {
   _id: string;
   name: string;
-  url: string;
+  description: string;
   proivder: ProviderEnum;
-  createdBy: string;
   state: ClusterStateEnum;
   organization: string;
   createdAt: Date;
@@ -309,7 +328,7 @@ interface InstancesInfo {
   total: number;
 }
 
-interface ClusterFundsUsage {
+interface ComputeProjectFundsUsage {
   dailyUsage: number;
   usedTillNow: number;
 }
@@ -318,28 +337,37 @@ interface Instance {
   _id: string;
   state: InstanceStateEnum;
   name: string;
-  orders: Array<string>;
-  cluster: string;
-  activeOrder: string;
-  latestUrlPreview: string;
-  agreedMachineImageType: MachineImageType;
+  deployments: Array<string>;
+  computeProject: string;
+  activeDeployment: string;
   retrievableAkt: number;
   withdrawnAkt: number;
-  healthCheck: HealthCheck;
-  scalable: boolean;
+  scalableRunningCostUpdatedAt: Date;
+  scalableRunningCost: number;
+  type: ComputeTypeEnum;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface InstanceWithProject {
+  _id: string;
+  state: InstanceStateEnum;
+  name: string;
+  deployments: Array<string>;
+  computeProject: ComputeProject;
+  activeDeployment: string;
+  retrievableAkt: number;
+  withdrawnAkt: number;
+  scalableRunningCostUpdatedAt: Date;
+  scalableRunningCost: number;
+  type: ComputeTypeEnum;
   createdAt: Date;
   updatedAt: Date;
 }
 
 interface ExtendedInstance extends Instance {
-  cpu: number;
-  memory: string;
-  storage: string;
-  ami: string;
   defaultDailyTopup: number;
-  image: string;
   leasePricePerBlock: number;
-  tag: string;
   topupReport?: TopupReport;
 }
 
@@ -358,7 +386,7 @@ interface TopupReport {
 }
 
 interface HealthCheck {
-  url: string;
+  path: string;
   port?: Port;
   status?: HealthStatusEnum;
   timestamp?: Date;
@@ -411,7 +439,7 @@ interface MarketplaceAppPort {
   exposedPort: number;
 }
 
-interface InstanceOrder {
+interface ComputeDeployment {
   _id: string;
   type: string;
   commitId: string;
@@ -421,37 +449,12 @@ interface InstanceOrder {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   env: any;
   logs: [{ time: string; log: Array<string> }];
-  topups: InstanceTopup[];
+  topups: [{ time: number; amount: number; txhash: string }];
   closingLogs: [{ time: string; log: string }];
   instanceLogs: Array<string>;
   instanceEvents: Array<string>;
-  clusterInstance: string;
-  clusterInstanceConfiguration: {
-    branch: string;
-    folderName: string; // folder where docker image is located in repo
-    protocol: string; // ex: akash
-    image: string; // name of the docker image if it is not located in repo
-    tag: string; // name of the docker image if it is not located in repo
-    instanceCount: number;
-    buildImage: boolean; // if container should build the image, or if user has already defined it
-    ports: Array<Port>;
-    env: Array<Env>;
-    command: Array<string>;
-    args: Array<string>;
-    region: string;
-    agreedMachineImage: {
-      machineType: string;
-      agreementDate: number;
-      cpu: number;
-      memory: string;
-      storage: string;
-      persistentStorage?: PersistentStorage;
-      maxPricePerBlock: number;
-      leasePricePerBlock: number;
-      defaultDailyTopUp: number;
-      topupThreashold: number;
-    };
-  };
+  computeInstance: string;
+  services: Array<ComputeServiceConfiguration>;
   lastTopup: InstanceTopup;
   deploymentConfigBase64: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -461,7 +464,98 @@ interface InstanceOrder {
   deploymentInitiator: string;
 }
 
-interface InstanceOrderLogs {
+interface ComputeServiceConfiguration {
+  name: string;
+  branch: string;
+  folderName: string; // folder where docker image is located in repo
+  protocol: string; // ex: akash
+  image: string; // name of the docker image if it is not located in repo
+  tag: string; // name of the docker image if it is not located in repo
+  serviceCount: number;
+  buildImage: boolean; // if container should build the image, or if user has already defined it
+  ports: Array<Port>;
+  env: Array<Env>;
+  command: Array<string>;
+  args: Array<string>;
+  region: string;
+  customServiceSpecs: CustomServiceSpecs;
+  agreedMachineImage: {
+    machineId: string;
+    machineType: string;
+    agreementDate: number;
+    cpu: number;
+    memory: string;
+    storage: string;
+    persistentStorage?: PersistentStorage;
+    gpu: GPUSpecs;
+    maxPricePerBlock: number;
+    leasePricePerBlock: number;
+    defaultDailyTopUp: number;
+    topupThreashold: number;
+  };
+  urlPrewiew?: string;
+  privateImageConfig?: PrivateImageConfig;
+  scalable: boolean;
+  autoscalingRules: AutoscalingRules;
+  healthCheck: HealthCheck;
+  template: string;
+}
+
+interface GPUSpecs {
+  units: number;
+  models: Vendor;
+}
+
+interface Vendor {
+  [key: string]: GPUModel[];
+}
+
+interface GPUModel {
+  model: string;
+}
+
+interface PrivateImageConfig {
+  dockerRegistryURL: string;
+  dockerUserName: string;
+  dockerPasswordOrToken: string;
+}
+
+interface AutoscalingRules {
+  numberOfChecks: AutoscalingNumberOfChecksEnum;
+  timeWindow: AutoscalingTimeWindowEnum;
+  minimumInstances: number;
+  maximumInstances: number;
+  scaleUp: AutoscalingRulesThreshold;
+  scaleDown: AutoscalingRulesThreshold;
+  cooldown: AutoscalingCooldownEnum;
+  lastScaleAction: Date;
+  lastScaleCheck: Date;
+  windowCounter: {
+    numberOfChecksPreformed: number;
+    numberOfRequestsAboveCPULimit: number;
+    numberOfRequestsBelowCPULimit: number;
+    numberOfRequestsAboveMemoryLimit: number;
+    numberOfRequestsBelowMemoryLimit: number;
+  };
+  averageCpuUtilization: number;
+  averageMemoryUtilization: number;
+  plan: AutoscalingPlanEnum;
+}
+
+interface AutoscalingRulesThreshold {
+  cpuThreshold: {
+    step: number;
+    utilizationPercentage: number;
+    checksInAlarm: number;
+  };
+  memoryThreshold: {
+    step: number;
+    utilizationPercentage: number;
+    checksInAlarm: number;
+  };
+}
+
+interface ComputeDeploymentLogs {
   _id: string;
   logs: Array<string>;
   logsLength: number;
@@ -478,7 +572,7 @@ interface PersistentStorage {
   mountPoint: string;
 }
 
-interface CustomInstanceSpecs {
+interface CustomServiceSpecs {
   cpu?: number;
   memory?: string;
   persistentStorage?: PersistentStorage;
@@ -500,6 +594,7 @@ interface ComputeMachine {
   maxPricePerBlock: number; //akt per block
   defaultDailyTopUp: number;
   topupThreashold: number;
+  gpu?: Gpu;
 }
 
 enum BucketStateEnum {
@@ -562,6 +657,20 @@ interface Upload {
   protocol: ProtocolEnum;
 }
 
+interface Gpu {
+  units: number;
+  vendor: string;
+  model: string;
+  totalUnits: number;
+  availableUnits: number;
+}
+
+interface ComputeMetrics {
+  cpu: number;
+  memory: number;
+  timestamp: string;
+}
+
 export {
   TokenScope,
   Project,
@@ -579,17 +688,18 @@ export {
   PinStatus,
   StartDeploymentConfiguration,
   EnvironmentVariable,
-  Cluster,
+  ComputeProject,
   InstancesInfo,
-  ClusterFundsUsage,
+  ComputeProjectFundsUsage,
   Instance,
   ExtendedInstance,
-  InstanceOrder,
+  ComputeDeployment,
+  ComputeServiceConfiguration,
   InstanceTopup,
   Env,
   Port,
   PersistentStorage,
-  CustomInstanceSpecs,
+  CustomServiceSpecs,
   MarketplaceApp,
   ComputeMachine,
   MarketplaceAppMetadata,
@@ -598,7 +708,7 @@ export {
   MarketplaceAppVariable,
   HealthCheck,
   MachineImageType,
-  InstanceOrderLogs,
+  ComputeDeploymentLogs,
   Bucket,
   BucketStateEnum,
   UploadStatusEnum,
@@ -606,4 +716,11 @@ export {
   UploadedFile,
   BucketDomain,
   BucketIpnsRecord,
+  PrivateImageConfig,
+  AutoscalingRules,
+  AutoscalingRulesThreshold,
+  InstanceWithProject,
+  Gpu,
+  MasterOrganization,
+  ComputeMetrics,
 };

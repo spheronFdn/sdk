@@ -35,28 +35,33 @@ export async function computeUpdate(
     if (!id) {
       throw new Error("Instance ID not provided");
     }
-    spinner.spin(`Updating compute instance ${id} 🚀`);
     console.log(`Reading from ${configPath}`);
+
+    spinner.spin(
+      `Initiating the process to update the configuration of your instance in Spheron...`
+    );
     const result: InstanceResponse = await SpheronApiService.updateInstance(
       id,
       organizationId,
       spheronConfig
     );
-    if (result && result.clusterInstanceId) {
-      spinner.success("Update successful !");
+    if (result && result.computeInstanceId) {
+      spinner.success(
+        `✓ Success! Update of instance ${result.computeInstanceId} is successful! 🚀 `
+      );
       const existingYamlConfig = yaml.load(
         yamlData
       ) as SpheronComputeConfiguration;
 
-      existingYamlConfig.instanceId = result.clusterInstanceId;
-      existingYamlConfig.clusterId = result.clusterId;
+      existingYamlConfig.instanceId = result.computeInstanceId;
+      existingYamlConfig.projectId = result.computeProjectId;
       existingYamlConfig.organizationId = organizationId;
 
       const updatedYamlData = yaml.dump(existingYamlConfig);
 
       const instanceYamlFilePath = path.join(
         process.cwd(),
-        `instance-${result.clusterId}.yaml`
+        `instance-${result.computeInstanceId}.yaml`
       );
 
       await fs.writeFile(instanceYamlFilePath, updatedYamlData, "utf8");
@@ -66,7 +71,9 @@ export async function computeUpdate(
         "Instance ID not found in the response. Unable to save the YAML file."
       );
     }
-    console.log(JSON.stringify(result, null, 2));
+    console.log(
+      `\n\nHelpful Commands:\n\nTo retrieve more detailed information about the instance, use this following command:\nspheron instance --id <INSTANCE ID>`
+    );
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);
     throw error;

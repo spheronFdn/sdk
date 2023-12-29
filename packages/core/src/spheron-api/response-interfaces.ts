@@ -1,9 +1,9 @@
 import { MarketplaceApp } from "./interfaces";
 
 interface InstanceResponse {
-  clusterId: string;
-  clusterInstanceId: string;
-  clusterInstanceOrderId: string;
+  computeProjectId: string;
+  computeInstanceId: string;
+  computeDeploymentId: string;
   topic: string;
 }
 

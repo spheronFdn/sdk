@@ -1,37 +1,21 @@
-import { AppTypeEnum } from "@spheron/core";
+import { MasterOrganization } from "@spheron/core";
 import MetadataService from "../services/metadata-service";
 
-export async function changeDefaultOrganization(
-  type: AppTypeEnum,
-  organizationId: string
-) {
+export async function changeDefaultOrganization(masterOrg: MasterOrganization) {
   try {
-    let appTypeMetadata: any;
-    switch (type) {
-      case AppTypeEnum.COMPUTE:
-        appTypeMetadata = await MetadataService.getComputeData();
-        if (!appTypeMetadata) {
-          appTypeMetadata = { organizationId: organizationId };
-        } else {
-          appTypeMetadata.organizationId = organizationId;
-        }
-        MetadataService.editComputeData(appTypeMetadata);
-        break;
+    await Promise.all([
+      MetadataService.editComputeData({
+        organizationId: masterOrg.compute._id,
+      }),
+      MetadataService.editMaterOrgData({ organizationId: masterOrg._id }),
+      MetadataService.editSiteData({ organizationId: masterOrg.site._id }),
+      MetadataService.editStorageData({
+        organizationId: masterOrg.storage._id,
+      }),
+    ]);
 
-      case AppTypeEnum.WEB_APP:
-        appTypeMetadata = await MetadataService.getSiteData();
-        if (!appTypeMetadata) {
-          appTypeMetadata = { organizationId: organizationId };
-        } else {
-          appTypeMetadata.organizationId = organizationId;
-        }
-        MetadataService.editSiteData(appTypeMetadata);
-        break;
-      default:
-        throw new Error("Unsupported app type");
-    }
     console.log(
-      `Succesfully switched default organizaiton to ${organizationId}`
+      `Succesfully switched default organizaiton to ${masterOrg.profile.name} (id:${masterOrg._id})`
     );
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);

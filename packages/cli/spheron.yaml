@@ -1,0 +1,19 @@
+projectName: my_first_project
+services:
+  - name: CalmFlower40
+    image: ./app
+    tag: latest
+    count: 1
+    ports: []
+    env: []
+    commands:
+      - '["/entrypoint.sh"]'
+    args:
+      - '[ "100", "5000" ]'
+    type: on_demand
+    plan: ''
+    customParams:
+      cpu: 0.5
+      memory: 2GB
+      storage: 20Gi
+region: us-west

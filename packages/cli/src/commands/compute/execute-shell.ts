@@ -2,7 +2,11 @@ import { ShellExecutionResponse } from "@spheron/core";
 import Spinner from "../../outputs/spinner";
 import SpheronApiService from "../../services/spheron-api";
 
-export async function executeShell(instanceId: string, command: string) {
+export async function executeShell(
+  instanceId: string,
+  command: string,
+  serviceName?: string
+) {
   const spinner = new Spinner();
   try {
     const result: ShellExecutionResponse =
