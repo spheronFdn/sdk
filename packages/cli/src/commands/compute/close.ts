@@ -29,8 +29,12 @@ export async function close(
       throw new Error("Instance ID not provided");
     }
     const result = await SpheronApiService.closeInstance(id);
-    spinner.success(`✓ Success! Instance ${id} is successful closed! 🚀`);
-    console.log(JSON.stringify(result, null, 2));
+    if (result.success) {
+      spinner.success(`✓ Success! Instance ${id} is successful closed! 🚀`);
+    } else {
+      spinner.stop();
+      console.log(`Error closing the instance ${id}!`);
+    }
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);
     throw error;

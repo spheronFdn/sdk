@@ -510,7 +510,7 @@ export async function commandHandler(options: any) {
 
         const prompt = await closeInstancePrompt(instanceId);
 
-        if (prompt.answer === "yes") {
+        if (prompt.answer === "Yes") {
           await close(instanceId, config);
         }
       } catch (error) {
