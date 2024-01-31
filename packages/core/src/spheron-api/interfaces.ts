@@ -345,6 +345,7 @@ interface Instance {
   scalableRunningCostUpdatedAt: Date;
   scalableRunningCost: number;
   type: ComputeTypeEnum;
+  region: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -395,6 +396,8 @@ interface HealthCheck {
 interface Port {
   containerPort: number;
   exposedPort: number;
+  global?: boolean;
+  exposeTo?: string;
 }
 
 interface MarketplaceApp {
@@ -723,4 +726,5 @@ export {
   Gpu,
   MasterOrganization,
   ComputeMetrics,
+  TopupReport,
 };

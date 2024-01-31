@@ -7,7 +7,7 @@ import * as path from "path";
 import { InstanceResponse } from "@spheron/core";
 import Spinner from "../../outputs/spinner";
 
-export async function computePublish(
+export async function computeDeploy(
   organization?: string,
   configPath?: string
 ): Promise<any> {
@@ -29,6 +29,9 @@ export async function computePublish(
     const spheronConfig: SpheronComputeConfiguration = yaml.load(
       yamlData
     ) as SpheronComputeConfiguration;
+
+    console.log(JSON.stringify(spheronConfig));
+
     const organizationId: string = organization
       ? organization
       : (await MetadataService.getComputeData())?.organizationId;
@@ -74,7 +77,6 @@ export async function computePublish(
         "Instance ID not found in the response. Unable to save the YAML file."
       );
     }
-    console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);
     throw error;

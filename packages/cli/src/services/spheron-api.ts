@@ -244,7 +244,7 @@ const SpheronApiService = {
     organizationId: string,
     computeProjectId?: string,
     state?: InstanceStateEnum
-  ): Promise<Instance[]> {
+  ): Promise<ExtendedInstance[]> {
     const client: SpheronApi = await this.initialize();
     const options: any = {
       skip: 0,
@@ -259,12 +259,15 @@ const SpheronApiService = {
     );
   },
 
-  async getComputeInstance(id: string): Promise<Instance> {
+  async getComputeInstance(id: string): Promise<ExtendedInstance> {
     const client: SpheronApi = await this.initialize();
     const options: any = {
       includeReport: true,
     };
-    const instance: Instance = await client.getComputeInstance(id, options);
+    const instance: ExtendedInstance = await client.getComputeInstance(
+      id,
+      options
+    );
     return instance;
   },
 
@@ -324,9 +327,8 @@ const SpheronApiService = {
           serviceCount: service.count,
           ports: service.ports,
           env: apiEnvs,
-          command: service.commands,
-          args: service.args,
-          region: configuration.region,
+          command: service.commands ?? [],
+          args: service.args ?? [],
           akashMachineImageName: service.plan,
           customServiceSpecs: apiPersistentSpecs,
           healthCheck: service.healthCheck
@@ -335,9 +337,9 @@ const SpheronApiService = {
                 port: service.healthCheck.port,
               }
             : undefined,
-          scalable:
-            service.type == CliComputeInstanceType.ON_DEMAND ? true : false,
+
           buildImage: false,
+          templateId: service.templateId,
         };
         return serviceConfig;
       }),
@@ -345,6 +347,8 @@ const SpheronApiService = {
       computeProjectName: configuration.projectName,
       computeProjectDescription: "",
       uniqueTopicId: uuidv4(),
+      region: configuration.region,
+      scalable: configuration.type == CliComputeInstanceType.ON_DEMAND,
     };
 
     const response: InstanceResponse = await client.createComputeInstance(req);
@@ -374,7 +378,6 @@ const SpheronApiService = {
           env: apiEnvs,
           command: service.commands,
           args: service.args,
-          region: configuration.region,
           akashMachineImageName: service.plan,
           customServiceSpecs: apiPersistentSpecs,
           healthCheck: service.healthCheck
@@ -383,8 +386,6 @@ const SpheronApiService = {
                 port: service.healthCheck.port,
               }
             : undefined,
-          scalable:
-            service.type == CliComputeInstanceType.ON_DEMAND ? true : false,
           buildImage: false,
         };
         return serviceConfig;
@@ -544,6 +545,9 @@ export function toCliPersistentStorage(
 }
 
 function toApiEnvs(envs: Array<CliComputeEnv>): Array<Env> {
+  if (!envs || envs.length == 0) {
+    return [];
+  }
   const apiEnvs = envs.map((x) => {
     return {
       value: `${x.name}=${x.value}`,

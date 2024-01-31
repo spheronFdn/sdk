@@ -18,6 +18,8 @@ interface CreateInstanceRequest {
   computeProvider: string;
   computeProjectName: string;
   computeProjectDescription: string;
+  scalable: boolean;
+  region: string;
 }
 
 interface ComputeServiceConfigurationDTO {
@@ -31,14 +33,12 @@ interface ComputeServiceConfigurationDTO {
   env: Array<Env>;
   command: Array<string>;
   args: Array<string>;
-  region: string;
   akashMachineImageName: string;
   customServiceSpecs?: CustomServiceSpecs;
   healthCheck?: {
     path: string;
     port: number;
   };
-  scalable: boolean;
   autoscalingRules?: AutoscalingRequestPayload;
   environmentVariables?: ClusterTemplateDeploymentVariable[];
   templateId?: string;

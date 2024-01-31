@@ -21,6 +21,7 @@ import {
   AutoscalingRules,
   MasterOrganization,
   ComputeMetrics,
+  ExtendedInstance,
 } from "@spheron/core";
 import Spinner from "../outputs/spinner";
 import SpheronApiService, {
@@ -32,6 +33,7 @@ import {
   CliCustomParams,
   InstanceVersionLogsTypeEnum,
   SpheronComputeConfiguration,
+  SpheronComputeServiceConfiguration,
 } from "./compute/interfaces";
 import path from "path";
 import * as fs from "fs";
@@ -268,11 +270,12 @@ export const ResourceFetcher = {
         throw new Error("OrganizationId not provided");
       }
 
-      const instances: Instance[] = await SpheronApiService.getComputeInstances(
-        organizationId,
-        computeProjectId,
-        state
-      );
+      const instances: ExtendedInstance[] =
+        await SpheronApiService.getComputeInstances(
+          organizationId,
+          computeProjectId,
+          state
+        );
       const instancesDtos: BasicComputeInstanceDTO[] = instances.map((x) => {
         return toBasicComputeInstanceDTO(x);
       });
@@ -300,7 +303,7 @@ export const ResourceFetcher = {
             : dto.state === InstanceStateEnum.CLOSED
             ? "❌ Closed"
             : `⚪ ${dto.state}`,
-          dto.type ?? ComputeTypeEnum.ON_DEMAND,
+          dto.type ?? CliComputeInstanceType.ON_DEMAND,
           dto.updatedAt.toString(),
           dto.createdAt.toString(),
         ];
@@ -309,7 +312,7 @@ export const ResourceFetcher = {
       printTableInFormat(tableRows, headers);
 
       console.log(
-        `\nHelpful Commands:\n\nTo retrieve more detailed information about a specific instance, use this following command:\nspheron instances --instance <INSTANCE ID>`
+        `\nHelpful Commands:\n\nTo retrieve more detailed information about a specific instance, use this following command:\nspheron instance --id <INSTANCE ID>`
       );
 
       spinner.success(``);
@@ -325,7 +328,8 @@ export const ResourceFetcher = {
     const spinner = new Spinner();
     try {
       spinner.spin("Fetching");
-      const instance: Instance = await SpheronApiService.getComputeInstance(id);
+      const instance: ExtendedInstance =
+        await SpheronApiService.getComputeInstance(id);
 
       let deployment;
       if (instance) {
@@ -404,7 +408,7 @@ export const ResourceFetcher = {
       );
 
       console.log(
-        `\nHelpful Commands:\n\nTo retrieve more detailed information about a specific service, use this following command:\nspheron service --instance <INSTANCE ID> --name <SERVICE_NAME>\n\nTo update your instance configuration, use this following command:\nspheron update --instance <INSTANCE ID> --config <PATH TO CONFIG>`
+        `\nHelpful Commands:\n\nTo retrieve more detailed information about a specific service, use this following command:\nspheron service --instance <INSTANCE ID> --name <SERVICE_NAME>\n\nTo update your instance configuration, use this following command:\nspheron update --instance <INSTANCE ID> [--config <PATH TO CONFIG>]`
       );
 
       spinner.success(``);
@@ -591,6 +595,9 @@ export const ResourceFetcher = {
         instanceId
       );
       let result;
+
+      logType = logType ?? InstanceVersionLogsTypeEnum.LIVE;
+
       if (instance && instance.activeDeployment && !versionId) {
         result = await SpheronApiService.getComputeDeploymentLogs(
           instance.activeDeployment,
@@ -883,7 +890,7 @@ const toComputeClusterDTO = function (
 };
 
 const toBasicComputeInstanceDTO = function (
-  instance: InstanceWithProject | Instance
+  instance: any
 ): BasicComputeInstanceDTO {
   return {
     _id: instance._id,
@@ -900,14 +907,15 @@ const toBasicComputeInstanceDTO = function (
         ? undefined
         : instance.computeProject.name,
     type: instance.type,
-    alreadySpent: instance.withdrawnAkt,
+    dailySpending: instance.topupReport?.dailyUsage,
+    alreadySpent: instance.topupReport?.usedTillNow,
     createdAt: instance.createdAt,
     updatedAt: instance.updatedAt,
   };
 };
 
 const toSuperComputeInstanceDTO = function (
-  instance: Instance,
+  instance: ExtendedInstance,
   deployment?: ComputeDeployment
 ): SuperComputeInstanceDTO {
   const dto: SuperComputeInstanceDTO = {
@@ -945,7 +953,8 @@ const toSuperComputeInstanceDTO = function (
       : null,
     type: instance.type,
     computeProject: instance.computeProject,
-    alreadySpent: instance.withdrawnAkt,
+    dailySpending: instance.topupReport?.dailyUsage,
+    alreadySpent: instance.topupReport?.usedTillNow,
     createdAt: instance.createdAt,
     updatedAt: instance.updatedAt,
   };
@@ -1039,15 +1048,16 @@ const toSpheronComputeConfiguration = async function (
         env: configEnvs,
         commands: service.command,
         args: service.args,
-        type: service.scalable
-          ? CliComputeInstanceType.ON_DEMAND
-          : CliComputeInstanceType.SPOT,
         plan: service.agreedMachineImage.machineType,
         customParams: customParams,
         healthCheck: configHealthCheck,
-      };
+      } as SpheronComputeServiceConfiguration;
     }),
-    region: deployment.services[0]?.region,
+    region: instance.region,
+    type:
+      instance.type == ComputeTypeEnum.ON_DEMAND
+        ? CliComputeInstanceType.ON_DEMAND
+        : CliComputeInstanceType.SPOT,
     instanceId: instance._id,
     projectId: instance.computeProject,
     organizationId: cluster.organization,

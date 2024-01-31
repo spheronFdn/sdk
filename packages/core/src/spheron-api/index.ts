@@ -43,6 +43,7 @@ import {
   BucketIpnsRecord,
   MasterOrganization,
   ComputeMetrics,
+  TopupReport,
 } from "./interfaces";
 import {
   CreateInstanceFromMarketplaceRequest,
@@ -715,20 +716,21 @@ class SpheronApi {
     },
     state?: InstanceStateEnum,
     computeProjectId?: string
-  ): Promise<Instance[]> {
+  ): Promise<ExtendedInstance[]> {
     if (options.skip < 0 || options.limit < 0) {
       throw new Error(`Skip and Limit cannot be negative numbers.`);
     }
 
-    const result: { instances: Instance[] } = await this.sendApiRequest<{
-      instances: Instance[];
-    }>(HttpMethods.GET, `/v1/compute-instance`, null, {
-      skip: options.skip,
-      limit: options.limit,
-      organizationId: organizationId,
-      state: state,
-      computeProjectId: computeProjectId,
-    });
+    const result: { instances: ExtendedInstance[] } =
+      await this.sendApiRequest<{
+        instances: ExtendedInstance[];
+      }>(HttpMethods.GET, `/v1/compute-instance`, null, {
+        skip: options.skip,
+        limit: options.limit,
+        organizationId: organizationId,
+        state: state,
+        computeProjectId: computeProjectId,
+      });
 
     return result.instances;
   }
@@ -775,16 +777,26 @@ class SpheronApi {
     options?: {
       includeReport?: boolean;
     }
-  ): Promise<Instance> {
-    const response: { success: boolean; instance: Instance } =
-      await this.sendApiRequest<{
-        success: boolean;
-        instance: Instance;
-      }>(HttpMethods.GET, `/v1/compute-instance/${id}`, null, {
-        topupReport: options && options.includeReport && "y",
-      });
+  ): Promise<ExtendedInstance> {
+    const response: {
+      success: boolean;
+      instance: Instance;
+      topupReport: TopupReport;
+    } = await this.sendApiRequest<{
+      success: boolean;
+      instance: Instance;
+      topupReport: TopupReport;
+    }>(HttpMethods.GET, `/v1/compute-instance/${id}`, null, {
+      topupReport: options && options.includeReport && "y",
+    });
 
-    return response.instance;
+    const extendedInstance: ExtendedInstance = {
+      ...response.instance,
+      defaultDailyTopup: 0,
+      leasePricePerBlock: 0,
+      topupReport: response.topupReport,
+    };
+    return extendedInstance;
   }
 
   async deleteComputeInstance(id: string): Promise<void> {

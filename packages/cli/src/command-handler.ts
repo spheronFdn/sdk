@@ -41,7 +41,7 @@ import {
   readDockerComposeFile,
   readDockerfile,
 } from "./commands/compute/init";
-import { computePublish } from "./commands/compute/publish";
+import { computeDeploy } from "./commands/compute/publish";
 import { validate } from "./commands/compute/validate";
 import { executeShell } from "./commands/compute/execute-shell";
 import { computeUpdate } from "./commands/compute/update-instance";
@@ -420,7 +420,7 @@ export async function commandHandler(options: any) {
               });
 
               services.push({
-                name: template.name,
+                name: template.name.toLocaleLowerCase().replace(" ", "_"),
                 templateId: template._id,
                 templateName: template.name,
                 image: template.serviceData.dockerImage,
@@ -430,7 +430,6 @@ export async function commandHandler(options: any) {
                 env: configEnvs,
                 commands: template.serviceData.commands,
                 args: template.serviceData.args,
-                type: CliComputeInstanceType.ON_DEMAND,
                 plan: defaultPlan ? defaultPlan.name : "Ventus Nano 1",
                 customParams: {
                   storage: "10Gi",
@@ -456,7 +455,6 @@ export async function commandHandler(options: any) {
             ],
             commands: [],
             args: [],
-            type: CliComputeInstanceType.ON_DEMAND,
             plan: "Ventus Nano 1",
             customParams: {
               storage: "10Gi",
@@ -468,6 +466,7 @@ export async function commandHandler(options: any) {
           projectName: "my_first_project",
           services: services,
           region: region,
+          type: CliComputeInstanceType.ON_DEMAND,
         });
       } catch (error) {
         console.log(error.message);
@@ -616,8 +615,8 @@ export async function commandHandler(options: any) {
   if (options._[0] === ComputeCommandEnum.INSTANCES) {
     (async () => {
       try {
-        const computeProjectId = options.computeProjectId;
-        let state = options.state;
+        const computeProjectId = options.project;
+        let state = options.status;
 
         if (!computeProjectId && !state) {
           state = "Active";
@@ -652,7 +651,7 @@ export async function commandHandler(options: any) {
   if (options._[0] === ComputeCommandEnum.LOGS) {
     (async () => {
       try {
-        const instanceId = options.instanceId;
+        const instanceId = options.instance;
         const serviceName = options.service;
 
         const type = options.type;
@@ -699,7 +698,7 @@ export async function commandHandler(options: any) {
         const organizationId = options.organizationId;
         const config = options.config ?? "./spheron.yaml";
 
-        await computePublish(organizationId, config);
+        await computeDeploy(organizationId, config);
       } catch (error) {
         process.exit(1);
       }
@@ -709,9 +708,9 @@ export async function commandHandler(options: any) {
   if (options._[0] === ComputeCommandEnum.UPDATE) {
     (async () => {
       try {
-        const organizationId = options.organizationId;
+        const organizationId = options.organization;
         const config = options.config ?? "./spheron.yaml";
-        const instanceId = options.instanceId;
+        const instanceId = options.instance;
 
         await computeUpdate(instanceId, config, organizationId);
       } catch (error) {

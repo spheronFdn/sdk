@@ -126,7 +126,6 @@ function convertToSpheronConfig(
               ? [service.command]
               : service.command || [],
           args: [],
-          type: CliComputeInstanceType.ON_DEMAND,
           plan: "Ventus Nano 1",
           customParams: customParams,
         };
@@ -213,7 +212,6 @@ export async function readDockerfile(
       env: [],
       commands: [],
       args: [],
-      type: CliComputeInstanceType.ON_DEMAND,
       plan: "",
       customParams: {
         cpu: 0.5,

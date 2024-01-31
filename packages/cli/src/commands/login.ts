@@ -23,12 +23,14 @@ export async function login(provider: string): Promise<void> {
           server.once("request", async (req, res) => {
             try {
               const code = req.url?.split("&")[0].split("=")[1];
+
               const verify: VerifiedTokenResponse =
                 await SpheronApiService.verfiyGitToken(
                   provider,
                   String(code),
                   port
                 );
+
               // Closing of server
               res.setHeader("connection", "close");
               res.statusCode = 302;
@@ -106,6 +108,9 @@ export async function login(provider: string): Promise<void> {
                   );
                 }
               }
+
+              console.log(`Error ${e.message}`);
+
               console.log(
                 `✖️  Error occured while logging in, please try again.`
               );

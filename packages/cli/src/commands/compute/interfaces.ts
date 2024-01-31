@@ -33,6 +33,7 @@ export interface SpheronComputeConfiguration {
   organizationId?: string;
   versionId?: string;
   services: Array<SpheronComputeServiceConfiguration>;
+  type: CliComputeInstanceType;
 }
 
 export interface SpheronComputeServiceConfiguration {
@@ -44,7 +45,6 @@ export interface SpheronComputeServiceConfiguration {
   env: Array<CliComputeEnv>;
   commands: Array<string>;
   args: Array<string>;
-  type: CliComputeInstanceType;
   plan: string;
   customParams: CliCustomParams;
   templateId?: string;
