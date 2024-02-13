@@ -505,7 +505,7 @@ export async function commandHandler(options: any) {
     (async () => {
       try {
         const config = options.config;
-        const instanceId = options.id;
+        const instanceId = options.instance;
 
         const prompt = await closeInstancePrompt(instanceId);
 
