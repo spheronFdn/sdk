@@ -31,6 +31,11 @@ interface Bucket {
   state: BucketStateEnum;
 }
 
+// interface BucketWithDomains {
+//   bucket: Bucket;
+//   domains: Domain[];
+// }
+
 interface Upload {
   id: string;
   protocolLink: string;

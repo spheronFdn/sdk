@@ -369,6 +369,23 @@ export class SpheronClient extends ScopeExtractor {
     );
   }
 
+  // async getOrganizationBucketsWithDomains(
+  //   organizationId: string,
+  //   options: {
+  //     name?: string;
+  //     state?: BucketStateEnum;
+  //     skip: number;
+  //     limit: number;
+  //   }
+  // ): Promise<BucketWithDomains[]> {
+  //   await this.validateStorageOrganizationType();
+
+  //   return await this.bucketManager.getOrganizationBucketsWithDomains(
+  //     organizationId,
+  //     options
+  //   );
+  // }
+
   async getOrganizationBucketCount(
     organizationId: string,
     options?: {

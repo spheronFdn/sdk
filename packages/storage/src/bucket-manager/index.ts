@@ -40,6 +40,28 @@ class BucketManager {
     return buckets.map((x) => this.mapCoreBucket(x));
   }
 
+  // async getOrganizationBucketsWithDomains(
+  //   organizationId: string,
+  //   options: {
+  //     name?: string;
+  //     state?: BucketStateEnum;
+  //     skip: number;
+  //     limit: number;
+  //   }
+  // ): Promise<BucketWithDomains[]> {
+  //   const { buckets } = await this.spheronApi.getOrganizationBucketsWithDomains(
+  //     {
+  //       organizationId,
+  //       ...options,
+  //     }
+  //   );
+  //   return buckets.map((x) => {
+  //     const bucket = this.mapCoreBucket(x.bucket);
+  //     const domains = this.mapCoreBucketDomains(x.domains);
+  //     return { bucket, domains };
+  //   });
+  // }
+
   async getOrganizationBucketCount(
     organizationId: string,
     options?: {
