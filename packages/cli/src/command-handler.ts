@@ -544,7 +544,7 @@ export async function commandHandler(options: any) {
     })();
   }
 
-  if (options._[0] === ComputeCommandEnum.MARKETPLACE_APP) {
+  if (options._[0] === ComputeCommandEnum.MARKETPLACE_APPS) {
     (async () => {
       try {
         const category = options.category;

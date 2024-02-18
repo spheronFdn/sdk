@@ -25,7 +25,7 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           })
           .version(false)
           .usage("Usage: $0 login [--github|--gitlab|--bitbucket]")
-          .wrap(100)
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
@@ -33,7 +33,11 @@ import { GlobalCommandEnum } from "./commands/interfaces";
       GlobalCommandEnum.LOGOUT,
       "Log out of your account — Ends your current session.",
       (yargs: any) => {
-        yargs.version(false).usage("Usage: $0 logout").help();
+        yargs
+          .version(false)
+          .usage("Usage: $0 logout")
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
       }
     )
     .command(
@@ -46,7 +50,7 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           })
           .version(false)
           .usage(`Usage: $0 create-organization --name <ORG NAME>`)
-          .wrap(100)
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
@@ -60,7 +64,7 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           })
           .version(false)
           .usage(`Usage: $0 switch-organization [--organization <ORG ID>]`)
-          .wrap(150)
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
@@ -79,7 +83,7 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           .usage(
             `Usage: $0 init [--import <DOCKER COMPOSE PATH / DOCKERFILE PATH>] [--marketplace <APP ID>]`
           )
-          .wrap(150)
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
@@ -93,7 +97,7 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           })
           .version(false)
           .usage(`Usage: $0 publish [--config <PATH_TO_CONFIG>]`)
-          .wrap(150)
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
@@ -115,7 +119,27 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           .usage(
             `Usage: $0 build [--config <PATH TO CONFIG>] [-u <DOCKERHUB USERNAME>] [-p <DOCKERHUB PASSWORD>]`
           )
-          .wrap(150)
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.UPDATE,
+      "Update instance settings — Modifies configuration based on spheron.yaml.",
+      (yargs: any) => {
+        yargs
+          .option("config", {
+            describe: "Set relative path to spheron.yaml file",
+            demandOption: false,
+          })
+          .option("instance", {
+            describe: "Set instance ID",
+          })
+          .version(false)
+          .usage(
+            `Usage: $0 update [--config <PATH TO CONFIG>] [--instance <INSTANCE ID>]`
+          )
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
@@ -129,7 +153,7 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           })
           .version(false)
           .usage(`Usage: $0 close [--id <INSTANCE ID>]`)
-          .wrap(150)
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
@@ -168,22 +192,126 @@ import { GlobalCommandEnum } from "./commands/interfaces";
     //   }
     // )
     .command(
-      ComputeCommandEnum.UPDATE,
-      "Update instance settings — Modifies configuration based on spheron.yaml.",
+      ComputeCommandEnum.MARKETPLACE_APPS,
+      "List all marketplace apps — Displays available apps in the Spheron marketplace.",
       (yargs: any) => {
         yargs
-          .option("config", {
-            describe: "Relative path to config file",
+          .option("category", {
+            describe: "Set category of the marketplace",
             demandOption: false,
           })
-          .option("instance", {
+          .version(false)
+          .usage(`Usage: $0 marketplace-apps [--category <CATEGORY>]`)
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.INSTANCES,
+      "List project instances — Displays all instances within a specified project.",
+      (yargs: any) => {
+        yargs
+          .option("project", {
+            describe: "Set project ID",
+            demandOption: false,
+          })
+          .version(false)
+          .usage(`Usage: $0 instances [--project <PROJECT NAME>]`)
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.INSTANCE,
+      "Fetch instance and service details — Provides information on an instance and its associated services.",
+      (yargs: any) => {
+        yargs
+          .option("id", {
             describe: "Set instance ID",
+            demandOption: false,
+          })
+          .version(false)
+          .usage(`Usage: $0 instance [--id <INSTANCE ID>]`)
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.SERVICE,
+      "Get service details within an instance — Shows information for services in a specific instance.",
+      (yargs: any) => {
+        yargs
+          .option("id", {
+            describe: "Set instance ID",
+            demandOption: false,
+          })
+          .option("name", {
+            describe: "Set service name",
+            demandOption: false,
           })
           .version(false)
           .usage(
-            `Usage: $0 update [--config <PATH TO CONFIG>] [--instanceId <INSTANCE ID>]`
+            `Usage: $0 service [--instance <INSTANCE ID>] [--name <SERVICE NAME>]`
           )
-          .wrap(150)
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.PLANS,
+      "List available plans — Displays all plans offered by Spheron.",
+      (yargs: any) => {
+        yargs
+          .option("region", {
+            describe: "Set region name",
+            demandOption: false,
+          })
+          .version(false)
+          .usage(`Usage: $0 plans [--region <REGION>]`)
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.REGIONS,
+      "Show available regions — Displays all regions where services can be deployed.",
+      (yargs: any) => {
+        yargs
+          .version(false)
+          .usage(`Usage: $0 regions`)
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.PROJECTS,
+      "Retrieve project and instance information — Shows details of the project along with its instances.",
+      (yargs: any) => {
+        yargs
+          .version(false)
+          .usage(`Usage: $0 projects`)
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.LOGS,
+      "Fetch service logs — Retrieves all logs for a specific service within an instance.",
+      (yargs: any) => {
+        yargs
+          .option("instance", {
+            describe: "Set instance ID",
+            demandOption: false,
+          })
+          .option("service", {
+            describe: "Set service name",
+            demandOption: false,
+          })
+          .version(false)
+          .usage(
+            `Usage: $0 logs [--instance <INSTANCE ID>] [--name <SERVICE NAME>]`
+          )
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
