@@ -2,24 +2,24 @@ import { changeDefaultOrganization } from "./commands/switch-organization";
 import { createConfiguration } from "./commands/create-configuration";
 import { createOrganization } from "./commands/create-organization";
 import { ResourceFetcher } from "./commands/get-resources";
-import {
-  GptCommandEnum,
-  createTestCases,
-  findBugsInCode,
-  improveCode,
-  transpileCode,
-  updateCode,
-} from "./commands/gpt/gpt";
+// import {
+//   GptCommandEnum,
+//   createTestCases,
+//   findBugsInCode,
+//   improveCode,
+//   transpileCode,
+//   updateCode,
+// } from "./commands/gpt/gpt";
 import { login } from "./commands/login";
 import { logout } from "./commands/logout";
 import configuration from "./configuration";
 import {
-  filePathForGPT,
-  languageForGPT,
-  languageForGPTTest,
+  // filePathForGPT,
+  // languageForGPT,
+  // languageForGPTTest,
   promptForSwitchOrganization,
   promptForCreateOrganization,
-  promptForGPT,
+  // promptForGPT,
   promptForLogin,
   closeInstancePrompt,
 } from "./prompts/prompts";
@@ -42,8 +42,8 @@ import {
   readDockerfile,
 } from "./commands/compute/init";
 import { computeDeploy } from "./commands/compute/publish";
-import { validate } from "./commands/compute/validate";
-import { executeShell } from "./commands/compute/execute-shell";
+// import { validate } from "./commands/compute/validate";
+// import { executeShell } from "./commands/compute/execute-shell";
 import { computeUpdate } from "./commands/compute/update-instance";
 import { build } from "./commands/compute/build";
 import { close } from "./commands/compute/close";
@@ -83,191 +83,191 @@ export async function commandHandler(options: any) {
     })();
   }
 
-  if (options._[0] === "gpt" && options._[1] === GptCommandEnum.UPDATE) {
-    const validOptions = ["prompt", "filepath"];
-    const unknownOptions = Object.keys(options).filter(
-      (option) =>
-        option !== "_" && option !== "$0" && !validOptions.includes(option)
-    );
-    if (unknownOptions.length > 0) {
-      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
-      process.exit(1);
-    }
-    const isWhitelisted = await SpheronApiService.isGptWhitelisted();
-    // check if the user is whitelisted
-    if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
-      console.log(isWhitelisted?.message);
-      process.exit(1);
-    }
-    (async () => {
-      try {
-        let gptPrompt;
-        if (options.prompt) {
-          gptPrompt = options.prompt;
-        } else {
-          const prompt = await promptForGPT();
-          gptPrompt = prompt.gpt;
-        }
-        let filePath;
-        if (options.filepath) {
-          filePath = options.filepath;
-        } else {
-          const path = await filePathForGPT();
-          filePath = path.inputpath;
-        }
-        await updateCode(gptPrompt, filePath);
-      } catch (error) {
-        console.log(error.message);
-        process.exit(1);
-      }
-    })();
-  }
+  // if (options._[0] === "gpt" && options._[1] === GptCommandEnum.UPDATE) {
+  //   const validOptions = ["prompt", "filepath"];
+  //   const unknownOptions = Object.keys(options).filter(
+  //     (option) =>
+  //       option !== "_" && option !== "$0" && !validOptions.includes(option)
+  //   );
+  //   if (unknownOptions.length > 0) {
+  //     console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+  //     process.exit(1);
+  //   }
+  //   const isWhitelisted = await SpheronApiService.isGptWhitelisted();
+  //   // check if the user is whitelisted
+  //   if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
+  //     console.log(isWhitelisted?.message);
+  //     process.exit(1);
+  //   }
+  //   (async () => {
+  //     try {
+  //       let gptPrompt;
+  //       if (options.prompt) {
+  //         gptPrompt = options.prompt;
+  //       } else {
+  //         const prompt = await promptForGPT();
+  //         gptPrompt = prompt.gpt;
+  //       }
+  //       let filePath;
+  //       if (options.filepath) {
+  //         filePath = options.filepath;
+  //       } else {
+  //         const path = await filePathForGPT();
+  //         filePath = path.inputpath;
+  //       }
+  //       await updateCode(gptPrompt, filePath);
+  //     } catch (error) {
+  //       console.log(error.message);
+  //       process.exit(1);
+  //     }
+  //   })();
+  // }
 
-  if (options._[0] === "gpt" && options._[1] === GptCommandEnum.FINDBUGS) {
-    const validOptions = ["filepath"];
-    const unknownOptions = Object.keys(options).filter(
-      (option) =>
-        option !== "_" && option !== "$0" && !validOptions.includes(option)
-    );
-    if (unknownOptions.length > 0) {
-      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
-      process.exit(1);
-    }
-    const isWhitelisted = await SpheronApiService.isGptWhitelisted();
-    // check if the user is whitelisted
-    if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
-      console.log(isWhitelisted?.message);
-      process.exit(1);
-    }
-    (async () => {
-      try {
-        let filePath;
-        if (options.filepath) {
-          filePath = options.filepath;
-        } else {
-          const path = await filePathForGPT();
-          filePath = path.inputpath;
-        }
-        await findBugsInCode(filePath);
-      } catch (error) {
-        console.log(error.message);
-        process.exit(1);
-      }
-    })();
-  }
+  // if (options._[0] === "gpt" && options._[1] === GptCommandEnum.FINDBUGS) {
+  //   const validOptions = ["filepath"];
+  //   const unknownOptions = Object.keys(options).filter(
+  //     (option) =>
+  //       option !== "_" && option !== "$0" && !validOptions.includes(option)
+  //   );
+  //   if (unknownOptions.length > 0) {
+  //     console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+  //     process.exit(1);
+  //   }
+  //   const isWhitelisted = await SpheronApiService.isGptWhitelisted();
+  //   // check if the user is whitelisted
+  //   if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
+  //     console.log(isWhitelisted?.message);
+  //     process.exit(1);
+  //   }
+  //   (async () => {
+  //     try {
+  //       let filePath;
+  //       if (options.filepath) {
+  //         filePath = options.filepath;
+  //       } else {
+  //         const path = await filePathForGPT();
+  //         filePath = path.inputpath;
+  //       }
+  //       await findBugsInCode(filePath);
+  //     } catch (error) {
+  //       console.log(error.message);
+  //       process.exit(1);
+  //     }
+  //   })();
+  // }
 
-  if (options._[0] === "gpt" && options._[1] === GptCommandEnum.IMPROVE) {
-    const validOptions = ["filepath"];
-    const unknownOptions = Object.keys(options).filter(
-      (option) =>
-        option !== "_" && option !== "$0" && !validOptions.includes(option)
-    );
-    if (unknownOptions.length > 0) {
-      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
-      process.exit(1);
-    }
-    const isWhitelisted = await SpheronApiService.isGptWhitelisted();
-    // check if the user is whitelisted
-    if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
-      console.log(isWhitelisted?.message);
-      process.exit(1);
-    }
-    (async () => {
-      try {
-        let filePath;
-        if (options.filepath) {
-          filePath = options.filepath;
-        } else {
-          const path = await filePathForGPT();
-          filePath = path.inputpath;
-        }
-        await improveCode(filePath);
-      } catch (error) {
-        console.log(error.message);
-        process.exit(1);
-      }
-    })();
-  }
+  // if (options._[0] === "gpt" && options._[1] === GptCommandEnum.IMPROVE) {
+  //   const validOptions = ["filepath"];
+  //   const unknownOptions = Object.keys(options).filter(
+  //     (option) =>
+  //       option !== "_" && option !== "$0" && !validOptions.includes(option)
+  //   );
+  //   if (unknownOptions.length > 0) {
+  //     console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+  //     process.exit(1);
+  //   }
+  //   const isWhitelisted = await SpheronApiService.isGptWhitelisted();
+  //   // check if the user is whitelisted
+  //   if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
+  //     console.log(isWhitelisted?.message);
+  //     process.exit(1);
+  //   }
+  //   (async () => {
+  //     try {
+  //       let filePath;
+  //       if (options.filepath) {
+  //         filePath = options.filepath;
+  //       } else {
+  //         const path = await filePathForGPT();
+  //         filePath = path.inputpath;
+  //       }
+  //       await improveCode(filePath);
+  //     } catch (error) {
+  //       console.log(error.message);
+  //       process.exit(1);
+  //     }
+  //   })();
+  // }
 
-  if (options._[0] === "gpt" && options._[1] === GptCommandEnum.TRANSPILE) {
-    const validOptions = ["filepath", "language"];
-    const unknownOptions = Object.keys(options).filter(
-      (option) =>
-        option !== "_" && option !== "$0" && !validOptions.includes(option)
-    );
-    if (unknownOptions.length > 0) {
-      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
-      process.exit(1);
-    }
-    const isWhitelisted = await SpheronApiService.isGptWhitelisted();
-    // check if the user is whitelisted
-    if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
-      console.log(isWhitelisted?.message);
-      process.exit(1);
-    }
-    (async () => {
-      try {
-        let progLanguage;
-        if (options.language) {
-          progLanguage = options.language;
-        } else {
-          const lang = await languageForGPT();
-          progLanguage = lang.lang;
-        }
-        let filePath;
-        if (options.filepath) {
-          filePath = options.filepath;
-        } else {
-          const path = await filePathForGPT();
-          filePath = path.inputpath;
-        }
-        await transpileCode(progLanguage, filePath);
-      } catch (error) {
-        console.log(error.message);
-        process.exit(1);
-      }
-    })();
-  }
+  // if (options._[0] === "gpt" && options._[1] === GptCommandEnum.TRANSPILE) {
+  //   const validOptions = ["filepath", "language"];
+  //   const unknownOptions = Object.keys(options).filter(
+  //     (option) =>
+  //       option !== "_" && option !== "$0" && !validOptions.includes(option)
+  //   );
+  //   if (unknownOptions.length > 0) {
+  //     console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+  //     process.exit(1);
+  //   }
+  //   const isWhitelisted = await SpheronApiService.isGptWhitelisted();
+  //   // check if the user is whitelisted
+  //   if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
+  //     console.log(isWhitelisted?.message);
+  //     process.exit(1);
+  //   }
+  //   (async () => {
+  //     try {
+  //       let progLanguage;
+  //       if (options.language) {
+  //         progLanguage = options.language;
+  //       } else {
+  //         const lang = await languageForGPT();
+  //         progLanguage = lang.lang;
+  //       }
+  //       let filePath;
+  //       if (options.filepath) {
+  //         filePath = options.filepath;
+  //       } else {
+  //         const path = await filePathForGPT();
+  //         filePath = path.inputpath;
+  //       }
+  //       await transpileCode(progLanguage, filePath);
+  //     } catch (error) {
+  //       console.log(error.message);
+  //       process.exit(1);
+  //     }
+  //   })();
+  // }
 
-  if (options._[0] === "gpt" && options._[1] === GptCommandEnum.TEST) {
-    const validOptions = ["filepath"];
-    const unknownOptions = Object.keys(options).filter(
-      (option) =>
-        option !== "_" && option !== "$0" && !validOptions.includes(option)
-    );
-    if (unknownOptions.length > 0) {
-      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
-      process.exit(1);
-    }
-    const isWhitelisted = await SpheronApiService.isGptWhitelisted();
-    // check if the user is whitelisted
-    if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
-      console.log(isWhitelisted?.message);
-      process.exit(1);
-    }
-    (async () => {
-      try {
-        let progLanguage;
-        if (options.language) {
-          progLanguage = options.language;
-        } else {
-          const lang = await languageForGPTTest();
-          progLanguage = lang.testlang;
-        }
-        let filePath;
-        if (options.filepath) {
-          filePath = options.filepath;
-        } else {
-          const path = await filePathForGPT();
-          filePath = path.inputpath;
-        }
-        await createTestCases(progLanguage, filePath);
-      } catch (error) {
-        console.log(error.message);
-        process.exit(1);
-      }
-    })();
-  }
+  // if (options._[0] === "gpt" && options._[1] === GptCommandEnum.TEST) {
+  //   const validOptions = ["filepath"];
+  //   const unknownOptions = Object.keys(options).filter(
+  //     (option) =>
+  //       option !== "_" && option !== "$0" && !validOptions.includes(option)
+  //   );
+  //   if (unknownOptions.length > 0) {
+  //     console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+  //     process.exit(1);
+  //   }
+  //   const isWhitelisted = await SpheronApiService.isGptWhitelisted();
+  //   // check if the user is whitelisted
+  //   if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
+  //     console.log(isWhitelisted?.message);
+  //     process.exit(1);
+  //   }
+  //   (async () => {
+  //     try {
+  //       let progLanguage;
+  //       if (options.language) {
+  //         progLanguage = options.language;
+  //       } else {
+  //         const lang = await languageForGPTTest();
+  //         progLanguage = lang.testlang;
+  //       }
+  //       let filePath;
+  //       if (options.filepath) {
+  //         filePath = options.filepath;
+  //       } else {
+  //         const path = await filePathForGPT();
+  //         filePath = path.inputpath;
+  //       }
+  //       await createTestCases(progLanguage, filePath);
+  //     } catch (error) {
+  //       console.log(error.message);
+  //       process.exit(1);
+  //     }
+  //   })();
+  // }
 
   if (options._[0] === ComputeCommandEnum.CREATE_ORGANIZATION) {
     const validOptions = ["name", "username"];
@@ -583,21 +583,21 @@ export async function commandHandler(options: any) {
     })();
   }
 
-  if (options._[0] === ComputeCommandEnum.METRICS) {
-    (async () => {
-      try {
-        const serviceName = options.name;
-        const instanceId = options.instance;
-        await ResourceFetcher.getComputeDeploymentService(
-          serviceName,
-          instanceId
-        );
-      } catch (error) {
-        console.log(error.message);
-        process.exit(1);
-      }
-    })();
-  }
+  // if (options._[0] === ComputeCommandEnum.METRICS) {
+  //   (async () => {
+  //     try {
+  //       const serviceName = options.name;
+  //       const instanceId = options.instance;
+  //       await ResourceFetcher.getComputeDeploymentService(
+  //         serviceName,
+  //         instanceId
+  //       );
+  //     } catch (error) {
+  //       console.log(error.message);
+  //       process.exit(1);
+  //     }
+  //   })();
+  // }
 
   if (options._[0] === ComputeCommandEnum.INSTANCE) {
     (async () => {
@@ -719,53 +719,53 @@ export async function commandHandler(options: any) {
     })();
   }
 
-  if (options._[0] === ComputeCommandEnum.VALIDATE) {
-    const validOptions = ["config"];
-    const unknownOptions = Object.keys(options).filter(
-      (option) =>
-        option !== "_" && option !== "$0" && !validOptions.includes(option)
-    );
-    if (unknownOptions.length > 0) {
-      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
-      process.exit(1);
-    }
-    (async () => {
-      let config;
-      if (options.config) {
-        config = options.path;
-      }
-      if (!config) {
-        config = "./spheron.yaml";
-      }
-      try {
-        await validate(config);
-      } catch (error) {
-        process.exit(1);
-      }
-    })();
-  }
+  // if (options._[0] === ComputeCommandEnum.VALIDATE) {
+  //   const validOptions = ["config"];
+  //   const unknownOptions = Object.keys(options).filter(
+  //     (option) =>
+  //       option !== "_" && option !== "$0" && !validOptions.includes(option)
+  //   );
+  //   if (unknownOptions.length > 0) {
+  //     console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+  //     process.exit(1);
+  //   }
+  //   (async () => {
+  //     let config;
+  //     if (options.config) {
+  //       config = options.path;
+  //     }
+  //     if (!config) {
+  //       config = "./spheron.yaml";
+  //     }
+  //     try {
+  //       await validate(config);
+  //     } catch (error) {
+  //       process.exit(1);
+  //     }
+  //   })();
+  // }
 
-  if (options._[0] === ComputeCommandEnum.SHELL) {
-    const validOptions = ["instanceId", "command", "service"];
-    const unknownOptions = Object.keys(options).filter(
-      (option) =>
-        option !== "_" && option !== "$0" && !validOptions.includes(option)
-    );
-    if (unknownOptions.length > 0) {
-      console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
-      process.exit(1);
-    }
-    (async () => {
-      const instanceId = options.instanceId;
-      const command = options.command;
-      const serviceName = options.service;
-      try {
-        await executeShell(instanceId, command, serviceName);
-      } catch (error) {
-        process.exit(1);
-      }
-    })();
-  }
+  // if (options._[0] === ComputeCommandEnum.SHELL) {
+  //   const validOptions = ["instanceId", "command", "service"];
+  //   const unknownOptions = Object.keys(options).filter(
+  //     (option) =>
+  //       option !== "_" && option !== "$0" && !validOptions.includes(option)
+  //   );
+  //   if (unknownOptions.length > 0) {
+  //     console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
+  //     process.exit(1);
+  //   }
+  //   (async () => {
+  //     const instanceId = options.instanceId;
+  //     const command = options.command;
+  //     const serviceName = options.service;
+  //     try {
+  //       await executeShell(instanceId, command, serviceName);
+  //     } catch (error) {
+  //       process.exit(1);
+  //     }
+  //   })();
+  // }
 
   if (!options._[0]) {
     console.log(
