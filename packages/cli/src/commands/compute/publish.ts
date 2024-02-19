@@ -30,7 +30,7 @@ export async function computeDeploy(
       yamlData
     ) as SpheronComputeConfiguration;
 
-    console.log(JSON.stringify(spheronConfig));
+    // console.log(JSON.stringify(spheronConfig));
 
     const organizationId: string = organization
       ? organization
@@ -70,8 +70,8 @@ export async function computeDeploy(
         `instance-${result.computeInstanceId}.yaml`
       );
       await fs.writeFile(instanceYamlFilePath, updatedYamlData, "utf8");
-      console.log(`Instance data saved to ${instanceYamlFilePath}`);
-      spinner.success("Deployment finished 🚀");
+      console.log(`\nInstance data saved to ${instanceYamlFilePath}`);
+      spinner.success("Instance provisioning in progress 🚀");
     } else {
       console.log(
         "Instance ID not found in the response. Unable to save the YAML file."

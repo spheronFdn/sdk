@@ -21,7 +21,7 @@ export enum ComputeCommandEnum {
   USAGE = "usage",
   PLANS = "plans",
   REGIONS = "regions",
-  MARKETPLACE_APP = "marketplace-apps",
+  MARKETPLACE_APPS = "marketplace-apps",
   METRICS = "metrics",
 }
 

@@ -1,9 +1,7 @@
 #! /usr/bin/env node
-/* eslint-disable @typescript-eslint/no-var-requires */
-const yargs = require("yargs");
+import yargs from "yargs";
 import configuration from "./configuration";
 import { commandHandler } from "./command-handler";
-import { GptCommandEnum } from "./commands/gpt/gpt";
 import { ComputeCommandEnum } from "./commands/compute/interfaces";
 import { GlobalCommandEnum } from "./commands/interfaces";
 
@@ -13,299 +11,311 @@ import { GlobalCommandEnum } from "./commands/interfaces";
   const options = yargs
     .command(
       GlobalCommandEnum.LOGIN,
-      "Logs into yout Spheron account",
+      "Log in to your Spheron account — Enter your credentials when prompted.",
       (yargs: any) => {
         yargs
           .option("github", {
-            describe: "Login using Github credentials",
+            describe: "Log in using Github credentials.",
           })
           .option("gitlab", {
-            describe: "Login using Gitlab credentials",
+            describe: "Log in using Gitlab credentials.",
           })
           .option("bitbucket", {
-            describe: "Login using Bitbucket credentials",
+            describe: "Log in using Bitbucket credentials.",
           })
           .version(false)
           .usage("Usage: $0 login [--github|--gitlab|--bitbucket]")
-          .wrap(100)
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
     .command(
       GlobalCommandEnum.LOGOUT,
-      "Logs out of your account",
+      "Log out of your account — Ends your current session.",
       (yargs: any) => {
-        yargs.version(false).usage("Usage: $0 logout").help();
+        yargs
+          .version(false)
+          .usage("Usage: $0 logout")
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
       }
     )
     .command(
       ComputeCommandEnum.CREATE_ORGANIZATION,
-      "Create organization",
+      "Create a new organization — Follow the prompts to specify organization.",
       (yargs: any) => {
         yargs
           .option("name", {
-            describe: "Name of the organization",
-          })
-          .option("username", {
-            describe: "Username of the organization",
+            describe: "Name of the organization.",
           })
           .version(false)
-          .usage(
-            `Usage: $0 compute create-organization --name <organization_name> --username <username>`
-          )
-          .wrap(100)
+          .usage(`Usage: $0 create-organization --name <ORG NAME>`)
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
     .command(
       ComputeCommandEnum.SWITCH_ORGANIZATION,
-      "Change compute default configuration",
+      "Switch your active organization — Select from available organizations when prompted.",
       (yargs: any) => {
         yargs
           .option("organization", {
-            describe: "Set id of default organization ",
+            describe: "Set name of your organization.",
           })
           .version(false)
-          .usage(
-            `Usage: $0 compute switch-organization [--organization <organizationId>]`
-          )
-          .wrap(150)
+          .usage(`Usage: $0 switch-organization [--organization <ORG ID>]`)
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
     .command(
       ComputeCommandEnum.INIT,
-      "Create initial spheron compute configuration file",
+      "Initialize deployment configuration — Creates a Spheron configuration file in your project directory.",
       (yargs: any) => {
         yargs
-          .option("organization", {
-            describe: "Set id of default organization ",
+          .option("import", {
+            describe: "Set relative path to docker compose or dockerfile.",
           })
-          .option("dockerfile", {
-            describe:
-              "Set relative path to dockerfile if building from local",
-          })
-          .option("tag", {
-            describe: "Docker image tag",
-          })
-          .option("dockerhubRepository", {
-            describe: "Dockerhub repository ex: user/redis",
-          })
-          .option("template", {
-            describe: "Set template id ",
+          .option("marketplace", {
+            describe: "Set marketplace app ID.",
           })
           .version(false)
           .usage(
-            `Usage: $0 compute init [--dockerfile <path>] [--tag <tag>] [--templateId <id>] [--dockerhubRepository <repo>]`
+            `Usage: $0 init [--import <DOCKER COMPOSE PATH / DOCKERFILE PATH>] [--marketplace <APP ID>]`
           )
-          .wrap(150)
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
     .command(
       ComputeCommandEnum.DEPLOY,
-      "Deploy instance defined in spheron.yaml",
+      "Deploy your project — Uses the spheron.yaml file to launch your instance.",
       (yargs: any) => {
         yargs
-          .option("organizationId", {
-            describe: "Organization ID",
-          })
           .option("config", {
-            describe: "Relative path to config file",
+            describe: "Set relative path to spheron.yaml file",
           })
           .version(false)
-          .usage(
-            `Usage: $0 compute publish [--organizationId <organizationId>] [--config <path_to_config>] [--dockerhub <profile_name>]`
-          )
-          .wrap(150)
+          .usage(`Usage: $0 publish [--config <PATH_TO_CONFIG>]`)
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
     .command(
       ComputeCommandEnum.BUILD,
-      "Build docker image from spheron.yaml and push it to dockerhub",
+      "Build and push Docker image — Compiles an image from spheron.yaml and uploads it to Docker Hub.",
       (yargs: any) => {
         yargs
           .option("config", {
-            describe: "Relative path to config file",
+            describe: "Set relative path to spheron.yaml file",
           })
           .option("u", {
-            describe: "Dockerhub username",
+            describe: "Set dockerhub username",
           })
           .option("p", {
-            describe: "Dockerhub password",
+            describe: "Set dockerhub password",
           })
           .version(false)
           .usage(
-            `Usage: $0 compute build [--config <path_to_config>] [-u <dockerhub_username>] [-p <dockerhub_password>]`
+            `Usage: $0 build [--config <PATH TO CONFIG>] [-u <DOCKERHUB USERNAME>] [-p <DOCKERHUB PASSWORD>]`
           )
-          .wrap(150)
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
     .command(
       ComputeCommandEnum.UPDATE,
-      "Update instance configuration",
+      "Update instance settings — Modifies configuration based on spheron.yaml.",
       (yargs: any) => {
         yargs
           .option("config", {
-            describe: "Relative path to config file",
+            describe: "Set relative path to spheron.yaml file",
             demandOption: false,
           })
-          .option("organizationId", {
-            describe: "organization ID",
-          })
-          .option("instanceId", {
-            describe: "Instance id",
+          .option("instance", {
+            describe: "Set instance ID",
           })
           .version(false)
           .usage(
-            `Usage: $0 compute update --config <config_path> [--instanceId <instanceId>] [--organizationId <orgId>] `
+            `Usage: $0 update [--config <PATH TO CONFIG>] [--instance <INSTANCE ID>]`
           )
-
-          .wrap(150)
-          .help();
-      }
-    )
-    .command(ComputeCommandEnum.CLOSE, "Close instance", (yargs: any) => {
-      yargs
-        .option("config", {
-          describe: "Relative path to config file",
-          demandOption: false,
-        })
-        .option("id", {
-          describe: "Instance id",
-        })
-        .version(false)
-        .usage(
-          `Usage: $0 compute close --config <config_path> [--id <instanceId>] [--organizationId <orgId>] `
-        )
-
-        .wrap(150)
-        .help();
-    })
-    .command(
-      ComputeCommandEnum.SHELL,
-      "Execute shell command inside of instance",
-      (yargs: any) => {
-        yargs
-          .option("instanceId", {
-            describe: "Instance id",
-          })
-          .option("command", {
-            describe: "shell command",
-          })
-          .version(false)
-          .usage(
-            `Usage: $0 compute shell --instanceId <instanceId> --command 'ls -a'`
-          )
-          .wrap(150)
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
     .command(
-      ComputeCommandEnum.VALIDATE,
-      "Validate spheron configuration (or some other spheron compute configuration file)",
+      ComputeCommandEnum.CLOSE,
+      "Terminate the instance — Shuts down the specified active instance.",
       (yargs: any) => {
         yargs
-          .option("config", {
-            describe: "Relative path to config file",
-            demandOption: false,
+          .option("instance", {
+            describe: "Set instance ID",
           })
           .version(false)
-          .usage(`Usage: $0 compute validate [--config <file_path>]`)
-          .wrap(150)
+          .usage(`Usage: $0 close [--id <INSTANCE ID>]`)
+          .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }
     )
-    .command("gpt <command>", "GPT related commands", (yargs: any) => {
-      yargs
-        .command(
-          GptCommandEnum.GENERATE,
-          "Generate test cases",
-          (yargs: any) => {
-            yargs
-              .option("prompt", {
-                describe: "Prompt",
-                demandOption: true,
-              })
-              .option("filepath", {
-                describe: "Path to file",
-                demandOption: true,
-              })
-              .version(false)
-              .usage(
-                `Usage: $0 gpt generate --prompt <prompt> --filepath <file_path>`
-              )
-              .wrap(100)
-              .help();
-          }
-        )
-        .command(GptCommandEnum.UPDATE, "Update code", (yargs: any) => {
-          yargs
-            .option("prompt", {
-              describe: "Prompt",
-              demandOption: true,
-            })
-            .option("filepath", {
-              describe: "Path to file",
-            })
-            .version(false)
-            .usage(
-              `Usage: $0 gpt update --prompt <prompt> --filepath <file_path>`
-            )
-            .wrap(100)
-            .help();
-        })
-        .command(GptCommandEnum.FINDBUGS, "Debug code", (yargs: any) => {
-          yargs
-            .option("filepath", {
-              describe: "Path to file",
-              demandOption: true,
-            })
-            .version(false)
-            .usage(`Usage: $0 gpt findbugs --filepath <file_path>`)
-            .wrap(100)
-            .help();
-        })
-        .command(GptCommandEnum.IMPROVE, "Optimise code", (yargs: any) => {
-          yargs
-            .option("filepath", {
-              describe: "Path to file",
-              demandOption: true,
-            })
-            .version(false)
-            .usage(`Usage: $0 gpt improve --filepath <file_path>`)
-            .wrap(100)
-            .help();
-        })
-        .command(GptCommandEnum.TRANSPILE, "Transpile code", (yargs: any) => {
-          yargs
-            .option("filepath", {
-              describe: "Path to file",
-              demandOption: true,
-            })
-            .option("language", {
-              describe: "Languag",
-              demandOption: true,
-            })
-            .version(false)
-            .usage(`Usage: $0 gpt transpile --filepath <file_path>`)
-            .wrap(100)
-            .help();
-        })
-        .command(GptCommandEnum.TEST, "Generate test cases", (yargs: any) => {
-          yargs
-            .option("filepath", {
-              describe: "Path to file",
-              demandOption: true,
-            })
-            .version(false)
-            .usage(`Usage: $0 gpt ctc --filepath <file_path>`)
-            .wrap(100)
-            .help();
-        });
-    }).argv;
+    // .command(
+    //   ComputeCommandEnum.SHELL,
+    //   "Execute shell command inside of instance",
+    //   (yargs: any) => {
+    //     yargs
+    //       .option("instanceId", {
+    //         describe: "Instance id",
+    //       })
+    //       .option("command", {
+    //         describe: "shell command",
+    //       })
+    //       .version(false)
+    //       .usage(
+    //         `Usage: $0 compute shell --instanceId <instanceId> --command 'ls -a'`
+    //       )
+    //       .wrap(150)
+    //       .help();
+    //   }
+    // )
+    // .command(
+    //   ComputeCommandEnum.VALIDATE,
+    //   "Validate spheron configuration (or some other spheron compute configuration file)",
+    //   (yargs: any) => {
+    //     yargs
+    //       .option("config", {
+    //         describe: "Relative path to config file",
+    //         demandOption: false,
+    //       })
+    //       .version(false)
+    //       .usage(`Usage: $0 compute validate [--config <file_path>]`)
+    //       .wrap(150)
+    //       .help();
+    //   }
+    // )
+    .command(
+      ComputeCommandEnum.MARKETPLACE_APPS,
+      "List all marketplace apps — Displays available apps in the Spheron marketplace.",
+      (yargs: any) => {
+        yargs
+          .option("category", {
+            describe: "Set category of the marketplace",
+            demandOption: false,
+          })
+          .version(false)
+          .usage(`Usage: $0 marketplace-apps [--category <CATEGORY>]`)
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.INSTANCES,
+      "List project instances — Displays all instances within a specified project.",
+      (yargs: any) => {
+        yargs
+          .option("project", {
+            describe: "Set project ID",
+            demandOption: false,
+          })
+          .version(false)
+          .usage(`Usage: $0 instances [--project <PROJECT NAME>]`)
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.INSTANCE,
+      "Fetch instance and service details — Provides information on an instance and its associated services.",
+      (yargs: any) => {
+        yargs
+          .option("id", {
+            describe: "Set instance ID",
+            demandOption: false,
+          })
+          .version(false)
+          .usage(`Usage: $0 instance [--id <INSTANCE ID>]`)
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.SERVICE,
+      "Get service details within an instance — Shows information for services in a specific instance.",
+      (yargs: any) => {
+        yargs
+          .option("id", {
+            describe: "Set instance ID",
+            demandOption: false,
+          })
+          .option("name", {
+            describe: "Set service name",
+            demandOption: false,
+          })
+          .version(false)
+          .usage(
+            `Usage: $0 service [--instance <INSTANCE ID>] [--name <SERVICE NAME>]`
+          )
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.PLANS,
+      "List available plans — Displays all plans offered by Spheron.",
+      (yargs: any) => {
+        yargs
+          .option("region", {
+            describe: "Set region name",
+            demandOption: false,
+          })
+          .version(false)
+          .usage(`Usage: $0 plans [--region <REGION>]`)
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.REGIONS,
+      "Show available regions — Displays all regions where services can be deployed.",
+      (yargs: any) => {
+        yargs
+          .version(false)
+          .usage(`Usage: $0 regions`)
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.PROJECTS,
+      "Retrieve project and instance information — Shows details of the project along with its instances.",
+      (yargs: any) => {
+        yargs
+          .version(false)
+          .usage(`Usage: $0 projects`)
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .command(
+      ComputeCommandEnum.LOGS,
+      "Fetch service logs — Retrieves all logs for a specific service within an instance.",
+      (yargs: any) => {
+        yargs
+          .option("instance", {
+            describe: "Set instance ID",
+            demandOption: false,
+          })
+          .option("service", {
+            describe: "Set service name",
+            demandOption: false,
+          })
+          .version(false)
+          .usage(
+            `Usage: $0 logs [--instance <INSTANCE ID>] [--name <SERVICE NAME>]`
+          )
+          .wrap(yargs.terminalWidth() * 0.8)
+          .help();
+      }
+    )
+    .wrap(yargs.terminalWidth() * 0.8).argv;
 
   await commandHandler(options);
 })();

@@ -24,7 +24,7 @@ export async function validate(rootPath: string): Promise<any> {
       validationErrors += 1;
     }
     if (!spheronConfig.tag) {
-      console.log("tag not specifed -> deafult is latest ⚠️");
+      console.log("tag not specifed -> default is latest ⚠️");
       validationWarnings += 1;
     }
 
