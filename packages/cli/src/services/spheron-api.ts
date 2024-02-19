@@ -11,7 +11,6 @@ import {
   Domain,
   Env,
   ExtendedInstance,
-  Instance,
   InstanceLogType,
   ComputeDeployment,
   ComputeDeploymentLogs,

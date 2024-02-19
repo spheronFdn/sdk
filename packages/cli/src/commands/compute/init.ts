@@ -7,7 +7,6 @@ import Spinner from "../../outputs/spinner";
 import {
   BuildConfig,
   CliComputeEnv,
-  CliComputeInstanceType,
   CliCustomParams,
   CliPersistentStorageTypesEnum,
   DockerCompose,

@@ -15,7 +15,6 @@ import {
   Port,
   User,
   ComputeTypeEnum,
-  InstanceWithProject,
   Gpu,
   InstancesInfo,
   AutoscalingRules,

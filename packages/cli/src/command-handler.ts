@@ -23,7 +23,7 @@ import {
   promptForLogin,
   closeInstancePrompt,
 } from "./prompts/prompts";
-import SpheronApiService from "./services/spheron-api";
+import SpheronApiService, { toCliPersistentStorage } from "./services/spheron-api";
 import { fileExists } from "./utils";
 import {
   ComputeCommandEnum,
@@ -418,7 +418,15 @@ export async function commandHandler(options: any) {
                   exposedPort: x.exposedPort,
                 };
               });
-
+              const cliPersistentStorage = template.serviceData.customTemplateSpecs.persistentStorage?.class?  {
+                size: template.serviceData.customTemplateSpecs.persistentStorage.size,
+                class: toCliPersistentStorage(
+                  template.serviceData.customTemplateSpecs.persistentStorage.class
+                ),
+                mountPoint:
+                template.serviceData.customTemplateSpecs.persistentStorage.mountPoint,
+              }: undefined;
+              console.log(cliPersistentStorage)
               services.push({
                 name: template.name.toLocaleLowerCase().replace(" ", "_"),
                 templateId: template._id,
@@ -432,7 +440,8 @@ export async function commandHandler(options: any) {
                 args: template.serviceData.args,
                 plan: defaultPlan ? defaultPlan.name : "Ventus Nano 1",
                 customParams: {
-                  storage: "10Gi",
+                  storage: template.serviceData.customTemplateSpecs.storage ?? "10Gi",
+                  persistentStorage: cliPersistentStorage 
                 },
               });
             })
