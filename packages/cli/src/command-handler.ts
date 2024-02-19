@@ -505,12 +505,12 @@ export async function commandHandler(options: any) {
     (async () => {
       try {
         const config = options.config;
-        const instanceId = options.instance;
+        const id = options.id;
 
-        const prompt = await closeInstancePrompt(instanceId);
+        const prompt = await closeInstancePrompt(id);
 
         if (prompt.answer === "Yes") {
-          await close(instanceId, config);
+          await close(id, config);
         }
       } catch (error) {
         process.exit(1);
