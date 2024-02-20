@@ -21,7 +21,7 @@ import {
   MasterOrganization,
   ComputeMetrics,
   ExtendedInstance,
-} from "@spheron/core-testing";
+} from "@spheron/core";
 import Spinner from "../outputs/spinner";
 import SpheronApiService, {
   toCliPersistentStorage,

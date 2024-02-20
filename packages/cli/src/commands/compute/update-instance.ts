@@ -5,7 +5,7 @@ import * as yaml from "js-yaml";
 import * as fs from "fs/promises"; // Node.js fs module with promises
 import * as path from "path";
 import { SpheronComputeConfiguration } from "./interfaces";
-import { InstanceResponse } from "@spheron/core-testing";
+import { InstanceResponse } from "@spheron/core";
 import Spinner from "../../outputs/spinner";
 
 export async function computeUpdate(

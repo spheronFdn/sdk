@@ -3,7 +3,7 @@ import open from "open";
 import { writeToJsonFile } from "../utils";
 import configuration from "../configuration";
 import Spinner from "../outputs/spinner";
-import { AppTypeEnum, VerifiedTokenResponse } from "@spheron/core-testing";
+import { AppTypeEnum, VerifiedTokenResponse } from "@spheron/core";
 import SpheronApiService from "../services/spheron-api";
 
 let server: http.Server;

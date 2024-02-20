@@ -1,4 +1,4 @@
-import { AppTypeEnum } from "@spheron/core-testing";
+import { AppTypeEnum } from "@spheron/core";
 import { readFromJsonFile, writeToJsonFile } from "../utils";
 import configuration from "../configuration";
 

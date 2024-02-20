@@ -2,7 +2,7 @@ import configuration from "../configuration";
 import { fileExists } from "../utils";
 import { createConfiguration } from "./create-configuration";
 import Spinner from "../outputs/spinner";
-import { AppTypeEnum, Organization } from "@spheron/core-testing";
+import { AppTypeEnum, Organization } from "@spheron/core";
 import SpheronApiService from "../services/spheron-api";
 import MetadataService from "../services/metadata-service";
 

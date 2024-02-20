@@ -35,7 +35,7 @@ import {
   MarketplaceApp,
   MasterOrganization,
   User,
-} from "@spheron/core-testing";
+} from "@spheron/core";
 import {
   computeInit,
   readDockerComposeFile,

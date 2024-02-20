@@ -1,6 +1,6 @@
 import { YesNoEnum } from "../commands/gpt/gpt";
 import SpheronApiService from "../services/spheron-api";
-import { MarketplaceApp, MarketplaceCategoryEnum } from "@spheron/core-testing";
+import { MarketplaceApp, MarketplaceCategoryEnum } from "@spheron/core";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const inquirer = require("inquirer");

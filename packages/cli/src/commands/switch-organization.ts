@@ -1,4 +1,4 @@
-import { MasterOrganization } from "@spheron/core-testing";
+import { MasterOrganization } from "@spheron/core";
 import MetadataService from "../services/metadata-service";
 
 export async function changeDefaultOrganization(masterOrg: MasterOrganization) {
