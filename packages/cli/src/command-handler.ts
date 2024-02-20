@@ -23,7 +23,9 @@ import {
   promptForLogin,
   closeInstancePrompt,
 } from "./prompts/prompts";
-import SpheronApiService, { toCliPersistentStorage } from "./services/spheron-api";
+import SpheronApiService, {
+  toCliPersistentStorage,
+} from "./services/spheron-api";
 import { fileExists } from "./utils";
 import {
   ComputeCommandEnum,
@@ -358,8 +360,6 @@ export async function commandHandler(options: any) {
   if (options._[0] === ComputeCommandEnum.INIT) {
     (async () => {
       try {
-        console.log(`prompt data: ${JSON.stringify(options)}`);
-
         const marketplaceAppId = options.marketplace;
         const importFile = options.import;
         const dockerFile = options.dockerFile;
@@ -418,15 +418,20 @@ export async function commandHandler(options: any) {
                   exposedPort: x.exposedPort,
                 };
               });
-              const cliPersistentStorage = template.serviceData.customTemplateSpecs?.persistentStorage?.class?  {
-                size: template.serviceData.customTemplateSpecs.persistentStorage.size,
-                class: toCliPersistentStorage(
-                  template.serviceData.customTemplateSpecs.persistentStorage.class
-                ),
-                mountPoint:
-                template.serviceData.customTemplateSpecs.persistentStorage.mountPoint,
-              }: undefined;
-              console.log(cliPersistentStorage)
+              const cliPersistentStorage = template.serviceData
+                .customTemplateSpecs?.persistentStorage?.class
+                ? {
+                    size: template.serviceData.customTemplateSpecs
+                      .persistentStorage.size,
+                    class: toCliPersistentStorage(
+                      template.serviceData.customTemplateSpecs.persistentStorage
+                        .class
+                    ),
+                    mountPoint:
+                      template.serviceData.customTemplateSpecs.persistentStorage
+                        .mountPoint,
+                  }
+                : undefined;
               services.push({
                 name: template.name.toLocaleLowerCase().replace(" ", "_"),
                 templateId: template._id,
@@ -440,8 +445,9 @@ export async function commandHandler(options: any) {
                 args: template.serviceData.args,
                 plan: defaultPlan ? defaultPlan.name : "Ventus Nano 1",
                 customParams: {
-                  storage: template.serviceData.customTemplateSpecs?.storage ?? "10Gi",
-                  persistentStorage: cliPersistentStorage 
+                  storage:
+                    template.serviceData.customTemplateSpecs?.storage ?? "10Gi",
+                  persistentStorage: cliPersistentStorage,
                 },
               });
             })
@@ -499,9 +505,7 @@ export async function commandHandler(options: any) {
         const config = options.config;
         const dockerUsername = options.u;
         const dockerPassword = options.p;
-        console.log("CONFIG:", config);
-        console.log("Username:", dockerUsername);
-        console.log("Password:", dockerPassword);
+
         await build(config, dockerUsername, dockerPassword);
       } catch (error) {
         console.log(error.message);
@@ -754,31 +758,31 @@ export async function commandHandler(options: any) {
   //   })();
   // }
 
-  // if (options._[0] === ComputeCommandEnum.SHELL) {
-  //   const validOptions = ["instanceId", "command", "service"];
-  //   const unknownOptions = Object.keys(options).filter(
-  //     (option) =>
-  //       option !== "_" && option !== "$0" && !validOptions.includes(option)
-  //   );
-  //   if (unknownOptions.length > 0) {
-  //     console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
-  //     process.exit(1);
-  //   }
-  //   (async () => {
-  //     const instanceId = options.instanceId;
-  //     const command = options.command;
-  //     const serviceName = options.service;
-  //     try {
-  //       await executeShell(instanceId, command, serviceName);
-  //     } catch (error) {
+  //   if (options._[0] === ComputeCommandEnum.SHELL) {
+  //     const validOptions = ["instance", "command", "service"];
+  //     const unknownOptions = Object.keys(options).filter(
+  //       (option) =>
+  //         option !== "_" && option !== "$0" && !validOptions.includes(option)
+  //     );
+  //     if (unknownOptions.length > 0) {
+  //       console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
   //       process.exit(1);
   //     }
-  //   })();
-  // }
+  //     (async () => {
+  //       const instance = options.instance;
+  //       const command = options.command;
+  //       const serviceName = options.service;
+  //       try {
+  //         await executeShell(instance, command, serviceName);
+  //       } catch (error) {
+  //         process.exit(1);
+  //       }
+  //     })();
+  //   }
 
-  if (!options._[0]) {
-    console.log(
-      "Please use --help to check all commands available with spheron cli"
-    );
-  }
+  //   if (!options._[0]) {
+  //     console.log(
+  //       "Please use --help to check all commands available with spheron cli"
+  //     );
+  //   }
 }

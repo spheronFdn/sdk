@@ -297,11 +297,7 @@ export const ResourceFetcher = {
           dto._id,
           dto.dailySpending ? `$${dto.dailySpending?.toFixed(2)} / mo` : `N.A.`,
           dto.computeProjectName as string,
-          dto.state === InstanceStateEnum.ACTIVE
-            ? "✅ Active"
-            : dto.state === InstanceStateEnum.CLOSED
-            ? "❌ Closed"
-            : `⚪ ${dto.state}`,
+          mapInstanceState(dto.state),
           dto.type ?? CliComputeInstanceType.ON_DEMAND,
           dto.updatedAt.toString(),
           dto.createdAt.toString(),
@@ -451,9 +447,7 @@ export const ResourceFetcher = {
       );
       console.log(`Name: ${service.name}`);
       console.log(`Image: ${service.image}`);
-      console.log(
-        `Status: ${instance.state === "Active" ? "✅ Active" : "❌ Inactive"}`
-      );
+      console.log(`Status: ${mapInstanceState(instance.state)}`);
       console.log(`Replicas: ${service.serviceCount}`);
       console.log(`Region: ${service.region}`);
       console.log(
@@ -512,14 +506,16 @@ export const ResourceFetcher = {
       console.log(`Arguments:`);
       service.args.forEach((arg) => console.log(`  ${arg}`));
 
-      console.log(`\nHealth Check:`);
-      console.log(`  Port: ${service.healthCheck.port?.containerPort}`);
-      console.log(`  Path: ${service.healthCheck.path}`);
-      console.log(
-        `  Status: ${
-          service.healthCheck.status ? "✅ Healthy" : "❌ Unhealthy"
-        }`
-      );
+      if (service.healthCheck && service.healthCheck.port?.containerPort) {
+        console.log(`\nHealth Check:`);
+        console.log(`  Port: ${service.healthCheck.port?.containerPort}`);
+        console.log(`  Path: ${service.healthCheck.path}`);
+        console.log(
+          `  Status: ${
+            service.healthCheck.status ? "✅ Healthy" : "❌ Unhealthy"
+          }`
+        );
+      }
 
       console.log(`\nUpdated At: ${instance.updatedAt.toString()}`);
       console.log(`Created At: ${instance.createdAt.toString()}`);
@@ -764,7 +760,7 @@ interface BasicComputeInstanceDTO {
 
 interface SuperComputeInstanceDTO {
   _id: string;
-  state: string;
+  state: InstanceStateEnum;
   name: string;
   versions: Array<string>;
   activeVersionId: string;
@@ -1102,9 +1098,7 @@ function printInstanceDetails(
     `Here is the detailed view of your Instance ${instance._id}! 👇\n`
   );
   console.log(`Name: ${instance.name}`);
-  console.log(
-    `Status: ${instance.state === "Active" ? "✅ Active" : "❌ Inactive"}`
-  );
+  console.log(`Status: ${mapInstanceState(instance.state)}`);
   const monthlyCost = instance.dailySpending
     ? `$${(instance.dailySpending * 30).toFixed(2)} / mo`
     : "N.A.";
@@ -1136,6 +1130,21 @@ function printOrganizationDetails(org: MasterOrganizationDTO): void {
 
   console.log(`ID: ${org._id}`);
   console.log(`Name: ${org.profile.name}`);
+}
+
+function mapInstanceState(state: InstanceStateEnum): string {
+  switch (state) {
+    case InstanceStateEnum.ACTIVE:
+      return `✅ Provisioned`;
+    case InstanceStateEnum.STARTING:
+      return `⚪ Provisioning`;
+    case InstanceStateEnum.CLOSED:
+      return `❌ Closed`;
+    case InstanceStateEnum.FAILED_START:
+      return `❌ Failed`;
+    default:
+      return `❌ Closed`;
+  }
 }
 
 const AKASH_IMAGE_CUSTOM_PLAN = "Custom Plan";

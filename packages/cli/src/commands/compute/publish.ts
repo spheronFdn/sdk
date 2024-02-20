@@ -30,8 +30,6 @@ export async function computeDeploy(
       yamlData
     ) as SpheronComputeConfiguration;
 
-    // console.log(JSON.stringify(spheronConfig));
-
     const organizationId: string = organization
       ? organization
       : (await MetadataService.getComputeData())?.organizationId;
