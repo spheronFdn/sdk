@@ -29,7 +29,7 @@ import {
   MasterOrganization,
   ProjectStateEnum,
   ComputeMetrics,
-} from "@spheron/core";
+} from "@spheron/core-testing";
 import configuration from "../configuration";
 import { IGPTResponse } from "../commands/gpt/gpt";
 import Spinner from "../outputs/spinner";

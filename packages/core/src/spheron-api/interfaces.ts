@@ -427,6 +427,14 @@ interface MarketplaceAppServiceData {
   ports: MarketplaceAppPort[];
   commands: string[];
   args: string[];
+  customTemplateSpecs?: ICustomServiceSpecs;
+}
+
+interface ICustomServiceSpecs {
+  cpu?: number;
+  memory?: string;
+  storage?: string;
+  persistentStorage?: PersistentStorage;
 }
 
 interface MarketplaceAppVariable {

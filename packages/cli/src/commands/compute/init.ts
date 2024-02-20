@@ -13,7 +13,7 @@ import {
   SpheronComputeConfiguration,
   SpheronComputeServiceConfiguration,
 } from "./interfaces";
-import { Port } from "@spheron/core";
+import { Port } from "@spheron/core-testing";
 
 export async function computeInit(configuration: SpheronComputeConfiguration) {
   const spinner = new Spinner();

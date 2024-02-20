@@ -1,4 +1,4 @@
-import { ShellExecutionResponse } from "@spheron/core";
+import { ShellExecutionResponse } from "@spheron/core-testing";
 import Spinner from "../../outputs/spinner";
 import SpheronApiService from "../../services/spheron-api";
 

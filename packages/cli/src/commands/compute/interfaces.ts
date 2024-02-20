@@ -1,4 +1,4 @@
-import { Port } from "@spheron/core";
+import { Port } from "@spheron/core-testing";
 
 export enum ComputeCommandEnum {
   GET = "get",

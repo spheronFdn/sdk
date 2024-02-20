@@ -35,7 +35,7 @@ import {
   MarketplaceApp,
   MasterOrganization,
   User,
-} from "@spheron/core";
+} from "@spheron/core-testing";
 import {
   computeInit,
   readDockerComposeFile,
@@ -418,7 +418,7 @@ export async function commandHandler(options: any) {
                   exposedPort: x.exposedPort,
                 };
               });
-              const cliPersistentStorage = template.serviceData.customTemplateSpecs.persistentStorage?.class?  {
+              const cliPersistentStorage = template.serviceData.customTemplateSpecs?.persistentStorage?.class?  {
                 size: template.serviceData.customTemplateSpecs.persistentStorage.size,
                 class: toCliPersistentStorage(
                   template.serviceData.customTemplateSpecs.persistentStorage.class
@@ -440,7 +440,7 @@ export async function commandHandler(options: any) {
                 args: template.serviceData.args,
                 plan: defaultPlan ? defaultPlan.name : "Ventus Nano 1",
                 customParams: {
-                  storage: template.serviceData.customTemplateSpecs.storage ?? "10Gi",
+                  storage: template.serviceData.customTemplateSpecs?.storage ?? "10Gi",
                   persistentStorage: cliPersistentStorage 
                 },
               });

@@ -1,6 +1,6 @@
 {
   "name": "@spheron/cli-test",
-  "version": "2.0.0",
+  "version": "11.0.6",
   "description": "CLI for working on projects and deploying them via Spheron ",
   "keywords": [
     "CLI",
@@ -27,7 +27,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@spheron/core": "*",
+    "@spheron/core-testing": "^11.0.6",
     "@spheron/storage": "^2.0.2",
     "@types/js-yaml": "^4.0.5",
     "axios": "^1.3.2",
