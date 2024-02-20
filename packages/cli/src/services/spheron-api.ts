@@ -29,6 +29,7 @@ import {
   MasterOrganization,
   ProjectStateEnum,
   ComputeMetrics,
+  TokenScope,
 } from "@spheron/core";
 import configuration from "../configuration";
 import { IGPTResponse } from "../commands/gpt/gpt";
@@ -143,6 +144,12 @@ const SpheronApiService = {
     const client: SpheronApi = await this.initialize();
     const deployment: Deployment = await client.getDeployment(id);
     return deployment;
+  },
+
+  async getTokenScope(): Promise<TokenScope> {
+    const client: SpheronApi = await this.initialize();
+    const scope: TokenScope = await client.getTokenScope();
+    return scope;
   },
 
   async getProjectDeployments(

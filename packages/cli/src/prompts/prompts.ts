@@ -10,7 +10,7 @@ export async function promptForLogin(): Promise<any> {
     {
       type: "list",
       name: "provider",
-      message: "Select your provider:",
+      message: "Select login method:",
       choices: ["Github", "Gitlab", "Bitbucket"],
     },
   ]);

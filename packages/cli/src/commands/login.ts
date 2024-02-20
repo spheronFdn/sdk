@@ -3,13 +3,30 @@ import open from "open";
 import { writeToJsonFile } from "../utils";
 import configuration from "../configuration";
 import Spinner from "../outputs/spinner";
-import { AppTypeEnum, VerifiedTokenResponse } from "@spheron/core";
+import { AppTypeEnum, MasterOrganization, User, VerifiedTokenResponse } from "@spheron/core";
 import SpheronApiService from "../services/spheron-api";
+import { changeDefaultOrganization } from "./switch-organization";
 
 let server: http.Server;
 
-export async function login(provider: string): Promise<void> {
+export async function login(provider: string, value?: string): Promise<void> {
   const spinner = new Spinner();
+  if(provider == "token"){
+    await writeToJsonFile(
+      "jwtToken",
+      value,
+      configuration.configFilePath
+    );
+    const user: User = await SpheronApiService.getProfile();
+    const scope = await SpheronApiService.getTokenScope();
+
+    const masterOrg = user.organizations.find(
+      (org) => org.profile.name === scope.organizations[0].name
+    ) as MasterOrganization;
+
+    await changeDefaultOrganization(masterOrg);
+    return;
+  }
   spinner.spin(`Waiting for ${provider} authentication to be completed `);
   server = http.createServer();
   server.listen(0, "127.0.0.1", async () => {

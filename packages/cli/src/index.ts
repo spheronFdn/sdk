@@ -23,8 +23,11 @@ import { GlobalCommandEnum } from "./commands/interfaces";
           .option("bitbucket", {
             describe: "Log in using Bitbucket credentials.",
           })
+          .option("token", {
+            describe: "Log in by copying the api token from the platform.",
+          })
           .version(false)
-          .usage("Usage: $0 login [--github|--gitlab|--bitbucket]")
+          .usage("Usage: $0 login [--github|--gitlab|--bitbucket|--token]")
           .wrap(yargs.terminalWidth() * 0.8)
           .help();
       }

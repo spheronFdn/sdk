@@ -56,7 +56,7 @@ export async function commandHandler(options: any) {
     await createConfiguration();
   }
   if (options._[0] === "login") {
-    const validOptions = ["github", "gitlab", "bitbucket"];
+    const validOptions = ["github", "gitlab", "bitbucket","token"];
     const unknownOptions = Object.keys(options).filter(
       (option) =>
         option !== "_" && option !== "$0" && !validOptions.includes(option)
@@ -72,6 +72,8 @@ export async function commandHandler(options: any) {
         await login("gitlab");
       } else if (options.bitbucket) {
         await login("bitbucket");
+      } else if(options.token){
+        await login("token", options.token)
       } else {
         const { provider } = await promptForLogin();
         await login(provider.toLowerCase());
