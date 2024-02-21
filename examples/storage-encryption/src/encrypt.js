@@ -2,7 +2,7 @@ const { signAuthMessage } = require("./utils");
 const LitJsSdk = require("@lit-protocol/lit-node-client");
 const { SpheronClient } = require("@spheron/storage");
 
-const chain = "ethereum";
+const chain = "mumbai";
 
 const accessControlConditions = [
   {
@@ -24,11 +24,10 @@ const main = async () => {
   const spheronToken = process.argv[4];
   const walletPrivateKey = process.argv[5];
 
-  const authSig = await signAuthMessage(walletPrivateKey);
-
   const client = new LitJsSdk.LitNodeClient({});
-
   await client.connect();
+
+  const authSig = await signAuthMessage(walletPrivateKey);
 
   const spheron = new SpheronClient({
     token: spheronToken,
