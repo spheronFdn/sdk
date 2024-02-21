@@ -166,51 +166,42 @@ export class SpheronClient extends ScopeExtractor {
       throw new Error(`Name must be provided`);
     }
 
-    let dataToEncrypt: any;
     let ciphertext: string;
     let dataToEncryptHash: string;
+
+    const encryptionParams = {
+      accessControlConditions,
+      authSig,
+      chain,
+      sessionSigs,
+      evmContractConditions,
+      solRpcConditions,
+      unifiedAccessControlConditions,
+    };
+
     if (string && filePath) {
       throw new Error(`Provide only either a string or filePath to encrypt`);
     } else if (string !== undefined) {
-      dataToEncrypt = string;
-      const response = await encryptString(
-        {
-          accessControlConditions,
-          authSig,
-          chain,
-          dataToEncrypt,
-          sessionSigs,
-          evmContractConditions,
-          solRpcConditions,
-          unifiedAccessControlConditions,
-        },
+      const stringEncryptionParams = {
+        ...encryptionParams,
+        dataToEncrypt: string,
+      };
+      ({ ciphertext, dataToEncryptHash } = await encryptString(
+        stringEncryptionParams,
         litNodeClient
-      );
-      ciphertext = response.ciphertext;
-      dataToEncryptHash = response.dataToEncryptHash;
+      ));
     } else if (filePath !== undefined) {
       const { content } = await readFileContent(filePath);
-      dataToEncrypt = content;
-      const response = await encryptFile(
-        {
-          accessControlConditions,
-          authSig,
-          chain,
-          file: dataToEncrypt,
-          sessionSigs,
-          evmContractConditions,
-          solRpcConditions,
-          unifiedAccessControlConditions,
-        },
+      const fileEncryptionParams = { ...encryptionParams, file: content };
+      ({ ciphertext, dataToEncryptHash } = await encryptFile(
+        fileEncryptionParams,
         litNodeClient
-      );
-      ciphertext = response.ciphertext;
-      dataToEncryptHash = response.dataToEncryptHash;
+      ));
     } else {
       throw new Error(`Either string or file must be provided`);
     }
 
-    if (!dataToEncrypt) {
+    if (!dataToEncryptHash) {
       throw new Error(`No data to encrypt`);
     }
 
@@ -289,44 +280,33 @@ export class SpheronClient extends ScopeExtractor {
 
   async decryptUpload({
     authSig,
-    // sessionSigs,
+    sessionSigs,
     ipfsCid,
     litNodeClient,
   }: any): Promise<any> {
     await this.validateStorageOrganizationType();
 
+    const metadataUrl = `https://${ipfsCid}.ipfs.sphn.link/data.json`;
+
     const metadata = await (
-      await fetch(`https://${ipfsCid}.ipfs.sphn.link/data.json`).catch(() => {
+      await fetch(metadataUrl).catch(() => {
         throw new Error("Error finding metadata from IPFS CID");
       })
     ).json();
 
+    const decryptionParams = {
+      accessControlConditions: metadata.accessControlConditions,
+      ciphertext: metadata.ciphertext,
+      dataToEncryptHash: metadata.dataToEncryptHash,
+      authSig,
+      sessionSigs,
+      chain: metadata.chain,
+    };
+
     if (metadata.file) {
-      const decryptedFile = await decryptToFile(
-        {
-          accessControlConditions: metadata.accessControlConditions,
-          ciphertext: metadata.ciphertext,
-          dataToEncryptHash: metadata.dataToEncryptHash,
-          authSig,
-          chain: metadata.chain,
-        },
-        litNodeClient
-      );
-
-      return decryptedFile;
+      return await decryptToFile(decryptionParams, litNodeClient);
     } else {
-      const decryptedString = await decryptToString(
-        {
-          accessControlConditions: metadata.accessControlConditions,
-          ciphertext: metadata.ciphertext,
-          dataToEncryptHash: metadata.dataToEncryptHash,
-          authSig,
-          chain: metadata.chain,
-        },
-        litNodeClient
-      );
-
-      return decryptedString;
+      return await decryptToString(decryptionParams, litNodeClient);
     }
   }
 
