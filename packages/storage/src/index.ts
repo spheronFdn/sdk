@@ -28,6 +28,12 @@ import {
 } from "@spheron/encryption";
 import { readFileContent } from "./utils";
 import FormData from "form-data";
+import {
+  encryptString,
+  encryptFile,
+  decryptToString,
+  decryptToFile,
+} from "@lit-protocol/lit-node-client";
 
 export {
   ipfs,
@@ -149,7 +155,7 @@ export class SpheronClient extends ScopeExtractor {
     filePath,
     litNodeClient,
     configuration,
-  }: EncryptToIpfsProps): Promise<UploadResult> {
+  }: any): Promise<UploadResult> {
     await this.validateStorageOrganizationType();
 
     if (!string && !filePath) {
@@ -160,14 +166,46 @@ export class SpheronClient extends ScopeExtractor {
       throw new Error(`Name must be provided`);
     }
 
-    let dataToEncrypt: Uint8Array | null = null;
+    let dataToEncrypt: any;
+    let ciphertext: string;
+    let dataToEncryptHash: string;
     if (string && filePath) {
       throw new Error(`Provide only either a string or filePath to encrypt`);
     } else if (string !== undefined) {
-      dataToEncrypt = uint8arrayFromString(string, "utf8");
+      dataToEncrypt = string;
+      const response = await encryptString(
+        {
+          accessControlConditions,
+          authSig,
+          chain,
+          dataToEncrypt,
+          sessionSigs,
+          evmContractConditions,
+          solRpcConditions,
+          unifiedAccessControlConditions,
+        },
+        litNodeClient
+      );
+      ciphertext = response.ciphertext;
+      dataToEncryptHash = response.dataToEncryptHash;
     } else if (filePath !== undefined) {
       const { content } = await readFileContent(filePath);
       dataToEncrypt = content;
+      const response = await encryptFile(
+        {
+          accessControlConditions,
+          authSig,
+          chain,
+          file: dataToEncrypt,
+          sessionSigs,
+          evmContractConditions,
+          solRpcConditions,
+          unifiedAccessControlConditions,
+        },
+        litNodeClient
+      );
+      ciphertext = response.ciphertext;
+      dataToEncryptHash = response.dataToEncryptHash;
     } else {
       throw new Error(`Either string or file must be provided`);
     }
@@ -176,35 +214,16 @@ export class SpheronClient extends ScopeExtractor {
       throw new Error(`No data to encrypt`);
     }
 
-    const { encryptedData, symmetricKey } = await encryptData(dataToEncrypt);
-
-    const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
-      accessControlConditions,
-      evmContractConditions,
-      solRpcConditions,
-      unifiedAccessControlConditions,
-      symmetricKey,
-      authSig,
-      sessionSigs,
-      chain,
-    });
-
-    const encryptedSymmetricKeyString = uint8arrayToString(
-      encryptedSymmetricKey,
-      "base16"
-    );
-
-    const encryptedDataJson = Buffer.from(encryptedData.buffer).toJSON();
-
     try {
       const uploadJson = JSON.stringify({
-        encryptedData: encryptedDataJson,
-        encryptedSymmetricKeyString,
+        dataToEncryptHash,
+        ciphertext,
         accessControlConditions,
         evmContractConditions,
         solRpcConditions,
         unifiedAccessControlConditions,
         chain,
+        file: filePath ? true : false,
       });
 
       const { uploadId, parallelUploadCount } =
@@ -270,10 +289,10 @@ export class SpheronClient extends ScopeExtractor {
 
   async decryptUpload({
     authSig,
-    sessionSigs,
+    // sessionSigs,
     ipfsCid,
     litNodeClient,
-  }: DecryptFromIpfsProps): Promise<Uint8Array> {
+  }: any): Promise<any> {
     await this.validateStorageOrganizationType();
 
     const metadata = await (
@@ -282,20 +301,33 @@ export class SpheronClient extends ScopeExtractor {
       })
     ).json();
 
-    const symmetricKey = await litNodeClient.getEncryptionKey({
-      accessControlConditions: metadata.accessControlConditions,
-      evmContractConditions: metadata.evmContractConditions,
-      solRpcConditions: metadata.solRpcConditions,
-      unifiedAccessControlConditions: metadata.unifiedAccessControlConditions,
-      toDecrypt: metadata.encryptedSymmetricKeyString,
-      chain: metadata.chain,
-      authSig,
-      sessionSigs,
-    });
+    if (metadata.file) {
+      const decryptedFile = await decryptToFile(
+        {
+          accessControlConditions: metadata.accessControlConditions,
+          ciphertext: metadata.ciphertext,
+          dataToEncryptHash: metadata.dataToEncryptHash,
+          authSig,
+          chain: metadata.chain,
+        },
+        litNodeClient
+      );
 
-    const encrypted = new Uint8Array(Buffer.from(metadata.encryptedData));
+      return decryptedFile;
+    } else {
+      const decryptedString = await decryptToString(
+        {
+          accessControlConditions: metadata.accessControlConditions,
+          ciphertext: metadata.ciphertext,
+          dataToEncryptHash: metadata.dataToEncryptHash,
+          authSig,
+          chain: metadata.chain,
+        },
+        litNodeClient
+      );
 
-    return decryptData(encrypted, symmetricKey);
+      return decryptedString;
+    }
   }
 
   async createSingleUploadToken(configuration: {
