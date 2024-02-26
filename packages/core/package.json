@@ -1,6 +1,6 @@
 {
   "name": "@spheron/core",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "Shared core package for all sdk packages",
   "keywords": [
     "Storage",
@@ -35,6 +35,7 @@
     "dist/"
   ],
   "dependencies": {
+    "@types/async-lock": "^1.4.0",
     "async-lock": "^1.4.0",
     "axios": "1.1.2",
     "eventsource": "^2.0.2",
