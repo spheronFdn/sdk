@@ -1349,6 +1349,20 @@ class SpheronApi {
     return upload;
   }
 
+  async pinUpload(uploadId: string): Promise<Upload> {
+    const { upload } = await this.sendApiRequest<{
+      upload: Upload;
+    }>(HttpMethods.PATCH, `/v1/upload/${uploadId}/pin`);
+    return upload;
+  }
+
+  async unpinUpload(uploadId: string): Promise<Upload> {
+    const { upload } = await this.sendApiRequest<{
+      upload: Upload;
+    }>(HttpMethods.PATCH, `/v1/upload/${uploadId}/unpin`);
+    return upload;
+  }
+
   //#region Upload API
 
   private async sendApiRequest<T>(

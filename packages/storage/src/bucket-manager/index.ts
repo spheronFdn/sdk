@@ -162,6 +162,16 @@ class BucketManager {
     return this.mapCoreUpload(upload);
   }
 
+  async pinUpload(uploadId: string): Promise<Upload> {
+    const upload = await this.spheronApi.pinUpload(uploadId);
+    return this.mapCoreUpload(upload);
+  }
+
+  async unpinUpload(uploadId: string): Promise<Upload> {
+    const upload = await this.spheronApi.unpinUpload(uploadId);
+    return this.mapCoreUpload(upload);
+  }
+
   async getBucketIpnsRecords(bucketId: string): Promise<IpnsRecord[]> {
     const { ipnsRecords } = await this.spheronApi.getBucketIpnsRecords(
       bucketId
