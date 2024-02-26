@@ -1,20 +1,19 @@
 import {
   AppTypeEnum,
-  Cluster,
-  ClusterProtocolEnum,
+  ComputeProject,
   ComputeMachine,
+  ComputeServiceConfigurationDTO,
   CreateInstanceRequest,
-  CustomInstanceSpecs,
+  CustomServiceSpecs,
   Deployment,
   DeploymentEnvironment,
   DeploymentStatusEnum,
   Domain,
   Env,
   ExtendedInstance,
-  Instance,
   InstanceLogType,
-  InstanceOrder,
-  InstanceOrderLogs,
+  ComputeDeployment,
+  ComputeDeploymentLogs,
   InstanceResponse,
   MarketplaceApp,
   Organization,
@@ -25,6 +24,12 @@ import {
   UpdateInstaceRequest,
   User,
   VerifiedTokenResponse,
+  InstanceStateEnum,
+  InstancesInfo,
+  MasterOrganization,
+  ProjectStateEnum,
+  ComputeMetrics,
+  TokenScope,
 } from "@spheron/core";
 import configuration from "../configuration";
 import { IGPTResponse } from "../commands/gpt/gpt";
@@ -77,10 +82,29 @@ const SpheronApiService = {
     return organization;
   },
 
-  async getOrganization(id: string): Promise<Organization> {
+  async getOrganization(id: string): Promise<MasterOrganization> {
     const client: SpheronApi = await this.initialize();
-    const organization: Organization = await client.getOrganization(id);
-    return organization;
+    return client.getMasterOrganization(id);
+  },
+
+  async getProjectsCount(id: string): Promise<number> {
+    const client: SpheronApi = await this.initialize();
+    return client.getOrganizationProjectCount(id, {
+      state: ProjectStateEnum.MAINTAINED,
+    });
+  },
+
+  async getBucketsCount(id: string): Promise<number> {
+    const client: SpheronApi = await this.initialize();
+    const response = await client.getOrganizationBucketCount({
+      organizationId: id,
+    });
+    return response.count;
+  },
+
+  async getComputeProjectsCount(id: string): Promise<number> {
+    const client: SpheronApi = await this.initialize();
+    return client.getOrganizationComputeProjectCount(id);
   },
 
   async getProfile(): Promise<User> {
@@ -120,6 +144,12 @@ const SpheronApiService = {
     const client: SpheronApi = await this.initialize();
     const deployment: Deployment = await client.getDeployment(id);
     return deployment;
+  },
+
+  async getTokenScope(): Promise<TokenScope> {
+    const client: SpheronApi = await this.initialize();
+    const scope: TokenScope = await client.getTokenScope();
+    return scope;
   },
 
   async getProjectDeployments(
@@ -170,7 +200,10 @@ const SpheronApiService = {
     return deploymentEnvironments;
   },
 
-  async getComputePlans(name?: string): Promise<ComputeMachine[]> {
+  async getComputePlans(
+    name?: string,
+    region?: string
+  ): Promise<ComputeMachine[]> {
     const client: SpheronApi = await this.initialize();
     const options: any = {
       skip: 0,
@@ -178,6 +211,9 @@ const SpheronApiService = {
     };
     if (name) {
       options.searchString = name;
+    }
+    if (region) {
+      options.region = region;
     }
     const computePlans: ComputeMachine[] = await client.getComputeMachines(
       options
@@ -191,55 +227,71 @@ const SpheronApiService = {
     return regions;
   },
 
-  async getClusters(organizationId: string): Promise<Cluster[]> {
+  async getComputeProjects(organizationId: string): Promise<ComputeProject[]> {
     const client: SpheronApi = await this.initialize();
     const options: any = {
       skip: 0,
       limit: 50,
     };
-    const clusters: Cluster[] = await client.getOrganizationClusters(
+    return client.getOrganizationComputeProjects(organizationId, options);
+  },
+
+  async getComputeProject(id: string): Promise<ComputeProject> {
+    const client: SpheronApi = await this.initialize();
+    return client.getComputeProject(id);
+  },
+
+  async getComputeProjectDetails(id: string): Promise<InstancesInfo> {
+    const client: SpheronApi = await this.initialize();
+    return client.getComputeProjectDetails(id);
+  },
+
+  async getComputeInstances(
+    organizationId: string,
+    computeProjectId?: string,
+    state?: InstanceStateEnum
+  ): Promise<ExtendedInstance[]> {
+    const client: SpheronApi = await this.initialize();
+    const options: any = {
+      skip: 0,
+      limit: 50,
+      includeReport: true,
+    };
+    return client.getComputeInstances(
       organizationId,
-      options
+      options,
+      state,
+      computeProjectId
     );
-    return clusters;
   },
 
-  async getCluster(id: string): Promise<Cluster> {
-    const client: SpheronApi = await this.initialize();
-    const clusters: Cluster = await client.getCluster(id);
-    return clusters;
-  },
-
-  async getClusterInstances(clusterId: string): Promise<ExtendedInstance[]> {
-    const client: SpheronApi = await this.initialize();
-    const options: any = {
-      skip: 0,
-      limit: 50,
-      includeReport: true,
-    };
-    const instances: ExtendedInstance[] = await client.getClusterInstances(
-      clusterId,
-      options
-    );
-    return instances;
-  },
-
-  async getClusterInstance(id: string): Promise<Instance> {
+  async getComputeInstance(id: string): Promise<ExtendedInstance> {
     const client: SpheronApi = await this.initialize();
     const options: any = {
       includeReport: true,
     };
-    const instance: Instance = await client.getClusterInstance(id, options);
+    const instance: ExtendedInstance = await client.getComputeInstance(
+      id,
+      options
+    );
     return instance;
   },
 
-  async getClusterInstanceOrder(versionId: string): Promise<InstanceOrder> {
+  async getComputeDeployment(versionId: string): Promise<ComputeDeployment> {
     const client: SpheronApi = await this.initialize();
-    const { order } = await client.getClusterInstanceOrder(versionId);
-    return order;
+    const { deployment } = await client.getComputeDeployment(versionId);
+    return deployment;
   },
 
-  async getClusterInstanceLogs(
+  async getComputeMetrics(
+    instanceId: string,
+    serviceName: string
+  ): Promise<ComputeMetrics> {
+    const client: SpheronApi = await this.initialize();
+    return client.getComputeMetrics(instanceId, serviceName);
+  },
+
+  async getComputeDeploymentLogs(
     versionId: string,
     logType: InstanceVersionLogsTypeEnum,
     from: number,
@@ -253,8 +305,9 @@ const SpheronApiService = {
       logType: mapVersionOrderLogsType(logType),
       search,
     };
-    const instanceWihtLogs: InstanceOrderLogs =
-      await client.getClusterInstanceOrderLogs(versionId, logsOptions);
+    const instanceWihtLogs: ComputeDeploymentLogs =
+      await client.getComputeDeploymentLogs(versionId, logsOptions);
+
     return {
       logs: instanceWihtLogs.logs,
       logsLength: instanceWihtLogs.logsLength,
@@ -266,34 +319,45 @@ const SpheronApiService = {
     configuration: SpheronComputeConfiguration
   ): Promise<InstanceResponse> {
     const client: SpheronApi = await this.initialize();
-    const apiPersistentSpecs = toCustomInstanceSpecs(
-      configuration.customParams
-    );
-    const apiEnvs = toApiEnvs(configuration.env);
+
     const req: CreateInstanceRequest = {
       organizationId,
-      configuration: {
-        protocol: ClusterProtocolEnum.AKASH,
-        image: configuration.image,
-        tag: configuration.tag,
-        instanceCount: configuration.instanceCount,
-        ports: configuration.ports,
-        env: apiEnvs,
-        command: configuration.commands,
-        args: configuration.args,
-        region: configuration.region,
-        akashMachineImageName: configuration.plan,
-        customInstanceSpecs: apiPersistentSpecs,
-      },
-      clusterUrl: configuration.image,
-      clusterProvider: "DOCKERHUB",
-      clusterName: configuration.clusterName,
-      healthCheckUrl: configuration.healthCheck?.path,
-      healthCheckPort: configuration.healthCheck?.port,
-      scalable:
-        configuration.type == CliComputeInstanceType.ON_DEMAND ? true : false,
+      services: configuration.services.map((service) => {
+        const apiEnvs = toApiEnvs(service.env);
+
+        const apiPersistentSpecs = toCustomInstanceSpecs(service.customParams);
+        const serviceConfig: ComputeServiceConfigurationDTO = {
+          name: service.name,
+          image: service.image,
+          tag: service.tag,
+          serviceCount: service.count,
+          ports: service.ports,
+          env: apiEnvs,
+          command: service.commands ?? [],
+          args: service.args ?? [],
+          akashMachineImageName: service.plan,
+          customServiceSpecs: apiPersistentSpecs,
+          healthCheck: service.healthCheck
+            ? {
+                path: service.healthCheck.path,
+                port: service.healthCheck.port,
+              }
+            : undefined,
+
+          buildImage: false,
+          templateId: service.templateId,
+        };
+        return serviceConfig;
+      }),
+      computeProvider: "DOCKERHUB",
+      computeProjectName: configuration.projectName,
+      computeProjectDescription: "",
+      uniqueTopicId: uuidv4(),
+      region: configuration.region,
+      scalable: configuration.type == CliComputeInstanceType.ON_DEMAND,
     };
-    const response: InstanceResponse = await client.createClusterInstance(req);
+
+    const response: InstanceResponse = await client.createComputeInstance(req);
     return response;
   },
 
@@ -303,21 +367,37 @@ const SpheronApiService = {
     configuration: SpheronComputeConfiguration
   ): Promise<InstanceResponse> {
     const client: SpheronApi = await this.initialize();
-    const apiEnvs = toApiEnvs(configuration.env);
-    const customInstanceSpecs = toCustomInstanceSpecs(
-      configuration.customParams
-    );
+
     const updateRequest: UpdateInstaceRequest = {
-      env: apiEnvs,
-      command: configuration.commands,
-      args: configuration.args,
+      organizationId,
       uniqueTopicId: uuidv4(),
-      tag: configuration.tag,
-      akashMachineImageName: configuration.plan,
-      customInstanceSpecs,
-      instanceCount: configuration.instanceCount,
+      services: configuration.services.map((service) => {
+        const apiEnvs = toApiEnvs(service.env);
+
+        const apiPersistentSpecs = toCustomInstanceSpecs(service.customParams);
+        const serviceConfig: ComputeServiceConfigurationDTO = {
+          name: service.name,
+          image: service.image,
+          tag: service.tag,
+          serviceCount: service.count,
+          ports: service.ports,
+          env: apiEnvs,
+          command: service.commands,
+          args: service.args,
+          akashMachineImageName: service.plan,
+          customServiceSpecs: apiPersistentSpecs,
+          healthCheck: service.healthCheck
+            ? {
+                path: service.healthCheck.path,
+                port: service.healthCheck.port,
+              }
+            : undefined,
+          buildImage: false,
+        };
+        return serviceConfig;
+      }),
     };
-    const response: InstanceResponse = await client.updateClusterInstance(
+    const response: InstanceResponse = await client.updateComputeInstance(
       id,
       organizationId,
       updateRequest
@@ -330,19 +410,19 @@ const SpheronApiService = {
   ): Promise<{ message: string; success: boolean }> {
     const client: SpheronApi = await this.initialize();
 
-    const response = await client.closeClusterInstance(id);
+    const response = await client.closeComputeInstance(id);
     return response;
   },
 
-  async getComputeTemplates(): Promise<MarketplaceApp[]> {
+  async getMarketplaceApps(): Promise<MarketplaceApp[]> {
     const client: SpheronApi = await this.initialize();
-    const templates: MarketplaceApp[] = await client.getClusterTemplates();
+    const templates: MarketplaceApp[] = await client.getMarketplaceApps();
     return templates;
   },
 
-  async getComputeTemplate(id: string): Promise<MarketplaceApp> {
+  async getMarketplaceApp(id: string): Promise<MarketplaceApp> {
     const client: SpheronApi = await this.initialize();
-    const template: MarketplaceApp = await client.getClusterTemplate(id);
+    const template: MarketplaceApp = await client.getMarketplaceApp(id);
     return template;
   },
 
@@ -422,9 +502,9 @@ function mapVersionOrderLogsType(
 
 export function toCustomInstanceSpecs(
   spec: CliCustomParams
-): CustomInstanceSpecs {
+): CustomServiceSpecs {
   let persistentStorageApi = undefined;
-  const config: CustomInstanceSpecs = {
+  const config: CustomServiceSpecs = {
     storage: spec.storage,
     cpu: spec.cpu,
     memory: spec.memory,
@@ -471,6 +551,9 @@ export function toCliPersistentStorage(
 }
 
 function toApiEnvs(envs: Array<CliComputeEnv>): Array<Env> {
+  if (!envs || envs.length == 0) {
+    return [];
+  }
   const apiEnvs = envs.map((x) => {
     return {
       value: `${x.name}=${x.value}`,

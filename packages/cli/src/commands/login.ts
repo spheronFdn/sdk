@@ -3,13 +3,30 @@ import open from "open";
 import { writeToJsonFile } from "../utils";
 import configuration from "../configuration";
 import Spinner from "../outputs/spinner";
-import { AppTypeEnum, VerifiedTokenResponse } from "@spheron/core";
+import { AppTypeEnum, MasterOrganization, User, VerifiedTokenResponse } from "@spheron/core";
 import SpheronApiService from "../services/spheron-api";
+import { changeDefaultOrganization } from "./switch-organization";
 
 let server: http.Server;
 
-export async function login(provider: string): Promise<void> {
+export async function login(provider: string, value?: string): Promise<void> {
   const spinner = new Spinner();
+  if(provider == "token"){
+    await writeToJsonFile(
+      "jwtToken",
+      value,
+      configuration.configFilePath
+    );
+    const user: User = await SpheronApiService.getProfile();
+    const scope = await SpheronApiService.getTokenScope();
+
+    const masterOrg = user.organizations.find(
+      (org) => org.profile.name === scope.organizations[0].name
+    ) as MasterOrganization;
+
+    await changeDefaultOrganization(masterOrg);
+    return;
+  }
   spinner.spin(`Waiting for ${provider} authentication to be completed `);
   server = http.createServer();
   server.listen(0, "127.0.0.1", async () => {
@@ -23,12 +40,14 @@ export async function login(provider: string): Promise<void> {
           server.once("request", async (req, res) => {
             try {
               const code = req.url?.split("&")[0].split("=")[1];
+
               const verify: VerifiedTokenResponse =
                 await SpheronApiService.verfiyGitToken(
                   provider,
                   String(code),
                   port
                 );
+
               // Closing of server
               res.setHeader("connection", "close");
               res.statusCode = 302;
@@ -47,10 +66,27 @@ export async function login(provider: string): Promise<void> {
                 verify.jwtToken,
                 configuration.configFilePath
               );
+
+              await writeToJsonFile(
+                "masterOrganization",
+                {
+                  organizationId: verify.masterOrganizationId,
+                },
+                configuration.configFilePath
+              );
+
               await writeToJsonFile(
                 AppTypeEnum.WEB_APP,
                 {
                   organizationId: verify.siteOrganizationId,
+                },
+                configuration.configFilePath
+              );
+
+              await writeToJsonFile(
+                AppTypeEnum.STORAGE,
+                {
+                  organizationId: verify.storageOrganizationId,
                 },
                 configuration.configFilePath
               );
@@ -89,6 +125,9 @@ export async function login(provider: string): Promise<void> {
                   );
                 }
               }
+
+              console.log(`Error ${e.message}`);
+
               console.log(
                 `✖️  Error occured while logging in, please try again.`
               );

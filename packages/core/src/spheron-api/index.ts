@@ -5,6 +5,7 @@ import {
   DomainTypeEnum,
   FrameworkEnum,
   InstanceLogType,
+  InstanceStateEnum,
   NodeVersionEnum,
   ProjectStateEnum,
   ProtocolEnum,
@@ -26,20 +27,23 @@ import {
   IPNSName,
   StartDeploymentConfiguration,
   EnvironmentVariable,
-  Cluster,
+  ComputeProject,
   InstancesInfo,
-  ClusterFundsUsage,
+  ComputeProjectFundsUsage,
   ExtendedInstance,
   Instance,
-  InstanceOrder,
+  ComputeDeployment,
   MarketplaceApp,
   ComputeMachine,
-  InstanceOrderLogs,
+  ComputeDeploymentLogs,
   Bucket,
   BucketStateEnum,
   Upload,
   BucketDomain,
   BucketIpnsRecord,
+  MasterOrganization,
+  ComputeMetrics,
+  TopupReport,
 } from "./interfaces";
 import {
   CreateInstanceFromMarketplaceRequest,
@@ -59,7 +63,7 @@ class SpheronApi {
 
   constructor(token: string, url?: string) {
     this.token = token;
-    this.spheronApiUrl = url ?? "https://api-v2.spheron.network";
+    this.spheronApiUrl = url ?? "http://localhost:8080";
   }
 
   async getTokenScope(): Promise<TokenScope> {
@@ -253,6 +257,13 @@ class SpheronApi {
       `/v1/organization/${id}`
     );
     return organization;
+  }
+
+  async getMasterOrganization(id: string): Promise<MasterOrganization> {
+    return this.sendApiRequest<MasterOrganization>(
+      HttpMethods.GET,
+      `/v1/organization/${id}`
+    );
   }
 
   async updateOrganization(
@@ -624,46 +635,56 @@ class SpheronApi {
 
   //#endregion Deployment Environment
 
-  async getOrganizationClusters(
+  async getOrganizationComputeProjects(
     id: string,
     options: {
       skip: number;
       limit: number;
     }
-  ): Promise<Cluster[]> {
+  ): Promise<ComputeProject[]> {
     if (options.skip < 0 || options.limit < 0) {
       throw new Error(`Skip and Limit cannot be negative numbers.`);
     }
-    const result = await this.sendApiRequest<{ clusters: Cluster[] }>(
+    const result = await this.sendApiRequest<{
+      computeProjects: ComputeProject[];
+    }>(
       HttpMethods.GET,
-      `/v1/organization/${id}/clusters?skip=${options.skip}&limit=${options.limit}`
+      `/v1/organization/${id}/compute-projects?skip=${options.skip}&limit=${options.limit}`
     );
-    return result.clusters;
+    return result.computeProjects;
   }
 
-  async getCluster(id: string): Promise<Cluster> {
-    return this.sendApiRequest<Cluster>(HttpMethods.GET, `/v1/cluster/${id}`);
+  async getComputeProject(id: string): Promise<ComputeProject> {
+    return this.sendApiRequest<ComputeProject>(
+      HttpMethods.GET,
+      `/v1/compute-project/${id}`
+    );
   }
 
-  async deleteCluster(id: string): Promise<void> {
-    await this.sendApiRequest<Cluster>(HttpMethods.DELETE, `/v1/cluster/${id}`);
+  async deleteComputeProject(id: string): Promise<void> {
+    await this.sendApiRequest<ComputeProject>(
+      HttpMethods.DELETE,
+      `/v1/compute-project/${id}`
+    );
   }
 
-  async getClusterInstancesDetails(id: string): Promise<InstancesInfo> {
+  async getComputeProjectDetails(id: string): Promise<InstancesInfo> {
     return this.sendApiRequest<InstancesInfo>(
       HttpMethods.GET,
-      `/v1/cluster/${id}/instances/count`
+      `/v1/compute-project/${id}/instances/count`
     );
   }
 
-  async getClusterFundsUsage(id: string): Promise<ClusterFundsUsage> {
-    return this.sendApiRequest<ClusterFundsUsage>(
+  async getComputeProjectFundsUsage(
+    id: string
+  ): Promise<ComputeProjectFundsUsage> {
+    return this.sendApiRequest<ComputeProjectFundsUsage>(
       HttpMethods.GET,
-      `/v1/cluster/${id}/funds-usage`
+      `/v1/compute-project/${id}/funds-usage`
     );
   }
 
-  async getClusterInstances(
+  async getComputeProjectInstances(
     id: string,
     options: {
       skip: number;
@@ -678,7 +699,7 @@ class SpheronApi {
     const result: { extendedInstances: ExtendedInstance[] } =
       await this.sendApiRequest<{
         extendedInstances: ExtendedInstance[];
-      }>(HttpMethods.GET, `/v1/cluster/${id}/instances`, null, {
+      }>(HttpMethods.GET, `/v1/compute-project/${id}/instances`, null, {
         skip: options.skip,
         limit: options.limit,
         topupReport: options.includeReport && "y",
@@ -687,98 +708,148 @@ class SpheronApi {
     return result.extendedInstances;
   }
 
-  async getClusterTemplates(): Promise<MarketplaceApp[]> {
+  async getComputeInstances(
+    organizationId: string,
+    options: {
+      skip: number;
+      limit: number;
+    },
+    state?: InstanceStateEnum,
+    computeProjectId?: string
+  ): Promise<ExtendedInstance[]> {
+    if (options.skip < 0 || options.limit < 0) {
+      throw new Error(`Skip and Limit cannot be negative numbers.`);
+    }
+
+    const result: { instances: ExtendedInstance[] } =
+      await this.sendApiRequest<{
+        instances: ExtendedInstance[];
+      }>(HttpMethods.GET, `/v1/compute-instance`, null, {
+        skip: options.skip,
+        limit: options.limit,
+        organizationId: organizationId,
+        state: state,
+        computeProjectId: computeProjectId,
+      });
+
+    return result.instances;
+  }
+
+  async getComputeMetrics(
+    instanceId: string,
+    serviceName: string
+  ): Promise<ComputeMetrics> {
+    const result: { metrics: ComputeMetrics } = await this.sendApiRequest<{
+      metrics: ComputeMetrics;
+    }>(HttpMethods.GET, `/v1/compute-instance/${instanceId}/metrics`, null, {
+      service: serviceName,
+    });
+
+    return result.metrics;
+  }
+
+  async getMarketplaceApps(): Promise<MarketplaceApp[]> {
     const response = await this.sendApiRequest<{
       clusterTemplates: MarketplaceApp[];
-    }>(HttpMethods.GET, `/v1/cluster-templates`);
+    }>(HttpMethods.GET, `/v1/marketplace-app`);
 
     return response.clusterTemplates;
   }
 
-  async getClusterTemplate(id: string): Promise<MarketplaceApp> {
+  async getMarketplaceApp(id: string): Promise<MarketplaceApp> {
     const response = await this.sendApiRequest<{
       clusterTemplate: MarketplaceApp;
-    }>(HttpMethods.GET, `/v1/cluster-templates/${id}`);
+    }>(HttpMethods.GET, `/v1/marketplace-app/${id}`);
 
     return response.clusterTemplate;
   }
 
-  async getClusterCategories(): Promise<string[]> {
+  async getMarketplaceAppCategories(): Promise<string[]> {
     const result: { categories: string[] } = await this.sendApiRequest<{
       categories: string[];
-    }>(HttpMethods.GET, `/v1/cluster-templates/categories`);
+    }>(HttpMethods.GET, `/v1/marketplace-app/categories`);
 
     return result.categories;
   }
 
-  async getClusterInstance(
+  async getComputeInstance(
     id: string,
     options?: {
       includeReport?: boolean;
     }
-  ): Promise<Instance> {
-    const response: { success: boolean; instance: Instance } =
-      await this.sendApiRequest<{
-        success: boolean;
-        instance: Instance;
-      }>(HttpMethods.GET, `/v1/cluster-instance/${id}`, null, {
-        topupReport: options && options.includeReport && "y",
-      });
+  ): Promise<ExtendedInstance> {
+    const response: {
+      success: boolean;
+      instance: Instance;
+      topupReport: TopupReport;
+    } = await this.sendApiRequest<{
+      success: boolean;
+      instance: Instance;
+      topupReport: TopupReport;
+    }>(HttpMethods.GET, `/v1/compute-instance/${id}`, null, {
+      topupReport: options && options.includeReport && "y",
+    });
 
-    return response.instance;
+    const extendedInstance: ExtendedInstance = {
+      ...response.instance,
+      defaultDailyTopup: 0,
+      leasePricePerBlock: 0,
+      topupReport: response.topupReport,
+    };
+    return extendedInstance;
   }
 
-  async deleteClusterInstance(id: string): Promise<void> {
+  async deleteComputeInstance(id: string): Promise<void> {
     await this.sendApiRequest<Instance>(
       HttpMethods.DELETE,
-      `/v1/cluster-instance/${id}`
+      `/v1/compute-instance/${id}`
     );
   }
 
-  async updateClusterInstance(
+  async updateComputeInstance(
     id: string,
     organizationId: string,
-    clusterInstance: UpdateInstaceRequest
+    computeInstance: UpdateInstaceRequest
   ): Promise<InstanceResponse> {
     return this.sendApiRequest<InstanceResponse>(
       HttpMethods.PATCH,
-      `/v1/cluster-instance/${id}/update`,
-      { ...clusterInstance, organizationId }
+      `/v1/compute-instance/${id}/update`,
+      { ...computeInstance, organizationId }
     );
   }
 
-  async updateClusterInstanceHealthCheckInfo(
+  async updateComputeInstanceHealthCheckInfo(
     id: string,
     healthCheck: { path: string; cointainerPort: number }
   ): Promise<{ message: string; updated: boolean }> {
     return this.sendApiRequest<{
       message: string;
       updated: boolean;
-    }>(HttpMethods.PATCH, `/v1/cluster-instance/${id}/update/health-check`, {
+    }>(HttpMethods.PATCH, `/v1/compute-instance/${id}/update/health-check`, {
       healthCheckUrl: healthCheck.path,
       healthCheckPort: healthCheck.cointainerPort,
     });
   }
 
-  async closeClusterInstance(
+  async closeComputeInstance(
     id: string
   ): Promise<{ message: string; success: boolean }> {
     return this.sendApiRequest<{
       message: string;
       success: boolean;
-    }>(HttpMethods.POST, `/v1/cluster-instance/${id}/close`);
+    }>(HttpMethods.POST, `/v1/compute-instance/${id}/close`);
   }
 
-  async getClusterInstanceOrder(
+  async getComputeDeployment(
     id: string
-  ): Promise<{ order: InstanceOrder; liveLogs: string[] }> {
+  ): Promise<{ deployment: ComputeDeployment; liveLogs: string[] }> {
     return this.sendApiRequest<{
-      order: InstanceOrder;
+      deployment: ComputeDeployment;
       liveLogs: string[];
-    }>(HttpMethods.GET, `/v1/cluster-instance/order/${id}`);
+    }>(HttpMethods.GET, `/v1/compute-instance/deployment/${id}`);
   }
 
-  async getClusterInstanceOrderLogs(
+  async getComputeDeploymentLogs(
     id: string,
     logsOptions: {
       from: number;
@@ -786,53 +857,53 @@ class SpheronApi {
       logType: InstanceLogType;
       search?: string;
     }
-  ): Promise<InstanceOrderLogs> {
+  ): Promise<ComputeDeploymentLogs> {
     if (logsOptions.from < 0 || logsOptions.to < 0) {
       throw new Error(`From and To cannot be negative numbers.`);
     }
 
     const response = await this.sendApiRequest<{
       success: boolean;
-      order: InstanceOrderLogs;
+      deployment: ComputeDeploymentLogs;
     }>(
       HttpMethods.GET,
-      `/v1/cluster-instance/order/${id}/logs`,
+      `/v1/compute-instance/deployment/${id}/logs`,
       null,
       logsOptions
     );
 
-    return response.order;
+    return response.deployment;
   }
 
-  async createClusterInstance(
-    clusterInstance: CreateInstanceRequest
+  async createComputeInstance(
+    computeInstance: CreateInstanceRequest
   ): Promise<InstanceResponse> {
     return this.sendApiRequest<InstanceResponse>(
       HttpMethods.POST,
-      `/v1/cluster-instance/create`,
-      clusterInstance
+      `/v1/compute-instance/create`,
+      computeInstance
     );
   }
 
-  async createClusterInstanceFromTemplate(
-    clusterInstance: CreateInstanceFromMarketplaceRequest
+  async createComputeInstanceFromMarketplace(
+    computeInstance: CreateInstanceFromMarketplaceRequest
   ): Promise<MarketplaceInstanceResponse> {
     return this.sendApiRequest<MarketplaceInstanceResponse>(
       HttpMethods.POST,
-      `/v1/cluster-instance/template`,
-      clusterInstance
+      `/v1/compute-instance/template`,
+      computeInstance
     );
   }
 
-  async getClusterInstanceDomains(id: string): Promise<Domain[]> {
+  async getComputeInstanceDomains(id: string): Promise<Domain[]> {
     const result: { domains: Domain[] } = await this.sendApiRequest<{
       domains: Domain[];
-    }>(HttpMethods.GET, `/v1/cluster-instance/${id}/domains`);
+    }>(HttpMethods.GET, `/v1/compute-instance/${id}/domains`);
 
     return result.domains;
   }
 
-  async addClusterInstanceDomain(
+  async addComputeInstanceDomain(
     instanceId: string,
     doamin: {
       link: string;
@@ -842,14 +913,14 @@ class SpheronApi {
   ): Promise<Domain> {
     const response = await this.sendApiRequest<{ domain: Domain }>(
       HttpMethods.POST,
-      `/v1/cluster-instance/${instanceId}/domains`,
+      `/v1/compute-instance/${instanceId}/domains`,
       doamin
     );
 
     return response.domain;
   }
 
-  async updateClusterInstanceDomain(
+  async updateComputeInstanceDomain(
     instanceId: string,
     domainId: string,
     doamin: {
@@ -860,30 +931,30 @@ class SpheronApi {
   ): Promise<Domain> {
     const response = await this.sendApiRequest<{ domain: Domain }>(
       HttpMethods.PATCH,
-      `/v1/cluster-instance/${instanceId}/domains/${domainId}`,
+      `/v1/compute-instance/${instanceId}/domains/${domainId}`,
       doamin
     );
 
     return response.domain;
   }
 
-  async deleteClusterInstanceDomain(
+  async deleteComputeInstanceDomain(
     instanceId: string,
     domainId: string
   ): Promise<void> {
     await this.sendApiRequest<Domain>(
       HttpMethods.DELETE,
-      `/v1/cluster-instance/${instanceId}/domains/${domainId}`
+      `/v1/compute-instance/${instanceId}/domains/${domainId}`
     );
   }
 
-  async verifyClusterInstanceDomain(
+  async verifyComputeInstanceDomain(
     instanceId: string,
     domainId: string
   ): Promise<void> {
     await this.sendApiRequest<Domain>(
       HttpMethods.PATCH,
-      `/v1/cluster-instance/${instanceId}/domains/${domainId}/verify`
+      `/v1/compute-instance/${instanceId}/domains/${domainId}/verify`
     );
   }
 
@@ -891,6 +962,10 @@ class SpheronApi {
     skip: number;
     limit: number;
     searchString?: string;
+    region?: string;
+    provider?: string;
+    scalingMode?: string;
+    machineImageType?: string;
   }): Promise<ComputeMachine[]> {
     if (options.limit < 0 || options.skip < 0) {
       throw new Error(`Limit and Skip cannot be negative numbers.`);
@@ -917,7 +992,7 @@ class SpheronApi {
     return result.regions;
   }
 
-  async triggerClusterInstanceHealthCheck(
+  async triggerComputeInstanceHealthCheck(
     instanceId: string,
     topicId: string
   ): Promise<{
@@ -929,11 +1004,11 @@ class SpheronApi {
       message: string;
     }>(
       HttpMethods.POST,
-      `/v1/cluster-instance/${instanceId}/trigger/container-health-check?topicId=${topicId}`
+      `/v1/compute-instance/${instanceId}/trigger/container-health-check?topicId=${topicId}`
     );
   }
 
-  async triggerClusterInstanceStatusCheck(
+  async triggerComputeInstanceStatusCheck(
     instanceId: string,
     topicId: string
   ): Promise<{
@@ -945,11 +1020,11 @@ class SpheronApi {
       message: string;
     }>(
       HttpMethods.POST,
-      `/v1/cluster-instance/${instanceId}/trigger/container-health-check?topicId=${topicId}`
+      `/v1/compute-instance/${instanceId}/trigger/container-health-check?topicId=${topicId}`
     );
   }
 
-  async triggerClusterInstanceLogFetch(
+  async triggerComputeInstanceLogFetch(
     instanceId: string,
     topicId: string
   ): Promise<{
@@ -961,7 +1036,7 @@ class SpheronApi {
       message: string;
     }>(
       HttpMethods.POST,
-      `/v1/cluster-instance/${instanceId}/trigger/fetch-logs?topicId=${topicId}`
+      `/v1/compute-instance/${instanceId}/trigger/fetch-logs?topicId=${topicId}`
     );
   }
 
@@ -980,10 +1055,18 @@ class SpheronApi {
   ): Promise<ShellExecutionResponse> {
     const response = await this.sendApiRequest<ShellExecutionResponse>(
       HttpMethods.POST,
-      `/v1/cluster-instance/${instanceId}/exec-command`,
+      `/v1/compute-instance/${instanceId}/exec-command`,
       { command }
     );
     return response;
+  }
+
+  async getOrganizationComputeProjectCount(id: string): Promise<number> {
+    const result = await this.sendApiRequest<{ count: number }>(
+      HttpMethods.GET,
+      `/v1/organization/${id}/compute-projects/count`
+    );
+    return result.count;
   }
 
   //#gpt api

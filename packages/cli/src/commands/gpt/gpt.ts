@@ -19,7 +19,7 @@ export enum GptCommandEnum {
   TEST = "ctc",
 }
 
-export enum FixBugEnum {
+export enum YesNoEnum {
   YES = "Yes",
   NO = "No",
 }
@@ -167,7 +167,7 @@ export async function findBugsInCode(filepath: any) {
 
     const fixBug = await fixBugForGPT();
 
-    if (fixBug.fix === FixBugEnum.YES) {
+    if (fixBug.fix === YesNoEnum.YES) {
       const spinnerFixMessage = "Fixing bugs in your code ⚔️  ...";
       const startTime = Date.now();
       const gptResponse: any = await SpheronApiService.generateCode(

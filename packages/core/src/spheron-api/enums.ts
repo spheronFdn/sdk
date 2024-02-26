@@ -101,6 +101,7 @@ enum InstanceStateEnum {
 enum HealthStatusEnum {
   ACTIVE = "Active",
   INACTIVE = "Inactive",
+  PENDING = "Pending",
   UNKNOWN = "Unknown",
 }
 
@@ -127,8 +128,33 @@ enum ClusterProtocolEnum {
 }
 
 enum ComputeTypeEnum {
-  SPOT = "spot",
-  DEMAND = "demand",
+  SPOT = "SPOT",
+  ON_DEMAND = "ON_DEMAND",
+}
+
+enum AutoscalingNumberOfChecksEnum {
+  CHECKS_5 = 5,
+}
+
+enum AutoscalingTimeWindowEnum {
+  WINDOW_60 = 60, // 1min
+  WINDOW_120 = 120, // 2min
+  WINDOW_300 = 300, // 5min
+  WINDOW_6000 = 600, // 10min
+}
+
+enum AutoscalingCooldownEnum {
+  MINUTE_5 = 300,
+  MINUTE_10 = 600,
+  MINUTE_15 = 900,
+  MINUTE_20 = 1200,
+}
+
+enum AutoscalingPlanEnum {
+  CUSTOM = "custom",
+  RELAX = "relax",
+  STANDARD = "standard",
+  AGGRESSIVE = "aggressive",
 }
 
 export {
@@ -150,4 +176,8 @@ export {
   PersistentStorageClassEnum,
   ClusterProtocolEnum,
   ComputeTypeEnum,
+  AutoscalingNumberOfChecksEnum,
+  AutoscalingTimeWindowEnum,
+  AutoscalingCooldownEnum,
+  AutoscalingPlanEnum,
 };

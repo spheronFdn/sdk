@@ -7,7 +7,7 @@ import * as path from "path";
 import { InstanceResponse } from "@spheron/core";
 import Spinner from "../../outputs/spinner";
 
-export async function computePublish(
+export async function computeDeploy(
   organization?: string,
   configPath?: string
 ): Promise<any> {
@@ -26,9 +26,10 @@ export async function computePublish(
     console.log(`Reading from ${configPath}`);
     const yamlFilePath = path.join(process.cwd(), configPath); // Read spheron.yaml from the current working directory
     const yamlData = await fs.readFile(yamlFilePath, "utf8");
-    const spheronConfig: any = yaml.load(
+    const spheronConfig: SpheronComputeConfiguration = yaml.load(
       yamlData
     ) as SpheronComputeConfiguration;
+
     const organizationId: string = organization
       ? organization
       : (await MetadataService.getComputeData())?.organizationId;
@@ -37,12 +38,12 @@ export async function computePublish(
         "Please specify the organization that you would wish to use while deploying your instance"
       );
     }
-    if (
-      spheronConfig.image.startsWith("./") ||
-      spheronConfig.image.startsWith("/")
-    ) {
-      spheronConfig.image = `${spheronConfig.dockerhubRepository}:${spheronConfig.tag}`;
-    }
+
+    spheronConfig.services.forEach((service) => {
+      if (service.image.startsWith("./") || service.image.startsWith("/")) {
+        service.image = `${service.dockerhubRepository}:${service.tag}`;
+      }
+    });
 
     spinner.spin(`Publishing new compute instance 🚀`);
 
@@ -50,31 +51,30 @@ export async function computePublish(
       organizationId,
       spheronConfig
     );
-    if (result && result.clusterInstanceId) {
+    if (result && result.computeInstanceId) {
       // Read the existing YAML file.
       const existingYamlConfig = yaml.load(
         yamlData
       ) as SpheronComputeConfiguration;
 
-      existingYamlConfig.instanceId = result.clusterInstanceId;
-      existingYamlConfig.clusterId = result.clusterId;
+      existingYamlConfig.instanceId = result.computeInstanceId;
+      existingYamlConfig.projectId = result.computeDeploymentId;
       existingYamlConfig.organizationId = organization;
 
       const updatedYamlData = yaml.dump(existingYamlConfig);
 
       const instanceYamlFilePath = path.join(
         process.cwd(),
-        `instance-${result.clusterId}.yaml`
+        `instance-${result.computeInstanceId}.yaml`
       );
       await fs.writeFile(instanceYamlFilePath, updatedYamlData, "utf8");
-      console.log(`Instance data saved to ${instanceYamlFilePath}`);
-      spinner.success("Deployment finished 🚀");
+      console.log(`\nInstance data saved to ${instanceYamlFilePath}`);
+      spinner.success("Instance provisioning in progress 🚀");
     } else {
       console.log(
         "Instance ID not found in the response. Unable to save the YAML file."
       );
     }
-    console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);
     throw error;

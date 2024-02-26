@@ -11,23 +11,39 @@ const MetadataService = {
     return jwtToken;
   },
 
-  async getComputeData(): Promise<ComputeMetadata> {
-    const data: ComputeMetadata = await readFromJsonFile(
+  async getMaterOrgData(): Promise<OrganizationMetadata> {
+    const data: OrganizationMetadata = await readFromJsonFile(
+      "masterOrganization",
+      configuration.configFilePath
+    );
+    return data;
+  },
+
+  async getComputeData(): Promise<OrganizationMetadata> {
+    const data: OrganizationMetadata = await readFromJsonFile(
       AppTypeEnum.COMPUTE,
       configuration.configFilePath
     );
     return data;
   },
 
-  async getSiteData(): Promise<SiteMetadata> {
-    const data: SiteMetadata = await readFromJsonFile(
+  async getSiteData(): Promise<OrganizationMetadata> {
+    const data: OrganizationMetadata = await readFromJsonFile(
       AppTypeEnum.WEB_APP,
       configuration.configFilePath
     );
     return data;
   },
 
-  async editComputeData(metadata: ComputeMetadata): Promise<void> {
+  async getStorageData(): Promise<OrganizationMetadata> {
+    const data: OrganizationMetadata = await readFromJsonFile(
+      AppTypeEnum.STORAGE,
+      configuration.configFilePath
+    );
+    return data;
+  },
+
+  async editComputeData(metadata: OrganizationMetadata): Promise<void> {
     await writeToJsonFile(
       AppTypeEnum.COMPUTE,
       metadata,
@@ -35,9 +51,25 @@ const MetadataService = {
     );
   },
 
-  async editSiteData(metadata: SiteMetadata): Promise<void> {
+  async editMaterOrgData(metadata: OrganizationMetadata): Promise<void> {
+    await writeToJsonFile(
+      "masterOrganization",
+      metadata,
+      configuration.configFilePath
+    );
+  },
+
+  async editSiteData(metadata: OrganizationMetadata): Promise<void> {
     await writeToJsonFile(
       AppTypeEnum.WEB_APP,
+      metadata,
+      configuration.configFilePath
+    );
+  },
+
+  async editStorageData(metadata: OrganizationMetadata): Promise<void> {
+    await writeToJsonFile(
+      AppTypeEnum.STORAGE,
       metadata,
       configuration.configFilePath
     );
@@ -62,11 +94,7 @@ const MetadataService = {
   },
 };
 
-export interface ComputeMetadata {
-  organizationId: string;
-}
-
-export interface SiteMetadata {
+export interface OrganizationMetadata {
   organizationId: string;
 }
 

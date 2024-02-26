@@ -6,24 +6,45 @@ export enum ComputeCommandEnum {
   SWITCH_ORGANIZATION = "switch-organization",
   INIT = "init",
   BUILD = "build",
-  PUBLISH = "publish",
+  DEPLOY = "deploy",
   VALIDATE = "validate",
   UPDATE = "update",
   SHELL = "shell",
   CLOSE = "close",
+
+  ORGANIZATION = "organization",
+  INSTANCES = "instances",
+  PROJECTS = "projects",
+  INSTANCE = "instance",
+  SERVICE = "service",
+  LOGS = "logs",
+  USAGE = "usage",
+  PLANS = "plans",
+  REGIONS = "regions",
+  MARKETPLACE_APPS = "marketplace-apps",
+  METRICS = "metrics",
 }
 
 export interface SpheronComputeConfiguration {
-  clusterName: string;
   region: string;
+  projectName: string;
+  instanceId?: string;
+  projectId?: string;
+  organizationId?: string;
+  versionId?: string;
+  services: Array<SpheronComputeServiceConfiguration>;
+  type: CliComputeInstanceType;
+}
+
+export interface SpheronComputeServiceConfiguration {
+  name: string;
   image: string;
   tag: string;
-  instanceCount: number;
+  count: number;
   ports: Array<Port>;
   env: Array<CliComputeEnv>;
   commands: Array<string>;
   args: Array<string>;
-  type: CliComputeInstanceType;
   plan: string;
   customParams: CliCustomParams;
   templateId?: string;
@@ -33,10 +54,6 @@ export interface SpheronComputeConfiguration {
     port: number;
   };
   dockerhubRepository?: string;
-  instanceId?: string;
-  clusterId?: string;
-  organizationId?: string;
-  versionId?: string;
 }
 
 export interface CliComputeEnv {
@@ -74,3 +91,42 @@ export interface CliCustomParams {
   persistentStorage?: CliCustomPersistentStorage;
   storage: string;
 }
+
+export interface DockerCompose {
+  version: string;
+  services: { [serviceName: string]: Service };
+  networks?: { [networkName: string]: Network };
+  volumes?: { [volumeName: string]: Volume };
+}
+
+export interface Service {
+  image?: string;
+  build?: string | BuildConfig;
+  command?: string | string[];
+  environment?: { [key: string]: string } | string[];
+  volumes?: string[];
+  ports?: string[];
+  depends_on?: string[];
+  networks?: string[];
+  // Add more service-specific properties as needed
+}
+
+export interface BuildConfig {
+  context: string;
+  dockerfile?: string;
+  args?: { [argName: string]: string };
+}
+
+export interface Network {
+  driver?: string;
+  driver_opts?: { [optName: string]: string };
+  // Add more network-specific properties as needed
+}
+
+interface Volume {
+  driver?: string;
+  driver_opts?: { [optName: string]: string };
+  // Add more volume-specific properties as needed
+}
+
+// The readDockerComposeFile function remains the same

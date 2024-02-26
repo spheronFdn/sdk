@@ -15,6 +15,9 @@ export async function close(
     if (!configPath) {
       configPath = "spheron.yaml";
     }
+
+    spinner.spin(`Initiating the process to close your instance in Spheron...`);
+
     const yamlFilePath = path.join(process.cwd(), configPath); // Read spheron.yaml from the current working directory
     const yamlData = await fs.readFile(yamlFilePath, "utf8");
     const spheronConfig: any = yaml.load(
@@ -25,9 +28,13 @@ export async function close(
     if (!id) {
       throw new Error("Instance ID not provided");
     }
-    spinner.spin(`Closing compute instance ${id}...`);
     const result = await SpheronApiService.closeInstance(id);
-    console.log(JSON.stringify(result, null, 2));
+    if (result.success) {
+      spinner.success(`✓ Success! Instance ${id} is successful closed! 🚀`);
+    } else {
+      spinner.stop();
+      console.log(`Error closing the instance ${id}!`);
+    }
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);
     throw error;
