@@ -29,6 +29,7 @@ import {
   MasterOrganization,
   ProjectStateEnum,
   ComputeMetrics,
+  MarketplaceCategoryEnum,
 } from "@spheron/core";
 import configuration from "../configuration";
 import { IGPTResponse } from "../commands/gpt/gpt";
@@ -407,16 +408,19 @@ const SpheronApiService = {
     return response;
   },
 
-  async getMarketplaceApps(): Promise<MarketplaceApp[]> {
+  async getMarketplaceApps(
+    category?: MarketplaceCategoryEnum
+  ): Promise<MarketplaceApp[]> {
     const client: SpheronApi = await this.initialize();
-    const templates: MarketplaceApp[] = await client.getMarketplaceApps();
+    const templates: MarketplaceApp[] = await client.getMarketplaceApps(
+      category
+    );
     return templates;
   },
 
   async getMarketplaceApp(id: string): Promise<MarketplaceApp> {
     const client: SpheronApi = await this.initialize();
-    const template: MarketplaceApp = await client.getMarketplaceApp(id);
-    return template;
+    return client.getMarketplaceApp(id);
   },
 
   async isGptWhitelisted(): Promise<any> {

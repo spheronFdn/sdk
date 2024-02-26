@@ -6,6 +6,7 @@ import {
   FrameworkEnum,
   InstanceLogType,
   InstanceStateEnum,
+  MarketplaceCategoryEnum,
   NodeVersionEnum,
   ProjectStateEnum,
   ProtocolEnum,
@@ -748,20 +749,23 @@ class SpheronApi {
     return result.metrics;
   }
 
-  async getMarketplaceApps(): Promise<MarketplaceApp[]> {
+  async getMarketplaceApps(
+    category?: MarketplaceCategoryEnum
+  ): Promise<MarketplaceApp[]> {
     const response = await this.sendApiRequest<{
-      clusterTemplates: MarketplaceApp[];
-    }>(HttpMethods.GET, `/v1/marketplace-app`);
+      templates: MarketplaceApp[];
+    }>(HttpMethods.GET, `/v1/marketplace-app`, undefined, { category });
 
-    return response.clusterTemplates;
+    return response.templates;
   }
 
   async getMarketplaceApp(id: string): Promise<MarketplaceApp> {
-    const response = await this.sendApiRequest<{
-      clusterTemplate: MarketplaceApp;
-    }>(HttpMethods.GET, `/v1/marketplace-app/${id}`);
+    const response = await this.sendApiRequest<MarketplaceApp>(
+      HttpMethods.GET,
+      `/v1/marketplace-app/${id}`
+    );
 
-    return response.clusterTemplate;
+    return response;
   }
 
   async getMarketplaceAppCategories(): Promise<string[]> {

@@ -395,60 +395,62 @@ export async function commandHandler(options: any) {
 
           await Promise.all(
             templateIds.map(async (id: string) => {
-              const template: MarketplaceApp =
+              const marketplaceApp: MarketplaceApp =
                 await SpheronApiService.getMarketplaceApp(id);
-              if (!template) {
+              if (!marketplaceApp) {
                 throw new Error("Specified template does not exist");
               }
 
               const plans = await SpheronApiService.getComputePlans();
-              const defaultPlan = plans.find(
-                (x) => x._id == template.serviceData.defaultAkashMachineImageId
-              );
-              const configEnvs = template.serviceData.variables.map((x) => {
-                return {
-                  name: x.name,
-                  value: `${x.defaultValue}`,
-                  hidden: x.hidden ? x.hidden : false,
-                };
-              });
-              const configPorts = template.serviceData.ports.map((x) => {
-                return {
-                  containerPort: x.containerPort,
-                  exposedPort: x.exposedPort,
-                };
-              });
-              const cliPersistentStorage = template.serviceData
-                .customTemplateSpecs?.persistentStorage?.class
-                ? {
-                    size: template.serviceData.customTemplateSpecs
-                      .persistentStorage.size,
-                    class: toCliPersistentStorage(
-                      template.serviceData.customTemplateSpecs.persistentStorage
-                        .class
-                    ),
-                    mountPoint:
-                      template.serviceData.customTemplateSpecs.persistentStorage
-                        .mountPoint,
-                  }
-                : undefined;
-              services.push({
-                name: template.name.toLocaleLowerCase().replace(" ", "_"),
-                templateId: template._id,
-                templateName: template.name,
-                image: template.serviceData.dockerImage,
-                tag: template.serviceData.dockerImageTag,
-                count: 1,
-                ports: configPorts,
-                env: configEnvs,
-                commands: template.serviceData.commands,
-                args: template.serviceData.args,
-                plan: defaultPlan ? defaultPlan.name : "Ventus Nano 1",
-                customParams: {
-                  storage:
-                    template.serviceData.customTemplateSpecs?.storage ?? "10Gi",
-                  persistentStorage: cliPersistentStorage,
-                },
+              marketplaceApp.services.forEach((serviceData) => {
+                const defaultPlan = plans.find(
+                  (x) => x._id == serviceData.defaultAkashMachineImageId
+                );
+                const configEnvs = serviceData.variables.map((x) => {
+                  return {
+                    name: x.name,
+                    value: `${x.defaultValue}`,
+                    hidden: x.hidden ? x.hidden : false,
+                  };
+                });
+                const configPorts = serviceData.ports.map((x) => {
+                  return {
+                    containerPort: x.containerPort,
+                    exposedPort: x.exposedPort,
+                  };
+                });
+                const cliPersistentStorage = serviceData.customTemplateSpecs
+                  ?.persistentStorage?.class
+                  ? {
+                      size: serviceData.customTemplateSpecs.persistentStorage
+                        .size,
+                      class: toCliPersistentStorage(
+                        serviceData.customTemplateSpecs.persistentStorage.class
+                      ),
+                      mountPoint:
+                        serviceData.customTemplateSpecs.persistentStorage
+                          .mountPoint,
+                    }
+                  : undefined;
+                services.push({
+                  name: serviceData.metadata.name
+                    .toLocaleLowerCase()
+                    .replace(/ /g, "-"),
+                  templateId: serviceData._id,
+                  templateName: serviceData.metadata.name,
+                  image: serviceData.dockerImage,
+                  tag: serviceData.dockerImageTag,
+                  count: 1,
+                  ports: configPorts,
+                  env: configEnvs,
+                  commands: serviceData.commands,
+                  args: serviceData.args,
+                  plan: defaultPlan ? defaultPlan.name : "Ventus Nano 1",
+                  customParams: {
+                    storage: serviceData.customTemplateSpecs?.storage ?? "20Gi",
+                    persistentStorage: cliPersistentStorage,
+                  },
+                });
               });
             })
           );
