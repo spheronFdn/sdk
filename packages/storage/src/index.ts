@@ -337,6 +337,21 @@ export class SpheronClient extends ScopeExtractor {
     });
   }
 
+  async pinCIDs(configuration: { name: string; cids: string[] }): Promise<
+    {
+      uploadId: string;
+      cid: string;
+    }[]
+  > {
+    await this.validateStorageOrganizationType();
+
+    return await this.uploadManager.pinCIDs({
+      name: configuration.name,
+      cids: configuration.cids,
+      token: this.configuration.token,
+    });
+  }
+
   async getOrganizationBuckets(
     organizationId: string,
     options: {
@@ -506,6 +521,18 @@ export class SpheronClient extends ScopeExtractor {
     return await this.bucketManager.getUpload(uploadId);
   }
 
+  async pinUpload(uploadId: string): Promise<Upload> {
+    await this.validateStorageOrganizationType();
+
+    return await this.bucketManager.pinUpload(uploadId);
+  }
+
+  async unpinUpload(uploadId: string): Promise<Upload> {
+    await this.validateStorageOrganizationType();
+
+    return await this.bucketManager.unpinUpload(uploadId);
+  }
+
   async getOrganizationUsage(organizationId: string): Promise<UsageWithLimits> {
     await this.validateStorageOrganizationType();
 
@@ -597,7 +624,7 @@ export class SpheronClient extends ScopeExtractor {
   }
 
   async migrateStaticSiteOrgToStorage(
-    webappOrganizationId: string,
+    staticSiteOrganizationId: string,
     storageOrganizationId: string
   ): Promise<{
     numberOfBuckets: number;
@@ -606,7 +633,7 @@ export class SpheronClient extends ScopeExtractor {
     await this.validateStorageOrganizationType();
 
     return await this.spheronApi.migrateStaticSiteOrgToStorage(
-      webappOrganizationId,
+      staticSiteOrganizationId,
       storageOrganizationId
     );
   }
