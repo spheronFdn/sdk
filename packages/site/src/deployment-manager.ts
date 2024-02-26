@@ -1,4 +1,4 @@
-import { SpheronApi } from "@spheron/core";
+import { SpheronApi, ScopeExtractor } from "@spheron/core";
 import {
   CancelDeploymentResponse,
   Deployment,
@@ -6,10 +6,9 @@ import {
   DeploymentResponse,
   StartDeploymentConfiguration,
 } from "./interfaces";
-import OrganizationIdExtractor from "./organizationId-extractor";
 import { mapCoreDeployment, mapCoreDeploymentLogs } from "./interface-mappers";
 
-class DeploymentManger extends OrganizationIdExtractor {
+class DeploymentManger extends ScopeExtractor {
   private readonly spheronApi: SpheronApi;
 
   constructor(spheronApi: SpheronApi) {

@@ -1,16 +1,17 @@
 import * as fs from "fs";
-import Spinner from "../outputs/spinner";
-import SpheronApiService from "../services/spheron-api";
+import Spinner from "../../outputs/spinner";
+import SpheronApiService from "../../services/spheron-api";
 import {
   createLog,
   generateFilePath,
   generateFilesString,
   generateTestCaseFileName,
   generateTestCasesFilesString,
-} from "../utils";
-import { fixBugForGPT } from "../prompts/prompts";
+} from "../../utils";
+import { fixBugForGPT } from "../../prompts/prompts";
 
-export enum CommandEnum {
+export enum GptCommandEnum {
+  GENERATE = "generate",
   UPDATE = "update",
   FINDBUGS = "findbugs",
   IMPROVE = "improve",
@@ -18,7 +19,7 @@ export enum CommandEnum {
   TEST = "ctc",
 }
 
-export enum FixBugEnum {
+export enum YesNoEnum {
   YES = "Yes",
   NO = "No",
 }
@@ -166,7 +167,7 @@ export async function findBugsInCode(filepath: any) {
 
     const fixBug = await fixBugForGPT();
 
-    if (fixBug.fix === FixBugEnum.YES) {
+    if (fixBug.fix === YesNoEnum.YES) {
       const spinnerFixMessage = "Fixing bugs in your code ⚔️  ...";
       const startTime = Date.now();
       const gptResponse: any = await SpheronApiService.generateCode(

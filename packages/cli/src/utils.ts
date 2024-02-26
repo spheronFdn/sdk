@@ -1,6 +1,6 @@
 import fs from "fs";
 import * as path from "path";
-import { IFiles } from "./commands/gpt";
+import { IFiles } from "./commands/gpt/gpt";
 
 export async function fileExists(path: string): Promise<boolean> {
   try {

@@ -7,7 +7,7 @@
 - All the code is in the `./src/encrypt.js` file. To encrypt the data, run `npm run encrypt <filePath> <bucketName> <spheronToken> <walletPrivateKey>`. Replace the values with yours.
   - `filePath` the path to the file you want to encrypt
   - `bucketName` the bucket name to which you want to upload data.
-  - `spheronToken` your Spheron API token. Make sure to use a token for the web-app organization.
+  - `spheronToken` your Spheron API token. Make sure to use a token for the storage organization.
   - `walletPrivateKey` your wallet private key.
 - In the console you will get the upload response.
 
@@ -17,6 +17,6 @@
   Replace the values with yours.
   - `filePath` the path to the file that should be created with the decrypted data.
   - `cid` the cid of the encrypted data.
-  - `spheronToken` your Spheron API token. Make sure to use a token for the web-app organization.
+  - `spheronToken` your Spheron API token. Make sure to use a token for the storage organization.
   - `walletPrivateKey` your wallet private key.
 - The decrypted data will be in the file path.

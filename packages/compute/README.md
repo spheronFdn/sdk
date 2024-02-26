@@ -51,6 +51,7 @@ await client.instance.create(
       path: healthCheckPath,
       port: healthCheckPort,
     },
+    type: ComputeTypeEnum.DEMAND,
   }
 );
 ```

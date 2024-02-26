@@ -27,6 +27,7 @@ export async function createConfiguration() {
       [],
       configuration.projectTrackingFilePath
     );
+
     await fs.promises.chmod(configuration.projectTrackingFilePath, 0o777);
   } catch (error) {
     console.log(`✖️  Error: ${error.message}`);

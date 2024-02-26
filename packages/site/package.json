@@ -1,6 +1,6 @@
 {
   "name": "@spheron/site",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Typescript library for working with Spheron Web-App Organizations.",
   "keywords": [
     "Storage",
@@ -35,8 +35,7 @@
     "dist/"
   ],
   "dependencies": {
-    "@spheron/core": "1.0.9",
-    "async-lock": "^1.4.0"
+    "@spheron/core": "2.0.1"
   },
   "license": "Apache-2.0",
   "repository": {
