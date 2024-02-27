@@ -419,6 +419,8 @@ export async function commandHandler(options: any) {
                   return {
                     containerPort: x.containerPort,
                     exposedPort: x.exposedPort,
+                    exposedTo: x.defaultExposeTo,
+                    global: x.global != undefined ? x.global : true,
                   };
                 });
                 const cliPersistentStorage = serviceData.customTemplateSpecs
@@ -482,7 +484,7 @@ export async function commandHandler(options: any) {
         }
 
         await computeInit({
-          projectName: "my_first_project",
+          projectName: "MySpheronProject",
           services: services,
           region: region,
           type: CliComputeInstanceType.ON_DEMAND,

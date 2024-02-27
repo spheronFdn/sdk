@@ -451,6 +451,8 @@ interface MarketplaceAppVariable {
 interface MarketplaceAppPort {
   containerPort: number;
   exposedPort: number;
+  defaultExposeTo?: Array<string>;
+  global?: boolean;
 }
 
 interface ComputeDeployment {
