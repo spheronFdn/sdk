@@ -108,6 +108,9 @@ export interface Service {
   ports?: string[];
   depends_on?: string[];
   networks?: string[];
+  env_file?: string | string[];
+  entrypoint?: string | string[];
+  deploy?: { replicas?: number };
   // Add more service-specific properties as needed
 }
 

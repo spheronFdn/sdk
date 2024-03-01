@@ -8,8 +8,6 @@ import {
   ComputeDeployment,
   InstanceStateEnum,
   MarketplaceApp,
-  MarketplaceAppPort,
-  MarketplaceAppVariable,
   MarketplaceCategoryEnum,
   PersistentStorage,
   Port,
@@ -647,34 +645,25 @@ export const ResourceFetcher = {
     const spinner = new Spinner();
     try {
       spinner.spin("Fetching");
-      let templates: MarketplaceApp[] =
-        await SpheronApiService.getMarketplaceApps();
-      if (category) {
-        if (
-          !Object.values(MarketplaceCategoryEnum).find((x) => x == category)
-        ) {
-          throw new Error("Specified category does not exist");
-        }
-        templates = templates.filter((x) => x.metadata.category == category);
-      }
-      const templateDtos: ComputeTemplateDto[] = templates.map((x) => {
-        return toComputeTemplateDTO(x);
-      });
+      const marketplaceApps: MarketplaceApp[] =
+        await SpheronApiService.getMarketplaceApps(category);
 
       console.log(
         "\nExplore our diverse range of marketplace apps, tailored for seamless deployment on Spheron 🚀\n\n"
       );
 
       const headers: string[] = ["APP ID", "NAME", "CATEGORY", "IMAGE", "DOCS"];
-      const tableRows: string[][] = templateDtos.map((dto) => {
-        return [
-          dto._id,
-          dto.name,
-          dto.metadata.category,
-          dto.serviceData.image,
-          dto.metadata.docsLink,
-        ];
-      });
+      const tableRows: string[][] = marketplaceApps.map(
+        (app: MarketplaceApp) => {
+          return [
+            app._id,
+            app.name,
+            app.metadata.category,
+            app.services.map((s) => s.dockerImage).join(", "),
+            app.metadata.docsLink,
+          ];
+        }
+      );
 
       printTableInFormat(tableRows, headers);
 
@@ -691,7 +680,7 @@ export const ResourceFetcher = {
 
       spinner.success(``);
     } catch (error) {
-      console.log(`✖️  Error while fetching compute templates`);
+      console.log(`✖️  Error while fetching marketplace apps.`);
       throw error;
     } finally {
       spinner.stop();
@@ -794,25 +783,6 @@ interface SuperComputeInstanceDTO {
   alreadySpent?: number;
   createdAt: Date;
   updatedAt: Date;
-}
-
-interface ComputeTemplateDto {
-  _id: string;
-  name: string;
-  metadata: {
-    description: string;
-    docsLink: string;
-    category: string;
-  };
-  serviceData: {
-    defaultPlan: string;
-    image: string;
-    tag: string;
-    variables: MarketplaceAppVariable[];
-    ports: MarketplaceAppPort[];
-    commands: string[];
-    args: string[];
-  };
 }
 
 const toOrganizationDTO = function (
@@ -956,30 +926,6 @@ const toSuperComputeInstanceDTO = function (
   return dto;
 };
 
-const toComputeTemplateDTO = function (
-  app: MarketplaceApp
-): ComputeTemplateDto {
-  const template: ComputeTemplateDto = {
-    _id: app._id,
-    name: app.name,
-    metadata: {
-      description: app.metadata.description,
-      docsLink: app.metadata.docsLink,
-      category: app.metadata.category,
-    },
-    serviceData: {
-      defaultPlan: app.serviceData.defaultAkashMachineImageId,
-      image: app.serviceData.dockerImage,
-      tag: app.serviceData.dockerImageTag,
-      variables: app.serviceData.variables,
-      ports: app.serviceData.ports,
-      commands: app.serviceData.commands,
-      args: app.serviceData.args,
-    },
-  };
-  return template;
-};
-
 const toSpheronComputeConfiguration = async function (
   instance: Instance,
   deployment: ComputeDeployment
@@ -1067,7 +1013,10 @@ function printTableInFormat(data: string[][], columnHeaders: string[]): void {
   const columnWidths: number[] = columnHeaders.map((header) => header.length);
   data.forEach((row) => {
     row.forEach((item, index) => {
-      columnWidths[index] = Math.max(columnWidths[index], item.length);
+      columnWidths[index] = Math.max(
+        columnWidths[index],
+        item?.length ? item.length : 1
+      );
     });
   });
 

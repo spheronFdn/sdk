@@ -1,5 +1,6 @@
 import path from "path";
 
+import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as yaml from "js-yaml";
 
@@ -90,6 +91,27 @@ function convertToSpheronConfig(
   dockerCompose: DockerCompose
 ): Array<SpheronComputeServiceConfiguration> | null {
   try {
+    const privateNetworks: Map<string, Set<string>> = new Map<
+      string,
+      Set<string>
+    >();
+
+    Object.entries(dockerCompose.services).forEach(([serviceName, service]) => {
+      if (service.networks) {
+        Object.keys(service.networks).forEach((networkName) => {
+          if (dockerCompose.networks && dockerCompose.networks[networkName]) {
+            if (privateNetworks.has(networkName)) {
+              privateNetworks.get(networkName)?.add(serviceName);
+            } else {
+              const set = new Set<string>();
+              set.add(serviceName);
+              privateNetworks.set(networkName, set);
+            }
+          }
+        });
+      }
+    });
+
     const services = Object.entries(dockerCompose.services).map(
       ([name, service]) => {
         const [image, tag] = service.image
@@ -111,19 +133,37 @@ function convertToSpheronConfig(
           };
         }
 
+        let envFromFile: CliComputeEnv[] = [];
+        if (service.env_file) {
+          envFromFile = loadEnvFiles(service.env_file);
+        }
+        const envVariables: CliComputeEnv[] = [
+          ...envFromFile,
+          ...mapEnvironmentVariables(service.environment || []),
+        ];
+
+        let command =
+          typeof service.entrypoint === "string"
+            ? [service.entrypoint]
+            : service.entrypoint || [];
+        command = command.concat(
+          typeof service.command === "string"
+            ? [service.command]
+            : service.command || []
+        );
+
         const serviceConfig: SpheronComputeServiceConfiguration = {
-          name,
+          name: name.toLocaleLowerCase().replace(/ /g, "-").replace(/_/g, "-"),
           image: image,
           tag: tag != "" ? tag : "latest",
-          count: 1,
-          ports: service.ports ? service.ports.map(mapDockerPort) : [],
-          env: service.environment
-            ? mapEnvironmentVariables(service.environment)
-            : [],
-          commands:
-            typeof service.command === "string"
-              ? [service.command]
-              : service.command || [],
+          count: service.deploy?.replicas ? service.deploy.replicas : 1,
+          ports: service.ports
+            ? service.ports.map((port) =>
+                mapDockerPort(port, service.networks, privateNetworks)
+              )
+            : [{ exposedPort: 3333, containerPort: 3333, global: true }],
+          env: envVariables,
+          commands: command,
           args: [],
           plan: "Ventus Nano 1",
           customParams: customParams,
@@ -144,9 +184,55 @@ function convertToSpheronConfig(
   }
 }
 
-function mapDockerPort(port: string): Port {
+function loadEnvFiles(envFiles: string | string[]): CliComputeEnv[] {
+  let envVariables: CliComputeEnv[] = [];
+  if (!Array.isArray(envFiles)) {
+    envFiles = [envFiles];
+  }
+
+  envFiles.forEach((filePath) => {
+    if (fs.existsSync(filePath)) {
+      const envConfig: { [key: string]: string } = dotenv.parse(
+        fs.readFileSync(filePath)
+      );
+      envVariables = envVariables.concat(
+        Object.entries(envConfig).map(([name, value]) => ({
+          name,
+          value,
+          hidden: false,
+        }))
+      );
+    } else {
+      console.warn(`Warning: .env file not found at ${filePath}`);
+    }
+  });
+
+  return envVariables;
+}
+
+function mapDockerPort(
+  port: string,
+  serviceNetworks?: Array<string>,
+  privateNetworks?: Map<string, Set<string>>
+): Port {
   const [exposedPort, containerPort] = port.split(":").map(Number);
-  return { exposedPort, containerPort };
+
+  if (serviceNetworks && privateNetworks) {
+    return {
+      exposedPort,
+      containerPort,
+      global: false,
+      exposeTo: serviceNetworks.flatMap((serviceNetwork) => {
+        const set = privateNetworks.get(serviceNetwork);
+        if (set) {
+          return Array.from(set);
+        }
+        return [];
+      }),
+    };
+  }
+
+  return { exposedPort, containerPort, global: true };
 }
 
 function mapEnvironmentVariables(

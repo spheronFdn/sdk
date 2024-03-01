@@ -77,14 +77,17 @@ import { GlobalCommandEnum } from "./commands/interfaces";
       (yargs: any) => {
         yargs
           .option("import", {
-            describe: "Set relative path to docker compose or dockerfile.",
+            describe: "Set relative path to docker compose file.",
+          })
+          .option("dockerFile", {
+            describe: "Set relative path to dockerfile.",
           })
           .option("marketplace", {
             describe: "Set marketplace app ID.",
           })
           .version(false)
           .usage(
-            `Usage: $0 init [--import <DOCKER COMPOSE PATH / DOCKERFILE PATH>] [--marketplace <APP ID>]`
+            `Usage: $0 init [--import <DOCKER COMPOSE PATH>] [--dockerFile <DOCKERFILE PATH>] [--marketplace <APP ID>]`
           )
           .wrap(yargs.terminalWidth() * 0.8)
           .help();
@@ -92,7 +95,7 @@ import { GlobalCommandEnum } from "./commands/interfaces";
     )
     .command(
       ComputeCommandEnum.DEPLOY,
-      "Deploy your project — Uses the spheron.yaml file to launch your instance.",
+      "Deploy your instance — Uses the spheron.yaml file to launch your instance.",
       (yargs: any) => {
         yargs
           .option("config", {

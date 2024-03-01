@@ -2,24 +2,12 @@ import { changeDefaultOrganization } from "./commands/switch-organization";
 import { createConfiguration } from "./commands/create-configuration";
 import { createOrganization } from "./commands/create-organization";
 import { ResourceFetcher } from "./commands/get-resources";
-// import {
-//   GptCommandEnum,
-//   createTestCases,
-//   findBugsInCode,
-//   improveCode,
-//   transpileCode,
-//   updateCode,
-// } from "./commands/gpt/gpt";
 import { login } from "./commands/login";
 import { logout } from "./commands/logout";
 import configuration from "./configuration";
 import {
-  // filePathForGPT,
-  // languageForGPT,
-  // languageForGPTTest,
   promptForSwitchOrganization,
   promptForCreateOrganization,
-  // promptForGPT,
   promptForLogin,
   closeInstancePrompt,
 } from "./prompts/prompts";
@@ -44,8 +32,6 @@ import {
   readDockerfile,
 } from "./commands/compute/init";
 import { computeDeploy } from "./commands/compute/publish";
-// import { validate } from "./commands/compute/validate";
-// import { executeShell } from "./commands/compute/execute-shell";
 import { computeUpdate } from "./commands/compute/update-instance";
 import { build } from "./commands/compute/build";
 import { close } from "./commands/compute/close";
@@ -56,7 +42,7 @@ export async function commandHandler(options: any) {
     await createConfiguration();
   }
   if (options._[0] === "login") {
-    const validOptions = ["github", "gitlab", "bitbucket","token"];
+    const validOptions = ["github", "gitlab", "bitbucket", "token"];
     const unknownOptions = Object.keys(options).filter(
       (option) =>
         option !== "_" && option !== "$0" && !validOptions.includes(option)
@@ -72,8 +58,8 @@ export async function commandHandler(options: any) {
         await login("gitlab");
       } else if (options.bitbucket) {
         await login("bitbucket");
-      } else if(options.token){
-        await login("token", options.token)
+      } else if (options.token) {
+        await login("token", options.token);
       } else {
         const { provider } = await promptForLogin();
         await login(provider.toLowerCase());
@@ -86,192 +72,6 @@ export async function commandHandler(options: any) {
       await logout();
     })();
   }
-
-  // if (options._[0] === "gpt" && options._[1] === GptCommandEnum.UPDATE) {
-  //   const validOptions = ["prompt", "filepath"];
-  //   const unknownOptions = Object.keys(options).filter(
-  //     (option) =>
-  //       option !== "_" && option !== "$0" && !validOptions.includes(option)
-  //   );
-  //   if (unknownOptions.length > 0) {
-  //     console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
-  //     process.exit(1);
-  //   }
-  //   const isWhitelisted = await SpheronApiService.isGptWhitelisted();
-  //   // check if the user is whitelisted
-  //   if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
-  //     console.log(isWhitelisted?.message);
-  //     process.exit(1);
-  //   }
-  //   (async () => {
-  //     try {
-  //       let gptPrompt;
-  //       if (options.prompt) {
-  //         gptPrompt = options.prompt;
-  //       } else {
-  //         const prompt = await promptForGPT();
-  //         gptPrompt = prompt.gpt;
-  //       }
-  //       let filePath;
-  //       if (options.filepath) {
-  //         filePath = options.filepath;
-  //       } else {
-  //         const path = await filePathForGPT();
-  //         filePath = path.inputpath;
-  //       }
-  //       await updateCode(gptPrompt, filePath);
-  //     } catch (error) {
-  //       console.log(error.message);
-  //       process.exit(1);
-  //     }
-  //   })();
-  // }
-
-  // if (options._[0] === "gpt" && options._[1] === GptCommandEnum.FINDBUGS) {
-  //   const validOptions = ["filepath"];
-  //   const unknownOptions = Object.keys(options).filter(
-  //     (option) =>
-  //       option !== "_" && option !== "$0" && !validOptions.includes(option)
-  //   );
-  //   if (unknownOptions.length > 0) {
-  //     console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
-  //     process.exit(1);
-  //   }
-  //   const isWhitelisted = await SpheronApiService.isGptWhitelisted();
-  //   // check if the user is whitelisted
-  //   if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
-  //     console.log(isWhitelisted?.message);
-  //     process.exit(1);
-  //   }
-  //   (async () => {
-  //     try {
-  //       let filePath;
-  //       if (options.filepath) {
-  //         filePath = options.filepath;
-  //       } else {
-  //         const path = await filePathForGPT();
-  //         filePath = path.inputpath;
-  //       }
-  //       await findBugsInCode(filePath);
-  //     } catch (error) {
-  //       console.log(error.message);
-  //       process.exit(1);
-  //     }
-  //   })();
-  // }
-
-  // if (options._[0] === "gpt" && options._[1] === GptCommandEnum.IMPROVE) {
-  //   const validOptions = ["filepath"];
-  //   const unknownOptions = Object.keys(options).filter(
-  //     (option) =>
-  //       option !== "_" && option !== "$0" && !validOptions.includes(option)
-  //   );
-  //   if (unknownOptions.length > 0) {
-  //     console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
-  //     process.exit(1);
-  //   }
-  //   const isWhitelisted = await SpheronApiService.isGptWhitelisted();
-  //   // check if the user is whitelisted
-  //   if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
-  //     console.log(isWhitelisted?.message);
-  //     process.exit(1);
-  //   }
-  //   (async () => {
-  //     try {
-  //       let filePath;
-  //       if (options.filepath) {
-  //         filePath = options.filepath;
-  //       } else {
-  //         const path = await filePathForGPT();
-  //         filePath = path.inputpath;
-  //       }
-  //       await improveCode(filePath);
-  //     } catch (error) {
-  //       console.log(error.message);
-  //       process.exit(1);
-  //     }
-  //   })();
-  // }
-
-  // if (options._[0] === "gpt" && options._[1] === GptCommandEnum.TRANSPILE) {
-  //   const validOptions = ["filepath", "language"];
-  //   const unknownOptions = Object.keys(options).filter(
-  //     (option) =>
-  //       option !== "_" && option !== "$0" && !validOptions.includes(option)
-  //   );
-  //   if (unknownOptions.length > 0) {
-  //     console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
-  //     process.exit(1);
-  //   }
-  //   const isWhitelisted = await SpheronApiService.isGptWhitelisted();
-  //   // check if the user is whitelisted
-  //   if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
-  //     console.log(isWhitelisted?.message);
-  //     process.exit(1);
-  //   }
-  //   (async () => {
-  //     try {
-  //       let progLanguage;
-  //       if (options.language) {
-  //         progLanguage = options.language;
-  //       } else {
-  //         const lang = await languageForGPT();
-  //         progLanguage = lang.lang;
-  //       }
-  //       let filePath;
-  //       if (options.filepath) {
-  //         filePath = options.filepath;
-  //       } else {
-  //         const path = await filePathForGPT();
-  //         filePath = path.inputpath;
-  //       }
-  //       await transpileCode(progLanguage, filePath);
-  //     } catch (error) {
-  //       console.log(error.message);
-  //       process.exit(1);
-  //     }
-  //   })();
-  // }
-
-  // if (options._[0] === "gpt" && options._[1] === GptCommandEnum.TEST) {
-  //   const validOptions = ["filepath"];
-  //   const unknownOptions = Object.keys(options).filter(
-  //     (option) =>
-  //       option !== "_" && option !== "$0" && !validOptions.includes(option)
-  //   );
-  //   if (unknownOptions.length > 0) {
-  //     console.log(`Unrecognized options: ${unknownOptions.join(", ")}`);
-  //     process.exit(1);
-  //   }
-  //   const isWhitelisted = await SpheronApiService.isGptWhitelisted();
-  //   // check if the user is whitelisted
-  //   if (!isWhitelisted?.whitelisted && isWhitelisted?.error) {
-  //     console.log(isWhitelisted?.message);
-  //     process.exit(1);
-  //   }
-  //   (async () => {
-  //     try {
-  //       let progLanguage;
-  //       if (options.language) {
-  //         progLanguage = options.language;
-  //       } else {
-  //         const lang = await languageForGPTTest();
-  //         progLanguage = lang.testlang;
-  //       }
-  //       let filePath;
-  //       if (options.filepath) {
-  //         filePath = options.filepath;
-  //       } else {
-  //         const path = await filePathForGPT();
-  //         filePath = path.inputpath;
-  //       }
-  //       await createTestCases(progLanguage, filePath);
-  //     } catch (error) {
-  //       console.log(error.message);
-  //       process.exit(1);
-  //     }
-  //   })();
-  // }
 
   if (options._[0] === ComputeCommandEnum.CREATE_ORGANIZATION) {
     const validOptions = ["name", "username"];
@@ -397,60 +197,64 @@ export async function commandHandler(options: any) {
 
           await Promise.all(
             templateIds.map(async (id: string) => {
-              const template: MarketplaceApp =
+              const marketplaceApp: MarketplaceApp =
                 await SpheronApiService.getMarketplaceApp(id);
-              if (!template) {
+              if (!marketplaceApp) {
                 throw new Error("Specified template does not exist");
               }
 
               const plans = await SpheronApiService.getComputePlans();
-              const defaultPlan = plans.find(
-                (x) => x._id == template.serviceData.defaultAkashMachineImageId
-              );
-              const configEnvs = template.serviceData.variables.map((x) => {
-                return {
-                  name: x.name,
-                  value: `${x.defaultValue}`,
-                  hidden: x.hidden ? x.hidden : false,
-                };
-              });
-              const configPorts = template.serviceData.ports.map((x) => {
-                return {
-                  containerPort: x.containerPort,
-                  exposedPort: x.exposedPort,
-                };
-              });
-              const cliPersistentStorage = template.serviceData
-                .customTemplateSpecs?.persistentStorage?.class
-                ? {
-                    size: template.serviceData.customTemplateSpecs
-                      .persistentStorage.size,
-                    class: toCliPersistentStorage(
-                      template.serviceData.customTemplateSpecs.persistentStorage
-                        .class
-                    ),
-                    mountPoint:
-                      template.serviceData.customTemplateSpecs.persistentStorage
-                        .mountPoint,
-                  }
-                : undefined;
-              services.push({
-                name: template.name.toLocaleLowerCase().replace(" ", "_"),
-                templateId: template._id,
-                templateName: template.name,
-                image: template.serviceData.dockerImage,
-                tag: template.serviceData.dockerImageTag,
-                count: 1,
-                ports: configPorts,
-                env: configEnvs,
-                commands: template.serviceData.commands,
-                args: template.serviceData.args,
-                plan: defaultPlan ? defaultPlan.name : "Ventus Nano 1",
-                customParams: {
-                  storage:
-                    template.serviceData.customTemplateSpecs?.storage ?? "10Gi",
-                  persistentStorage: cliPersistentStorage,
-                },
+              marketplaceApp.services.forEach((serviceData) => {
+                const defaultPlan = plans.find(
+                  (x) => x._id == serviceData.defaultAkashMachineImageId
+                );
+                const configEnvs = serviceData.variables.map((x) => {
+                  return {
+                    name: x.name,
+                    value: `${x.defaultValue}`,
+                    hidden: x.hidden ? x.hidden : false,
+                  };
+                });
+                const configPorts = serviceData.ports.map((x) => {
+                  return {
+                    containerPort: x.containerPort,
+                    exposedPort: x.exposedPort,
+                    exposeTo: x.defaultExposeTo,
+                    global: x.global != undefined ? x.global : true,
+                  };
+                });
+                const cliPersistentStorage = serviceData.customTemplateSpecs
+                  ?.persistentStorage?.class
+                  ? {
+                      size: serviceData.customTemplateSpecs.persistentStorage
+                        .size,
+                      class: toCliPersistentStorage(
+                        serviceData.customTemplateSpecs.persistentStorage.class
+                      ),
+                      mountPoint:
+                        serviceData.customTemplateSpecs.persistentStorage
+                          .mountPoint,
+                    }
+                  : undefined;
+                services.push({
+                  name: serviceData.metadata.name
+                    .toLocaleLowerCase()
+                    .replace(/ /g, "-"),
+                  templateId: serviceData._id,
+                  templateName: serviceData.metadata.name,
+                  image: serviceData.dockerImage,
+                  tag: serviceData.dockerImageTag,
+                  count: 1,
+                  ports: configPorts,
+                  env: configEnvs,
+                  commands: serviceData.commands,
+                  args: serviceData.args,
+                  plan: defaultPlan ? defaultPlan.name : "Ventus Nano 1",
+                  customParams: {
+                    storage: serviceData.customTemplateSpecs?.storage ?? "20Gi",
+                    persistentStorage: cliPersistentStorage,
+                  },
+                });
               });
             })
           );
@@ -480,7 +284,7 @@ export async function commandHandler(options: any) {
         }
 
         await computeInit({
-          projectName: "my_first_project",
+          projectName: "MySpheronProject",
           services: services,
           region: region,
           type: CliComputeInstanceType.ON_DEMAND,

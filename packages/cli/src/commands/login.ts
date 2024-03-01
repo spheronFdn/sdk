@@ -3,7 +3,12 @@ import open from "open";
 import { writeToJsonFile } from "../utils";
 import configuration from "../configuration";
 import Spinner from "../outputs/spinner";
-import { AppTypeEnum, MasterOrganization, User, VerifiedTokenResponse } from "@spheron/core";
+import {
+  AppTypeEnum,
+  MasterOrganization,
+  User,
+  VerifiedTokenResponse,
+} from "@spheron/core";
 import SpheronApiService from "../services/spheron-api";
 import { changeDefaultOrganization } from "./switch-organization";
 
@@ -11,12 +16,8 @@ let server: http.Server;
 
 export async function login(provider: string, value?: string): Promise<void> {
   const spinner = new Spinner();
-  if(provider == "token"){
-    await writeToJsonFile(
-      "jwtToken",
-      value,
-      configuration.configFilePath
-    );
+  if (provider == "token") {
+    await writeToJsonFile("jwtToken", value, configuration.configFilePath);
     const user: User = await SpheronApiService.getProfile();
     const scope = await SpheronApiService.getTokenScope();
 

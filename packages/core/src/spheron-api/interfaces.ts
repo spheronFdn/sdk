@@ -397,14 +397,15 @@ interface Port {
   containerPort: number;
   exposedPort: number;
   global?: boolean;
-  exposeTo?: string;
+  exposeTo?: Array<string>;
 }
 
 interface MarketplaceApp {
   _id: string;
   name: string;
   metadata: MarketplaceAppMetadata;
-  serviceData: MarketplaceAppServiceData;
+  services: Array<MarketplaceAppService>;
+  priority?: number;
 }
 
 interface MarketplaceAppMetadata {
@@ -417,7 +418,9 @@ interface MarketplaceAppMetadata {
   usage: number;
 }
 
-interface MarketplaceAppServiceData {
+interface MarketplaceAppService {
+  _id: string;
+  metadata: { icon: string; name: string };
   defaultAkashMachineImageId: string;
   dockerImage: string;
   dockerImageTag: string;
@@ -448,6 +451,8 @@ interface MarketplaceAppVariable {
 interface MarketplaceAppPort {
   containerPort: number;
   exposedPort: number;
+  defaultExposeTo?: Array<string>;
+  global?: boolean;
 }
 
 interface ComputeDeployment {
@@ -714,7 +719,6 @@ export {
   MarketplaceApp,
   ComputeMachine,
   MarketplaceAppMetadata,
-  MarketplaceAppServiceData,
   MarketplaceAppPort,
   MarketplaceAppVariable,
   HealthCheck,

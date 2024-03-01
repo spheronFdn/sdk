@@ -109,6 +109,7 @@ enum MarketplaceCategoryEnum {
   DATABASE = "Database",
   NODE = "Node",
   TOOLS = "Tools",
+  AI = "AI",
 }
 
 enum InstanceLogType {
