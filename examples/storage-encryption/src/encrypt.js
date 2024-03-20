@@ -2,7 +2,7 @@ const { signAuthMessage } = require("./utils");
 const LitJsSdk = require("@lit-protocol/lit-node-client");
 const { SpheronClient } = require("@spheron/storage");
 
-const chain = "mumbai";
+const chain = "ethereum";
 
 const accessControlConditions = [
   {

@@ -20,12 +20,7 @@ import { createPayloads } from "./fs-payload-creator";
 import { ipfs } from "./ipfs.utils";
 import { IpnsRecord, UsageWithLimits } from "./bucket-manager/interfaces";
 import { DecryptFromIpfsProps, EncryptToIpfsProps } from "./interface";
-import {
-  uint8arrayFromString,
-  encryptData,
-  uint8arrayToString,
-  decryptData,
-} from "@spheron/encryption";
+import { uint8arrayToString } from "@spheron/encryption";
 import { readFileContent } from "./utils";
 import FormData from "form-data";
 import {
@@ -155,7 +150,7 @@ export class SpheronClient extends ScopeExtractor {
     filePath,
     litNodeClient,
     configuration,
-  }: any): Promise<UploadResult> {
+  }: EncryptToIpfsProps): Promise<UploadResult> {
     await this.validateStorageOrganizationType();
 
     if (!string && !filePath) {
@@ -283,7 +278,7 @@ export class SpheronClient extends ScopeExtractor {
     sessionSigs,
     ipfsCid,
     litNodeClient,
-  }: any): Promise<any> {
+  }: DecryptFromIpfsProps): Promise<Uint8Array | string> {
     await this.validateStorageOrganizationType();
 
     const metadataUrl = `https://${ipfsCid}.ipfs.sphn.link/data.json`;
