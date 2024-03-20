@@ -9,10 +9,10 @@
   "keywords": [],
   "author": "Spheron Team",
   "dependencies": {
-    "@lit-protocol/lit-node-client": "^2.2.23",
-    "ethers": "^6.5.1",
-    "siwe": "^2.1.4",
-    "@spheron/storage": "2.0.0"
+    "@lit-protocol/lit-node-client": "3.1.4",
+    "@spheron/storage": "^2.0.4",
+    "ethers": "^6.11.1",
+    "siwe": "^2.1.4"
   },
   "license": "Apache-2.0",
   "repository": {
