@@ -18,7 +18,11 @@ import {
 } from "@spheron/core";
 import { createPayloads } from "./fs-payload-creator";
 import { ipfs } from "./ipfs.utils";
-import { IpnsRecord, UsageWithLimits } from "./bucket-manager/interfaces";
+import {
+  BucketWithDomains,
+  IpnsRecord,
+  UsageWithLimits,
+} from "./bucket-manager/interfaces";
 import { DecryptFromIpfsProps, EncryptToIpfsProps } from "./interface";
 import {
   uint8arrayFromString,
@@ -364,6 +368,23 @@ export class SpheronClient extends ScopeExtractor {
     await this.validateStorageOrganizationType();
 
     return await this.bucketManager.getOrganizationBuckets(
+      organizationId,
+      options
+    );
+  }
+
+  async getOrganizationBucketsWithDomains(
+    organizationId: string,
+    options: {
+      name?: string;
+      state?: BucketStateEnum;
+      skip: number;
+      limit: number;
+    }
+  ): Promise<BucketWithDomains[]> {
+    await this.validateStorageOrganizationType();
+
+    return await this.bucketManager.getOrganizationBucketsWithDomains(
       organizationId,
       options
     );
