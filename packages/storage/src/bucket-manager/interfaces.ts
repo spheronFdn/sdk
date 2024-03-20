@@ -31,10 +31,10 @@ interface Bucket {
   state: BucketStateEnum;
 }
 
-// interface BucketWithDomains {
-//   bucket: Bucket;
-//   domains: Domain[];
-// }
+interface BucketWithDomains {
+  bucket: Bucket;
+  domains: Domain[];
+}
 
 interface Upload {
   id: string;
@@ -81,6 +81,7 @@ interface UsageWithLimits {
 
 export {
   Bucket,
+  BucketWithDomains,
   Domain,
   Upload,
   BucketStateEnum,
