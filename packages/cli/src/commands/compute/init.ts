@@ -165,7 +165,7 @@ function convertToSpheronConfig(
           env: envVariables,
           commands: command,
           args: [],
-          plan: "Ventus Nano 1",
+          plan: "Ventus Nano",
           customParams: customParams,
         };
 
