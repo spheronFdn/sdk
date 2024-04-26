@@ -22,7 +22,7 @@
 
 <a  href="https://www.npmjs.com/package/@spheron/storage"  target="_blank"  rel="noreferrer">
 
-<img  src="https://img.shields.io/static/v1?label=npm&message=v2.0.2&color=green"  />
+<img  src="https://img.shields.io/static/v1?label=npm&message=v2.0.3&color=green"  />
 
 </a>
 
