@@ -1,3 +1,5 @@
+### Note: This SDK has been deprecated and is no longer actively maintained. Please be aware that none of its functionalities will work, as the supporting infrastructure has been discontinued.
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://github.com/spheronFdn/sdk/blob/main/.github/assets/spheron-logo-dark.svg">
